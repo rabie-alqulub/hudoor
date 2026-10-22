@@ -9,48 +9,68 @@
 <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js"></script>
 <style>
   :root{
-    --green:#1F5E3B; --green2:#2E7D4F; --light:#E8F3EC; --gold:#B8893B;
-    --bg:#F6F8F6; --card:#FFFFFF; --text:#1C2420; --muted:#5F6B64; --red:#B3261E; --line:#DCE3DE;
+    --navy:#3B5F78; --navy2:#2C4A60; --navy3:#1F3546; --gold:#D08E2C; --gold2:#B87A1F;
+    --light:#EAF0F4; --goldlight:#FBF1E1;
+    --bg:#F5F3EE; --card:#FFFFFF; --text:#1E2A33; --muted:#66727C; --red:#B3261E; --line:#E2DDD3;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#101513; --card:#18201C; --text:#E8EEEA; --muted:#9AA8A0; --light:#1E2B24; --line:#2A352F; }
+    :root{ --bg:#0F161C; --card:#18222B; --text:#E9EEF2; --muted:#9DABB6; --light:#1F2D38; --goldlight:#2E2618; --line:#2A3743; }
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:Tajawal,system-ui,sans-serif;min-height:100vh}
-  header{background:var(--green);color:#fff;padding:18px 16px 22px;text-align:center}
-  header h1{margin:0;font-size:20px;font-weight:700}
-  header p{margin:4px 0 0;font-size:13px;opacity:.85}
-  main{max-width:460px;margin:-12px auto 0;padding:0 16px 32px}
-  .card{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:14px}
-  h2{font-size:18px;margin:0 0 12px}
+  header{background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;padding:20px 16px 46px;text-align:center;border-bottom:4px solid var(--gold)}
+  .logo{width:84px;height:84px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);border:3px solid var(--gold);margin-bottom:10px}
+  .logo{overflow:hidden}
+  .logo img{height:58px;width:auto}
+  .clock span{display:inline-block}
+  header h1{margin:0;font-size:21px;font-weight:700}
+  header p{margin:6px 0 0;font-size:13px;color:#F3D9AE}
+  main{max-width:460px;margin:-30px auto 0;padding:0 16px 32px}
+  .card{background:var(--card);border-radius:18px;padding:20px;box-shadow:0 4px 16px rgba(30,42,51,.08);margin-bottom:14px;border:1px solid var(--line)}
+  h2{font-size:18px;margin:0 0 12px;color:var(--navy)}
+  @media (prefers-color-scheme: dark){ h2{color:#E8B867} }
   label{display:block;font-size:14px;color:var(--muted);margin:12px 0 6px}
   input{width:100%;font:inherit;font-size:20px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);text-align:center;letter-spacing:2px}
+  input:focus{outline:2px solid var(--gold);border-color:var(--gold)}
   button{width:100%;font:inherit;font-size:17px;font-weight:700;padding:14px;border:0;border-radius:12px;cursor:pointer;margin-top:12px}
-  .primary{background:var(--green);color:#fff}
-  .secondary{background:var(--light);color:var(--green)}
+  .primary{background:var(--navy);color:#fff}
+  .secondary{background:var(--light);color:var(--navy)}
+  @media (prefers-color-scheme: dark){ .secondary{color:#E8B867} }
   .link{background:none;color:var(--muted);font-weight:500;font-size:14px;text-decoration:underline;padding:8px}
   .row{display:flex;gap:10px}
   .row button{flex:1}
-  .big{font-size:20px;padding:22px 10px}
-  .in{background:var(--green)} .out{background:var(--gold)}
+  .in{background:var(--navy);color:#fff} .out{background:var(--gold);color:#fff}
+  .punch{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .punch button{margin:0;padding:20px 8px;font-size:18px;display:flex;flex-direction:column;align-items:center;gap:8px;border-radius:16px;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+  .punch svg{width:34px;height:34px}
   button:disabled{opacity:.5}
   .msg{padding:12px 14px;border-radius:12px;font-size:15px;margin-top:12px;line-height:1.6}
-  .ok{background:#E3F4E8;color:#1B5E20} .err{background:#FCE8E6;color:var(--red)} .info{background:var(--light);color:var(--text)}
-  @media (prefers-color-scheme: dark){ .ok{background:#1B3A26;color:#A5D6A7} .err{background:#3A1F1D;color:#F2B8B5} }
+  .ok{background:#E3F2EA;color:#1B5E3A} .err{background:#FCE8E6;color:var(--red)} .info{background:var(--light);color:var(--text)}
+  @media (prefers-color-scheme: dark){ .ok{background:#183326;color:#A5D6B7} .err{background:#3A1F1D;color:#F2B8B5} }
   .cam{position:relative;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:3/4;margin-top:8px}
   .cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-  .oval{position:absolute;inset:12% 18%;border:3px dashed rgba(255,255,255,.7);border-radius:50%}
+  .oval{position:absolute;inset:12% 18%;border:3px dashed rgba(208,142,44,.85);border-radius:50%}
   .cam .hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:#fff;font-size:15px;text-shadow:0 1px 3px #000}
-  .clock{font-size:40px;font-weight:700;text-align:center;color:var(--green);margin:4px 0}
-  @media (prefers-color-scheme: dark){ .clock{color:#8FD0A6} }
-  .date{text-align:center;color:var(--muted);font-size:14px}
+  .emp{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px dashed var(--line)}
+  .avatar{flex:none;width:48px;height:48px;border-radius:50%;background:var(--goldlight);color:var(--gold2);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700}
+  .emp .who small{margin:0;font-size:13px}
+  .emp .who b{display:block;font-size:19px;line-height:1.3}
+  .timebox{background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;border-radius:16px;padding:16px 12px;text-align:center}
+  .clock{font-size:46px;font-weight:700;letter-spacing:1px;line-height:1.1;font-variant-numeric:tabular-nums}
+  .clock .sec{font-size:24px;color:#F3D9AE}
+  .clock .ampm{font-size:22px}
+  .date{font-size:16px;margin-top:6px;font-weight:500}
+  .gdate{font-size:14px;color:#F3D9AE;margin-top:2px}
   .hello{text-align:center;font-size:17px;margin-bottom:6px}
+  .tools{display:flex;gap:10px}
+  .tools button{flex:1;margin-top:0;background:var(--card);color:var(--muted);border:1px solid var(--line);font-size:14px;font-weight:500;padding:12px 8px}
   .hidden{display:none}
   small{color:var(--muted);display:block;margin-top:8px;line-height:1.6}
 </style>
 </head>
 <body>
 <header>
+  <div class="logo"><img src="logo.jpg" alt="شعار ربيع القلوب"></div>
   <h1>بصمة الحضور والانصراف</h1>
   <p id="orgName">مجمع ربيع القلوب لتحفيظ القرآن الكريم - جامع علي الشبلان</p>
 </header>
@@ -92,12 +112,18 @@
   <!-- 4) الشاشة الرئيسية -->
   <section id="vMain" class="hidden">
     <div class="card">
-      <p class="hello" id="mainName"></p>
-      <div class="clock" id="clock">--:--</div>
-      <div class="date" id="today"></div>
-      <div class="row">
-        <button class="primary big in" id="btnIn">تسجيل حضور</button>
-        <button class="primary big out" id="btnOut">تسجيل انصراف</button>
+      <div class="emp">
+        <div class="avatar" id="mainAvatar">؟</div>
+        <div class="who"><small>أهلاً وسهلاً</small><b id="mainName"></b><small id="mainId"></small></div>
+      </div>
+      <div class="timebox">
+        <div class="clock" dir="ltr"><span id="clock">--:--</span><span class="sec" id="clockSec"></span> <span class="ampm" id="clockAmPm"></span></div>
+        <div class="date" id="today"></div>
+        <div class="gdate" id="todayG"></div>
+      </div>
+      <div class="punch">
+        <button class="in" id="btnIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>تسجيل حضور</button>
+        <button class="out" id="btnOut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>تسجيل انصراف</button>
       </div>
       <div id="mainMsg"></div>
     </div>
@@ -118,8 +144,10 @@
       <button class="link" id="btnPinCancel">إلغاء</button>
     </div>
 
-    <button class="link" id="btnShowPin">تعذّرت بصمة الوجه؟ استخدم الرمز البديل</button>
-    <button class="link" data-logout>تغيير رقم الهوية</button>
+    <div class="tools">
+      <button id="btnShowPin">الرمز البديل</button>
+      <button data-logout>تغيير رقم الهوية</button>
+    </div>
   </section>
 
   <div id="loading" class="card"><div class="msg info">جاري التحميل...</div></div>
@@ -256,7 +284,8 @@ async function route(){
   } else if (st.status === 'قيد المراجعة'){
     $('pendingName').textContent = st.name; show('vPending');
   } else {
-    $('mainName').textContent = 'أهلاً ' + st.name; show('vMain');
+    $('mainName').textContent = st.name || ''; $('mainAvatar').textContent = (st.name || '؟').trim().charAt(0);
+    $('mainId').textContent = 'رقم الهوية: ' + empId.slice(0,2) + '••••••' + empId.slice(-2); show('vMain');
     if (st.otherDevice) msg('mainMsg', 'هذا الجوال غير مسجل لك. البصمة تعمل من جوالك المسجل فقط.', 'err');
     loadModels();
   }
@@ -353,11 +382,16 @@ $('btnPinCancel').onclick = () => $('pinCard').classList.add('hidden');
 
 /* ---------- الساعة ---------- */
 function tick(){
-  const now = new Date();
-  $('clock').textContent = now.toLocaleTimeString('ar-SA', { hour:'2-digit', minute:'2-digit', timeZone:'Asia/Riyadh' });
-  $('today').textContent = now.toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Asia/Riyadh' });
+  const now = new Date(), tz = { timeZone:'Asia/Riyadh' };
+  const parts = new Intl.DateTimeFormat('ar-SA', { ...tz, hour:'numeric', minute:'2-digit', second:'2-digit', hour12:true }).formatToParts(now);
+  const p = t => (parts.find(x => x.type === t) || {}).value || '';
+  $('clock').textContent = p('hour') + ':' + p('minute');
+  $('clockSec').textContent = ':' + p('second');
+  $('clockAmPm').textContent = p('dayPeriod');
+  $('today').textContent = now.toLocaleDateString('ar-SA', { ...tz, weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  $('todayG').textContent = now.toLocaleDateString('ar-SA-u-ca-gregory', { ...tz, day:'numeric', month:'long', year:'numeric' }) + ' م';
 }
-tick(); setInterval(tick, 15000);
+tick(); setInterval(tick, 1000);
 
 boot();
 </script>
