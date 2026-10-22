@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>بصمة الحضور - ربيع القلوب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js"></script>
+<style>
+  :root{
+    --green:#1F5E3B; --green2:#2E7D4F; --light:#E8F3EC; --gold:#B8893B;
+    --bg:#F6F8F6; --card:#FFFFFF; --text:#1C2420; --muted:#5F6B64; --red:#B3261E; --line:#DCE3DE;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#101513; --card:#18201C; --text:#E8EEEA; --muted:#9AA8A0; --light:#1E2B24; --line:#2A352F; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Tajawal,system-ui,sans-serif;min-height:100vh}
+  header{background:var(--green);color:#fff;padding:18px 16px 22px;text-align:center}
+  header h1{margin:0;font-size:20px;font-weight:700}
+  header p{margin:4px 0 0;font-size:13px;opacity:.85}
+  main{max-width:460px;margin:-12px auto 0;padding:0 16px 32px}
+  .card{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:14px}
+  h2{font-size:18px;margin:0 0 12px}
+  label{display:block;font-size:14px;color:var(--muted);margin:12px 0 6px}
+  input{width:100%;font:inherit;font-size:20px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);text-align:center;letter-spacing:2px}
+  button{width:100%;font:inherit;font-size:17px;font-weight:700;padding:14px;border:0;border-radius:12px;cursor:pointer;margin-top:12px}
+  .primary{background:var(--green);color:#fff}
+  .secondary{background:var(--light);color:var(--green)}
+  .link{background:none;color:var(--muted);font-weight:500;font-size:14px;text-decoration:underline;padding:8px}
+  .row{display:flex;gap:10px}
+  .row button{flex:1}
+  .big{font-size:20px;padding:22px 10px}
+  .in{background:var(--green)} .out{background:var(--gold)}
+  button:disabled{opacity:.5}
+  .msg{padding:12px 14px;border-radius:12px;font-size:15px;margin-top:12px;line-height:1.6}
+  .ok{background:#E3F4E8;color:#1B5E20} .err{background:#FCE8E6;color:var(--red)} .info{background:var(--light);color:var(--text)}
+  @media (prefers-color-scheme: dark){ .ok{background:#1B3A26;color:#A5D6A7} .err{background:#3A1F1D;color:#F2B8B5} }
+  .cam{position:relative;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:3/4;margin-top:8px}
+  .cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+  .oval{position:absolute;inset:12% 18%;border:3px dashed rgba(255,255,255,.7);border-radius:50%}
+  .cam .hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:#fff;font-size:15px;text-shadow:0 1px 3px #000}
+  .clock{font-size:40px;font-weight:700;text-align:center;color:var(--green);margin:4px 0}
+  @media (prefers-color-scheme: dark){ .clock{color:#8FD0A6} }
+  .date{text-align:center;color:var(--muted);font-size:14px}
+  .hello{text-align:center;font-size:17px;margin-bottom:6px}
+  .hidden{display:none}
+  small{color:var(--muted);display:block;margin-top:8px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <h1>بصمة الحضور والانصراف</h1>
+  <p id="orgName">مجمع ربيع القلوب لتحفيظ القرآن الكريم - جامع علي الشبلان</p>
+</header>
+
+<main>
+  <!-- 1) إدخال الرقم الوظيفي -->
+  <section id="vLogin" class="card hidden">
+    <h2>الدخول</h2>
+    <label for="empId">رقم الهوية / الإقامة</label>
+    <input id="empId" inputmode="numeric" autocomplete="off" placeholder="10 أرقام" maxlength="15">
+    <button class="primary" id="btnLogin">متابعة</button>
+    <div id="loginMsg"></div>
+  </section>
+
+  <!-- 2) التسجيل الأول -->
+  <section id="vEnroll" class="card hidden">
+    <h2>تسجيل بصمة الوجه لأول مرة</h2>
+    <p class="hello" id="enrollName"></p>
+    <small>ضع وجهك داخل الإطار في مكان جيد الإضاءة، وانظر للكاميرا مباشرة، دون نظارة شمسية أو غطاء للوجه.</small>
+    <div class="cam"><video id="vidEnroll" playsinline muted autoplay></video><div class="oval"></div><div class="hint" id="hintEnroll"></div></div>
+    <label for="pin1">رمز بديل من 4 أرقام (يُستخدم إذا تعذّرت بصمة الوجه)</label>
+    <input id="pin1" type="password" inputmode="numeric" maxlength="4">
+    <label for="pin2">تأكيد الرمز</label>
+    <input id="pin2" type="password" inputmode="numeric" maxlength="4">
+    <button class="primary" id="btnEnroll">التقاط وتسجيل</button>
+    <div id="enrollMsg"></div>
+    <small>بالضغط على "التقاط وتسجيل" توافق على حفظ صورة وجهك لدى إدارة المجمع لغرض إثبات الحضور فقط.</small>
+  </section>
+
+  <!-- 3) بانتظار الاعتماد -->
+  <section id="vPending" class="card hidden">
+    <h2>بانتظار اعتماد الإدارة</h2>
+    <p class="hello" id="pendingName"></p>
+    <div class="msg info" id="pendingMsg">تم استلام تسجيلك. ستعمل بصمتك بعد أن تراجع الإدارة صورتك وتعتمدها.</div>
+    <button class="secondary" id="btnRecheck">تحقّق من الحالة</button>
+    <button class="link" data-logout>تغيير رقم الهوية</button>
+  </section>
+
+  <!-- 4) الشاشة الرئيسية -->
+  <section id="vMain" class="hidden">
+    <div class="card">
+      <p class="hello" id="mainName"></p>
+      <div class="clock" id="clock">--:--</div>
+      <div class="date" id="today"></div>
+      <div class="row">
+        <button class="primary big in" id="btnIn">تسجيل حضور</button>
+        <button class="primary big out" id="btnOut">تسجيل انصراف</button>
+      </div>
+      <div id="mainMsg"></div>
+    </div>
+
+    <div class="card hidden" id="camCard">
+      <div class="cam"><video id="vidPunch" playsinline muted autoplay></video><div class="oval"></div><div class="hint" id="hintPunch"></div></div>
+      <button class="link" id="btnCancel">إلغاء</button>
+    </div>
+
+    <div class="card hidden" id="pinCard">
+      <h2>الرمز البديل</h2>
+      <small>يُقبل التسجيل بالرمز البديل من داخل الجامع فقط، ويُعلَّم للمراجعة من الإدارة.</small>
+      <input id="pinFallback" type="password" inputmode="numeric" maxlength="4">
+      <div class="row">
+        <button class="primary in" id="btnPinIn">حضور بالرمز</button>
+        <button class="primary out" id="btnPinOut">انصراف بالرمز</button>
+      </div>
+      <button class="link" id="btnPinCancel">إلغاء</button>
+    </div>
+
+    <button class="link" id="btnShowPin">تعذّرت بصمة الوجه؟ استخدم الرمز البديل</button>
+    <button class="link" data-logout>تغيير رقم الهوية</button>
+  </section>
+
+  <div id="loading" class="card"><div class="msg info">جاري التحميل...</div></div>
+</main>
+
+<script>
+/* ======================================================================
+   ضع رابط تطبيق الويب (Web app URL) من Apps Script بين علامتي التنصيص
+   ====================================================================== */
+const API_URL = 'https://script.google.com/macros/s/AKfycbw5bv1rSm_zSkemNT6nuFVQGIrYRAFxx8oD4xnzoPRFbnUYge2cLcjTDT7vSz5ex_ShZA/exec';
+
+const MODELS = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/model/';
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+  del(k){ try { localStorage.removeItem(k); } catch(e){} }
+};
+let cfg = null, empId = null, stream = null, modelsReady = null, punching = false, faceFails = 0;
+
+/* ---------- معرف الجهاز (يُربط بالمعلم عند التسجيل) ---------- */
+function deviceId(){
+  let d = store.get('rq_device');
+  if (!d){
+    d = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2));
+    store.set('rq_device', d);
+  }
+  return d;
+}
+
+/* ---------- الاتصال بالخادم ---------- */
+async function api(data){
+  const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(data) });
+  return r.json();
+}
+
+function show(view){
+  ['vLogin','vEnroll','vPending','vMain','loading'].forEach(v => $(v).classList.toggle('hidden', v !== view));
+}
+function msg(el, text, type){ $(el).innerHTML = text ? '<div class="msg ' + type + '"></div>' : ''; if (text) $(el).firstChild.textContent = text; }
+
+/* ---------- نماذج التعرف على الوجه ---------- */
+function loadModels(){
+  if (!modelsReady){
+    modelsReady = Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri(MODELS),
+      faceapi.nets.faceLandmark68Net.loadFromUri(MODELS),
+      faceapi.nets.faceRecognitionNet.loadFromUri(MODELS)
+    ]);
+  }
+  return modelsReady;
+}
+
+async function startCam(videoId){
+  stopCam();
+  stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ideal:640}, height:{ideal:480} }, audio:false });
+  const v = $(videoId); v.srcObject = stream; await v.play();
+  return v;
+}
+function stopCam(){ if (stream){ stream.getTracks().forEach(t => t.stop()); stream = null; } }
+
+/* يلتقط وجهاً واحداً واضحاً ويعيد البصمة الرقمية */
+async function detect(video){
+  const opt = new faceapi.TinyFaceDetectorOptions({ inputSize:320, scoreThreshold:0.5 });
+  const res = await faceapi.detectSingleFace(video, opt).withFaceLandmarks().withFaceDescriptor();
+  if (!res) return null;
+  const box = res.detection.box, w = video.videoWidth;
+  if (box.width < w * 0.25) return { tooFar:true };
+  return { descriptor: Array.from(res.descriptor) };
+}
+
+function snapshot(video){
+  const c = document.createElement('canvas'), s = 480 / Math.max(video.videoWidth, video.videoHeight);
+  c.width = Math.round(video.videoWidth * s); c.height = Math.round(video.videoHeight * s);
+  c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.7);
+}
+
+/* يحاول عدة مرات حتى يجد وجهاً واضحاً */
+async function captureFace(video, hintId, samples, timeoutMs){
+  const got = []; let photo = null; const end = Date.now() + timeoutMs;
+  while (Date.now() < end && got.length < samples){
+    const r = await detect(video);
+    if (!r) $(hintId).textContent = 'لم يُكتشف وجه، انظر للكاميرا';
+    else if (r.tooFar) $(hintId).textContent = 'اقترب من الكاميرا قليلاً';
+    else { got.push(r.descriptor); if (!photo) photo = snapshot(video); $(hintId).textContent = 'ثبّت وجهك... ' + got.length + '/' + samples; }
+    await new Promise(r => setTimeout(r, 350));
+  }
+  if (got.length < samples) return null;
+  const avg = got[0].map((_, i) => got.reduce((s, d) => s + d[i], 0) / got.length);
+  return { descriptor: avg, photo };
+}
+
+/* ---------- الموقع ---------- */
+function getLocation(){
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) return reject(new Error('جهازك لا يدعم تحديد الموقع'));
+    navigator.geolocation.getCurrentPosition(
+      p => resolve({ lat:p.coords.latitude, lng:p.coords.longitude, accuracy:p.coords.accuracy }),
+      e => reject(new Error(e.code === 1 ? 'يجب السماح بالوصول إلى الموقع من إعدادات المتصفح' : 'تعذّر تحديد موقعك، أعد المحاولة')),
+      { enableHighAccuracy:true, timeout:20000, maximumAge:0 }
+    );
+  });
+}
+function distanceM(a, b, c, d){
+  const R = 6371000, t = x => x * Math.PI / 180;
+  const h = Math.sin(t(c - a) / 2) ** 2 + Math.cos(t(a)) * Math.cos(t(c)) * Math.sin(t(d - b) / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/* ---------- التدفق ---------- */
+async function boot(){
+  if (API_URL.indexOf('http') !== 0){ show('vLogin'); msg('loginMsg', 'لم يُضبط رابط الخادم بعد في الملف.', 'err'); return; }
+  try { cfg = await api({ action:'config' }); } catch(e){ cfg = null; }
+  if (cfg && cfg.name) $('orgName').textContent = cfg.name + (cfg.mosque ? ' - ' + cfg.mosque : '');
+  empId = store.get('rq_emp');
+  if (empId) await route(); else show('vLogin');
+}
+
+async function route(){
+  show('loading');
+  let st;
+  try { st = await api({ action:'status', id:empId, device:deviceId() }); }
+  catch(e){ show('vLogin'); msg('loginMsg', 'تعذّر الاتصال بالخادم. تحقق من الإنترنت.', 'err'); return; }
+  if (!st.ok){ store.del('rq_emp'); show('vLogin'); msg('loginMsg', st.msg, 'err'); return; }
+  store.set('rq_emp', empId);
+  if (st.status === 'غير مسجل' || st.status === 'مرفوض'){
+    $('enrollName').textContent = 'أهلاً ' + st.name;
+    show('vEnroll');
+    if (st.status === 'مرفوض') msg('enrollMsg', 'رُفض تسجيلك السابق، يرجى التسجيل مجدداً بصورة أوضح.', 'err');
+    loadModels();
+    try { await startCam('vidEnroll'); $('hintEnroll').textContent = 'ضع وجهك داخل الإطار'; }
+    catch(e){ msg('enrollMsg', 'تعذّر تشغيل الكاميرا. اسمح للمتصفح باستخدامها ثم أعد تحميل الصفحة.', 'err'); }
+  } else if (st.status === 'قيد المراجعة'){
+    $('pendingName').textContent = st.name; show('vPending');
+  } else {
+    $('mainName').textContent = 'أهلاً ' + st.name; show('vMain');
+    if (st.otherDevice) msg('mainMsg', 'هذا الجوال غير مسجل لك. البصمة تعمل من جوالك المسجل فقط.', 'err');
+    loadModels();
+  }
+}
+
+$('btnLogin').onclick = async () => {
+  const v = $('empId').value.replace(/[^0-9٠-٩]/g,'').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+  if (!v) return msg('loginMsg', 'أدخل رقم هويتك أو إقامتك', 'err');
+  empId = v; await route();
+};
+
+$('btnEnroll').onclick = async () => {
+  const p1 = $('pin1').value, p2 = $('pin2').value;
+  if (!/^\d{4}$/.test(p1)) return msg('enrollMsg', 'الرمز البديل يجب أن يكون 4 أرقام', 'err');
+  if (p1 !== p2) return msg('enrollMsg', 'الرمزان غير متطابقين', 'err');
+  const b = $('btnEnroll'); b.disabled = true; msg('enrollMsg', 'جاري تجهيز التعرف على الوجه...', 'info');
+  try {
+    await loadModels();
+    msg('enrollMsg', 'ثبّت وجهك داخل الإطار...', 'info');
+    const face = await captureFace($('vidEnroll'), 'hintEnroll', 3, 15000);
+    if (!face){ msg('enrollMsg', 'لم أتمكن من التقاط وجهك بوضوح. حسّن الإضاءة وأعد المحاولة.', 'err'); b.disabled = false; return; }
+    msg('enrollMsg', 'جاري الإرسال...', 'info');
+    const r = await api({ action:'enroll', id:empId, device:deviceId(), pin:p1, descriptor:face.descriptor, photo:face.photo });
+    if (r.ok){ stopCam(); $('pendingName').textContent = ''; show('vPending'); msg('pendingMsg', r.msg, 'info'); }
+    else msg('enrollMsg', r.msg, 'err');
+  } catch(e){ msg('enrollMsg', 'حدث خطأ: ' + e.message, 'err'); }
+  b.disabled = false;
+};
+
+$('btnRecheck').onclick = route;
+document.querySelectorAll('[data-logout]').forEach(b => b.onclick = () => { stopCam(); store.del('rq_emp'); empId = null; $('empId').value = ''; show('vLogin'); });
+
+async function punch(type){
+  if (punching) return; punching = true;
+  $('btnIn').disabled = $('btnOut').disabled = true;
+  $('pinCard').classList.add('hidden');
+  const label = type === 'in' ? 'الحضور' : 'الانصراف';
+  try {
+    msg('mainMsg', 'جاري تحديد موقعك...', 'info');
+    const loc = await getLocation();
+    if (cfg && cfg.lat && cfg.lng){
+      const d = Math.round(distanceM(loc.lat, loc.lng, cfg.lat, cfg.lng));
+      if (d > cfg.radius) throw new Error('أنت خارج نطاق الجامع (تبعد ' + d + ' م). البصمة متاحة داخل الجامع فقط.');
+    }
+    msg('mainMsg', 'جاري تشغيل الكاميرا...', 'info');
+    await loadModels();
+    $('camCard').classList.remove('hidden');
+    const v = await startCam('vidPunch');
+    $('hintPunch').textContent = 'انظر للكاميرا';
+    msg('mainMsg', 'جاري التحقق من الوجه...', 'info');
+    const face = await captureFace(v, 'hintPunch', 2, 12000);
+    stopCam(); $('camCard').classList.add('hidden');
+    if (!face) throw new Error('لم أتمكن من التقاط وجهك. أعد المحاولة أو استخدم الرمز البديل.');
+    msg('mainMsg', 'جاري تسجيل ' + label + '...', 'info');
+    const r = await api({ action:'punch', type, method:'face', id:empId, device:deviceId(),
+                          lat:loc.lat, lng:loc.lng, accuracy:loc.accuracy, descriptor:face.descriptor, photo:face.photo });
+    if (r.ok){ faceFails = 0; msg('mainMsg', r.msg, 'ok'); }
+    else { faceFails++; msg('mainMsg', r.msg, 'err'); if (faceFails >= 2) openPin(); }
+  } catch(e){
+    stopCam(); $('camCard').classList.add('hidden');
+    msg('mainMsg', e.message, 'err');
+    if (/الكاميرا|Permission|NotAllowed|NotFound/i.test(e.message + e.name)) openPin();
+  }
+  punching = false; $('btnIn').disabled = $('btnOut').disabled = false;
+}
+
+function openPin(){ $('pinFallback').value = ''; $('pinCard').classList.remove('hidden'); }
+
+async function pinPunch(pinType){
+  const pin = $('pinFallback').value;
+  if (!/^\d{4}$/.test(pin)) return msg('mainMsg', 'أدخل الرمز البديل (4 أرقام)', 'err');
+  $('btnPinIn').disabled = $('btnPinOut').disabled = true;
+  try {
+    msg('mainMsg', 'جاري تحديد موقعك...', 'info');
+    const loc = await getLocation();
+    let photo = '';
+    try { const v = await startCam('vidPunch'); await new Promise(r => setTimeout(r, 800)); photo = snapshot(v); } catch(e){}
+    stopCam();
+    const r = await api({ action:'punch', type:pinType, method:'pin', pin, id:empId, device:deviceId(),
+                          lat:loc.lat, lng:loc.lng, accuracy:loc.accuracy, photo });
+    msg('mainMsg', r.msg + (r.ok && r.review ? ' (سيُراجع من الإدارة)' : ''), r.ok ? 'ok' : 'err');
+    if (r.ok) $('pinCard').classList.add('hidden');
+  } catch(e){ msg('mainMsg', e.message, 'err'); }
+  $('btnPinIn').disabled = $('btnPinOut').disabled = false;
+}
+$('btnPinIn').onclick = () => pinPunch('in');
+$('btnPinOut').onclick = () => pinPunch('out');
+
+$('btnIn').onclick = () => punch('in');
+$('btnOut').onclick = () => punch('out');
+$('btnCancel').onclick = () => { stopCam(); $('camCard').classList.add('hidden'); };
+$('btnShowPin').onclick = () => openPin();
+$('btnPinCancel').onclick = () => $('pinCard').classList.add('hidden');
+
+/* ---------- الساعة ---------- */
+function tick(){
+  const now = new Date();
+  $('clock').textContent = now.toLocaleTimeString('ar-SA', { hour:'2-digit', minute:'2-digit', timeZone:'Asia/Riyadh' });
+  $('today').textContent = now.toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'Asia/Riyadh' });
+}
+tick(); setInterval(tick, 15000);
+
+boot();
+</script>
+</body>
+</html>
