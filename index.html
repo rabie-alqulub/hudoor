@@ -64,6 +64,22 @@
   .hello{text-align:center;font-size:17px;margin-bottom:6px}
   .tools{display:flex;gap:10px}
   .tools button{flex:1;margin-top:0;background:var(--card);color:var(--muted);border:1px solid var(--line);font-size:14px;font-weight:500;padding:12px 8px}
+  .verify h2{text-align:center;margin-bottom:4px}
+  .verify .sub{text-align:center;color:var(--muted);font-size:14px;margin:0 0 10px}
+  .ring{position:absolute;inset:10% 15%;border-radius:50%;border:4px solid rgba(208,142,44,.9);box-shadow:0 0 0 2000px rgba(0,0,0,.35);transition:border-color .3s}
+  .ring::after{content:'';position:absolute;left:8%;right:8%;height:3px;top:10%;background:linear-gradient(90deg,transparent,#F3D9AE,transparent);border-radius:3px;animation:scan 1.6s ease-in-out infinite alternate}
+  .ring.found{border-color:#4CAF7A}
+  .ring.found::after{background:linear-gradient(90deg,transparent,#A5E6BF,transparent)}
+  @keyframes scan{from{top:10%}to{top:88%}}
+  .result{text-align:center;padding:10px 0 4px}
+  .badge{width:110px;height:110px;border-radius:50%;margin:6px auto 14px;display:flex;align-items:center;justify-content:center;animation:pop .35s ease-out}
+  .badge svg{width:62px;height:62px}
+  .badge.ok{background:#2E8B57;color:#fff;box-shadow:0 0 0 10px rgba(46,139,87,.15)}
+  .badge.no{background:var(--red);color:#fff;box-shadow:0 0 0 10px rgba(179,38,30,.15)}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}80%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+  .result h3{margin:0 0 6px;font-size:21px}
+  .result p{margin:0;color:var(--muted);line-height:1.7;font-size:15px}
+  .result .when{margin-top:8px;font-size:16px;color:var(--text);font-weight:700}
   .hidden{display:none}
   small{color:var(--muted);display:block;margin-top:8px;line-height:1.6}
 </style>
@@ -128,9 +144,20 @@
       <div id="mainMsg"></div>
     </div>
 
-    <div class="card hidden" id="camCard">
-      <div class="cam"><video id="vidPunch" playsinline muted autoplay></video><div class="oval"></div><div class="hint" id="hintPunch"></div></div>
-      <button class="link" id="btnCancel">إلغاء</button>
+    <div class="card verify hidden" id="camCard">
+      <div id="scanBox">
+        <h2 id="scanTitle">التحقق من بصمة الوجه</h2>
+        <p class="sub">ضع وجهك داخل الدائرة وانظر للكاميرا</p>
+        <div class="cam"><video id="vidPunch" playsinline muted autoplay></video><div class="ring" id="ring"></div><div class="hint" id="hintPunch"></div></div>
+        <button class="link" id="btnCancel">إلغاء</button>
+      </div>
+      <div class="result hidden" id="resultBox">
+        <div class="badge" id="resBadge"></div>
+        <h3 id="resTitle"></h3>
+        <p id="resText"></p>
+        <div class="when" id="resWhen"></div>
+        <div id="resActions"></div>
+      </div>
     </div>
 
     <div class="card hidden" id="pinCard">
@@ -317,41 +344,70 @@ $('btnEnroll').onclick = async () => {
 $('btnRecheck').onclick = route;
 document.querySelectorAll('[data-logout]').forEach(b => b.onclick = () => { stopCam(); store.del('rq_emp'); empId = null; $('empId').value = ''; show('vLogin'); });
 
+const ICON_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+const ICON_NO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+let lastType = 'in';
+
+function scanMode(type){
+  $('scanTitle').textContent = 'التحقق من بصمة الوجه - ' + (type === 'in' ? 'حضور' : 'انصراف');
+  $('ring').classList.remove('found'); $('hintPunch').textContent = '';
+  $('scanBox').classList.remove('hidden'); $('resultBox').classList.add('hidden');
+  $('camCard').classList.remove('hidden');
+  $('camCard').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+/* يعرض نتيجة التحقق: علامة صح أو خطأ */
+function showResult(ok, title, text, retry){
+  stopCam();
+  $('scanBox').classList.add('hidden'); $('resultBox').classList.remove('hidden');
+  $('camCard').classList.remove('hidden');
+  const b = $('resBadge'); b.className = 'badge ' + (ok ? 'ok' : 'no'); b.innerHTML = ok ? ICON_OK : ICON_NO;
+  $('resTitle').textContent = title; $('resText').textContent = text || '';
+  $('resWhen').textContent = ok ? new Date().toLocaleTimeString('ar-SA', { hour:'numeric', minute:'2-digit', timeZone:'Asia/Riyadh' }) : '';
+  const act = $('resActions'); act.innerHTML = '';
+  const mk = (label, cls, fn) => { const x = document.createElement('button'); x.className = cls; x.textContent = label; x.onclick = fn; act.appendChild(x); };
+  if (ok) mk('تم', 'primary', closeVerify);
+  else {
+    if (retry) mk('إعادة المحاولة ببصمة الوجه', 'primary', () => punch(lastType));
+    mk('استخدام الرمز البديل', 'secondary', () => { closeVerify(); openPin(); });
+    mk('إلغاء', 'link', closeVerify);
+  }
+  $('camCard').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+function closeVerify(){ stopCam(); $('camCard').classList.add('hidden'); }
+
 async function punch(type){
-  if (punching) return; punching = true;
+  if (punching) return; punching = true; lastType = type;
   $('btnIn').disabled = $('btnOut').disabled = true;
-  $('pinCard').classList.add('hidden');
+  $('pinCard').classList.add('hidden'); msg('mainMsg', '', '');
   const label = type === 'in' ? 'الحضور' : 'الانصراف';
   try {
-    msg('mainMsg', 'جاري تحديد موقعك...', 'info');
+    scanMode(type);
+    $('hintPunch').textContent = 'جاري تحديد موقعك...';
     const loc = await getLocation();
     if (cfg && cfg.lat && cfg.lng){
       const d = Math.round(distanceM(loc.lat, loc.lng, cfg.lat, cfg.lng));
-      if (d > cfg.radius) throw new Error('أنت خارج نطاق الجامع (تبعد ' + d + ' م). البصمة متاحة داخل الجامع فقط.');
+      if (d > cfg.radius){ showResult(false, 'خارج نطاق الجامع', 'تبعد ' + d + ' م عن الجامع. البصمة متاحة داخل الجامع فقط.', true); return; }
     }
-    msg('mainMsg', 'جاري تشغيل الكاميرا...', 'info');
+    $('hintPunch').textContent = 'جاري تشغيل الكاميرا...';
     await loadModels();
-    $('camCard').classList.remove('hidden');
     const v = await startCam('vidPunch');
     $('hintPunch').textContent = 'انظر للكاميرا';
-    msg('mainMsg', 'جاري التحقق من الوجه...', 'info');
     const face = await captureFace(v, 'hintPunch', 2, 12000);
-    stopCam(); $('camCard').classList.add('hidden');
-    if (!face) throw new Error('لم أتمكن من التقاط وجهك. أعد المحاولة أو استخدم الرمز البديل.');
-    msg('mainMsg', 'جاري تسجيل ' + label + '...', 'info');
+    if (!face){ showResult(false, 'لم يُلتقط الوجه', 'تأكد من الإضاءة وأن وجهك داخل الدائرة ثم أعد المحاولة.', true); return; }
+    $('ring').classList.add('found'); $('hintPunch').textContent = 'جاري مطابقة الوجه...';
     const r = await api({ action:'punch', type, method:'face', id:empId, device:deviceId(),
                           lat:loc.lat, lng:loc.lng, accuracy:loc.accuracy, descriptor:face.descriptor, photo:face.photo });
-    if (r.ok){ faceFails = 0; msg('mainMsg', r.msg, 'ok'); }
-    else { faceFails++; msg('mainMsg', r.msg, 'err'); if (faceFails >= 2) openPin(); }
+    if (r.ok){ faceFails = 0; showResult(true, 'تم التحقق وتسجيل ' + label, r.msg); }
+    else { faceFails++; showResult(false, 'لم يتم التحقق', r.msg, true); }
   } catch(e){
-    stopCam(); $('camCard').classList.add('hidden');
-    msg('mainMsg', e.message, 'err');
-    if (/الكاميرا|Permission|NotAllowed|NotFound/i.test(e.message + e.name)) openPin();
+    showResult(false, 'تعذّر التحقق', e.message, !/الكاميرا|Permission|NotAllowed|NotFound/i.test(e.message + e.name));
+  } finally {
+    punching = false; $('btnIn').disabled = $('btnOut').disabled = false;
   }
-  punching = false; $('btnIn').disabled = $('btnOut').disabled = false;
 }
 
-function openPin(){ $('pinFallback').value = ''; $('pinCard').classList.remove('hidden'); }
+function openPin(){ $('pinFallback').value = ''; $('pinCard').classList.remove('hidden'); $('pinCard').scrollIntoView({ behavior:'smooth', block:'center' }); }
 
 async function pinPunch(pinType){
   const pin = $('pinFallback').value;
@@ -365,8 +421,8 @@ async function pinPunch(pinType){
     stopCam();
     const r = await api({ action:'punch', type:pinType, method:'pin', pin, id:empId, device:deviceId(),
                           lat:loc.lat, lng:loc.lng, accuracy:loc.accuracy, photo });
-    msg('mainMsg', r.msg + (r.ok && r.review ? ' (سيُراجع من الإدارة)' : ''), r.ok ? 'ok' : 'err');
-    if (r.ok) $('pinCard').classList.add('hidden');
+    if (r.ok){ $('pinCard').classList.add('hidden'); msg('mainMsg', '', ''); showResult(true, 'تم تسجيل ' + (pinType === 'in' ? 'الحضور' : 'الانصراف') + ' بالرمز', r.msg + (r.review ? ' (سيُراجع من الإدارة)' : '')); }
+    else msg('mainMsg', r.msg, 'err');
   } catch(e){ msg('mainMsg', e.message, 'err'); }
   $('btnPinIn').disabled = $('btnPinOut').disabled = false;
 }
@@ -375,7 +431,7 @@ $('btnPinOut').onclick = () => pinPunch('out');
 
 $('btnIn').onclick = () => punch('in');
 $('btnOut').onclick = () => punch('out');
-$('btnCancel').onclick = () => { stopCam(); $('camCard').classList.add('hidden'); };
+$('btnCancel').onclick = closeVerify;
 $('btnShowPin').onclick = () => openPin();
 $('btnPinCancel').onclick = () => $('pinCard').classList.add('hidden');
 
