@@ -72,7 +72,7 @@
 <header>
   <div class="logo"><img src="logo.jpg" alt="شعار ربيع القلوب"></div>
   <h1>بصمة الحضور والانصراف</h1>
-  <p id="orgName">مجمع ربيع القلوب لتحفيظ القرآن الكريم - جامع علي الشبلان</p>
+  <p id="orgName">مجمع حلقات ربيع القلوب لتحفيظ القرآن بمجمع علي الشبلان بأبها</p>
 </header>
 
 <main>
@@ -262,7 +262,6 @@ function distanceM(a, b, c, d){
 async function boot(){
   if (API_URL.indexOf('http') !== 0){ show('vLogin'); msg('loginMsg', 'لم يُضبط رابط الخادم بعد في الملف.', 'err'); return; }
   try { cfg = await api({ action:'config' }); } catch(e){ cfg = null; }
-  if (cfg && cfg.name) $('orgName').textContent = cfg.name + (cfg.mosque ? ' - ' + cfg.mosque : '');
   empId = store.get('rq_emp');
   if (empId) await route(); else show('vLogin');
 }
