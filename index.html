@@ -130,6 +130,12 @@
   .pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
   .p-ok{background:#E3F2EA;color:#1B6B40} .p-late{background:var(--goldlight);color:var(--gold2)} .p-abs{background:#FCE8E6;color:var(--red)} .p-none{background:var(--light);color:var(--muted)}
   @media (prefers-color-scheme: dark){ .p-ok{background:#183326;color:#8FD9AE} .p-late{color:#E8B867} .p-abs{background:#3A1F1D;color:#F2B8B5} }
+  .choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .choice button{margin:0;padding:18px 8px;background:var(--light);color:var(--navy);display:flex;flex-direction:column;align-items:center;gap:8px;border:2px solid transparent;border-radius:16px}
+  .choice button.sel{border-color:var(--gold)}
+  .choice svg{width:32px;height:32px}
+  @media (prefers-color-scheme: dark){ .choice button{color:#E8B867} }
+  #pinBox input{margin-top:12px}
   .hidden{display:none}
   small{color:var(--muted);display:block;margin-top:8px;line-height:1.6}
 </style>
@@ -182,7 +188,7 @@
     <p class="hello" id="pendingName"></p>
     <div class="msg info" id="pendingMsg">تم استلام تسجيلك. ستعمل بصمتك بعد أن تراجع الإدارة صورتك وتعتمدها.</div>
     <button class="secondary" id="btnRecheck">تحقّق من الحالة</button>
-    <button class="link" data-logout>تغيير رقم الهوية</button>
+    <button class="link" id="btnPendingOut">خروج</button>
   </section>
 
   <!-- 4) الشاشة الرئيسية -->
@@ -207,23 +213,26 @@
       <div id="mainMsg"></div>
     </div>
 
-    <div class="card hidden" id="pinCard">
-      <h2>الرمز البديل</h2>
-      <small>يُقبل التسجيل بالرمز البديل من داخل الجامع فقط، ويُعلَّم للمراجعة من الإدارة.</small>
-      <input id="pinFallback" type="password" inputmode="numeric" maxlength="4">
-      <div class="row">
-        <button class="primary in" id="btnPinIn">حضور بالرمز</button>
-        <button class="primary out" id="btnPinOut">انصراف بالرمز</button>
+    <div class="card hidden" id="choiceCard">
+      <h2 id="choiceTitle">تسجيل حضور</h2>
+      <small>اختر طريقة التحقق</small>
+      <div class="choice">
+        <button id="chFace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>بصمة الوجه</button>
+        <button id="chPin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/><path d="M19 4l2 2"/></svg>الرمز البديل</button>
       </div>
-      <button class="link" id="btnPinCancel">إلغاء</button>
+      <div id="pinBox" class="hidden">
+        <input id="pinFallback" type="password" inputmode="numeric" maxlength="4" placeholder="الرمز البديل (4 أرقام)">
+        <button class="primary" id="btnPinGo">تأكيد</button>
+        <small>التسجيل بالرمز البديل يُعلَّم للمراجعة من الإدارة.</small>
+      </div>
+      <div id="pinMsg"></div>
+      <button class="link" id="btnChoiceCancel">إلغاء</button>
     </div>
 
     <div class="tools">
       <button id="btnReports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M8 17v-5"/><path d="M13 17V8"/><path d="M18 17v-8"/></svg>التقارير</button>
       <a id="lnkRemind" href="reminders.ics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>التذكير</a>
-      <button id="btnShowPin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/><path d="M19 4l2 2"/></svg>الرمز البديل</button>
     </div>
-    <button class="link" data-logout>تغيير رقم الهوية</button>
   </section>
 
   <!-- 6) التقارير -->
@@ -407,7 +416,7 @@ function timeState(){
 function lockPunch(geoLock){
   const t = timeState(), lock = geoLock || !t.ok;
   $('win').className = 'geo ' + t.st; $('winText').textContent = t.text;
-  ['btnIn','btnOut','btnPinIn','btnPinOut'].forEach(id => { $(id).disabled = lock || punching; $(id).classList.toggle('locked', lock); });
+  ['btnIn','btnOut','btnPinGo'].forEach(id => { $(id).disabled = lock || punching; $(id).classList.toggle('locked', lock); });
 }
 function startGeo(){
   if (!navigator.geolocation){ setGeo('out', 'جهازك لا يدعم تحديد الموقع'); return lockPunch(true); }
@@ -534,7 +543,7 @@ function logout(){
 /* تغيير رقم الهوية: يمسح الرقم المحفوظ */
 function changeId(){ logout(); store.del('rq_nid'); $('empId').value = ''; msg('loginMsg', '', ''); }
 $('btnLogout').onclick = logout;
-document.querySelectorAll('[data-logout]').forEach(b => b.onclick = changeId);
+$('btnPendingOut').onclick = logout;
 
 const ICON_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 const ICON_NO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
@@ -567,10 +576,10 @@ function showResult(ok, title, text, retry){
   if (gateMode){
     if (retry) mk('إعادة المحاولة ببصمة الوجه', 'primary', gateVerify);
     mk('الدخول بالرمز البديل', 'secondary', gatePinForm);
-    mk('تغيير رقم الهوية', 'link', changeId);
+    mk('خروج', 'link', logout);
   } else {
     if (retry) mk('إعادة المحاولة ببصمة الوجه', 'primary', () => punch(lastType));
-    mk('استخدام الرمز البديل', 'secondary', () => { closeVerify(); openPin(); });
+    mk('استخدام الرمز البديل', 'secondary', () => { closeVerify(); openChoice(lastType, true); });
     mk('إلغاء', 'link', closeVerify);
   }
   $('camCard').scrollIntoView({ behavior:'smooth', block:'center' });
@@ -621,7 +630,7 @@ function gatePinForm(){
 async function punch(type){
   if (punching || !inRange || !timeState().ok) return; punching = true; lastType = type;
   $('btnIn').disabled = $('btnOut').disabled = true;
-  $('pinCard').classList.add('hidden'); msg('mainMsg', '', '');
+  $('choiceCard').classList.add('hidden'); msg('mainMsg', '', '');
   const label = type === 'in' ? 'الحضور' : 'الانصراف';
   try {
     scanMode('التحقق من بصمة الوجه - ' + (type === 'in' ? 'حضور' : 'انصراف'), 'ضع وجهك داخل الدائرة وانظر للكاميرا');
@@ -648,34 +657,46 @@ async function punch(type){
   }
 }
 
-function openPin(){ $('pinFallback').value = ''; $('pinCard').classList.remove('hidden'); $('pinCard').scrollIntoView({ behavior:'smooth', block:'center' }); }
+/* ---------- اختيار طريقة التحقق بعد الضغط على حضور أو انصراف ---------- */
+function openChoice(type, pinFirst){
+  lastType = type;
+  $('choiceTitle').textContent = type === 'in' ? 'تسجيل حضور' : 'تسجيل انصراف';
+  $('pinFallback').value = ''; msg('pinMsg', '', ''); msg('mainMsg', '', '');
+  $('pinBox').classList.toggle('hidden', !pinFirst); $('chPin').classList.toggle('sel', !!pinFirst);
+  $('choiceCard').classList.remove('hidden');
+  $('choiceCard').scrollIntoView({ behavior:'smooth', block:'center' });
+  if (pinFirst) $('pinFallback').focus();
+}
+function closeChoice(){ $('choiceCard').classList.add('hidden'); }
+$('chFace').onclick = () => { closeChoice(); punch(lastType); };
+$('chPin').onclick = () => { $('pinBox').classList.remove('hidden'); $('chPin').classList.add('sel'); $('pinFallback').focus(); };
+$('btnChoiceCancel').onclick = closeChoice;
+$('btnPinGo').onclick = () => pinPunch(lastType);
+function openPin(){ openChoice(lastType, true); }
 
 async function pinPunch(pinType){
   const pin = $('pinFallback').value;
-  if (!inRange) return msg('mainMsg', 'البصمة متاحة داخل نطاق الجامع فقط.', 'err');
-  if (!timeState().ok) return msg('mainMsg', timeState().text, 'err');
-  if (!/^\d{4}$/.test(pin)) return msg('mainMsg', 'أدخل الرمز البديل (4 أرقام)', 'err');
-  $('btnPinIn').disabled = $('btnPinOut').disabled = true;
+  if (!inRange) return msg('pinMsg', 'البصمة متاحة داخل نطاق الجامع فقط.', 'err');
+  if (!timeState().ok) return msg('pinMsg', timeState().text, 'err');
+  if (!/^\d{4}$/.test(pin)) return msg('pinMsg', 'أدخل الرمز البديل (4 أرقام)', 'err');
+  $('btnPinGo').disabled = true;
   try {
-    msg('mainMsg', 'جاري التسجيل...', 'info');
+    msg('pinMsg', 'جاري التسجيل...', 'info');
     const loc = await freshLocation();
     let photo = '';
-    try { const v = await startCam('vidPunch'); await new Promise(r => setTimeout(r, 800)); photo = snapshot(v); } catch(e){}
+    try { const v = await startCam('vidPunch'); await sleep(800); photo = snapshot(v); } catch(e){}
     stopCam();
     const r = await api({ action:'punch', type:pinType, method:'pin', pin, id:empId, device:deviceId(),
                           lat:loc.lat, lng:loc.lng, accuracy:loc.accuracy, photo });
-    if (r.ok){ $('pinCard').classList.add('hidden'); msg('mainMsg', '', ''); showResult(true, 'تم تسجيل ' + (pinType === 'in' ? 'الحضور' : 'الانصراف') + ' بالرمز', r.msg + (r.review ? ' (سيُراجع من الإدارة)' : '')); }
-    else msg('mainMsg', r.msg, 'err');
-  } catch(e){ msg('mainMsg', e.message, 'err'); }
+    if (r.ok){ closeChoice(); showResult(true, 'تم تسجيل ' + (pinType === 'in' ? 'الحضور' : 'الانصراف') + ' بالرمز', r.msg + (r.review ? ' (سيُراجع من الإدارة)' : '')); }
+    else msg('pinMsg', r.msg, 'err');
+  } catch(e){ msg('pinMsg', e.message, 'err'); }
   lockPunch(!inRange);
 }
-$('btnPinIn').onclick = () => pinPunch('in');
-$('btnPinOut').onclick = () => pinPunch('out');
 
-$('btnIn').onclick = () => punch('in');
-$('btnOut').onclick = () => punch('out');
+$('btnIn').onclick = () => { if (!$('btnIn').disabled) openChoice('in'); };
+$('btnOut').onclick = () => { if (!$('btnOut').disabled) openChoice('out'); };
 $('btnCancel').onclick = closeVerify;
-$('btnShowPin').onclick = () => openPin();
 $('lnkRemind').onclick = () => msg('mainMsg', 'أضف التذكير إلى تقويم جوالك: تنبيه الساعة 1:15 م لبصمة الحضور، والساعة 5:30 م لبصمة الخروج، من الأحد إلى الأربعاء.', 'info');
 
 /* ---------- التقارير ---------- */
@@ -767,7 +788,6 @@ document.querySelectorAll('#repTabs button').forEach(b => b.onclick = () => {
   if (rep.period === 'day') rep.date = lastWorkday(rep.date > riyadhNow().date ? riyadhNow().date : rep.date);
   loadReport();
 });
-$('btnPinCancel').onclick = () => $('pinCard').classList.add('hidden');
 
 /* ---------- الساعة ---------- */
 function tick(){
