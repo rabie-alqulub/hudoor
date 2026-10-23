@@ -430,6 +430,18 @@
       <div class="card" id="stList"></div>
     </div>
 
+    <!-- بيانات الطلاب -->
+    <div id="pStudents" class="hidden">
+      <div class="card">
+        <h2>بيانات الطلاب</h2>
+        <small>جميع طلاب المجمع وأولياء أمورهم. أي تعديل هنا يُحدّث قاعدة أولياء الأمور تلقائياً.</small>
+        <div class="stchips" id="sdSum"></div>
+        <select id="sdHal" style="margin-top:10px"></select>
+        <input id="sdSearch" placeholder="ابحث باسم الطالب أو ولي الأمر أو الجوال" style="margin-top:8px">
+      </div>
+      <div class="card" id="sdList"></div>
+    </div>
+
     <!-- تسجيل موظف جديد -->
     <div id="pNewStaff" class="hidden">
       <div class="card" id="nsForm">
@@ -667,6 +679,25 @@
   </div>
 </div>
 
+<!-- تعديل بيانات طالب -->
+<div class="sheet hidden" id="sdSheet">
+  <div class="panel">
+    <div class="head"><h2>تعديل بيانات الطالب</h2><button class="iconbtn" id="sdClose">إغلاق</button></div>
+    <small class="muted" id="sdNo"></small>
+    <div class="edgrid">
+      <div class="full"><label for="sdName">اسم الطالب</label><input id="sdName"></div>
+      <div class="full"><label for="sdHid">الحلقة</label><select id="sdHid"></select></div>
+      <div class="full"><label for="sdPname">اسم ولي الأمر</label><input id="sdPname"></div>
+      <div><label for="sdPphone">جوال ولي الأمر</label><input id="sdPphone" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>
+      <div><label for="sdPnid">هوية ولي الأمر</label><input id="sdPnid" inputmode="numeric" maxlength="15"></div>
+      <div><label for="sdLevel">مقدار الحفظ</label><input id="sdLevel" placeholder="مثال: جزء عم"></div>
+      <div><label for="sdJoined">تاريخ الالتحاق</label><input id="sdJoined" type="date"></div>
+    </div>
+    <button class="btn" id="sdSave">حفظ التعديلات</button>
+    <div id="sdMsg"></div>
+  </div>
+</div>
+
 <!-- تأكيد -->
 <div class="sheet hidden" id="cfSheet">
   <div class="panel">
@@ -831,7 +862,7 @@ async function loadHome(){
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
-  { t:'شؤون الطلاب', ic:'users', items:[['soon', 'تسجيل طالب جديد'], ['soon', 'تعديل / حذف طالب'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['soon', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['soon', 'تسجيل طالب جديد'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['soon', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['soon', 'إضافة حلقة'], ['soon', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
@@ -873,6 +904,8 @@ function openRole(r, title, group){
   if (r === 'assign') openAssign();
   $('pStaff').classList.toggle('hidden', r !== 'staff');
   if (r === 'staff') openStaff();
+  $('pStudents').classList.toggle('hidden', r !== 'studentsList');
+  if (r === 'studentsList') openStudents();
   $('pNewStaff').classList.toggle('hidden', r !== 'staffNew');
   if (r === 'staffNew') openNewStaff();
   if (r === 'soon'){ $('soonTitle').textContent = title; $('soonIc').innerHTML = ICONS[(group && group.ic) || 'settings']; }
@@ -1350,6 +1383,79 @@ async function staffOp(s, op){
     toast(r.msg); if (r.ok){ s.st = r.st; if (op === 'delete'){ s.halaqat = []; s.pin = 'default'; } renderStaff(); }
   } catch(e){ if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
 }
+/* ---------- بيانات الطلاب ---------- */
+let SB = null, sdF = '', sdCur = null;
+async function openStudents(){
+  $('sdList').innerHTML = '<div class="msg info">جاري التحميل...</div>'; $('sdSum').innerHTML = '';
+  try { SB = await api({ action:'students' }); } catch(e){ if (e.message !== 'expired') msg('sdList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (!SB.ok) return msg('sdList', SB.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : SB.msg, 'err');
+  const cur = $('sdHal').value;
+  fillSel('sdHal', SB.halaqat.map(h => [h.hid, h.name + ' (' + SB.students.filter(x => x.hid === h.hid && !x.st).length + ')']), 'كل الحلقات');
+  $('sdHal').value = cur && SB.halaqat.some(h => h.hid === cur) ? cur : '';
+  renderStudents();
+}
+function renderStudents(){
+  const hal = $('sdHal').value, inHal = SB.students.filter(x => !hal || x.hid === hal);
+  const live = inHal.filter(x => x.st !== 'محذوف'), nSus = live.filter(x => x.st === 'موقوف').length, nDel = inHal.length - live.length;
+  if ((sdF === 'موقوف' && !nSus) || (sdF === 'محذوف' && !nDel)) sdF = '';
+  const sum = $('sdSum'); sum.innerHTML = '';
+  [['', 'الكل', live.length]].concat(nSus ? [['موقوف', 'الموقوفون', nSus]] : []).concat(nDel ? [['محذوف', 'المحذوفون', nDel]] : []).forEach(x => {
+    const b = el('button', sdF === x[0] ? 'on' : '', x[1] + ' (' + x[2] + ')'); b.onclick = () => { sdF = x[0]; renderStudents(); }; sum.appendChild(b);
+  });
+  const q = $('sdSearch').value.trim(), box = $('sdList'); box.innerHTML = '';
+  const list = inHal.filter(x => (sdF === 'محذوف' ? x.st === 'محذوف' : x.st !== 'محذوف' && (!sdF || x.st === sdF)) &&
+    (!q || x.name.indexOf(q) !== -1 || x.pname.indexOf(q) !== -1 || x.pphone.indexOf(q) !== -1 || x.sid === q));
+  if (!list.length) box.appendChild(el('small', '', SB.students.length ? 'لا توجد نتائج.' : 'لا يوجد طلاب بعد.'));
+  list.forEach(x => {
+    const w = el('div', 'strow' + (x.st ? ' off' : '')), top = el('div', 'top');
+    top.appendChild(el('b', '', x.name));
+    if (!hal) top.appendChild(el('span', 'pill p-none', x.hname || 'بدون حلقة'));
+    if (x.st) top.appendChild(el('span', 'pill p-red', x.st === 'موقوف' ? 'موقوف' : 'محذوف'));
+    w.appendChild(top);
+    const m = el('div', 'meta');
+    const add = (k, v, href) => { if (!v) return; const d = el('span', '', k + ': '); const i = el(href ? 'a' : 'i', '', v); if (href){ i.href = href; i.style.fontWeight = '600'; } d.appendChild(i); m.appendChild(d); };
+    add('رقم الطالب', x.sid); add('ولي الأمر', x.pname); add('الجوال', x.pphone, 'tel:' + x.pphone); add('هوية ولي الأمر', x.pnid); add('مقدار الحفظ', x.level); add('الالتحاق', x.joined);
+    w.appendChild(m);
+    if (SB.admin){
+      const ac = el('div', 'stact'), btn = (cls, ic, t, fn) => { const b = el('button', cls); b.title = t; b.setAttribute('aria-label', t); b.innerHTML = ST_IC[ic]; b.appendChild(el('span', '', t)); b.onclick = fn; ac.appendChild(b); };
+      if (x.st === 'محذوف') btn('good', 'restore', 'استعادة', () => studentOp(x, 'restore'));
+      else {
+        btn('', 'edit', 'تعديل', () => openStudentEdit(x));
+        if (x.st === 'موقوف') btn('good', 'restore', 'رفع الإيقاف', () => studentOp(x, 'restore'));
+        else btn('warn', 'pause', 'إيقاف', () => confirmOp('إيقاف الطالب ' + x.name, 'يختفي من كشف حلقته في التقييم حتى ترفع الإيقاف. سجلاته وبياناته تبقى كما هي.', 'إيقاف الطالب', () => studentOp(x, 'suspend')));
+        btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + x.name + ' من النظام', 'يُحذف من حلقته ومن قاعدة أولياء الأمور. سجلاته السابقة تبقى محفوظة، ويمكنك استعادته من «المحذوفون».', 'حذف من النظام', () => studentOp(x, 'delete')));
+      }
+      w.appendChild(ac);
+    }
+    box.appendChild(w);
+  });
+}
+$('sdHal').onchange = () => SB && SB.ok && renderStudents();
+$('sdSearch').oninput = () => SB && SB.ok && renderStudents();
+async function studentOp(x, op){
+  try { const r = await api({ action:'studentStatus', sid:x.sid, op:op }); toast(r.msg); if (r.ok){ x.st = r.st; renderStudents(); } }
+  catch(e){ if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
+}
+function openStudentEdit(x){
+  sdCur = x; msg('sdMsg', '', '');
+  $('sdNo').textContent = 'رقم الطالب: ' + x.sid;
+  fillSel('sdHid', SB.halaqat.map(h => [h.hid, h.name])); $('sdHid').value = x.hid;
+  $('sdName').value = x.name; $('sdPname').value = x.pname; $('sdPphone').value = x.pphone; $('sdPnid').value = x.pnid; $('sdLevel').value = x.level;
+  $('sdJoined').value = /^\d{4}-\d{2}-\d{2}$/.test(x.joined) ? x.joined : '';
+  $('sdSheet').classList.remove('hidden'); $('sdName').focus();
+}
+$('sdClose').onclick = () => $('sdSheet').classList.add('hidden');
+$('sdSave').onclick = async () => {
+  const data = { name:$('sdName').value, hid:$('sdHid').value, pname:$('sdPname').value, pphone:$('sdPphone').value, pnid:$('sdPnid').value, level:$('sdLevel').value, joined:$('sdJoined').value };
+  $('sdSave').disabled = true; msg('sdMsg', 'جاري الحفظ...', 'info');
+  try {
+    const r = await api({ action:'saveStudent', sid:sdCur.sid, data:data });
+    if (!r.ok) return msg('sdMsg', r.msg, 'err');
+    $('sdSheet').classList.add('hidden'); toast(r.msg); openStudents();
+  } catch(e){ if (e.message !== 'expired') msg('sdMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+  finally { $('sdSave').disabled = false; }
+};
+
 /* ---------- تسجيل موظف جديد ---------- */
 let nsLast = null;
 const fillSel = (id, opts, blank) => { const sel = $(id); sel.innerHTML = ''; if (blank !== undefined){ const o = el('option', '', blank); o.value = ''; sel.appendChild(o); } opts.forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; sel.appendChild(o); }); };
