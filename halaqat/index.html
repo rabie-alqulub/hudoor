@@ -151,6 +151,19 @@
   .nssteps{margin:8px 0 12px;padding-inline-start:20px;line-height:1.9;font-size:14px}
   .nssteps a{color:var(--navy);font-weight:600}
   #nsDone .bar{flex-wrap:wrap;gap:6px;justify-content:flex-start}
+  .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 8px;margin-top:6px}
+  @media (max-width:560px){ .fgrid{grid-template-columns:1fr 1fr} .fgrid > div:first-child{grid-column:1/-1} }
+  .bw{display:grid;grid-template-columns:1fr 1.3fr;gap:8px;align-items:end}
+  .bw small{display:block;color:var(--muted);font-size:12px;margin-bottom:2px}
+  .bw .hs{display:grid;grid-template-columns:.8fr 1.6fr 1fr;gap:4px}
+  .bw .hs select{padding:9px 4px;font-size:14px}
+  @media (max-width:430px){ .bw{grid-template-columns:1fr} }
+  .qrcard{text-align:center}
+  .qrbox{margin:12px auto 6px;background:#fff;border-radius:14px;padding:10px;width:max-content;border:1px solid var(--line)}
+  .qrbox img{display:block;width:220px;height:220px}
+  .qrlink{direction:ltr;font-size:12.5px;color:var(--muted);word-break:break-all;margin-bottom:8px}
+  a.mini{text-decoration:none;display:inline-flex;align-items:center}
+  .warnbox{background:var(--errbg);color:var(--red);border-radius:10px;padding:6px 10px;font-size:13px;margin-top:6px}
   .edgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
   .edgrid .full{grid-column:1/-1}
   @media (max-width:430px){ .stact button span{display:none} .stact button{padding:8px 12px} }
@@ -439,9 +452,44 @@
         <small>جميع طلاب المجمع وأولياء أمورهم. أي تعديل هنا يُحدّث قاعدة أولياء الأمور تلقائياً.</small>
         <div class="stchips" id="sdSum"></div>
         <select id="sdHal" style="margin-top:10px"></select>
-        <input id="sdSearch" placeholder="ابحث باسم الطالب أو ولي الأمر أو الجوال" style="margin-top:8px">
+        <div class="fgrid">
+          <div><label for="sdQName">اسم الطالب أو جزء منه</label><input id="sdQName" autocomplete="off"></div>
+          <div><label for="sdQNid">رقم الهوية / الإقامة</label><input id="sdQNid" inputmode="numeric" autocomplete="off"></div>
+          <div><label for="sdQPhone">جوال ولي الأمر</label><input id="sdQPhone" inputmode="tel" autocomplete="off"></div>
+        </div>
       </div>
       <div class="card" id="sdList"></div>
+    </div>
+
+    <!-- تسجيل طالب جديد -->
+    <div id="pStudentNew" class="hidden">
+      <div class="card" id="snForm">
+        <h2>تسجيل طالب جديد</h2>
+        <small>الحقول المعلّمة بـ * مطلوبة. يُسكَّن الطالب في الحلقة مباشرة.</small>
+        <div id="snFields"></div>
+        <div style="margin-top:4px"><label for="snHal">إسناد الطالب إلى حلقة *</label><select id="snHal"></select></div>
+        <button class="btn" id="snSave">تسجيل الطالب</button>
+        <div id="snMsg"></div>
+      </div>
+      <div class="card hidden" id="snDone"><h2 id="snDoneT"></h2><div class="bar" style="justify-content:flex-start;gap:6px;flex-wrap:wrap"><button class="mini" id="snAgain">تسجيل طالب آخر</button><button class="mini" id="snList">عرض بيانات الطلاب</button></div></div>
+      <div class="card qrcard">
+        <h2>باركود التسجيل للعموم</h2>
+        <small>انشر هذا الباركود أو الرابط لمن يريد التسجيل. لا يُسكَّن المتقدم في حلقة، ويظهر طلبه في «طلبات المتقدمين» برقم انتظار حتى تقبله.</small>
+        <div class="qrbox"><img id="qrImg" alt="باركود رابط التسجيل" width="220" height="220"></div>
+        <div class="qrlink" id="qrLink"></div>
+        <div class="bar" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="mini" id="qrCopy">نسخ الرابط</button><button class="mini" id="qrPrint">طباعة إعلان التسجيل</button><a class="mini" id="qrDl" target="_blank" rel="noopener">تحميل الباركود</a></div>
+      </div>
+    </div>
+
+    <!-- طلبات المتقدمين -->
+    <div id="pApps" class="hidden">
+      <div class="card">
+        <h2>طلبات المتقدمين</h2>
+        <small>طلبات التسجيل الواردة من رابط/باركود التسجيل، مرتبة برقم الانتظار.</small>
+        <div class="stchips" id="apSum"></div>
+        <input id="apSearch" placeholder="ابحث بالاسم أو الهوية أو الجوال" style="margin-top:8px">
+      </div>
+      <div class="card" id="apList"></div>
     </div>
 
     <!-- تسجيل موظف جديد -->
@@ -688,6 +736,10 @@
     <small class="muted" id="sdNo"></small>
     <div class="edgrid">
       <div class="full"><label for="sdName">اسم الطالب</label><input id="sdName"></div>
+      <div><label for="sdNid">هوية الطالب / الإقامة</label><input id="sdNid" inputmode="numeric" maxlength="14"></div>
+      <div><label for="sdStage">المرحلة الدراسية</label><select id="sdStage"></select></div>
+      <div class="full"><label>تاريخ الميلاد</label><div id="sdBirth"></div></div>
+      <div><label for="sdSphone">جوال الطالب</label><input id="sdSphone" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>
       <div class="full"><label for="sdHid">الحلقة</label><select id="sdHid"></select></div>
       <div class="full"><label for="sdPname">اسم ولي الأمر</label><input id="sdPname"></div>
       <div><label for="sdPphone">جوال ولي الأمر</label><input id="sdPphone" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>
@@ -709,6 +761,18 @@
     <select id="mvHid"></select>
     <button class="btn" id="mvGo">نقل الطالب</button>
     <div id="mvMsg"></div>
+  </div>
+</div>
+
+<!-- قبول متقدم وتسكينه -->
+<div class="sheet hidden" id="apSheet">
+  <div class="panel">
+    <div class="head"><h2>قبول الطالب وتسكينه</h2><button class="iconbtn" id="apClose">إلغاء</button></div>
+    <p id="apText" style="line-height:1.8;margin:4px 0 6px"></p>
+    <label for="apHid">تسكين الطالب في حلقة</label>
+    <select id="apHid"></select>
+    <button class="btn" id="apGo">قبول وتسكين</button>
+    <div id="apMsg"></div>
   </div>
 </div>
 
@@ -845,6 +909,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
+ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users;
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
 let TABS = [];
@@ -861,6 +926,8 @@ async function loadHome(){
   const P = r.perms || [];
   if (r.roles.indexOf('teacher') !== -1 || r.roles.indexOf('admin') !== -1) TABS.push(['teach', 'التقييم']);
   if (P.indexOf('students.plans_all') !== -1) TABS.push(['plans', 'بناء الخطط التعليمية']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('students.view_all') !== -1) TABS.push(['studentsList', 'بيانات الطلاب']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('students.add') !== -1){ TABS.push(['studentNew', 'تسجيل طالب']); TABS.push(['apps', 'طلبات المتقدمين']); }
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
   if (r.roles.indexOf('parent') !== -1) TABS.push(['parent', 'أبنائي']);
@@ -876,7 +943,7 @@ async function loadHome(){
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['soon', 'تسجيل طالب جديد'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['soon', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['soon', 'إضافة حلقة'], ['soon', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
@@ -919,6 +986,10 @@ function openRole(r, title, group){
   $('pStaff').classList.toggle('hidden', r !== 'staff');
   if (r === 'staff') openStaff();
   $('pStudents').classList.toggle('hidden', r !== 'studentsList');
+  $('pStudentNew').classList.toggle('hidden', r !== 'studentNew');
+  if (r === 'studentNew') openStudentNew();
+  $('pApps').classList.toggle('hidden', r !== 'apps');
+  if (r === 'apps') openApps();
   if (r === 'studentsList') openStudents();
   $('pNewStaff').classList.toggle('hidden', r !== 'staffNew');
   if (r === 'staffNew') openNewStaff();
@@ -1398,8 +1469,192 @@ async function staffOp(s, op){
     toast(r.msg); if (r.ok){ s.st = r.st; if (op === 'delete'){ s.halaqat = []; s.pin = 'default'; } renderStaff(); }
   } catch(e){ if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
 }
+/* ---------- أدوات مشتركة: المراحل، تاريخ الميلاد الهجري/الميلادي، نموذج الطالب ---------- */
+const STAGES = ['أول ابتدائي', 'ثاني ابتدائي', 'ثالث ابتدائي', 'رابع ابتدائي', 'خامس ابتدائي', 'سادس ابتدائي', 'أول متوسط', 'ثاني متوسط',
+  'ثالث متوسط', 'أول ثانوي', 'ثاني ثانوي', 'ثالث ثانوي', 'جامعي', 'موظف'];
+const H_MONTHS = ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'];
+const normAr = t => String(t || '').trim().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ');
+let HFMT = null;
+function g2h(iso){
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return null;
+  try { HFMT = HFMT || new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { timeZone:'UTC', year:'numeric', month:'numeric', day:'numeric' }); } catch(e){ return null; }
+  const p = {}; HFMT.formatToParts(new Date(iso + 'T00:00:00Z')).forEach(x => p[x.type] = x.value);
+  return [parseInt(p.year, 10), parseInt(p.month, 10), parseInt(p.day, 10)];
+}
+function h2g(y, m, d){
+  const est = Date.UTC(622, 6, 16) + ((y - 1) * 354.36707 + (m - 1) * 29.530588 + (d - 1)) * 864e5;
+  for (let k = -45; k <= 45; k++){
+    const iso = new Date(est + k * 864e5).toISOString().slice(0, 10), h = g2h(iso);
+    if (h && h[0] === y && h[1] === m && h[2] === d) return iso;
+  }
+  return '';
+}
+const pad2 = n => String(n).padStart(2, '0');
+const hFmt = hv => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(hv || ''); return m ? (+m[3]) + ' ' + H_MONTHS[+m[2] - 1] + ' ' + m[1] + ' هـ' : ''; };
+const bFmt = (g, h) => [g ? g.split('-').reverse().join('/') : '', hFmt(h)].filter(Boolean).join(' • ');
+/** حقل تاريخ الميلاد: ميلادي وهجري، تعبئة أحدهما تملأ الآخر */
+function birthWidget(boxId){
+  const box = $(boxId); box.innerHTML = '';
+  const w = el('div', 'bw'), gd = el('div'), hd = el('div');
+  gd.appendChild(el('small', '', 'ميلادي')); const g = el('input'); g.type = 'date'; g.max = new Date().toISOString().slice(0, 10); gd.appendChild(g);
+  hd.appendChild(el('small', '', 'هجري')); const hs = el('div', 'hs');
+  const sd = el('select'), sm = el('select'), sy = el('select');
+  [[sd, 'اليوم'], [sm, 'الشهر'], [sy, 'السنة']].forEach(x => { const o = el('option', '', x[1]); o.value = ''; x[0].appendChild(o); });
+  for (let i = 1; i <= 30; i++){ const o = el('option', '', i); o.value = i; sd.appendChild(o); }
+  H_MONTHS.forEach((n, i) => { const o = el('option', '', (i + 1) + ' ' + n); o.value = i + 1; sm.appendChild(o); });
+  const cy = (g2h(new Date().toISOString().slice(0, 10)) || [1448])[0];
+  for (let y = cy; y >= 1370; y--){ const o = el('option', '', y); o.value = y; sy.appendChild(o); }
+  hs.appendChild(sd); hs.appendChild(sm); hs.appendChild(sy); hd.appendChild(hs);
+  w.appendChild(gd); w.appendChild(hd); box.appendChild(w);
+  const setH = h => { sd.value = h ? h[2] : ''; sm.value = h ? h[1] : ''; sy.value = h ? h[0] : ''; };
+  g.onchange = () => setH(g2h(g.value));
+  const fromH = () => { if (sd.value && sm.value && sy.value){ const iso = h2g(+sy.value, +sm.value, +sd.value); if (iso) g.value = iso; } };
+  [sd, sm, sy].forEach(x => x.onchange = fromH);
+  return {
+    get(){ return { g: g.value, h: sd.value && sm.value && sy.value ? sy.value + '-' + pad2(sm.value) + '-' + pad2(sd.value) : '' }; },
+    set(gv, hv){ g.value = /^\d{4}-\d{2}-\d{2}$/.test(gv || '') ? gv : ''; const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(hv || ''); setH(m ? [+m[1], +m[2], +m[3]] : g2h(g.value)); }
+  };
+}
+/** حقول بيانات الطالب المشتركة (التسجيل من الإدارة) */
+function studentFields(boxId, pre){
+  const box = $(boxId); box.innerHTML = '';
+  box.insertAdjacentHTML('beforeend', '<div class="edgrid" style="margin-top:6px">' +
+    '<div><label for="' + pre + 'N1">الاسم الأول *</label><input id="' + pre + 'N1" autocomplete="off"></div>' +
+    '<div><label for="' + pre + 'N2">اسم الأب *</label><input id="' + pre + 'N2" autocomplete="off"></div>' +
+    '<div><label for="' + pre + 'N3">اسم الجد</label><input id="' + pre + 'N3" autocomplete="off"></div>' +
+    '<div><label for="' + pre + 'N4">اسم العائلة *</label><input id="' + pre + 'N4" autocomplete="off"></div>' +
+    '<div class="full"><label for="' + pre + 'Nid">رقم الهوية / الإقامة *</label><input id="' + pre + 'Nid" inputmode="numeric" maxlength="14" autocomplete="off"></div>' +
+    '<div class="full"><label>تاريخ الميلاد * <span class="muted" style="font-weight:400">(اكتب الهجري أو الميلادي ويُعبّأ الآخر)</span></label><div id="' + pre + 'Birth"></div></div>' +
+    '<div><label for="' + pre + 'Pp">جوال ولي الأمر *</label><input id="' + pre + 'Pp" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>' +
+    '<div><label for="' + pre + 'Sp">جوال الطالب</label><input id="' + pre + 'Sp" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>' +
+    '<div class="full"><label for="' + pre + 'Stage">المرحلة الدراسية *</label><select id="' + pre + 'Stage"></select></div></div>');
+  fillSel(pre + 'Stage', STAGES.map(v => [v, v]), '— اختر —');
+  const bw = birthWidget(pre + 'Birth');
+  return {
+    get(){ const b = bw.get(); return { n1:$(pre + 'N1').value.trim(), n2:$(pre + 'N2').value.trim(), n3:$(pre + 'N3').value.trim(), n4:$(pre + 'N4').value.trim(),
+      nid:$(pre + 'Nid').value.replace(/\D/g, ''), birth:b.g, birthH:b.h, pphone:$(pre + 'Pp').value.replace(/\D/g, ''), sphone:$(pre + 'Sp').value.replace(/\D/g, ''), stage:$(pre + 'Stage').value }; },
+    reset(){ ['N1','N2','N3','N4','Nid','Pp','Sp'].forEach(k => $(pre + k).value = ''); $(pre + 'Stage').value = ''; bw.set('', ''); },
+    check(d){
+      const miss = [['n1','الاسم الأول'],['n2','اسم الأب'],['n4','اسم العائلة']].filter(x => !d[x[0]]).map(x => x[1]);
+      if (miss.length) return 'أكمل: ' + miss.join('، ');
+      if (d.nid.length < 10) return 'رقم الهوية / الإقامة 10 أرقام.';
+      if (!d.birth && !d.birthH) return 'أدخل تاريخ الميلاد (هجري أو ميلادي).';
+      if (!/^05\d{8}$/.test(d.pphone)) return 'جوال ولي الأمر يبدأ بـ 05 ويتكون من 10 أرقام.';
+      if (d.sphone && !/^05\d{8}$/.test(d.sphone)) return 'جوال الطالب يبدأ بـ 05 ويتكون من 10 أرقام.';
+      if (!d.stage) return 'اختر المرحلة الدراسية.';
+      return '';
+    }
+  };
+}
+
+/* ---------- تسجيل طالب جديد (الإدارة) + باركود التسجيل العام ---------- */
+const APPLY_URL = new URL('apply.html', location.href.split('?')[0].replace(/[^/]*$/, '')).href;
+let SNF = null;
+async function openStudentNew(){
+  if (!SNF) SNF = studentFields('snFields', 'sn');
+  $('snForm').classList.remove('hidden'); $('snDone').classList.add('hidden'); msg('snMsg', '', '');
+  $('qrLink').textContent = APPLY_URL;
+  const qr = 'https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=8&data=' + encodeURIComponent(APPLY_URL);
+  $('qrImg').src = qr; $('qrDl').href = qr + '&format=png&download=1';
+  fillSel('snHal', [], 'جاري التحميل...');
+  try {
+    const r = await api({ action:'students' });
+    if (r.ok) fillSel('snHal', r.halaqat.map(h => [h.hid, h.name]), '— اختر الحلقة —');
+    else { const a = await api({ action:'apps' }); if (a.ok) fillSel('snHal', a.halaqat.map(h => [h.hid, h.name]), '— اختر الحلقة —'); else msg('snMsg', a.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : a.msg, 'err'); }
+  } catch(e){ if (e.message !== 'expired') msg('snMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+}
+$('snSave').onclick = async () => {
+  const d = SNF.get(), e = SNF.check(d);
+  if (e) return msg('snMsg', e, 'err');
+  if (!$('snHal').value) return msg('snMsg', 'اختر الحلقة.', 'err');
+  $('snSave').disabled = true; msg('snMsg', 'جاري التسجيل...', 'info');
+  try {
+    const r = await api({ action:'addStudent', data:d, hid:$('snHal').value });
+    if (!r.ok) return msg('snMsg', r.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : (r.dup ? '⚠️ ' : '') + r.msg, 'err');
+    toast(r.msg); $('snDoneT').textContent = '✓ ' + r.msg; $('snForm').classList.add('hidden'); $('snDone').classList.remove('hidden'); SNF.reset(); window.scrollTo(0, 0);
+  } catch(e2){ if (e2.message !== 'expired') msg('snMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+  finally { $('snSave').disabled = false; }
+};
+$('snAgain').onclick = () => { $('snForm').classList.remove('hidden'); $('snDone').classList.add('hidden'); msg('snMsg', '', ''); };
+$('snList').onclick = () => openRole('studentsList');
+$('qrCopy').onclick = async () => { try { await navigator.clipboard.writeText(APPLY_URL); toast('نُسخ رابط التسجيل'); } catch(e){ toast('تعذّر النسخ'); } };
+$('qrPrint').onclick = () => {
+  const org = (D && D.org) || $('orgName').textContent, wnd = window.open('', '_blank');
+  if (!wnd) return toast('اسمح بالنوافذ المنبثقة للطباعة');
+  wnd.document.write('<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>التسجيل في حلقات تحفيظ القرآن</title><style>body{font-family:Tajawal,Tahoma,sans-serif;text-align:center;color:#1f3546;padding:40px}' +
+    'h1{font-size:34px;margin:10px 0}h2{font-weight:500;color:#555;font-size:20px;margin:0 0 24px}img.q{width:320px;height:320px;border:10px solid #fff;box-shadow:0 0 0 2px #C9963B;border-radius:16px}' +
+    'p{font-size:18px}.l{direction:ltr;font-size:14px;color:#666;word-break:break-all}.logo{width:90px;border-radius:50%}</style></head><body>' +
+    '<img class="logo" src="' + new URL('../logo.jpg', location.href).href + '"><h2>' + org.replace(/</g, '') + '</h2><h1>سجّل الآن في حلقات تحفيظ القرآن الكريم</h1>' +
+    '<img class="q" src="' + $('qrImg').src + '" onload="setTimeout(function(){print()},300)"><p>امسح الباركود بكاميرا الجوال وعبّئ بيانات الطالب</p><div class="l">' + APPLY_URL + '</div></body></html>');
+  wnd.document.close();
+};
+
+/* ---------- طلبات المتقدمين ---------- */
+let AP = null, apF = 'قيد الانتظار', apCur = null;
+async function openApps(){
+  $('apList').innerHTML = '<div class="msg info">جاري التحميل...</div>'; $('apSum').innerHTML = '';
+  try { AP = await api({ action:'apps' }); } catch(e){ if (e.message !== 'expired') msg('apList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (!AP.ok) return msg('apList', AP.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : AP.msg, 'err');
+  renderApps();
+}
+function renderApps(){
+  const cnt = st => AP.apps.filter(a => a.status === st).length;
+  const sum = $('apSum'); sum.innerHTML = '';
+  [['قيد الانتظار', 'قيد الانتظار'], ['مقبول', 'المقبولون'], ['مرفوض', 'المرفوضون'], ['', 'الكل']].forEach(x => {
+    const b = el('button', apF === x[0] ? 'on' : '', x[1] + ' (' + (x[0] ? cnt(x[0]) : AP.apps.length) + ')'); b.onclick = () => { apF = x[0]; renderApps(); }; sum.appendChild(b);
+  });
+  const q = normAr($('apSearch').value), qd = $('apSearch').value.replace(/\D/g, ''), box = $('apList'); box.innerHTML = '';
+  const list = AP.apps.filter(a => (!apF || a.status === apF) && (!q || normAr(a.name).indexOf(q) !== -1 || (qd && (a.nid.indexOf(qd) !== -1 || a.pphone.indexOf(qd) !== -1 || a.wait === qd))))
+    .sort((a, b) => Number(a.wait) - Number(b.wait));
+  if (!list.length) box.appendChild(el('small', '', AP.apps.length ? 'لا توجد طلبات هنا.' : 'لا توجد طلبات تسجيل بعد. انشر باركود التسجيل من «تسجيل طالب جديد».'));
+  list.forEach(a => {
+    const w = el('div', 'strow' + (a.status === 'مرفوض' ? ' off' : '')), top = el('div', 'top');
+    top.appendChild(el('b', '', a.name)); top.appendChild(el('span', 'pill p-late', 'انتظار رقم ' + a.wait));
+    if (a.status === 'مقبول') top.appendChild(el('span', 'pill p-ok', 'مقبول'));
+    if (a.status === 'مرفوض') top.appendChild(el('span', 'pill p-red', 'مرفوض'));
+    w.appendChild(top);
+    const m = el('div', 'meta');
+    const add = (k, v, href) => { if (!v) return; const d = el('span', '', k + ': '); const i = el(href ? 'a' : 'i', '', v); if (href){ i.href = href; i.style.fontWeight = '600'; } d.appendChild(i); m.appendChild(d); };
+    add('الهوية', a.nid); add('المرحلة', a.stage); add('الميلاد', bFmt(a.birth, a.birthH));
+    add('جوال ولي الأمر', a.pphone, 'tel:' + a.pphone); add('جوال الطالب', a.sphone, 'tel:' + a.sphone); add('تاريخ الطلب', a.date);
+    if (a.status === 'مقبول') add('سُكّن في', a.hname + (a.sid ? ' (رقم ' + a.sid + ')' : ''));
+    if (a.status !== 'قيد الانتظار' && a.by) add('بواسطة', a.by + (a.at ? ' • ' + a.at : ''));
+    w.appendChild(m);
+    if (a.dup && a.status === 'قيد الانتظار') w.appendChild(el('div', 'warnbox', '⚠️ رقم الهوية مسجل من قبل للطالب: ' + a.dup));
+    const ac = el('div', 'stact'), btn = (cls, ic, t, fn) => { const b = el('button', cls); b.title = t; b.innerHTML = ST_IC[ic]; b.appendChild(el('span', '', t)); b.onclick = fn; ac.appendChild(b); };
+    if (a.status === 'قيد الانتظار'){
+      btn('good', 'restore', 'قبول وتسكين', () => openAccept(a));
+      btn('danger', 'trash', 'رفض', () => confirmOp('رفض طلب ' + a.name, 'يُنقل الطلب إلى «المرفوضون»، ويمكنك إعادته للانتظار لاحقاً.', 'رفض الطلب', () => appOp(a, 'reject')));
+    } else if (a.status === 'مرفوض') btn('', 'restore', 'إعادة للانتظار', () => appOp(a, 'restore'));
+    if (ac.children.length) w.appendChild(ac);
+    box.appendChild(w);
+  });
+}
+$('apSearch').oninput = () => AP && AP.ok && renderApps();
+function openAccept(a){
+  apCur = a; msg('apMsg', a.dup ? '⚠️ رقم الهوية مسجل من قبل للطالب: ' + a.dup : '', a.dup ? 'err' : '');
+  $('apText').textContent = a.name + ' — انتظار رقم ' + a.wait + (a.stage ? ' • ' + a.stage : '');
+  fillSel('apHid', AP.halaqat.map(h => [h.hid, h.name]), '— اختر الحلقة —');
+  $('apSheet').classList.remove('hidden');
+}
+$('apClose').onclick = () => $('apSheet').classList.add('hidden');
+$('apGo').onclick = async () => {
+  if (!$('apHid').value) return msg('apMsg', 'اختر الحلقة.', 'err');
+  $('apGo').disabled = true; msg('apMsg', 'جاري القبول...', 'info');
+  try {
+    const r = await api({ action:'appDecide', wait:apCur.wait, op:'accept', hid:$('apHid').value });
+    if (!r.ok) return msg('apMsg', r.msg, 'err');
+    $('apSheet').classList.add('hidden'); toast(r.msg); openApps();
+  } catch(e){ if (e.message !== 'expired') msg('apMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+  finally { $('apGo').disabled = false; }
+};
+async function appOp(a, op){
+  try { const r = await api({ action:'appDecide', wait:a.wait, op:op }); toast(r.msg); if (r.ok) openApps(); }
+  catch(e){ if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
+}
+
 /* ---------- بيانات الطلاب ---------- */
-let SB = null, sdF = '', sdCur = null;
+let SB = null, sdF = '', sdCur = null, sdBW = null;
 async function openStudents(){
   $('sdList').innerHTML = '<div class="msg info">جاري التحميل...</div>'; $('sdSum').innerHTML = '';
   try { SB = await api({ action:'students' }); } catch(e){ if (e.message !== 'expired') msg('sdList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
@@ -1417,9 +1672,9 @@ function renderStudents(){
   [['', 'الكل', live.length]].concat(nSus ? [['موقوف', 'الموقوفون', nSus]] : []).concat(nDel ? [['محذوف', 'المحذوفون', nDel]] : []).forEach(x => {
     const b = el('button', sdF === x[0] ? 'on' : '', x[1] + ' (' + x[2] + ')'); b.onclick = () => { sdF = x[0]; renderStudents(); }; sum.appendChild(b);
   });
-  const q = $('sdSearch').value.trim(), box = $('sdList'); box.innerHTML = '';
+  const qn = normAr($('sdQName').value), qi = $('sdQNid').value.replace(/\D/g, ''), qp = $('sdQPhone').value.replace(/\D/g, ''), box = $('sdList'); box.innerHTML = '';
   const list = inHal.filter(x => (sdF === 'محذوف' ? x.st === 'محذوف' : x.st !== 'محذوف' && (!sdF || x.st === sdF)) &&
-    (!q || x.name.indexOf(q) !== -1 || x.pname.indexOf(q) !== -1 || x.pphone.indexOf(q) !== -1 || x.sid === q));
+    (!qn || normAr(x.name).indexOf(qn) !== -1) && (!qi || (x.nid || '').indexOf(qi) !== -1) && (!qp || x.pphone.indexOf(qp) !== -1));
   if (!list.length) box.appendChild(el('small', '', SB.students.length ? 'لا توجد نتائج.' : 'لا يوجد طلاب بعد.'));
   list.forEach(x => {
     const w = el('div', 'strow' + (x.st ? ' off' : '')), top = el('div', 'top');
@@ -1429,7 +1684,7 @@ function renderStudents(){
     w.appendChild(top);
     const m = el('div', 'meta');
     const add = (k, v, href) => { if (!v) return; const d = el('span', '', k + ': '); const i = el(href ? 'a' : 'i', '', v); if (href){ i.href = href; i.style.fontWeight = '600'; } d.appendChild(i); m.appendChild(d); };
-    add('رقم الطالب', x.sid); add('ولي الأمر', x.pname); add('الجوال', x.pphone, 'tel:' + x.pphone); add('هوية ولي الأمر', x.pnid); add('مقدار الحفظ', x.level); add('الالتحاق', x.joined);
+    add('رقم الطالب', x.sid); add('الهوية', x.nid); add('المرحلة', x.stage); add('ولي الأمر', x.pname); add('الجوال', x.pphone, 'tel:' + x.pphone); add('هوية ولي الأمر', x.pnid); add('جوال الطالب', x.sphone, 'tel:' + x.sphone); add('الميلاد', bFmt(x.birth, x.birthH)); add('مقدار الحفظ', x.level); add('الالتحاق', x.joined);
     w.appendChild(m);
     if (SB.admin){
       const ac = el('div', 'stact'), btn = (cls, ic, t, fn) => { const b = el('button', cls); b.title = t; b.setAttribute('aria-label', t); b.innerHTML = ST_IC[ic]; b.appendChild(el('span', '', t)); b.onclick = fn; ac.appendChild(b); };
@@ -1447,7 +1702,7 @@ function renderStudents(){
   });
 }
 $('sdHal').onchange = () => SB && SB.ok && renderStudents();
-$('sdSearch').oninput = () => SB && SB.ok && renderStudents();
+['sdQName', 'sdQNid', 'sdQPhone'].forEach(id => $(id).oninput = () => SB && SB.ok && renderStudents());
 async function studentOp(x, op){
   try { const r = await api({ action:'studentStatus', sid:x.sid, op:op }); toast(r.msg); if (r.ok){ x.st = r.st; renderStudents(); } }
   catch(e){ if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
@@ -1458,6 +1713,9 @@ function openStudentEdit(x){
   fillSel('sdHid', SB.halaqat.map(h => [h.hid, h.name])); $('sdHid').value = x.hid;
   $('sdName').value = x.name; $('sdPname').value = x.pname; $('sdPphone').value = x.pphone; $('sdPnid').value = x.pnid; $('sdLevel').value = x.level;
   $('sdJoined').value = /^\d{4}-\d{2}-\d{2}$/.test(x.joined) ? x.joined : '';
+  $('sdNid').value = x.nid || ''; $('sdSphone').value = x.sphone || '';
+  fillSel('sdStage', STAGES.map(v => [v, v]), '—'); $('sdStage').value = x.stage || '';
+  if (!sdBW) sdBW = birthWidget('sdBirth'); sdBW.set(x.birth, x.birthH);
   $('sdSheet').classList.remove('hidden'); $('sdName').focus();
 }
 let mvCur = null;
@@ -1482,7 +1740,9 @@ $('mvGo').onclick = async () => {
 };
 $('sdClose').onclick = () => $('sdSheet').classList.add('hidden');
 $('sdSave').onclick = async () => {
-  const data = { name:$('sdName').value, hid:$('sdHid').value, pname:$('sdPname').value, pphone:$('sdPphone').value, pnid:$('sdPnid').value, level:$('sdLevel').value, joined:$('sdJoined').value };
+  const b = sdBW.get();
+  const data = { name:$('sdName').value, hid:$('sdHid').value, pname:$('sdPname').value, pphone:$('sdPphone').value, pnid:$('sdPnid').value, level:$('sdLevel').value, joined:$('sdJoined').value,
+    nid:$('sdNid').value, sphone:$('sdSphone').value, stage:$('sdStage').value, birth:b.g, birthH:b.h };
   $('sdSave').disabled = true; msg('sdMsg', 'جاري الحفظ...', 'info');
   try {
     const r = await api({ action:'saveStudent', sid:sdCur.sid, data:data });
