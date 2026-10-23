@@ -123,6 +123,15 @@
     nav.groups{position:fixed;top:0;right:0;bottom:0;width:min(300px,86vw);max-width:none;margin:0;padding:18px 14px;background:var(--bg);z-index:30;transform:translateX(105%);transition:transform .25s;overflow-y:auto;box-shadow:-10px 0 30px rgba(0,0,0,.25)}
     nav.groups.open{transform:none}
   }
+  .asrow{padding:12px 0;border-bottom:1px solid var(--line)}
+  .asrow:last-child{border-bottom:0}
+  .asrow .top{display:flex;align-items:center;gap:8px}
+  .asrow .top b{flex:1;min-width:0;font-size:16px}
+  .asrow .ctl{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:8px}
+  .asrow select{font-size:15px;padding:9px}
+  .asrow .mini:disabled{opacity:.45}
+  .asrow .who{font-size:13px;margin-top:2px}
+  .asrow.none .who{color:var(--red)}
   .soon{text-align:center;padding:30px 16px}
   .soon .ic{width:64px;height:64px;margin:0 auto 12px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:var(--goldlight);color:var(--gold2)}
   .soon .ic svg{width:32px;height:32px}
@@ -369,6 +378,16 @@
         <div class="chips" id="planHal" style="margin-top:10px"></div>
       </div>
       <div class="card" id="planList"></div>
+    </div>
+
+    <!-- إسناد حلقة لمعلم -->
+    <div id="pAssign" class="hidden">
+      <div class="card">
+        <h2>إسناد حلقة لمعلم</h2>
+        <small>اختر معلم كل حلقة ثم اضغط «حفظ». تظهر الحلقة للمعلم فور دخوله.</small>
+        <input id="asSearch" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:10px">
+      </div>
+      <div class="card" id="asList"></div>
     </div>
 
     <!-- خيار سيُحدَّد لاحقاً -->
@@ -714,7 +733,7 @@ const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
   { t:'شؤون الطلاب', ic:'users', items:[['soon', 'تسجيل طالب جديد'], ['soon', 'تعديل / حذف طالب'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['soon', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['soon', 'تسجيل موظف جديد'], ['soon', 'تعديل / حذف موظف'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
-  { t:'الحلقات', ic:'halaqa', items:[['soon', 'إضافة حلقة'], ['soon', 'تعديل حلقة'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
+  { t:'الحلقات', ic:'halaqa', items:[['soon', 'إضافة حلقة'], ['soon', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['soon', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['soon', 'تقرير الطلاب'], ['soon', 'تقرير المجمع']] },
@@ -750,6 +769,8 @@ function openRole(r, title, group){
   document.querySelectorAll('#nav .gitems button, #nav > button').forEach(b => b.classList.toggle('on', (b.dataset.r === 'soon' ? 'soon:' + b.dataset.t : b.dataset.r) === key));
   document.querySelectorAll('#nav .ngroup').forEach(w => { const d = w.classList.contains('direct'), has = d ? w.querySelector('.ghead').dataset.r === key : !!w.querySelector('.gitems button.on'); w.classList.toggle('cur', has); if (has && !d) w.classList.add('open'); });
   $('pSoon').classList.toggle('hidden', r !== 'soon');
+  $('pAssign').classList.toggle('hidden', r !== 'assign');
+  if (r === 'assign') openAssign();
   if (r === 'soon'){ $('soonTitle').textContent = title; $('soonIc').innerHTML = ICONS[(group && group.ic) || 'settings']; }
   if (r === 'perms' || r === 'general'){ setSub(r); r = 'settings'; }
   $('pWelcome').classList.toggle('hidden', r !== 'welcome');
@@ -1124,6 +1145,44 @@ $('apprGo').onclick = async () => {
   } catch(e){ msg('apprMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('apprGo').disabled = false; }
 };
+
+/* ---------- إسناد حلقة لمعلم (للمدير) ---------- */
+let AS = null;
+async function openAssign(){
+  $('asList').innerHTML = '<div class="msg info">جاري التحميل...</div>';
+  try { AS = await api({ action:'halaqatAdmin' }); } catch(e){ if (e.message !== 'expired') msg('asList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (!AS.ok) return msg('asList', AS.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : AS.msg, 'err');
+  renderAssign();
+}
+function renderAssign(){
+  const q = $('asSearch').value.trim(), box = $('asList'); box.innerHTML = '';
+  const list = AS.halaqat.filter(h => !q || h.name.indexOf(q) !== -1 || h.teacher.indexOf(q) !== -1);
+  if (!AS.halaqat.length) return msg('asList', 'لا توجد حلقات بعد. أضفها في تبويب «الحلقات» بجدول البيانات.', 'info');
+  if (!list.length) box.appendChild(el('small', '', 'لا توجد نتائج.'));
+  list.forEach(h => {
+    const w = el('div', 'asrow' + (h.tnid ? '' : ' none')), top = el('div', 'top');
+    top.appendChild(el('b', '', h.name)); top.appendChild(el('span', 'pill p-none', h.students + ' طالب'));
+    if (!h.active) top.appendChild(el('span', 'pill p-abs', 'موقوفة'));
+    w.appendChild(top);
+    const who = el('div', 'who muted', h.tnid ? 'المعلم الحالي: ' + (h.teacher || h.tnid) : 'لم تُسند لمعلم بعد'); w.appendChild(who);
+    const ctl = el('div', 'ctl'), sel = el('select'); sel.id = 'as-' + h.hid;
+    const o0 = el('option', '', '— بدون معلم —'); o0.value = ''; sel.appendChild(o0);
+    AS.teachers.forEach(t => { const o = el('option', '', t.name); o.value = t.nid; if (t.nid === h.tnid) o.selected = true; sel.appendChild(o); });
+    const sv = el('button', 'mini', 'حفظ'); sv.disabled = true;
+    sel.onchange = () => { sv.disabled = sel.value === h.tnid; };
+    sv.onclick = async () => {
+      sv.disabled = true; sv.textContent = '...';
+      try {
+        const r = await api({ action:'assignHalaqa', hid:h.hid, tnid:sel.value });
+        if (!r.ok){ toast(r.msg); sv.disabled = false; }
+        else { h.tnid = r.tnid; h.teacher = r.teacher; toast(r.msg); renderAssign(); }
+      } catch(e){ toast('تعذّر الاتصال بالخادم'); sv.disabled = false; }
+      sv.textContent = 'حفظ';
+    };
+    ctl.appendChild(sel); ctl.appendChild(sv); w.appendChild(ctl); box.appendChild(w);
+  });
+}
+$('asSearch').oninput = () => AS && AS.ok && renderAssign();
 
 /* ---------- الإعدادات والصلاحيات (للمدير) ---------- */
 const CAT_ICON = { 'الطلاب':'users', 'الموظفين':'staff', 'الحلقات':'halaqa', 'الاتصال والرسائل':'chat', 'الإعدادات العامة':'settings', 'المنافس':'trophy', 'الاختبارات':'exam' };
