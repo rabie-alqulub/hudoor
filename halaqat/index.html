@@ -143,6 +143,9 @@
   .stact button.good{color:var(--ok)}
   .stact button:disabled{opacity:.5}
   .pill.p-red{background:var(--errbg);color:var(--red)}
+  .nssteps{margin:8px 0 12px;padding-inline-start:20px;line-height:1.9;font-size:14px}
+  .nssteps a{color:var(--navy);font-weight:600}
+  #nsDone .bar{flex-wrap:wrap;gap:6px;justify-content:flex-start}
   .edgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
   .edgrid .full{grid-column:1/-1}
   @media (max-width:430px){ .stact button span{display:none} .stact button{padding:8px 12px} }
@@ -422,6 +425,41 @@
         <input id="stSearch" placeholder="ابحث بالاسم أو رقم الهوية أو الجوال" style="margin-top:10px">
       </div>
       <div class="card" id="stList"></div>
+    </div>
+
+    <!-- تسجيل موظف جديد -->
+    <div id="pNewStaff" class="hidden">
+      <div class="card" id="nsForm">
+        <h2>تسجيل موظف جديد</h2>
+        <small>يُسجَّل في جدول الحضور والانصراف بنفس خاناته، فيستطيع تسجيل بصمته في صفحة الحضور، ويدخل ترتيل برقم هويته والرمز 123456.</small>
+        <div class="edgrid" style="margin-top:6px">
+          <div><label for="nsEmp">الرقم الوظيفي</label><input id="nsEmp" inputmode="numeric" maxlength="8"></div>
+          <div><label for="nsStatus">الحالة</label><select id="nsStatus"></select></div>
+          <div class="full"><label for="nsName">الاسم الرباعي *</label><input id="nsName" autocomplete="off"></div>
+          <div><label for="nsNid">رقم الهوية / الإقامة *</label><input id="nsNid" inputmode="numeric" maxlength="15" autocomplete="off"></div>
+          <div><label for="nsNat">الجنسية</label><select id="nsNat"><option>سعودي</option><option>مقيم</option></select></div>
+          <div><label for="nsPhone">رقم الجوال</label><input id="nsPhone" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>
+          <div><label for="nsSifa">الصفة *</label><select id="nsSifa"></select></div>
+          <div><label for="nsTask">المهمة</label><input id="nsTask" placeholder="مثال: معلم حلقة"></div>
+          <div><label for="nsShift">رمز الفترة</label><select id="nsShift"></select></div>
+          <div id="nsHcodeBox"><label for="nsHcode">رمز الحلقة (جدول الحضور)</label><select id="nsHcode"></select></div>
+          <div><label for="nsStart">تاريخ المباشرة</label><input id="nsStart" type="date"></div>
+          <div><label for="nsDev">رقم البصمة بالجهاز</label><input id="nsDev" inputmode="numeric"></div>
+          <div class="full"><label for="nsHal">إسناد حلقة في ترتيل (اختياري)</label><select id="nsHal"></select></div>
+          <div class="full"><label for="nsNotes">ملاحظات</label><input id="nsNotes"></div>
+        </div>
+        <button class="btn" id="nsSave">تسجيل الموظف</button>
+        <div id="nsMsg"></div>
+      </div>
+      <div class="card hidden" id="nsDone">
+        <h2 id="nsDoneT"></h2>
+        <ol class="nssteps">
+          <li>يدخل الموظف <a href="https://rabie-alqulub.github.io/hudoor/" target="_blank" rel="noopener">صفحة البصمة</a> برقم هويته، ويسجّل بصمة وجهه والرمز البديل.</li>
+          <li>تعتمد أنت بصمته كالمعتاد، ثم يبدأ تسجيل حضوره.</li>
+          <li>يدخل ترتيل برقم هويته والرمز الأولي <b>123456</b>، ويُطلب منه تغييره.</li>
+        </ol>
+        <div class="bar"><button class="mini" id="nsAgain">تسجيل موظف آخر</button><button class="mini" id="nsList">عرض بيانات الموظفين</button><button class="mini" id="nsCopy">نسخ رسالة للموظف</button></div>
+      </div>
     </div>
 
     <!-- خيار سيُحدَّد لاحقاً -->
@@ -795,7 +833,7 @@ async function loadHome(){
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
   { t:'شؤون الطلاب', ic:'users', items:[['soon', 'تسجيل طالب جديد'], ['soon', 'تعديل / حذف طالب'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['soon', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
-  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['soon', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
+  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['soon', 'إضافة حلقة'], ['soon', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['soon', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل']] },
@@ -836,6 +874,8 @@ function openRole(r, title, group){
   if (r === 'assign') openAssign();
   $('pStaff').classList.toggle('hidden', r !== 'staff');
   if (r === 'staff') openStaff();
+  $('pNewStaff').classList.toggle('hidden', r !== 'staffNew');
+  if (r === 'staffNew') openNewStaff();
   if (r === 'soon'){ $('soonTitle').textContent = title; $('soonIc').innerHTML = ICONS[(group && group.ic) || 'settings']; }
   if (r === 'perms' || r === 'general'){ setSub(r); r = 'settings'; }
   $('pWelcome').classList.toggle('hidden', r !== 'welcome');
@@ -1311,12 +1351,56 @@ async function staffOp(s, op){
     toast(r.msg); if (r.ok){ s.st = r.st; if (op === 'delete'){ s.halaqat = []; s.pin = 'default'; } renderStaff(); }
   } catch(e){ if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
 }
+/* ---------- تسجيل موظف جديد ---------- */
+let nsLast = null;
+const fillSel = (id, opts, blank) => { const sel = $(id); sel.innerHTML = ''; if (blank !== undefined){ const o = el('option', '', blank); o.value = ''; sel.appendChild(o); } opts.forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; sel.appendChild(o); }); };
+async function openNewStaff(){
+  $('nsForm').classList.remove('hidden'); $('nsDone').classList.add('hidden'); msg('nsMsg', 'جاري التحميل...', 'info'); $('nsSave').disabled = true;
+  try { SD = await api({ action:'staff' }); } catch(e){ if (e.message !== 'expired') msg('nsMsg', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (!SD.ok) return msg('nsMsg', SD.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : SD.msg, 'err');
+  if (!SD.lists) return msg('nsMsg', 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.', 'err');
+  const L = SD.lists;
+  fillSel('nsSifa', L.sifa.map(x => [x, x]), '— اختر —');
+  fillSel('nsStatus', L.status.map(x => [x, x]));
+  fillSel('nsShift', L.shifts.map(x => [x.code, x.code + (x.name ? ' - ' + x.name : '')]), '—'); if (L.shifts.length === 1) $('nsShift').value = L.shifts[0].code;
+  fillSel('nsHcode', L.attHalaqat.map(x => [x.code, x.code + (x.name ? ' - ' + x.name : '')]), '—'); $('nsHcodeBox').classList.toggle('hidden', !L.attHalaqat.length);
+  const tn = {}; SD.staff.forEach(x => tn[x.nid] = x.name);
+  fillSel('nsHal', (SD.halaqat || []).map(h => [h.hid, h.name + (h.tnid ? ' (حالياً: ' + (tn[h.tnid] || h.tnid) + ')' : ' (بدون معلم)')]), '— بدون —');
+  ['nsName','nsNid','nsPhone','nsTask','nsDev','nsNotes'].forEach(id => $(id).value = '');
+  $('nsEmp').value = SD.nextEmp || ''; $('nsNat').value = 'سعودي'; $('nsStart').value = D.today || '';
+  $('nsSifa').onchange = () => { if (!$('nsTask').value && $('nsSifa').value === 'معلم') $('nsTask').value = 'معلم حلقة'; };
+  msg('nsMsg', '', ''); $('nsSave').disabled = false; $('nsName').focus();
+}
+$('nsSave').onclick = async () => {
+  const data = { emp:$('nsEmp').value, name:$('nsName').value, nid:$('nsNid').value, nat:$('nsNat').value, phone:$('nsPhone').value, sifa:$('nsSifa').value,
+    task:$('nsTask').value, shift:$('nsShift').value, hcode:$('nsHcode').value, start:$('nsStart').value, dev:$('nsDev').value, status:$('nsStatus').value, notes:$('nsNotes').value };
+  if (!data.name.trim() || !data.nid.trim()) return msg('nsMsg', 'الاسم ورقم الهوية مطلوبان.', 'err');
+  if (!data.sifa) return msg('nsMsg', 'اختر الصفة.', 'err');
+  $('nsSave').disabled = true; msg('nsMsg', 'جاري التسجيل...', 'info');
+  try {
+    const r = await api({ action:'addStaff', data:data, hid:$('nsHal').value });
+    if (!r.ok) return msg('nsMsg', r.msg, 'err');
+    nsLast = r; toast(r.msg);
+    $('nsDoneT').textContent = '✓ ' + r.msg; $('nsForm').classList.add('hidden'); $('nsDone').classList.remove('hidden'); window.scrollTo(0, 0);
+  } catch(e){ if (e.message !== 'expired') msg('nsMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+  finally { $('nsSave').disabled = false; }
+};
+$('nsAgain').onclick = () => openNewStaff();
+$('nsList').onclick = () => openRole('staff');
+$('nsCopy').onclick = async () => {
+  const t = 'السلام عليكم ' + (nsLast ? nsLast.name : '') + '\nتم تسجيلك في مجمع حلقات ربيع القلوب.\n' +
+    '١) بصمة الحضور: https://rabie-alqulub.github.io/hudoor/ ادخل برقم هويتك وسجّل بصمة وجهك.\n' +
+    '٢) برنامج ترتيل: https://rabie-alqulub.github.io/hudoor/halaqat/ اسم المستخدم رقم هويتك والرمز 123456 ثم غيّره.';
+  try { await navigator.clipboard.writeText(t); toast('نُسخت الرسالة'); } catch(e){ toast('تعذّر النسخ'); }
+};
+
 let edCur = null;
 function openEdit(s){
   edCur = s; msg('edMsg', '', '');
   $('edEmp').textContent = 'الرقم الوظيفي: ' + (s.emp || '—') + ' • التعديل يُحفظ في جدول الحضور والانصراف';
   $('edName').value = s.name; $('edNid').value = s.nid; $('edPhone').value = s.phone; $('edTask').value = s.task || ''; $('edShift').value = s.shift || ''; $('edStart').value = /^\d{4}-\d{2}-\d{2}$/.test(s.start || '') ? s.start : '';
   const setSel = (id, v) => { const sel = $(id); if (v && ![...sel.options].some(o => o.value === v)){ const o = el('option', '', v); sel.appendChild(o); } sel.value = v || sel.options[0].value; };
+  if (SD && SD.lists) fillSel('edSifa', SD.lists.sifa.map(x => [x, x]));
   setSel('edNat', s.nat); setSel('edSifa', s.sifa);
   $('edSheet').classList.remove('hidden'); $('edName').focus();
 }
