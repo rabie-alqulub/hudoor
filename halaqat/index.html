@@ -161,7 +161,7 @@
   .qrcard{text-align:center}
   .qrbox{margin:12px auto 6px;background:#fff;border-radius:14px;padding:10px;width:max-content;border:1px solid var(--line)}
   .qrbox img{display:block;width:220px;height:220px}
-  .qrlink{direction:ltr;font-size:12.5px;color:var(--muted);word-break:break-all;margin-bottom:8px}
+  .qrlink{display:block;direction:ltr;font-size:13px;color:var(--navy);font-weight:600;word-break:break-all;margin-bottom:10px}
   a.mini{text-decoration:none;display:inline-flex;align-items:center}
   .warnbox{background:var(--errbg);color:var(--red);border-radius:10px;padding:6px 10px;font-size:13px;margin-top:6px}
   .edgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
@@ -472,12 +472,16 @@
         <div id="snMsg"></div>
       </div>
       <div class="card hidden" id="snDone"><h2 id="snDoneT"></h2><div class="bar" style="justify-content:flex-start;gap:6px;flex-wrap:wrap"><button class="mini" id="snAgain">تسجيل طالب آخر</button><button class="mini" id="snList">عرض بيانات الطلاب</button></div></div>
+    </div>
+
+    <!-- رابط التسجيل العام -->
+    <div id="pRegLink" class="hidden">
       <div class="card qrcard">
-        <h2>باركود التسجيل للعموم</h2>
-        <small>انشر هذا الباركود أو الرابط لمن يريد التسجيل. لا يُسكَّن المتقدم في حلقة، ويظهر طلبه في «طلبات المتقدمين» برقم انتظار حتى تقبله.</small>
+        <h2>رابط التسجيل</h2>
+        <small>رابط عام لتسجيل الطلاب: من يفتحه يسجّل مباشرة بنفس خانات «تسجيل طالب جديد» دون حساب أو دخول. لا يُسكَّن المتقدم في حلقة، ويظهر طلبه في «طلبات المتقدمين» برقم انتظار حتى تقبله.</small>
         <div class="qrbox"><img id="qrImg" alt="باركود رابط التسجيل" width="220" height="220"></div>
-        <div class="qrlink" id="qrLink"></div>
-        <div class="bar" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="mini" id="qrCopy">نسخ الرابط</button><button class="mini" id="qrPrint">طباعة إعلان التسجيل</button><a class="mini" id="qrDl" target="_blank" rel="noopener">تحميل الباركود</a></div>
+        <a class="qrlink" id="qrLink" target="_blank" rel="noopener"></a>
+        <div class="bar" style="justify-content:center;gap:6px;flex-wrap:wrap"><button class="mini" id="qrCopy">نسخ الرابط</button><button class="mini" id="qrShare">مشاركة</button><a class="mini" id="qrOpen" target="_blank" rel="noopener">فتح الصفحة</a><button class="mini" id="qrPrint">طباعة إعلان التسجيل</button><a class="mini" id="qrDl" target="_blank" rel="noopener">تحميل الباركود</a></div>
       </div>
     </div>
 
@@ -909,7 +913,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users;
+ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
 let TABS = [];
@@ -927,7 +931,7 @@ async function loadHome(){
   if (r.roles.indexOf('teacher') !== -1 || r.roles.indexOf('admin') !== -1) TABS.push(['teach', 'التقييم']);
   if (P.indexOf('students.plans_all') !== -1) TABS.push(['plans', 'بناء الخطط التعليمية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.view_all') !== -1) TABS.push(['studentsList', 'بيانات الطلاب']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('students.add') !== -1){ TABS.push(['studentNew', 'تسجيل طالب']); TABS.push(['apps', 'طلبات المتقدمين']); }
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('students.add') !== -1){ TABS.push(['studentNew', 'تسجيل طالب']); TABS.push(['regLink', 'رابط التسجيل']); TABS.push(['apps', 'طلبات المتقدمين']); }
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
   if (r.roles.indexOf('parent') !== -1) TABS.push(['parent', 'أبنائي']);
@@ -943,7 +947,7 @@ async function loadHome(){
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['soon', 'إضافة حلقة'], ['soon', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
@@ -988,6 +992,8 @@ function openRole(r, title, group){
   $('pStudents').classList.toggle('hidden', r !== 'studentsList');
   $('pStudentNew').classList.toggle('hidden', r !== 'studentNew');
   if (r === 'studentNew') openStudentNew();
+  $('pRegLink').classList.toggle('hidden', r !== 'regLink');
+  if (r === 'regLink') openRegLink();
   $('pApps').classList.toggle('hidden', r !== 'apps');
   if (r === 'apps') openApps();
   if (r === 'studentsList') openStudents();
@@ -1553,9 +1559,6 @@ let SNF = null;
 async function openStudentNew(){
   if (!SNF) SNF = studentFields('snFields', 'sn');
   $('snForm').classList.remove('hidden'); $('snDone').classList.add('hidden'); msg('snMsg', '', '');
-  $('qrLink').textContent = APPLY_URL;
-  const qr = 'https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=8&data=' + encodeURIComponent(APPLY_URL);
-  $('qrImg').src = qr; $('qrDl').href = qr + '&format=png&download=1';
   fillSel('snHal', [], 'جاري التحميل...');
   try {
     const r = await api({ action:'students' });
@@ -1563,6 +1566,13 @@ async function openStudentNew(){
     else { const a = await api({ action:'apps' }); if (a.ok) fillSel('snHal', a.halaqat.map(h => [h.hid, h.name]), '— اختر الحلقة —'); else msg('snMsg', a.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : a.msg, 'err'); }
   } catch(e){ if (e.message !== 'expired') msg('snMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
 }
+function openRegLink(){
+  $('qrLink').textContent = APPLY_URL; $('qrLink').href = APPLY_URL; $('qrOpen').href = APPLY_URL;
+  const qr = 'https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=8&data=' + encodeURIComponent(APPLY_URL);
+  if ($('qrImg').src !== qr) $('qrImg').src = qr; $('qrDl').href = qr + '&format=png&download=1';
+  $('qrShare').classList.toggle('hidden', !navigator.share);
+}
+$('qrShare').onclick = () => navigator.share && navigator.share({ title:'التسجيل في حلقات تحفيظ القرآن', text:'رابط التسجيل في ' + ((D && D.orgShort) || 'مجمع ربيع القلوب') + ':', url:APPLY_URL }).catch(() => {});
 $('snSave').onclick = async () => {
   const d = SNF.get(), e = SNF.check(d);
   if (e) return msg('snMsg', e, 'err');
