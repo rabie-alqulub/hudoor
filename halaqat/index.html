@@ -156,6 +156,10 @@
   .bw{display:grid;grid-template-columns:1fr 1.3fr;gap:8px;align-items:end}
   .bw small{display:block;color:var(--muted);font-size:12px;margin-bottom:2px}
   .bw .hs{display:grid;grid-template-columns:.8fr 1.6fr 1fr;gap:4px}
+  .bw.choose{grid-template-columns:1fr}
+  .seg{display:inline-flex;background:var(--light);border-radius:10px;padding:3px;margin-bottom:6px;gap:2px}
+  .seg button{border:0;background:transparent;color:var(--text);font:inherit;font-size:14px;padding:6px 16px;border-radius:8px;cursor:pointer}
+  .seg button.on{background:var(--navy);color:#fff}
   .bw .hs select{padding:9px 4px;font-size:14px}
   @media (max-width:430px){ .bw{grid-template-columns:1fr} }
   .qrcard{text-align:center}
@@ -1499,9 +1503,9 @@ const pad2 = n => String(n).padStart(2, '0');
 const hFmt = hv => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(hv || ''); return m ? (+m[3]) + ' ' + H_MONTHS[+m[2] - 1] + ' ' + m[1] + ' هـ' : ''; };
 const bFmt = (g, h) => [g ? g.split('-').reverse().join('/') : '', hFmt(h)].filter(Boolean).join(' • ');
 /** حقل تاريخ الميلاد: ميلادي وهجري، تعبئة أحدهما تملأ الآخر */
-function birthWidget(boxId){
+function birthWidget(boxId, choose){
   const box = $(boxId); box.innerHTML = '';
-  const w = el('div', 'bw'), gd = el('div'), hd = el('div');
+  const w = el('div', 'bw' + (choose ? ' choose' : '')), gd = el('div'), hd = el('div');
   gd.appendChild(el('small', '', 'ميلادي')); const g = el('input'); g.type = 'date'; g.max = new Date().toISOString().slice(0, 10); gd.appendChild(g);
   hd.appendChild(el('small', '', 'هجري')); const hs = el('div', 'hs');
   const sd = el('select'), sm = el('select'), sy = el('select');
@@ -1511,13 +1515,29 @@ function birthWidget(boxId){
   const cy = (g2h(new Date().toISOString().slice(0, 10)) || [1448])[0];
   for (let y = cy; y >= 1370; y--){ const o = el('option', '', y); o.value = y; sy.appendChild(o); }
   hs.appendChild(sd); hs.appendChild(sm); hs.appendChild(sy); hd.appendChild(hs);
+  let mode = 'h';
+  if (choose){
+    const seg = el('div', 'seg'), bh = el('button', 'on', 'هجري'), bg = el('button', '', 'ميلادي');
+    bh.type = bg.type = 'button';
+    const pick = m => { mode = m; bh.classList.toggle('on', m === 'h'); bg.classList.toggle('on', m === 'g'); hd.classList.toggle('hidden', m !== 'h'); gd.classList.toggle('hidden', m !== 'g'); };
+    bh.onclick = () => pick('h'); bg.onclick = () => pick('g');
+    seg.appendChild(bh); seg.appendChild(bg); box.appendChild(seg); pick('h');
+    gd.firstChild.remove(); hd.firstChild.remove();
+  }
   w.appendChild(gd); w.appendChild(hd); box.appendChild(w);
   const setH = h => { sd.value = h ? h[2] : ''; sm.value = h ? h[1] : ''; sy.value = h ? h[0] : ''; };
   g.onchange = () => setH(g2h(g.value));
   const fromH = () => { if (sd.value && sm.value && sy.value){ const iso = h2g(+sy.value, +sm.value, +sd.value); if (iso) g.value = iso; } };
   [sd, sm, sy].forEach(x => x.onchange = fromH);
   return {
-    get(){ return { g: g.value, h: sd.value && sm.value && sy.value ? sy.value + '-' + pad2(sm.value) + '-' + pad2(sd.value) : '' }; },
+    get(){
+      const h = sd.value && sm.value && sy.value ? sy.value + '-' + pad2(sm.value) + '-' + pad2(sd.value) : '';
+      if (choose){   // يُرسل ما اختاره، ويُحسب الآخر تلقائياً
+        if (mode === 'h') return { g: h ? h2g(+sy.value, +sm.value, +sd.value) : '', h: h };
+        const x = g2h(g.value); return { g: g.value, h: x ? x[0] + '-' + pad2(x[1]) + '-' + pad2(x[2]) : '' };
+      }
+      return { g: g.value, h: h };
+    },
     set(gv, hv){ g.value = /^\d{4}-\d{2}-\d{2}$/.test(gv || '') ? gv : ''; const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(hv || ''); setH(m ? [+m[1], +m[2], +m[3]] : g2h(g.value)); }
   };
 }
@@ -1527,21 +1547,21 @@ function studentFields(boxId, pre){
   box.insertAdjacentHTML('beforeend', '<div class="edgrid" style="margin-top:6px">' +
     '<div><label for="' + pre + 'N1">الاسم الأول *</label><input id="' + pre + 'N1" autocomplete="off"></div>' +
     '<div><label for="' + pre + 'N2">اسم الأب *</label><input id="' + pre + 'N2" autocomplete="off"></div>' +
-    '<div><label for="' + pre + 'N3">اسم الجد</label><input id="' + pre + 'N3" autocomplete="off"></div>' +
+    '<div><label for="' + pre + 'N3">اسم الجد *</label><input id="' + pre + 'N3" autocomplete="off"></div>' +
     '<div><label for="' + pre + 'N4">اسم العائلة *</label><input id="' + pre + 'N4" autocomplete="off"></div>' +
     '<div class="full"><label for="' + pre + 'Nid">رقم الهوية / الإقامة *</label><input id="' + pre + 'Nid" inputmode="numeric" maxlength="14" autocomplete="off"></div>' +
-    '<div class="full"><label>تاريخ الميلاد * <span class="muted" style="font-weight:400">(اكتب الهجري أو الميلادي ويُعبّأ الآخر)</span></label><div id="' + pre + 'Birth"></div></div>' +
+    '<div class="full"><label>تاريخ الميلاد هجري أو ميلادي *</label><div id="' + pre + 'Birth"></div></div>' +
     '<div><label for="' + pre + 'Pp">جوال ولي الأمر *</label><input id="' + pre + 'Pp" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>' +
     '<div><label for="' + pre + 'Sp">جوال الطالب</label><input id="' + pre + 'Sp" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>' +
     '<div class="full"><label for="' + pre + 'Stage">المرحلة الدراسية *</label><select id="' + pre + 'Stage"></select></div></div>');
   fillSel(pre + 'Stage', STAGES.map(v => [v, v]), '— اختر —');
-  const bw = birthWidget(pre + 'Birth');
+  const bw = birthWidget(pre + 'Birth', true);
   return {
     get(){ const b = bw.get(); return { n1:$(pre + 'N1').value.trim(), n2:$(pre + 'N2').value.trim(), n3:$(pre + 'N3').value.trim(), n4:$(pre + 'N4').value.trim(),
       nid:$(pre + 'Nid').value.replace(/\D/g, ''), birth:b.g, birthH:b.h, pphone:$(pre + 'Pp').value.replace(/\D/g, ''), sphone:$(pre + 'Sp').value.replace(/\D/g, ''), stage:$(pre + 'Stage').value }; },
     reset(){ ['N1','N2','N3','N4','Nid','Pp','Sp'].forEach(k => $(pre + k).value = ''); $(pre + 'Stage').value = ''; bw.set('', ''); },
     check(d){
-      const miss = [['n1','الاسم الأول'],['n2','اسم الأب'],['n4','اسم العائلة']].filter(x => !d[x[0]]).map(x => x[1]);
+      const miss = [['n1','الاسم الأول'],['n2','اسم الأب'],['n3','اسم الجد'],['n4','اسم العائلة']].filter(x => !d[x[0]]).map(x => x[1]);
       if (miss.length) return 'أكمل: ' + miss.join('، ');
       if (d.nid.length < 10) return 'رقم الهوية / الإقامة 10 أرقام.';
       if (!d.birth && !d.birthH) return 'أدخل تاريخ الميلاد (هجري أو ميلادي).';
