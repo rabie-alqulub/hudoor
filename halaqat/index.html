@@ -660,7 +660,6 @@
       <div><label for="edNat">الجنسية</label><select id="edNat"><option>سعودي</option><option>مقيم</option></select></div>
       <div><label for="edSifa">الصفة</label><select id="edSifa"><option>معلم</option><option>مشرف تعليمي</option><option>مشرف طلاب</option><option>إداري</option><option>مدير المجمع</option></select></div>
       <div><label for="edTask">المهمة</label><input id="edTask"></div>
-      <div><label for="edShift">رمز الفترة</label><input id="edShift"></div>
       <div class="full"><label for="edStart">تاريخ المباشرة</label><input id="edStart" type="date"></div>
     </div>
     <button class="btn" id="edSave">حفظ التعديلات</button>
@@ -1318,7 +1317,7 @@ function renderStaff(){
     const m = el('div', 'meta');
     const add = (k, v, href) => { if (!v) return; const d = el('span', '', k + ': '); const i = el(href ? 'a' : 'i', '', v); if (href){ i.href = href; i.style.fontWeight = '600'; } d.appendChild(i); m.appendChild(d); };
     add('رقم الهوية', s.nid); add('الجوال', s.phone, 'tel:' + s.phone); add('الرقم الوظيفي', s.emp); add('الجنسية', s.nat);
-    add('المهمة', s.task && s.task !== s.sifa ? s.task : ''); add('الفترة', s.shift); add('المباشرة', s.start);
+    add('المهمة', s.task && s.task !== s.sifa ? s.task : ''); add('المباشرة', s.start);
     add('الحلقات', s.halaqat.join('، ') || (s.title === 'معلم' ? 'لم تُسند' : ''));
     if (s.pin === 'changed' && /^\d{4}-/.test(s.last)) add('آخر دخول', s.last);
     w.appendChild(m);
@@ -1394,7 +1393,7 @@ let edCur = null;
 function openEdit(s){
   edCur = s; msg('edMsg', '', '');
   $('edEmp').textContent = 'الرقم الوظيفي: ' + (s.emp || '—') + ' • التعديل يُحفظ في جدول الحضور والانصراف';
-  $('edName').value = s.name; $('edNid').value = s.nid; $('edPhone').value = s.phone; $('edTask').value = s.task || ''; $('edShift').value = s.shift || ''; $('edStart').value = /^\d{4}-\d{2}-\d{2}$/.test(s.start || '') ? s.start : '';
+  $('edName').value = s.name; $('edNid').value = s.nid; $('edPhone').value = s.phone; $('edTask').value = s.task || ''; $('edStart').value = /^\d{4}-\d{2}-\d{2}$/.test(s.start || '') ? s.start : '';
   const setSel = (id, v) => { const sel = $(id); if (v && ![...sel.options].some(o => o.value === v)){ const o = el('option', '', v); sel.appendChild(o); } sel.value = v || sel.options[0].value; };
   if (SD && SD.lists) fillSel('edSifa', SD.lists.sifa.concat((SD.lists.all || []).filter(x => SD.lists.sifa.indexOf(x) === -1)).map(x => [x, x]));
   setSel('edNat', s.nat); setSel('edSifa', s.sifa);
@@ -1402,7 +1401,7 @@ function openEdit(s){
 }
 $('edClose').onclick = () => $('edSheet').classList.add('hidden');
 $('edSave').onclick = async () => {
-  const data = { name:$('edName').value, nid:$('edNid').value, phone:$('edPhone').value, nat:$('edNat').value, sifa:$('edSifa').value, task:$('edTask').value, shift:$('edShift').value, start:$('edStart').value };
+  const data = { name:$('edName').value, nid:$('edNid').value, phone:$('edPhone').value, nat:$('edNat').value, sifa:$('edSifa').value, task:$('edTask').value, shift:edCur.shift || '', start:$('edStart').value };
   if (data.nid.replace(/\D/g, '') !== edCur.nid) return confirmOp('تغيير رقم الهوية', 'سيعود رمز دخوله إلى 123456، وتنتقل حلقاته وصلاحياته إلى الرقم الجديد.', 'متابعة الحفظ', () => saveEdit(data));
   saveEdit(data);
 };
