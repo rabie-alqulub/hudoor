@@ -45,8 +45,8 @@
   nav button{flex:none;white-space:nowrap;display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:15px}
   nav button.on{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 4px 12px rgba(59,95,120,.3)}
   nav svg{width:20px;height:20px}
-  @media (max-width:520px){ nav{gap:6px} nav button{padding:9px 11px;font-size:14px;gap:6px;border-radius:12px} nav svg{width:18px;height:18px} }
-  @media (max-width:430px){ nav button{padding:9px 13px} nav svg{display:none} }
+  @media (max-width:520px){ nav{gap:6px} nav:not(.groups) > button{padding:9px 11px;font-size:14px;gap:6px;border-radius:12px} nav svg{width:18px;height:18px} }
+  @media (max-width:430px){ nav:not(.groups) > button{padding:9px 13px} nav:not(.groups) > button svg{display:none} }
   @media (min-width:860px){
     .shell{display:grid;grid-template-columns:230px minmax(0,640px);gap:24px;padding:20px;justify-content:center}
     nav{flex-direction:column;position:sticky;top:90px;align-self:start;padding:0;margin:0;max-width:none}
@@ -95,6 +95,33 @@
   small,.muted{color:var(--muted)}
   small{display:block;line-height:1.6}
   .hidden{display:none !important}
+  nav.groups{flex-direction:column;gap:6px;overflow:visible}
+  nav.groups .gtitle{font-size:12px;color:var(--muted);padding:2px 6px 6px;font-weight:700}
+  .ngroup{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .ghead{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;background:none;color:var(--text);font-size:16px;font-weight:700;text-align:right}
+  .ghead .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--light);color:var(--navy)}
+  .ghead .ic svg{width:19px;height:19px}
+  .ghead .chev{margin-inline-start:auto;width:18px;height:18px;color:var(--muted);transition:transform .2s}
+  .ngroup.open .ghead .chev{transform:rotate(180deg)}
+  .ngroup.cur .ghead .ic{background:var(--navy);color:#fff}
+  .gitems{display:none;padding:0 10px 10px}
+  .ngroup.open .gitems{display:block}
+  .gitems button{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;margin-top:4px;border-radius:10px;background:none;color:var(--muted);font-size:15px;font-weight:500;text-align:right;border:0}
+  .gitems button::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--line)}
+  .gitems button.on{background:var(--navy);color:#fff;font-weight:700}
+  .gitems button.on::before{background:var(--gold)}
+  .gitems button span{margin-inline-start:auto;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--light);color:var(--muted)}
+  @media (prefers-color-scheme: dark){ .ghead .ic{color:#BFD3E2} }
+  .appbar .menubtn{display:none}
+  .scrim{position:fixed;inset:0;background:rgba(10,18,24,.45);z-index:29}
+  @media (max-width:859px){
+    body.admin .appbar .menubtn{display:flex}
+    nav.groups{position:fixed;top:0;right:0;bottom:0;width:min(300px,86vw);max-width:none;margin:0;padding:18px 14px;background:var(--bg);z-index:30;transform:translateX(105%);transition:transform .25s;overflow-y:auto;box-shadow:-10px 0 30px rgba(0,0,0,.25)}
+    nav.groups.open{transform:none}
+  }
+  .soon{text-align:center;padding:30px 16px}
+  .soon .ic{width:64px;height:64px;margin:0 auto 12px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:var(--goldlight);color:var(--gold2)}
+  .soon .ic svg{width:32px;height:32px}
   .pcat{border:1px solid var(--line);border-radius:14px;margin-top:10px;overflow:hidden}
   .pcat .ph{display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;background:var(--card);color:var(--text);text-align:right;font-size:16px;font-weight:700}
   .pcat .ph .ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--light);color:var(--navy)}
@@ -259,6 +286,7 @@
 <header class="appbar hidden" id="appbar">
   <button class="brand" id="brandHome" aria-label="الرئيسية"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg><span><b>ترتيل</b><small>الحلقة الذكية</small></span></button>
   <span class="grow"></span>
+  <button class="iconbtn menubtn" id="btnMenu" aria-label="القائمة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>القائمة</button>
   <button class="iconbtn" id="btnPin" aria-label="تغيير الرمز السري"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/></svg>الرمز</button>
   <button class="iconbtn" id="btnLogout" aria-label="تسجيل الخروج"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>خروج</button>
 </header>
@@ -337,6 +365,13 @@
         <div class="chips" id="planHal" style="margin-top:10px"></div>
       </div>
       <div class="card" id="planList"></div>
+    </div>
+
+    <!-- خيار سيُحدَّد لاحقاً -->
+    <div id="pSoon" class="hidden card soon">
+      <div class="ic" id="soonIc"></div>
+      <h2 id="soonTitle"></h2>
+      <small id="soonText">سيُضاف هذا الخيار بأوامره قريباً.</small>
     </div>
 
     <!-- الإعدادات (للمدير) -->
@@ -661,20 +696,56 @@ async function loadHome(){
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
   if (r.roles.indexOf('parent') !== -1) TABS.push(['parent', 'أبنائي']);
   const n = $('nav'); n.innerHTML = '';
-  TABS.forEach(x => { const b = el('button'); b.dataset.r = x[0]; b.innerHTML = ICONS[x[0]]; b.appendChild(el('span', '', x[1])); b.onclick = () => openRole(x[0]); n.appendChild(b); });
+  const admin = r.roles.indexOf('admin') !== -1;
+  document.body.classList.toggle('admin', admin);
+  n.classList.toggle('groups', admin);
+  if (admin) buildAdminNav(n);
+  else TABS.forEach(x => { const b = el('button'); b.dataset.r = x[0]; b.innerHTML = ICONS[x[0]]; b.appendChild(el('span', '', x[1])); b.onclick = () => openRole(x[0]); n.appendChild(b); });
   show('vHome');
   openRole('welcome');
 }
-function openRole(r){
+/* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
+const ADMIN_NAV = [
+  { t:'الطلاب', ic:'users', items:[['plans', 'خطة الطالب'], ['soon', 'سجل الطلاب'], ['soon', 'إضافة طالب'], ['soon', 'نقل طالب بين الحلقات']] },
+  { t:'الموظفين', ic:'staff', items:[['soon', 'قائمة الموظفين'], ['soon', 'متابعة المعلمين']] },
+  { t:'الحلقات', ic:'halaqa', items:[['teach', 'التقييم'], ['report', 'التقارير'], ['soon', 'إدارة الحلقات']] },
+  { t:'الإعدادات', ic:'settings', items:[['perms', 'الصلاحيات'], ['general', 'الإعدادات العامة']] }
+];
+function buildAdminNav(n){
+  n.appendChild(el('div', 'gtitle', 'لوحة المدير'));
+  ADMIN_NAV.forEach((g, gi) => {
+    const w = el('div', 'ngroup'); w.dataset.g = gi;
+    const h = el('button', 'ghead'); const ic = el('span', 'ic'); ic.innerHTML = ICONS[g.ic]; h.appendChild(ic); h.appendChild(el('span', '', g.t));
+    h.insertAdjacentHTML('beforeend', ICONS.chev); h.onclick = () => w.classList.toggle('open'); w.appendChild(h);
+    const box = el('div', 'gitems');
+    g.items.forEach(it => {
+      const b = el('button', '', it[1]); b.dataset.r = it[0]; b.dataset.t = it[1];
+      if (it[0] === 'soon') b.appendChild(el('span', '', 'قريباً'));
+      b.onclick = () => { openRole(it[0], it[1], g); closeMenu(); }; box.appendChild(b);
+    });
+    w.appendChild(box); n.appendChild(w);
+  });
+}
+function closeMenu(){ $('nav').classList.remove('open'); const sc = document.querySelector('.scrim'); if (sc) sc.remove(); }
+$('btnMenu').onclick = () => {
+  if ($('nav').classList.contains('open')) return closeMenu();
+  $('nav').classList.add('open'); const sc = el('div', 'scrim'); sc.onclick = closeMenu; document.body.appendChild(sc);
+};
+function openRole(r, title, group){
   role = r;
-  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.r === r));
+  const key = r === 'soon' ? 'soon:' + title : r;
+  document.querySelectorAll('#nav .gitems button, #nav > button').forEach(b => b.classList.toggle('on', (b.dataset.r === 'soon' ? 'soon:' + b.dataset.t : b.dataset.r) === key));
+  document.querySelectorAll('#nav .ngroup').forEach(w => { const has = !!w.querySelector('.gitems button.on'); w.classList.toggle('cur', has); if (has) w.classList.add('open'); });
+  $('pSoon').classList.toggle('hidden', r !== 'soon');
+  if (r === 'soon'){ $('soonTitle').textContent = title; $('soonIc').innerHTML = ICONS[(group && group.ic) || 'settings']; }
+  if (r === 'perms' || r === 'general'){ setSub(r); r = 'settings'; }
   $('pWelcome').classList.toggle('hidden', r !== 'welcome');
   $('pTeach').classList.toggle('hidden', r !== 'teach');
   $('pPlans').classList.toggle('hidden', r !== 'plans');
   $('pParent').classList.toggle('hidden', r !== 'parent');
   $('pReport').classList.toggle('hidden', r !== 'report');
   $('pSettings').classList.toggle('hidden', r !== 'settings');
-  if (r === 'settings') openSettings();
+  if (r === 'settings' && setSubNow === 'perms') openSettings();
   if (r === 'welcome') renderWelcome();
   if (r === 'teach') openTeach();
   if (r === 'plans') openPlans();
@@ -700,8 +771,9 @@ function renderWelcome(){
   if (st) [['users', st.students, 'طلابي'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
     .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', x[2])); box.appendChild(d); });
   const ac = $('actions'); ac.innerHTML = '';
-  const DESC = { settings:['الإعدادات', 'الصلاحيات وإعدادات المجمع', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['خطة الطالب', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['التقارير', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''] };
-  TABS.forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]]; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0]); ac.appendChild(b); });
+  const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['خطة الطالب', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['التقارير', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''] };
+  const acts = document.body.classList.contains('admin') ? [['teach'], ['report'], ['plans'], ['settings']] : TABS;
+  acts.forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]]; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
 }
 
 /* ---------- تغيير الرمز السري ---------- */
@@ -1042,10 +1114,13 @@ $('apprGo').onclick = async () => {
 /* ---------- الإعدادات والصلاحيات (للمدير) ---------- */
 const CAT_ICON = { 'الطلاب':'users', 'الموظفين':'staff', 'الحلقات':'halaqa', 'الاتصال والرسائل':'chat', 'الإعدادات العامة':'settings', 'المنافس':'trophy', 'الاختبارات':'exam' };
 let PD = null, peUser = null, peKeys = new Set();
-document.querySelectorAll('#setTabs button').forEach(b => b.onclick = () => {
-  document.querySelectorAll('#setTabs button').forEach(x => x.classList.toggle('on', x === b));
-  $('sPerms').classList.toggle('hidden', b.dataset.s !== 'perms'); $('sGeneral').classList.toggle('hidden', b.dataset.s !== 'general');
-});
+let setSubNow = 'perms';
+function setSub(sub){
+  setSubNow = sub;
+  document.querySelectorAll('#setTabs button').forEach(x => x.classList.toggle('on', x.dataset.s === sub));
+  $('sPerms').classList.toggle('hidden', sub !== 'perms'); $('sGeneral').classList.toggle('hidden', sub !== 'general');
+}
+document.querySelectorAll('#setTabs button').forEach(b => b.onclick = () => { setSub(b.dataset.s); if (b.dataset.s === 'perms') openSettings(); });
 async function openSettings(){
   $('permEdit').classList.add('hidden'); $('permUsersCard').classList.remove('hidden');
   $('permUsers').innerHTML = '<div class="msg info">جاري التحميل...</div>';
