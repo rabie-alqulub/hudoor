@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ترتيل - الحلقة الذكية</title>
+<title>مثاني - لحلقات تحفيظ القرآن</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -35,7 +35,9 @@
   .appbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);border-bottom:3px solid var(--gold);color:#fff}
   .brand{display:flex;align-items:center;gap:10px;background:none;color:#fff;padding:0;text-align:right}
   .brand .mark{width:42px;height:42px}
-  .brand b{display:block;font-size:19px;line-height:1.1} .brand small{color:#F3D9AE;font-size:12px}
+  .brand b{display:block;font-size:19px;line-height:1.1} .brand small{color:#F3D9AE;font-size:12px;white-space:nowrap;display:block}
+  @media (max-width:380px){ .brand small{font-size:10.5px} .brand{gap:7px} }
+  @media (max-width:340px){ .brand small{display:none} }
   .appbar .grow{flex:1}
   .appbar .iconbtn{background:rgba(255,255,255,.12);color:#fff}
   .shell{max-width:1100px;margin:0 auto}
@@ -321,12 +323,12 @@
 <body>
 <div class="hero" id="loginHero">
   <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg>
-  <h1>برنامج <span>ترتيل</span></h1>
-  <p>الحلقة الذكية</p>
+  <h1>برنامج <span>مثاني</span></h1>
+  <p>لحلقات تحفيظ القرآن</p>
   <div class="org"><img src="../logo.jpg" alt=""><span id="orgName">مجمع حلقات ربيع القلوب لتحفيظ القرآن بجامع علي الشبلان - أبها</span></div>
 </div>
 <header class="appbar hidden" id="appbar">
-  <button class="brand" id="brandHome" aria-label="الرئيسية"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg><span><b>ترتيل</b><small>الحلقة الذكية</small></span></button>
+  <button class="brand" id="brandHome" aria-label="الرئيسية"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg><span><b>مثاني</b><small>لحلقات تحفيظ القرآن</small></span></button>
   <span class="grow"></span>
   <button class="iconbtn menubtn" id="btnMenu" aria-label="القائمة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>القائمة</button>
   <button class="iconbtn" id="btnPin" aria-label="تغيير الرمز السري"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/></svg>الرمز</button>
@@ -423,7 +425,7 @@
     <div id="pStaff" class="hidden">
       <div class="card">
         <h2>بيانات الموظفين</h2>
-        <small>تُسحب تلقائياً من جدول الحضور والانصراف، وأي موظف جديد يُسجَّل هناك يظهر هنا ويدخل ترتيل برقم هويته والرمز الأولي 123456.</small>
+        <small>تُسحب تلقائياً من جدول الحضور والانصراف، وأي موظف جديد يُسجَّل هناك يظهر هنا ويدخل مثاني برقم هويته والرمز الأولي 123456.</small>
         <div class="stchips" id="stSum"></div>
         <input id="stSearch" placeholder="ابحث بالاسم أو رقم الهوية أو الجوال" style="margin-top:10px">
       </div>
@@ -446,7 +448,7 @@
     <div id="pNewStaff" class="hidden">
       <div class="card" id="nsForm">
         <h2>تسجيل موظف جديد</h2>
-        <small>يُسجَّل في جدول الحضور والانصراف بنفس خاناته، فيستطيع تسجيل بصمته في صفحة الحضور، ويدخل ترتيل برقم هويته والرمز 123456.</small>
+        <small>يُسجَّل في جدول الحضور والانصراف بنفس خاناته، فيستطيع تسجيل بصمته في صفحة الحضور، ويدخل مثاني برقم هويته والرمز 123456.</small>
         <div class="empno">الرقم الوظيفي <b id="nsEmp">—</b><small>يُعطى تلقائياً بالتسلسل</small></div>
         <div class="edgrid">
           <div><label for="nsN1">الاسم الأول *</label><input id="nsN1" autocomplete="off"></div>
@@ -458,7 +460,7 @@
           <div><label for="nsPhone">رقم الجوال</label><input id="nsPhone" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>
           <div><label for="nsSifa">الصفة *</label><select id="nsSifa"></select></div>
           <div><label for="nsStart">تاريخ المباشرة</label><input id="nsStart" type="date"></div>
-          <div class="full"><label for="nsHal">إسناد حلقة في ترتيل (اختياري)</label><select id="nsHal"></select></div>
+          <div class="full"><label for="nsHal">إسناد حلقة في مثاني (اختياري)</label><select id="nsHal"></select></div>
         </div>
         <button class="btn" id="nsSave">تسجيل الموظف</button>
         <div id="nsMsg"></div>
@@ -468,7 +470,7 @@
         <ol class="nssteps">
           <li>يدخل الموظف <a href="https://rabie-alqulub.github.io/hudoor/" target="_blank" rel="noopener">صفحة البصمة</a> برقم هويته، ويسجّل بصمة وجهه والرمز البديل.</li>
           <li>تعتمد أنت بصمته كالمعتاد، ثم يبدأ تسجيل حضوره.</li>
-          <li>يدخل ترتيل برقم هويته والرمز الأولي <b>123456</b>، ويُطلب منه تغييره.</li>
+          <li>يدخل مثاني برقم هويته والرمز الأولي <b>123456</b>، ويُطلب منه تغييره.</li>
         </ol>
         <div class="bar"><button class="mini" id="nsAgain">تسجيل موظف آخر</button><button class="mini" id="nsList">عرض بيانات الموظفين</button><button class="mini" id="nsCopy">نسخ رسالة للموظف</button></div>
       </div>
@@ -1339,7 +1341,7 @@ async function openStaff(){
   $('stList').innerHTML = '<div class="msg info">جاري التحميل...</div>'; $('stSum').innerHTML = '';
   try { SD = await api({ action:'staff' }); } catch(e){ if (e.message !== 'expired') msg('stList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (!SD.ok) return msg('stList', SD.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : SD.msg, 'err');
-  if (!SD.linked) return msg('stList', 'لم يُربط جدول الحضور بعد: ضع معرّفه في تبويب «الإعدادات» بجدول ترتيل.', 'err');
+  if (!SD.linked) return msg('stList', 'لم يُربط جدول الحضور بعد: ضع معرّفه في تبويب «الإعدادات» بجدول مثاني.', 'err');
   renderStaff();
 }
 function renderStaff(){
@@ -1356,7 +1358,7 @@ function renderStaff(){
     const w = el('div', 'strow' + (s.st ? ' off' : '')), top = el('div', 'top');
     top.appendChild(el('b', '', s.name));
     top.appendChild(el('span', 'pill ' + (s.title === 'معلم' ? 'p-none' : 'p-ok'), s.title));
-    if (s.st) top.appendChild(el('span', 'pill p-red', s.st === 'موقوف' ? 'الحساب موقوف' : 'محذوف من ترتيل'));
+    if (s.st) top.appendChild(el('span', 'pill p-red', s.st === 'موقوف' ? 'الحساب موقوف' : 'محذوف من مثاني'));
     else top.appendChild(el('span', 'pill ' + (s.pin === 'changed' ? 'p-ok' : 'p-late'), s.pin === 'changed' ? 'غيّر الرمز' : 'الرمز الأولي'));
     w.appendChild(top);
     const m = el('div', 'meta');
@@ -1372,8 +1374,8 @@ function renderStaff(){
       btn('', 'edit', 'تعديل', () => openEdit(s));
       if (!s.admin){
         if (s.st === 'موقوف') btn('good', 'restore', 'رفع الإيقاف', () => staffOp(s, 'restore'));
-        else btn('warn', 'pause', 'إيقاف الحساب', () => confirmOp('إيقاف حساب ' + s.name, 'لن يستطيع الدخول على ترتيل حتى ترفع الإيقاف، ويخرج فوراً إن كان داخلاً. بياناته وحلقاته تبقى كما هي.', 'إيقاف الحساب', () => staffOp(s, 'suspend')));
-        btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + s.name + ' من النظام', 'يُحذف من ترتيل: يُمنع من الدخول، وتُلغى إسنادات حلقاته وصلاحياته ورمزه السري. يبقى في جدول الحضور وبصمته لا تتأثر، ويمكنك استعادته من «المحذوفون».', 'حذف من النظام', () => staffOp(s, 'delete')));
+        else btn('warn', 'pause', 'إيقاف الحساب', () => confirmOp('إيقاف حساب ' + s.name, 'لن يستطيع الدخول على مثاني حتى ترفع الإيقاف، ويخرج فوراً إن كان داخلاً. بياناته وحلقاته تبقى كما هي.', 'إيقاف الحساب', () => staffOp(s, 'suspend')));
+        btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + s.name + ' من النظام', 'يُحذف من مثاني: يُمنع من الدخول، وتُلغى إسنادات حلقاته وصلاحياته ورمزه السري. يبقى في جدول الحضور وبصمته لا تتأثر، ويمكنك استعادته من «المحذوفون».', 'حذف من النظام', () => staffOp(s, 'delete')));
       }
     }
     w.appendChild(ac); box.appendChild(w);
@@ -1525,7 +1527,7 @@ $('nsList').onclick = () => openRole('staff');
 $('nsCopy').onclick = async () => {
   const t = 'السلام عليكم ' + (nsLast ? nsLast.name : '') + '\nتم تسجيلك في مجمع حلقات ربيع القلوب.\n' +
     '١) بصمة الحضور: https://rabie-alqulub.github.io/hudoor/ ادخل برقم هويتك وسجّل بصمة وجهك.\n' +
-    '٢) برنامج ترتيل: https://rabie-alqulub.github.io/hudoor/halaqat/ اسم المستخدم رقم هويتك والرمز 123456 ثم غيّره.';
+    '٢) برنامج مثاني: https://rabie-alqulub.github.io/hudoor/halaqat/ اسم المستخدم رقم هويتك والرمز 123456 ثم غيّره.';
   try { await navigator.clipboard.writeText(t); toast('نُسخت الرسالة'); } catch(e){ toast('تعذّر النسخ'); }
 };
 
