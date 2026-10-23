@@ -18,7 +18,7 @@
            --ok:#8FD9AE; --okbg:#183326; --errbg:#3A1F1D; --red:#F2B8B5; }
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:Tajawal,system-ui,sans-serif;min-height:100vh}
+  body{overflow-x:hidden;margin:0;background:var(--bg);color:var(--text);font-family:Tajawal,system-ui,sans-serif;min-height:100vh}
   header.old{background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;padding:18px 16px 42px;text-align:center;border-bottom:4px solid var(--gold)}
   .logo{width:72px;height:72px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);border:3px solid var(--gold);margin-bottom:8px;overflow:hidden}
   .logo img{height:50px;width:auto}
@@ -40,10 +40,13 @@
   .appbar .iconbtn{background:rgba(255,255,255,.12);color:#fff}
   .shell{max-width:1100px;margin:0 auto}
   body.in main{margin-top:12px}
-  nav{display:flex;gap:8px;padding:12px 14px 0;max-width:520px;margin:0 auto}
-  nav button{display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:15px}
+  nav{display:flex;gap:8px;padding:12px 14px 2px;max-width:520px;margin:0 auto;overflow-x:auto;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav button{flex:none;white-space:nowrap;display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:15px}
   nav button.on{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 4px 12px rgba(59,95,120,.3)}
   nav svg{width:20px;height:20px}
+  @media (max-width:520px){ nav{gap:6px} nav button{padding:9px 11px;font-size:14px;gap:6px;border-radius:12px} nav svg{width:18px;height:18px} }
+  @media (max-width:430px){ nav button{padding:9px 13px} nav svg{display:none} }
   @media (min-width:860px){
     .shell{display:grid;grid-template-columns:230px minmax(0,640px);gap:24px;padding:20px;justify-content:center}
     nav{flex-direction:column;position:sticky;top:90px;align-self:start;padding:0;margin:0;max-width:none}
@@ -92,6 +95,28 @@
   small,.muted{color:var(--muted)}
   small{display:block;line-height:1.6}
   .hidden{display:none !important}
+  .pcat{border:1px solid var(--line);border-radius:14px;margin-top:10px;overflow:hidden}
+  .pcat .ph{display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;background:var(--card);color:var(--text);text-align:right;font-size:16px;font-weight:700}
+  .pcat .ph .ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--light);color:var(--navy)}
+  .pcat .ph .ic svg{width:20px;height:20px}
+  .pcat .ph .cnt{margin-inline-start:auto;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--light);color:var(--muted)}
+  .pcat .ph .cnt.some{background:var(--goldlight);color:var(--gold2)}
+  .pcat .ph .chev{width:18px;height:18px;color:var(--muted);transition:transform .2s}
+  .pcat.open .ph .chev{transform:rotate(180deg)}
+  .pcat .pb{display:none;border-top:1px solid var(--line);padding:4px 14px 10px;background:var(--bg)}
+  .pcat.open .pb{display:block}
+  .prow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px dashed var(--line)}
+  .prow:last-of-type{border-bottom:0}
+  .prow .grow{flex:1;min-width:0} .prow b{display:block;font-size:15px} .prow small{font-size:12px}
+  .badge2{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--light);color:var(--muted);font-weight:700;margin-inline-start:6px}
+  .sw{flex:none;position:relative;width:46px;height:27px;border-radius:999px;background:var(--line);padding:0;transition:background .2s}
+  .sw::after{content:'';position:absolute;top:3px;right:3px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:right .2s}
+  .sw.on{background:var(--navy)} .sw.on::after{right:22px}
+  .uitem{display:flex;align-items:center;gap:10px;width:100%;padding:11px 4px;border-bottom:1px solid var(--line);background:none;color:var(--text);text-align:right}
+  .uitem .grow{flex:1;min-width:0} .uitem b{display:block;font-size:15px} .uitem small{font-size:12px}
+  .savebar{position:sticky;bottom:10px;z-index:3;margin-top:12px}
+  .savebar .btn{box-shadow:0 6px 18px rgba(31,53,70,.3)}
+  .allbtn{font-size:12px;padding:5px 10px;border-radius:9px;background:var(--light);color:var(--navy);font-weight:700;margin:8px 0 2px}
   .steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 4px}
   .steps3 span{text-align:center;font-size:13px;font-weight:700;padding:8px 2px;border-radius:999px;background:var(--light);color:var(--muted)}
   .steps3 span.on{background:var(--navy);color:#fff} .steps3 span.done{background:var(--okbg);color:var(--ok)}
@@ -314,6 +339,36 @@
       <div class="card" id="planList"></div>
     </div>
 
+    <!-- الإعدادات (للمدير) -->
+    <div id="pSettings" class="hidden">
+      <div class="card">
+        <h2>الإعدادات</h2>
+        <div class="tabs" id="setTabs" style="margin-top:6px"><button data-s="perms" class="on">الصلاحيات</button><button data-s="general">الإعدادات العامة</button></div>
+      </div>
+      <div id="sPerms">
+        <div class="card" id="permUsersCard">
+          <small>اختر الموظف لتحديد صلاحياته. الصلاحية تظهر في صفحته فور الحفظ.</small>
+          <input id="permSearch" placeholder="ابحث بالاسم أو رقم الهوية" style="margin-top:10px">
+          <div id="permUsers"></div>
+        </div>
+        <div class="hidden" id="permEdit">
+          <div class="card">
+            <div class="me">
+              <div class="avatar" id="peAvatar"></div>
+              <div class="who"><b id="peName"></b><small id="peSub"></small></div>
+              <button class="iconbtn" id="peBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>رجوع</button>
+            </div>
+          </div>
+          <div id="permCats"></div>
+          <div class="savebar"><button class="btn" id="peSave">حفظ الصلاحيات</button></div>
+        </div>
+      </div>
+      <div id="sGeneral" class="card hidden">
+        <h3>الإعدادات العامة</h3>
+        <div class="msg info">ستُضاف هنا الإعدادات العامة للمجمع. حالياً تُعدَّل من تبويب "الإعدادات" في جدول البيانات.</div>
+      </div>
+    </div>
+
     <!-- ولي الأمر -->
     <div id="pParent" class="hidden"></div>
 
@@ -329,6 +384,7 @@
     </div>
   </section>
 
+  <!-- placeholder -->
   <!-- سجل طالب -->
   <section id="vStudent" class="hidden">
     <div class="card">
@@ -577,6 +633,13 @@ const ICONS = {
   users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
   book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  staff:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h3"/><path d="M15 12h3"/><path d="M6 16c.7-1.5 1.8-2 3-2s2.3.5 3 2"/></svg>',
+  halaqa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="12" cy="12" r="3"/></svg>',
+  chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  trophy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3a3 3 0 0 1-3 4"/><path d="M7 5H4a3 3 0 0 0 3 4"/></svg>',
+  exam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>',
+  chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
@@ -593,7 +656,9 @@ async function loadHome(){
   // التبويبات على يمين الصفحة
   TABS = [];
   if (r.roles.indexOf('teacher') !== -1 || r.roles.indexOf('admin') !== -1) TABS.push(['teach', 'التقييم'], ['plans', 'خطة الطالب']);
-  if (r.roles.indexOf('admin') !== -1) TABS.push(['report', 'التقارير']);
+  const P = r.perms || [];
+  if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
+  if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
   if (r.roles.indexOf('parent') !== -1) TABS.push(['parent', 'أبنائي']);
   const n = $('nav'); n.innerHTML = '';
   TABS.forEach(x => { const b = el('button'); b.dataset.r = x[0]; b.innerHTML = ICONS[x[0]]; b.appendChild(el('span', '', x[1])); b.onclick = () => openRole(x[0]); n.appendChild(b); });
@@ -608,6 +673,8 @@ function openRole(r){
   $('pPlans').classList.toggle('hidden', r !== 'plans');
   $('pParent').classList.toggle('hidden', r !== 'parent');
   $('pReport').classList.toggle('hidden', r !== 'report');
+  $('pSettings').classList.toggle('hidden', r !== 'settings');
+  if (r === 'settings') openSettings();
   if (r === 'welcome') renderWelcome();
   if (r === 'teach') openTeach();
   if (r === 'plans') openPlans();
@@ -633,7 +700,7 @@ function renderWelcome(){
   if (st) [['users', st.students, 'طلابي'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
     .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', x[2])); box.appendChild(d); });
   const ac = $('actions'); ac.innerHTML = '';
-  const DESC = { teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['خطة الطالب', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['التقارير', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''] };
+  const DESC = { settings:['الإعدادات', 'الصلاحيات وإعدادات المجمع', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['خطة الطالب', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['التقارير', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''] };
   TABS.forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]]; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0]); ac.appendChild(b); });
 }
 
@@ -972,10 +1039,79 @@ $('apprGo').onclick = async () => {
   finally { $('apprGo').disabled = false; }
 };
 
+/* ---------- الإعدادات والصلاحيات (للمدير) ---------- */
+const CAT_ICON = { 'الطلاب':'users', 'الموظفين':'staff', 'الحلقات':'halaqa', 'الاتصال والرسائل':'chat', 'الإعدادات العامة':'settings', 'المنافس':'trophy', 'الاختبارات':'exam' };
+let PD = null, peUser = null, peKeys = new Set();
+document.querySelectorAll('#setTabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#setTabs button').forEach(x => x.classList.toggle('on', x === b));
+  $('sPerms').classList.toggle('hidden', b.dataset.s !== 'perms'); $('sGeneral').classList.toggle('hidden', b.dataset.s !== 'general');
+});
+async function openSettings(){
+  $('permEdit').classList.add('hidden'); $('permUsersCard').classList.remove('hidden');
+  $('permUsers').innerHTML = '<div class="msg info">جاري التحميل...</div>';
+  try { PD = await api({ action:'perms' }); } catch(e){ if (e.message !== 'expired') msg('permUsers', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (!PD.ok) return msg('permUsers', PD.msg === 'إجراء غير معروف' ? 'الصلاحيات تحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : PD.msg, 'err');
+  renderUsers();
+}
+function renderUsers(){
+  const q = $('permSearch').value.trim(), box = $('permUsers'); box.innerHTML = '';
+  const list = PD.users.filter(u => !q || u.name.indexOf(q) !== -1 || u.nid.indexOf(digits(q) || '#') !== -1);
+  if (!list.length) box.appendChild(el('small', '', 'لا توجد نتائج.'));
+  list.forEach(u => {
+    const b = el('button', 'uitem'); b.appendChild(el('div', 'avatar', u.name.charAt(0)));
+    const g = el('div', 'grow'); g.appendChild(el('b', '', u.name)); g.appendChild(el('small', 'muted', [u.halaqat.join('، '), u.role].filter(Boolean).join(' • '))); b.appendChild(g);
+    b.appendChild(el('span', 'pill ' + (u.keys.length ? 'p-late' : 'p-none'), u.keys.length ? u.keys.length + ' صلاحية' : 'بلا صلاحيات'));
+    b.onclick = () => openPermUser(u); box.appendChild(b);
+  });
+}
+$('permSearch').oninput = () => PD && PD.ok && renderUsers();
+function openPermUser(u){
+  peUser = u; peKeys = new Set(u.keys);
+  $('peName').textContent = u.name; $('peAvatar').textContent = u.name.charAt(0);
+  $('peSub').textContent = [u.halaqat.join('، '), 'هوية: ' + u.nid.slice(0, 2) + '••••••' + u.nid.slice(-2)].filter(Boolean).join(' • ');
+  $('permUsersCard').classList.add('hidden'); $('permEdit').classList.remove('hidden'); renderCats(); window.scrollTo(0, 0);
+}
+function renderCats(){
+  const box = $('permCats'), open = new Set([...box.querySelectorAll('.pcat.open')].map(x => x.dataset.c)); box.innerHTML = '';
+  PD.cats.forEach(c => {
+    const defs = PD.defs.filter(d => d.cat === c), on = defs.filter(d => peKeys.has(d.key)).length;
+    const w = el('div', 'pcat' + (open.has(c) ? ' open' : '')); w.dataset.c = c;
+    const h = el('button', 'ph'); const ic = el('span', 'ic'); ic.innerHTML = ICONS[CAT_ICON[c]] || ICONS.settings; h.appendChild(ic);
+    h.appendChild(el('span', '', c)); h.appendChild(el('span', 'cnt' + (on ? ' some' : ''), on + ' من ' + defs.length));
+    h.insertAdjacentHTML('beforeend', ICONS.chev); h.onclick = () => w.classList.toggle('open'); w.appendChild(h);
+    const body = el('div', 'pb');
+    if (!defs.length) body.appendChild(el('small', '', 'لا توجد صلاحيات في هذا التبويب بعد. تُضاف من تبويب "الصلاحيات المتاحة" في جدول البيانات.'));
+    else {
+      const all = el('button', 'allbtn', on === defs.length ? 'إلغاء الكل' : 'تحديد الكل');
+      all.onclick = () => { const full = on === defs.length; defs.forEach(d => full ? peKeys.delete(d.key) : peKeys.add(d.key)); renderCats(); };
+      body.appendChild(all);
+    }
+    defs.forEach(d => {
+      const r = el('div', 'prow'), g = el('div', 'grow'), t = el('b', '', d.name);
+      if (d.status && d.status !== 'مفعّلة') t.appendChild(el('span', 'badge2', d.status));
+      g.appendChild(t); if (d.desc) g.appendChild(el('small', 'muted', d.desc));
+      const sw = el('button', 'sw' + (peKeys.has(d.key) ? ' on' : '')); sw.setAttribute('aria-label', d.name);
+      sw.onclick = () => { peKeys.has(d.key) ? peKeys.delete(d.key) : peKeys.add(d.key); renderCats(); };
+      r.appendChild(g); r.appendChild(sw); body.appendChild(r);
+    });
+    w.appendChild(body); box.appendChild(w);
+  });
+}
+$('peBack').onclick = () => { $('permEdit').classList.add('hidden'); $('permUsersCard').classList.remove('hidden'); renderUsers(); };
+$('peSave').onclick = async () => {
+  $('peSave').disabled = true;
+  try {
+    const r = await api({ action:'savePerms', nid:peUser.nid, keys:[...peKeys] });
+    if (!r.ok) return toast(r.msg);
+    peUser.keys = r.keys; toast(r.msg); $('peBack').click();
+  } catch(e){ toast('تعذّر الاتصال بالخادم'); }
+  finally { $('peSave').disabled = false; }
+};
+
 /* ---------- خطة الطالب ---------- */
 let pl = { hal:null, s:null, type:'حفظ' }, planStuds = [];
 function openPlans(){
-  const list = D.halaqat || [];
+  const list = D.planHalaqat || D.halaqat || [];
   if (!list.length){ msg('planList', 'لا توجد حلقات مسندة إليك.', 'info'); return; }
   if (!pl.hal || !list.some(h => h.hid === pl.hal)) pl.hal = hal && list.some(h => h.hid === hal) ? hal : (list.find(h => h.mine) || list[0]).hid;
   fill('planHal', list.map(h => { const b = el('button', h.hid === pl.hal ? 'on' : '', h.name); b.onclick = () => { pl.hal = h.hid; openPlans(); }; return b; }));
