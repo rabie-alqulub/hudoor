@@ -48,7 +48,7 @@
   @media (max-width:520px){ nav{gap:6px} nav:not(.groups) > button{padding:9px 11px;font-size:14px;gap:6px;border-radius:12px} nav svg{width:18px;height:18px} }
   @media (max-width:430px){ nav:not(.groups) > button{padding:9px 13px} nav:not(.groups) > button svg{display:none} }
   @media (min-width:860px){
-    .shell{display:grid;grid-template-columns:230px minmax(0,640px);gap:24px;padding:20px;justify-content:center}
+    .shell{display:grid;grid-template-columns:270px minmax(0,640px);gap:24px;padding:20px;justify-content:center}
     nav{flex-direction:column;position:sticky;top:90px;align-self:start;padding:0;margin:0;max-width:none}
     nav button{width:100%;padding:14px 16px}
     body.in main{margin:0;padding:0 0 40px;max-width:none}
@@ -65,6 +65,7 @@
   .stat svg{width:22px;height:22px;color:var(--gold)}
   .stat b{display:block;font-size:22px;margin-top:2px} .stat span{font-size:12px;color:var(--muted)}
   .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .actions.one{grid-template-columns:1fr}
   .action{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:18px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);color:var(--text);text-align:right;box-shadow:0 4px 14px rgba(30,42,51,.06)}
   .action .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--light);color:var(--navy)}
   .action.gold .ic{background:var(--goldlight);color:var(--gold2)}
@@ -104,13 +105,16 @@
   .ghead .chev{margin-inline-start:auto;width:18px;height:18px;color:var(--muted);transition:transform .2s}
   .ngroup.open .ghead .chev{transform:rotate(180deg)}
   .ngroup.cur .ghead .ic{background:var(--navy);color:#fff}
+  .ngroup.direct.cur{border-color:var(--navy)}
   .gitems{display:none;padding:0 10px 10px}
   .ngroup.open .gitems{display:block}
   .gitems button{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;margin-top:4px;border-radius:10px;background:none;color:var(--muted);font-size:15px;font-weight:500;text-align:right;border:0}
   .gitems button::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--line)}
   .gitems button.on{background:var(--navy);color:#fff;font-weight:700}
   .gitems button.on::before{background:var(--gold)}
-  .gitems button span{margin-inline-start:auto;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--light);color:var(--muted)}
+  .gitems button{white-space:normal;line-height:1.45}
+  .gitems button::before{flex:none}
+  .gitems button span{flex:none;margin-inline-start:auto;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--light);color:var(--muted)}
   @media (prefers-color-scheme: dark){ .ghead .ic{color:#BFD3E2} }
   .appbar .menubtn{display:none}
   .scrim{position:fixed;inset:0;background:rgba(10,18,24,.45);z-index:29}
@@ -360,7 +364,7 @@
     <!-- خطة الطالب -->
     <div id="pPlans" class="hidden">
       <div class="card">
-        <h2>خطة الطالب</h2>
+        <h2>بناء الخطط التعليمية</h2>
         <small>خطة كل طالب لكل نوع: المقدار اليومي ونطاق الخطة ومدتها. التقييم اليومي مستقل عنها.</small>
         <div class="chips" id="planHal" style="margin-top:10px"></div>
       </div>
@@ -690,8 +694,9 @@ async function loadHome(){
   fillSurahs();
   // التبويبات على يمين الصفحة
   TABS = [];
-  if (r.roles.indexOf('teacher') !== -1 || r.roles.indexOf('admin') !== -1) TABS.push(['teach', 'التقييم'], ['plans', 'خطة الطالب']);
   const P = r.perms || [];
+  if (r.roles.indexOf('teacher') !== -1 || r.roles.indexOf('admin') !== -1) TABS.push(['teach', 'التقييم']);
+  if (P.indexOf('students.plans_all') !== -1) TABS.push(['plans', 'بناء الخطط التعليمية']);
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
   if (r.roles.indexOf('parent') !== -1) TABS.push(['parent', 'أبنائي']);
@@ -706,15 +711,23 @@ async function loadHome(){
 }
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
-  { t:'الطلاب', ic:'users', items:[['plans', 'خطة الطالب'], ['soon', 'سجل الطلاب'], ['soon', 'إضافة طالب'], ['soon', 'نقل طالب بين الحلقات']] },
-  { t:'الموظفين', ic:'staff', items:[['soon', 'قائمة الموظفين'], ['soon', 'متابعة المعلمين']] },
-  { t:'الحلقات', ic:'halaqa', items:[['teach', 'التقييم'], ['report', 'التقارير'], ['soon', 'إدارة الحلقات']] },
-  { t:'الإعدادات', ic:'settings', items:[['perms', 'الصلاحيات'], ['general', 'الإعدادات العامة']] }
+  { t:'التقييم', ic:'teach', r:'teach' },
+  { t:'شؤون الطلاب', ic:'users', items:[['soon', 'تسجيل طالب جديد'], ['soon', 'تعديل / حذف طالب'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['soon', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
+  { t:'شؤون الموظفين', ic:'staff', items:[['soon', 'تسجيل موظف جديد'], ['soon', 'تعديل / حذف موظف'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
+  { t:'الحلقات', ic:'halaqa', items:[['soon', 'إضافة حلقة'], ['soon', 'تعديل حلقة'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
+  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
+  { t:'الاتصالات والرسائل', ic:'chat', items:[['soon', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل']] },
+  { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['soon', 'تقرير الطلاب'], ['soon', 'تقرير المجمع']] },
+  { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['soon', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
 ];
 function buildAdminNav(n){
   n.appendChild(el('div', 'gtitle', 'لوحة المدير'));
   ADMIN_NAV.forEach((g, gi) => {
     const w = el('div', 'ngroup'); w.dataset.g = gi;
+    if (g.r){   // تبويب مباشر بلا خيارات (التقييم)
+      const h = el('button', 'ghead'); h.dataset.r = g.r; const ic = el('span', 'ic'); ic.innerHTML = ICONS[g.ic]; h.appendChild(ic); h.appendChild(el('span', '', g.t));
+      h.onclick = () => { openRole(g.r); closeMenu(); }; w.appendChild(h); w.classList.add('direct'); n.appendChild(w); return;
+    }
     const h = el('button', 'ghead'); const ic = el('span', 'ic'); ic.innerHTML = ICONS[g.ic]; h.appendChild(ic); h.appendChild(el('span', '', g.t));
     h.insertAdjacentHTML('beforeend', ICONS.chev); h.onclick = () => w.classList.toggle('open'); w.appendChild(h);
     const box = el('div', 'gitems');
@@ -735,7 +748,7 @@ function openRole(r, title, group){
   role = r;
   const key = r === 'soon' ? 'soon:' + title : r;
   document.querySelectorAll('#nav .gitems button, #nav > button').forEach(b => b.classList.toggle('on', (b.dataset.r === 'soon' ? 'soon:' + b.dataset.t : b.dataset.r) === key));
-  document.querySelectorAll('#nav .ngroup').forEach(w => { const has = !!w.querySelector('.gitems button.on'); w.classList.toggle('cur', has); if (has) w.classList.add('open'); });
+  document.querySelectorAll('#nav .ngroup').forEach(w => { const d = w.classList.contains('direct'), has = d ? w.querySelector('.ghead').dataset.r === key : !!w.querySelector('.gitems button.on'); w.classList.toggle('cur', has); if (has && !d) w.classList.add('open'); });
   $('pSoon').classList.toggle('hidden', r !== 'soon');
   if (r === 'soon'){ $('soonTitle').textContent = title; $('soonIc').innerHTML = ICONS[(group && group.ic) || 'settings']; }
   if (r === 'perms' || r === 'general'){ setSub(r); r = 'settings'; }
@@ -771,8 +784,9 @@ function renderWelcome(){
   if (st) [['users', st.students, 'طلابي'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
     .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', x[2])); box.appendChild(d); });
   const ac = $('actions'); ac.innerHTML = '';
-  const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['خطة الطالب', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['التقارير', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''] };
+  const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['بناء الخطط التعليمية', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['تقرير الحلقات', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''] };
   const acts = document.body.classList.contains('admin') ? [['teach'], ['report'], ['plans'], ['settings']] : TABS;
+  ac.classList.toggle('one', acts.length === 1);
   acts.forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]]; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
 }
 
