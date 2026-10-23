@@ -63,7 +63,7 @@
   .gdate{font-size:14px;color:#F3D9AE;margin-top:2px}
   .hello{text-align:center;font-size:17px;margin-bottom:6px}
   .tools{display:flex;gap:10px}
-  .tools button{flex:1;margin-top:0;background:var(--card);color:var(--muted);border:1px solid var(--line);font-size:14px;font-weight:500;padding:12px 8px}
+  .tools button,.tools a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;border-radius:12px;margin-top:0;background:var(--card);color:var(--muted);border:1px solid var(--line);font-size:14px;font-weight:500;padding:12px 8px}
   .verify h2{text-align:center;margin-bottom:4px}
   .verify .sub{text-align:center;color:var(--muted);font-size:14px;margin:0 0 10px}
   .ring{position:absolute;inset:10% 15%;border-radius:50%;border:4px solid rgba(208,142,44,.9);box-shadow:0 0 0 2000px rgba(0,0,0,.35);transition:border-color .3s}
@@ -100,6 +100,36 @@
   .who{flex:1;min-width:0}
   .logout{flex:none;width:auto;margin:0;padding:8px 10px;border-radius:12px;background:var(--light);color:var(--muted);font-size:12px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:3px}
   .logout svg{width:22px;height:22px}
+  .tools svg{width:22px;height:22px}
+  .geo.idle .dot{background:#9AA3AA}
+  .geo.warn{color:var(--gold2)} .geo.warn .dot{background:var(--gold)}
+  @media (prefers-color-scheme: dark){ .geo.warn{color:#E8B867} }
+  #win{margin-top:8px}
+  .rhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .rhead h2{margin:0}
+  .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--light);padding:4px;border-radius:12px}
+  .tabs button{margin:0;padding:9px;font-size:15px;background:none;color:var(--muted);border-radius:9px}
+  .tabs button.on{background:var(--card);color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  @media (prefers-color-scheme: dark){ .tabs button.on{color:#E8B867} }
+  .pnav{display:flex;align-items:center;gap:8px;margin:12px 0}
+  .pnav b{flex:1;text-align:center;font-size:15px}
+  .pnav button{width:auto;margin:0;padding:8px 12px;font-size:13px;background:var(--light);color:var(--text)}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+  .tile{border-radius:14px;padding:10px 6px;text-align:center}
+  .tile b{display:block;font-size:26px;line-height:1.2}
+  .tile span{font-size:13px;font-weight:500}
+  .t-ok{background:#E3F2EA;color:#1B6B40} .t-late{background:var(--goldlight);color:var(--gold2)} .t-abs{background:#FCE8E6;color:var(--red)}
+  @media (prefers-color-scheme: dark){ .t-ok{background:#183326;color:#8FD9AE} .t-late{color:#E8B867} .t-abs{background:#3A1F1D;color:#F2B8B5} }
+  .rnote{font-size:13px;color:var(--muted);margin:10px 0 2px}
+  .rrow{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--line)}
+  .rrow:last-child{border-bottom:0}
+  .rrow .nm{flex:1;min-width:0}
+  .rrow .nm b{display:block;font-size:15px}
+  .rrow .nm small{margin:2px 0 0;font-size:12px}
+  .pills{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .pill{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .p-ok{background:#E3F2EA;color:#1B6B40} .p-late{background:var(--goldlight);color:var(--gold2)} .p-abs{background:#FCE8E6;color:var(--red)} .p-none{background:var(--light);color:var(--muted)}
+  @media (prefers-color-scheme: dark){ .p-ok{background:#183326;color:#8FD9AE} .p-late{color:#E8B867} .p-abs{background:#3A1F1D;color:#F2B8B5} }
   .hidden{display:none}
   small{color:var(--muted);display:block;margin-top:8px;line-height:1.6}
 </style>
@@ -169,6 +199,7 @@
         <div class="gdate" id="todayG"></div>
       </div>
       <div class="geo wait" id="geo"><span class="dot"></span><span id="geoText">جاري تحديد موقعك...</span></div>
+      <div class="geo idle" id="win"><span class="dot"></span><span id="winText"></span></div>
       <div class="punch">
         <button class="in locked" id="btnIn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>تسجيل حضور</button>
         <button class="out locked" id="btnOut" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>تسجيل انصراف</button>
@@ -188,8 +219,28 @@
     </div>
 
     <div class="tools">
-      <button id="btnShowPin">الرمز البديل</button>
-      <button data-logout>تغيير رقم الهوية</button>
+      <button id="btnReports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M8 17v-5"/><path d="M13 17V8"/><path d="M18 17v-8"/></svg>التقارير</button>
+      <a id="lnkRemind" href="reminders.ics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>التذكير</a>
+      <button id="btnShowPin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/><path d="M19 4l2 2"/></svg>الرمز البديل</button>
+    </div>
+    <button class="link" data-logout>تغيير رقم الهوية</button>
+  </section>
+
+  <!-- 6) التقارير -->
+  <section id="vReport" class="hidden">
+    <div class="card">
+      <div class="rhead">
+        <h2 id="repTitle">التقارير</h2>
+        <button class="logout" id="btnRepBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>رجوع</button>
+      </div>
+      <div class="tabs" id="repTabs"><button data-p="day" class="on">يومي</button><button data-p="week">أسبوعي</button><button data-p="month">شهري</button></div>
+      <div class="pnav"><button id="repPrev">السابق</button><b id="repLabel"></b><button id="repNext">التالي</button></div>
+      <div class="tiles">
+        <div class="tile t-ok"><b id="tP">-</b><span>حاضر</span></div>
+        <div class="tile t-late"><b id="tL">-</b><span>متأخر</span></div>
+        <div class="tile t-abs"><b id="tA">-</b><span>غائب</span></div>
+      </div>
+      <div id="repBody"></div>
     </div>
   </section>
 
@@ -246,7 +297,7 @@ async function api(data){
 }
 
 function show(view){
-  ['vLogin','vEnroll','vPending','vMain','loading'].forEach(v => $(v).classList.toggle('hidden', v !== view));
+  ['vLogin','vEnroll','vPending','vMain','vReport','loading'].forEach(v => $(v).classList.toggle('hidden', v !== view));
   if (view !== 'vMain') { stopCam(); $('camCard').classList.add('hidden'); }
 }
 function msg(el, text, type){ $(el).innerHTML = text ? '<div class="msg ' + type + '"></div>' : ''; if (text) $(el).firstChild.textContent = text; }
@@ -336,7 +387,26 @@ function distanceM(a, b, c, d){
 
 /* ---------- متابعة الموقع: تفعيل أزرار البصمة داخل النطاق فقط ---------- */
 function setGeo(state, text){ $('geo').className = 'geo ' + state; $('geoText').textContent = text; }
-function lockPunch(lock){
+/* ---------- أوقات الدوام (الخادم هو المرجع، وهذه للعرض وتعطيل الأزرار) ---------- */
+const RULES = () => (cfg && cfg.rules) || { days:[0,1,2,3], start:'13:50', late:'16:35', end:'18:15' };
+function hm(t){ const a = String(t).split(':'); return +a[0] * 60 + +a[1]; }
+function ampm(t){ const m = hm(t), h = Math.floor(m / 60); return (h % 12 || 12) + ':' + ('0' + m % 60).slice(-2) + (h < 12 ? ' ص' : ' م'); }
+function riyadhNow(){
+  const p = {}; new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', weekday:'short', hourCycle:'h23' })
+    .formatToParts(new Date()).forEach(x => p[x.type] = x.value);
+  return { date: p.year + '-' + p.month + '-' + p.day, min: +p.hour * 60 + +p.minute, dow: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(p.weekday) };
+}
+function timeState(){
+  const r = RULES(), n = riyadhNow();
+  if (r.days.indexOf(n.dow) === -1) return { ok:false, st:'idle', text:'اليوم ليس يوم دوام (من الأحد إلى الأربعاء)' };
+  if (n.min < hm(r.start)) return { ok:false, st:'idle', text:'تبدأ البصمة الساعة ' + ampm(r.start) };
+  if (n.min > hm(r.end)) return { ok:false, st:'out', text:'انتهى وقت البصمة لهذا اليوم (' + ampm(r.end) + ')' };
+  if (n.min >= hm(r.late)) return { ok:true, st:'warn', text:'الحضور الآن متأخر • البصمة حتى ' + ampm(r.end) };
+  return { ok:true, st:'ok', text:'وقت البصمة من ' + ampm(r.start) + ' إلى ' + ampm(r.end) };
+}
+function lockPunch(geoLock){
+  const t = timeState(), lock = geoLock || !t.ok;
+  $('win').className = 'geo ' + t.st; $('winText').textContent = t.text;
   ['btnIn','btnOut','btnPinIn','btnPinOut'].forEach(id => { $(id).disabled = lock || punching; $(id).classList.toggle('locked', lock); });
 }
 function startGeo(){
@@ -549,7 +619,7 @@ function gatePinForm(){
 }
 
 async function punch(type){
-  if (punching || !inRange) return; punching = true; lastType = type;
+  if (punching || !inRange || !timeState().ok) return; punching = true; lastType = type;
   $('btnIn').disabled = $('btnOut').disabled = true;
   $('pinCard').classList.add('hidden'); msg('mainMsg', '', '');
   const label = type === 'in' ? 'الحضور' : 'الانصراف';
@@ -583,6 +653,7 @@ function openPin(){ $('pinFallback').value = ''; $('pinCard').classList.remove('
 async function pinPunch(pinType){
   const pin = $('pinFallback').value;
   if (!inRange) return msg('mainMsg', 'البصمة متاحة داخل نطاق الجامع فقط.', 'err');
+  if (!timeState().ok) return msg('mainMsg', timeState().text, 'err');
   if (!/^\d{4}$/.test(pin)) return msg('mainMsg', 'أدخل الرمز البديل (4 أرقام)', 'err');
   $('btnPinIn').disabled = $('btnPinOut').disabled = true;
   try {
@@ -605,6 +676,97 @@ $('btnIn').onclick = () => punch('in');
 $('btnOut').onclick = () => punch('out');
 $('btnCancel').onclick = closeVerify;
 $('btnShowPin').onclick = () => openPin();
+$('lnkRemind').onclick = () => msg('mainMsg', 'أضف التذكير إلى تقويم جوالك: تنبيه الساعة 1:15 م لبصمة الحضور، والساعة 5:30 م لبصمة الخروج، من الأحد إلى الأربعاء.', 'info');
+
+/* ---------- التقارير ---------- */
+const rep = { period:'day', date:null, seq:0 };
+const ud = d => { const p = d.split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2])); };
+const iso = t => t.toISOString().slice(0, 10);
+const addDays = (d, n) => { const t = ud(d); t.setUTCDate(t.getUTCDate() + n); return iso(t); };
+const isWork = d => RULES().days.indexOf(ud(d).getUTCDay()) !== -1;
+const fmtD = (d, o) => ud(d).toLocaleDateString('ar-SA-u-ca-gregory', Object.assign({ timeZone:'UTC' }, o));
+function t12(t){ if (!t) return '—'; const m = String(t).match(/(\d{1,2}):(\d{2})/); if (!m) return t; let h = +m[1]; if (/PM|م/i.test(t) && h < 12) h += 12; return (h % 12 || 12) + ':' + m[2] + (h < 12 ? ' ص' : ' م'); }
+function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+const PILL = { 'حاضر':'p-ok', 'متأخر':'p-late', 'غائب':'p-abs' };
+
+function lastWorkday(d){ for (let i = 0; i < 7 && !isWork(d); i++) d = addDays(d, -1); return d; }
+function periodStart(p, d){
+  if (p === 'week') return addDays(d, -ud(d).getUTCDay());
+  if (p === 'month') return d.slice(0, 8) + '01';
+  return d;
+}
+function shiftPeriod(dir){
+  let d = rep.date;
+  if (rep.period === 'day'){ do { d = addDays(d, dir); } while (!isWork(d)); }
+  else if (rep.period === 'week') d = addDays(periodStart('week', d), 7 * dir);
+  else { const t = ud(periodStart('month', d)); t.setUTCMonth(t.getUTCMonth() + dir); d = iso(t); }
+  rep.date = d; loadReport();
+}
+function periodLabel(r){
+  if (rep.period === 'day') return fmtD(rep.date, { weekday:'long', day:'numeric', month:'long' });
+  if (rep.period === 'month') return fmtD(rep.date, { month:'long', year:'numeric' });
+  const s = periodStart('week', rep.date);
+  return fmtD(s, { day:'numeric', month:'short' }) + ' – ' + fmtD(addDays(s, 3), { day:'numeric', month:'short' });
+}
+
+function openReports(){
+  show('vReport');
+  if (!rep.date) rep.date = rep.period === 'day' ? lastWorkday(riyadhNow().date) : riyadhNow().date;
+  loadReport();
+}
+async function loadReport(){
+  const my = ++rep.seq, today = riyadhNow().date;
+  document.querySelectorAll('#repTabs button').forEach(b => b.classList.toggle('on', b.dataset.p === rep.period));
+  $('repLabel').textContent = periodLabel();
+  let nextStart;
+  if (rep.period === 'day'){ nextStart = addDays(rep.date, 1); while (!isWork(nextStart)) nextStart = addDays(nextStart, 1); }
+  else if (rep.period === 'week') nextStart = addDays(periodStart('week', rep.date), 7);
+  else { const t = ud(periodStart('month', rep.date)); t.setUTCMonth(t.getUTCMonth() + 1); nextStart = iso(t); }
+  $('repNext').disabled = nextStart > today;
+  ['tP','tL','tA'].forEach(id => $(id).textContent = '-');
+  $('repBody').innerHTML = '<div class="msg info">جاري تحميل التقرير...</div>';
+  let r;
+  try { r = await api({ action:'report', id:empId, device:deviceId(), period:rep.period, date:rep.date }); }
+  catch(e){ if (my === rep.seq) msg('repBody', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (my !== rep.seq) return;
+  if (!r.ok) return msg('repBody', r.msg === 'إجراء غير معروف' ? 'التقارير تحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : r.msg, 'err');
+  renderReport(r);
+}
+function renderReport(r){
+  let P = 0, L = 0, A = 0; r.rows.forEach(x => { P += x.present; L += x.late; A += x.absent; });
+  $('tP').textContent = P; $('tL').textContent = L; $('tA').textContent = A;
+  $('repTitle').textContent = r.admin ? 'تقارير المعلمين' : 'تقريري';
+  const body = $('repBody'); body.innerHTML = '';
+  if (!r.dates.length){ body.appendChild(el('div', 'msg info', 'ليس يوم دوام. أيام الدوام من الأحد إلى الأربعاء.')); return; }
+  const row = (title, sub, pills) => {
+    const x = el('div', 'rrow'), nm = el('div', 'nm'); nm.appendChild(el('b', '', title)); if (sub) nm.appendChild(el('small', '', sub));
+    const ps = el('div', 'pills'); pills.forEach(p => ps.appendChild(el('span', 'pill ' + p[1], p[0])));
+    x.appendChild(nm); x.appendChild(ps); body.appendChild(x);
+  };
+  const times = d => d.in || d.out ? 'حضور ' + t12(d.in) + ' • انصراف ' + t12(d.out) : '';
+  if (!r.admin){
+    r.rows[0].days.slice().reverse().forEach(d => row(fmtD(d.date, { weekday:'long', day:'numeric', month:'short' }), times(d), [[d.status, PILL[d.status] || 'p-none']]));
+    return;
+  }
+  body.appendChild(el('div', 'rnote', 'عدد المعلمين: ' + r.rows.length));
+  if (r.period === 'day'){
+    const order = { 'غائب':0, 'متأخر':1, 'لم يسجّل':2, 'حاضر':3 };
+    r.rows.slice().sort((a, b) => (order[a.days[0].status] ?? 9) - (order[b.days[0].status] ?? 9))
+      .forEach(x => row(x.name, times(x.days[0]), [[x.days[0].status, PILL[x.days[0].status] || 'p-none']]));
+  } else {
+    r.rows.slice().sort((a, b) => b.absent - a.absent || b.late - a.late)
+      .forEach(x => row(x.name, '', [['حاضر ' + x.present, 'p-ok'], ['متأخر ' + x.late, 'p-late'], ['غائب ' + x.absent, 'p-abs']]));
+  }
+}
+$('btnReports').onclick = openReports;
+$('btnRepBack').onclick = () => { show('vMain'); lockPunch(!inRange); };
+$('repPrev').onclick = () => shiftPeriod(-1);
+$('repNext').onclick = () => shiftPeriod(1);
+document.querySelectorAll('#repTabs button').forEach(b => b.onclick = () => {
+  rep.period = b.dataset.p;
+  if (rep.period === 'day') rep.date = lastWorkday(rep.date > riyadhNow().date ? riyadhNow().date : rep.date);
+  loadReport();
+});
 $('btnPinCancel').onclick = () => $('pinCard').classList.add('hidden');
 
 /* ---------- الساعة ---------- */
@@ -618,7 +780,7 @@ function tick(){
   $('today').textContent = now.toLocaleDateString('ar-SA', { ...tz, weekday:'long', day:'numeric', month:'long', year:'numeric' });
   $('todayG').textContent = now.toLocaleDateString('ar-SA-u-ca-gregory', { ...tz, day:'numeric', month:'long', year:'numeric' }) + ' م';
 }
-tick(); setInterval(tick, 1000);
+tick(); setInterval(() => { tick(); if (!$('vMain').classList.contains('hidden') && !punching) lockPunch(!inRange); }, 1000);
 
 boot();
 </script>
