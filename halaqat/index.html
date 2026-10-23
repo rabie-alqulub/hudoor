@@ -325,7 +325,7 @@
   <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg>
   <h1>برنامج <span>مثاني</span></h1>
   <p>لحلقات تحفيظ القرآن</p>
-  <div class="org"><img src="../logo.jpg" alt=""><span id="orgName">مجمع حلقات ربيع القلوب لتحفيظ القرآن بجامع علي الشبلان - أبها</span></div>
+  <div class="org"><img src="../logo.jpg" alt=""><span id="orgName">مجمع حلقات ربيع القلوب القرآني بجامع علي الشبلان - أبها</span></div>
 </div>
 <header class="appbar hidden" id="appbar">
   <button class="brand" id="brandHome" aria-label="الرئيسية"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg><span><b>مثاني</b><small>لحلقات تحفيظ القرآن</small></span></button>
@@ -1525,7 +1525,7 @@ $('nsSave').onclick = async () => {
 $('nsAgain').onclick = () => openNewStaff();
 $('nsList').onclick = () => openRole('staff');
 $('nsCopy').onclick = async () => {
-  const t = 'السلام عليكم ' + (nsLast ? nsLast.name : '') + '\nتم تسجيلك في مجمع حلقات ربيع القلوب.\n' +
+  const t = 'السلام عليكم ' + (nsLast ? nsLast.name : '') + '\nتم تسجيلك في ' + ((D && D.orgShort) || 'مجمع ربيع القلوب') + '.\n' +
     '١) بصمة الحضور: https://rabie-alqulub.github.io/hudoor/ ادخل برقم هويتك وسجّل بصمة وجهك.\n' +
     '٢) برنامج مثاني: https://rabie-alqulub.github.io/hudoor/halaqat/ اسم المستخدم رقم هويتك والرمز 123456 ثم غيّره.';
   try { await navigator.clipboard.writeText(t); toast('نُسخت الرسالة'); } catch(e){ toast('تعذّر النسخ'); }
