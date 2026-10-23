@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>نظام الحلقات - ربيع القلوب</title>
+<title>ترتيل - الحلقة الذكية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -19,12 +19,59 @@
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:Tajawal,system-ui,sans-serif;min-height:100vh}
-  header{background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;padding:18px 16px 42px;text-align:center;border-bottom:4px solid var(--gold)}
+  header.old{background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;padding:18px 16px 42px;text-align:center;border-bottom:4px solid var(--gold)}
   .logo{width:72px;height:72px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);border:3px solid var(--gold);margin-bottom:8px;overflow:hidden}
   .logo img{height:50px;width:auto}
   header h1{margin:0;font-size:20px;font-weight:700}
   header p{margin:6px 0 0;font-size:13px;color:#F3D9AE}
-  main{max-width:520px;margin:-28px auto 0;padding:0 14px 40px}
+  main{max-width:520px;margin:-28px auto 0;padding:0 14px 40px;width:100%}
+  .hero{background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;padding:26px 16px 48px;text-align:center;border-bottom:4px solid var(--gold)}
+  .hero .mark{width:76px;height:76px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}
+  .hero h1{margin:10px 0 0;font-size:24px}
+  .hero h1 span{color:#F3D9AE}
+  .hero p{margin:6px 0 0;font-size:13px;color:#F3D9AE}
+  .hero .org{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:12px;opacity:.9}
+  .hero .org img{width:26px;height:26px;border-radius:50%;background:#fff;padding:2px}
+  .appbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);border-bottom:3px solid var(--gold);color:#fff}
+  .brand{display:flex;align-items:center;gap:10px;background:none;color:#fff;padding:0;text-align:right}
+  .brand .mark{width:42px;height:42px}
+  .brand b{display:block;font-size:19px;line-height:1.1} .brand small{color:#F3D9AE;font-size:12px}
+  .appbar .grow{flex:1}
+  .appbar .iconbtn{background:rgba(255,255,255,.12);color:#fff}
+  .shell{max-width:1100px;margin:0 auto}
+  body.in main{margin-top:12px}
+  nav{display:flex;gap:8px;padding:12px 14px 0;max-width:520px;margin:0 auto}
+  nav button{display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:15px}
+  nav button.on{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 4px 12px rgba(59,95,120,.3)}
+  nav svg{width:20px;height:20px}
+  @media (min-width:860px){
+    .shell{display:grid;grid-template-columns:230px minmax(0,640px);gap:24px;padding:20px;justify-content:center}
+    nav{flex-direction:column;position:sticky;top:90px;align-self:start;padding:0;margin:0;max-width:none}
+    nav button{width:100%;padding:14px 16px}
+    body.in main{margin:0;padding:0 0 40px;max-width:none}
+  }
+  .welcome{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;border-radius:22px;padding:22px 20px;margin-bottom:12px;box-shadow:0 8px 24px rgba(31,53,70,.25)}
+  .welcome .sky{position:absolute;left:-10px;top:-10px;width:130px;height:130px;opacity:.9}
+  .welcome .greet{font-size:14px;color:#F3D9AE;display:flex;align-items:center;gap:6px}
+  .welcome h2{color:#fff;font-size:24px;margin:6px 0 4px}
+  .welcome .when{font-size:13px;opacity:.85;line-height:1.7}
+  .welcome .hals{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .welcome .hals span{font-size:12px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.14)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center}
+  .stat svg{width:22px;height:22px;color:var(--gold)}
+  .stat b{display:block;font-size:22px;margin-top:2px} .stat span{font-size:12px;color:var(--muted)}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .action{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:18px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);color:var(--text);text-align:right;box-shadow:0 4px 14px rgba(30,42,51,.06)}
+  .action .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--light);color:var(--navy)}
+  .action.gold .ic{background:var(--goldlight);color:var(--gold2)}
+  .action .ic svg{width:26px;height:26px}
+  .action b{font-size:17px} .action small{font-size:12px}
+  @media (prefers-color-scheme: dark){ .action .ic{color:#BFD3E2} }
+  .hadith{text-align:center;padding:16px;border-radius:18px;background:var(--goldlight);color:var(--text);font-size:15px;line-height:1.9}
+  .hadith small{display:block;color:var(--gold2);margin-top:4px}
+  .notice{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:var(--errbg);color:var(--red);margin-bottom:12px;font-size:14px}
+  .notice button{margin-inline-start:auto;padding:7px 12px;border-radius:10px;background:var(--red);color:#fff;font-size:13px;font-weight:700}
   .card{background:var(--card);border-radius:18px;padding:18px;box-shadow:0 4px 16px rgba(30,42,51,.08);margin-bottom:12px;border:1px solid var(--line)}
   h2{font-size:18px;margin:0 0 12px;color:var(--navy)}
   h3{font-size:16px;margin:0 0 8px}
@@ -178,17 +225,26 @@
 </style>
 </head>
 <body>
-<header>
-  <div class="logo"><img src="../logo.jpg" alt="شعار ربيع القلوب"></div>
-  <h1>نظام الحلقات</h1>
-  <p id="orgName">مجمع حلقات ربيع القلوب لتحفيظ القرآن بجامع علي الشبلان - أبها</p>
+<div class="hero" id="loginHero">
+  <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg>
+  <h1>برنامج <span>ترتيل</span></h1>
+  <p>الحلقة الذكية</p>
+  <div class="org"><img src="../logo.jpg" alt=""><span id="orgName">مجمع حلقات ربيع القلوب لتحفيظ القرآن بجامع علي الشبلان - أبها</span></div>
+</div>
+<header class="appbar hidden" id="appbar">
+  <button class="brand" id="brandHome" aria-label="الرئيسية"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg><span><b>ترتيل</b><small>الحلقة الذكية</small></span></button>
+  <span class="grow"></span>
+  <button class="iconbtn" id="btnPin" aria-label="تغيير الرمز السري"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/></svg>الرمز</button>
+  <button class="iconbtn" id="btnLogout" aria-label="تسجيل الخروج"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>خروج</button>
 </header>
 
+<div class="shell">
+<nav id="nav" class="hidden"></nav>
 <main>
   <!-- الدخول -->
   <section id="vLogin" class="card hidden">
     <h2>الدخول</h2>
-    <small>للمعلمين وأولياء الأمور وإدارة المجمع</small>
+    <small>أدخل رقم هويتك والرمز السري</small>
     <div id="stepNid">
       <label for="nid">رقم الهوية / الإقامة</label>
       <input id="nid" class="big" inputmode="numeric" autocomplete="username" placeholder="10 أرقام" maxlength="15">
@@ -218,13 +274,19 @@
 
   <!-- الصفحة الرئيسية -->
   <section id="vHome" class="hidden">
-    <div class="card">
-      <div class="me">
-        <div class="avatar" id="meAvatar">؟</div>
-        <div class="who"><small>أهلاً وسهلاً</small><b id="meName"></b><small id="meRole"></small></div>
-        <button class="iconbtn" id="btnLogout" aria-label="تسجيل الخروج"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>خروج</button>
+    <!-- الترحيب -->
+    <div id="pWelcome" class="hidden">
+      <div class="notice hidden" id="pinNotice">أنت تستخدم الرمز الأولي. غيّره لحماية حسابك.<button id="btnPin2">تغيير الآن</button></div>
+      <div class="welcome">
+        <svg class="sky" id="sky" viewBox="0 0 120 120"></svg>
+        <div class="greet" id="greet"></div>
+        <h2 id="hello"></h2>
+        <div class="when" id="when"></div>
+        <div class="hals" id="myHals"></div>
       </div>
-      <div class="tabs hidden" id="roleTabs"></div>
+      <div class="stats" id="stats"></div>
+      <div class="actions" id="actions"></div>
+      <div class="hadith">«خيركم من تعلّم القرآن وعلّمه»<small>رواه البخاري</small></div>
     </div>
 
     <!-- المعلم: الحلقة والحضور -->
@@ -289,6 +351,7 @@
 
   <div id="loading" class="card"><div class="msg info">جاري التحميل...</div></div>
 </main>
+</div>
 
 <!-- نافذة تسجيل الحفظ/المراجعة -->
 <div class="sheet hidden" id="recSheet">
@@ -384,6 +447,21 @@
   </div>
 </div>
 
+<!-- تغيير الرمز السري -->
+<div class="sheet hidden" id="pinSheet">
+  <div class="panel">
+    <div class="head"><h2>تغيير الرمز السري</h2><button class="iconbtn" id="cpClose">إغلاق</button></div>
+    <label for="cpOld">الرمز الحالي</label>
+    <input id="cpOld" class="big" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+    <label for="cpNew">الرمز الجديد (4 إلى 6 أرقام)</label>
+    <input id="cpNew" class="big" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">
+    <label for="cpNew2">تأكيد الرمز الجديد</label>
+    <input id="cpNew2" class="big" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">
+    <button class="btn" id="cpSave">حفظ الرمز</button>
+    <div id="cpMsg"></div>
+  </div>
+</div>
+
 <!-- اختيار رقم الآية -->
 <div class="sheet hidden" id="ayahSheet">
   <div class="panel">
@@ -419,7 +497,13 @@ async function api(data){
   if (j.expired){ store.del('hq_token'); showLogin('انتهت الجلسة، سجّل الدخول مجدداً.'); throw new Error('expired'); }
   return j;
 }
-function show(v){ ['vLogin','vHome','vStudent','loading'].forEach(x => $(x).classList.toggle('hidden', x !== v)); window.scrollTo(0, 0); }
+function show(v){
+  ['vLogin','vHome','vStudent','loading'].forEach(x => $(x).classList.toggle('hidden', x !== v));
+  const inApp = v !== 'vLogin' && !!D;
+  document.body.classList.toggle('in', inApp);
+  $('loginHero').classList.toggle('hidden', inApp); $('appbar').classList.toggle('hidden', !inApp); $('nav').classList.toggle('hidden', !inApp || v === 'vStudent');
+  window.scrollTo(0, 0);
+}
 function msg(el, text, type){ const e = $(el); e.innerHTML = ''; if (text){ const d = document.createElement('div'); d.className = 'msg ' + type; d.textContent = text; e.appendChild(d); } }
 function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 function toast(t){ const x = el('div', 'toast', t); document.body.appendChild(x); setTimeout(() => x.remove(), 2200); }
@@ -463,7 +547,7 @@ async function doAuth(payload, btn){
   try {
     const r = await api(payload);
     if (!r.ok) return msg('loginMsg', r.msg, 'err');
-    store.set('hq_token', r.token); msg('loginMsg', '', ''); await loadHome();
+    store.set('hq_token', r.token); store.set('hq_must', r.mustChange ? '1' : ''); msg('loginMsg', '', ''); await loadHome();
   } catch(e){ if (e.message !== 'expired') msg('loginMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { btn.disabled = false; }
 }
@@ -485,6 +569,19 @@ $('btnLogout').onclick = async () => {
 
 /* ---------- الرئيسية ---------- */
 const ROLE_NAME = { admin:'إدارة المجمع', teacher:'معلم', parent:'ولي أمر' };
+const ICONS = {
+  teach:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3h6v3H9z"/><path d="M9 13l2 2 4-4"/></svg>',
+  plans:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>',
+  report:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M8 17v-5"/><path d="M13 17V8"/><path d="M18 17v-8"/></svg>',
+  parent:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/><path d="M21 21v-2a4 4 0 0 0-3-3.9"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"/></svg>',
+  seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
+};
+const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
+const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
+let TABS = [];
 async function loadHome(){
   show('loading');
   let r;
@@ -492,33 +589,68 @@ async function loadHome(){
   if (!r.ok) return showLogin(r.msg);
   D = r;
   if (r.org) $('orgName').textContent = r.org;
-  $('meName').textContent = r.name; $('meAvatar').textContent = (r.name || '؟').trim().charAt(0);
-  $('meRole').textContent = r.roles.map(x => ROLE_NAME[x]).join(' • ');
   fillSurahs();
-  // التبويبات حسب الأدوار
-  const tabs = [];
-  if (r.roles.indexOf('admin') !== -1) tabs.push(['report', 'التقارير'], ['teach', 'الحلقات'], ['plans', 'خطة الطالب']);
-  else if (r.roles.indexOf('teacher') !== -1) tabs.push(['teach', 'حلقتي'], ['plans', 'خطة الطالب'], ['report', 'إنجاز الحلقة']);
-  if (r.roles.indexOf('parent') !== -1) tabs.push(['parent', 'أبنائي']);
-  const t = $('roleTabs'); t.innerHTML = '';
-  tabs.forEach(x => { const b = el('button', '', x[1]); b.dataset.r = x[0]; b.onclick = () => openRole(x[0]); t.appendChild(b); });
-  t.classList.toggle('hidden', tabs.length < 2);
+  // التبويبات على يمين الصفحة
+  TABS = [];
+  if (r.roles.indexOf('teacher') !== -1 || r.roles.indexOf('admin') !== -1) TABS.push(['teach', 'التقييم'], ['plans', 'خطة الطالب']);
+  if (r.roles.indexOf('admin') !== -1) TABS.push(['report', 'التقارير']);
+  if (r.roles.indexOf('parent') !== -1) TABS.push(['parent', 'أبنائي']);
+  const n = $('nav'); n.innerHTML = '';
+  TABS.forEach(x => { const b = el('button'); b.dataset.r = x[0]; b.innerHTML = ICONS[x[0]]; b.appendChild(el('span', '', x[1])); b.onclick = () => openRole(x[0]); n.appendChild(b); });
   show('vHome');
-  const saved = store.get('hq_role');
-  openRole(tabs.some(x => x[0] === saved) ? saved : tabs[0][0]);
+  openRole('welcome');
 }
 function openRole(r){
-  role = r; store.set('hq_role', r);
-  document.querySelectorAll('#roleTabs button').forEach(b => b.classList.toggle('on', b.dataset.r === r));
+  role = r;
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.r === r));
+  $('pWelcome').classList.toggle('hidden', r !== 'welcome');
   $('pTeach').classList.toggle('hidden', r !== 'teach');
   $('pPlans').classList.toggle('hidden', r !== 'plans');
   $('pParent').classList.toggle('hidden', r !== 'parent');
   $('pReport').classList.toggle('hidden', r !== 'report');
+  if (r === 'welcome') renderWelcome();
   if (r === 'teach') openTeach();
   if (r === 'plans') openPlans();
   if (r === 'parent') renderParent();
   if (r === 'report') openReport();
+  window.scrollTo(0, 0);
 }
+$('brandHome').onclick = () => { if (D){ show('vHome'); openRole('welcome'); } };
+
+/* ---------- الترحيب ---------- */
+function renderWelcome(){
+  const hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', hourCycle:'h23' }).format(new Date());
+  const morning = hr >= 4 && hr < 12;
+  $('sky').innerHTML = morning ? SUN : MOON;
+  $('greet').textContent = morning ? 'صباح الخير' : 'مساء الخير';
+  $('hello').textContent = 'أهلاً ' + (D.roles.indexOf('teacher') !== -1 ? 'أ. ' : '') + D.name;
+  $('when').textContent = fmtD(D.today, { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + ' م • ' +
+    ud(D.today).toLocaleDateString('ar-SA', { timeZone:'UTC', day:'numeric', month:'long', year:'numeric' });
+  fill('myHals', (D.halaqat || []).filter(h => h.mine || D.roles.indexOf('admin') === -1).slice(0, 4).map(h => el('span', '', h.name)));
+  $('pinNotice').classList.toggle('hidden', store.get('hq_must') !== '1');
+  const st = D.stats;
+  const box = $('stats'); box.innerHTML = ''; box.classList.toggle('hidden', !st);
+  if (st) [['users', st.students, 'طلابي'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
+    .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', x[2])); box.appendChild(d); });
+  const ac = $('actions'); ac.innerHTML = '';
+  const DESC = { teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['خطة الطالب', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['التقارير', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''] };
+  TABS.forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]]; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0]); ac.appendChild(b); });
+}
+
+/* ---------- تغيير الرمز السري ---------- */
+function openPin(){ ['cpOld','cpNew','cpNew2'].forEach(id => $(id).value = ''); msg('cpMsg', '', ''); $('pinSheet').classList.remove('hidden'); $('cpOld').focus(); }
+$('btnPin').onclick = openPin; $('btnPin2').onclick = openPin;
+$('cpClose').onclick = () => $('pinSheet').classList.add('hidden');
+$('cpSave').onclick = async () => {
+  const o = $('cpOld').value, a = $('cpNew').value, b = $('cpNew2').value;
+  if (!/^\d{4,6}$/.test(a)) return msg('cpMsg', 'الرمز الجديد من 4 إلى 6 أرقام.', 'err');
+  if (a !== b) return msg('cpMsg', 'الرمزان غير متطابقين.', 'err');
+  $('cpSave').disabled = true;
+  try { const r = await api({ action:'changePin', old:o, pin:a }); if (!r.ok) return msg('cpMsg', r.msg, 'err');
+    store.set('hq_must', ''); $('pinSheet').classList.add('hidden'); toast(r.msg); if (role === 'welcome') renderWelcome(); }
+  catch(e){ msg('cpMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+  finally { $('cpSave').disabled = false; }
+};
 
 /* ---------- المعلم: الحضور ---------- */
 function openTeach(){
