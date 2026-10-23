@@ -130,6 +130,13 @@
   .scores button.on{border-color:var(--gold);background:var(--gold);color:#fff}
   .c-ok{color:var(--ok)} .c-late{color:var(--gold2)} .c-abs{color:var(--red)}
   .slabel{text-align:center;margin-top:6px;font-weight:700;min-height:22px}
+  .rng3{display:grid;grid-template-columns:1fr 1.8fr 1fr;gap:8px;align-items:end;margin-top:4px}
+  .rng3 label{text-align:center;margin:10px 0 6px}
+  .rng3 .ayah{width:100%}
+  .rng3 select{text-align:center;font-weight:700}
+  .sum{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--goldlight);color:var(--text);font-size:14px;line-height:1.7}
+  .sum b{color:var(--gold2)}
+  .ayah:disabled{opacity:.45}
   .ayah{font:inherit;font-size:17px;padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);text-align:center;font-weight:700}
   .ayah:empty::before{content:'آية';color:var(--muted);font-weight:400}
   .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
@@ -273,23 +280,27 @@
 <div class="sheet hidden" id="recSheet">
   <div class="panel">
     <div class="head"><h2 id="rsName"></h2><button class="iconbtn" id="rsClose">إغلاق</button></div>
-    <small id="rsLast"></small>
     <div class="types" id="rsType"></div>
-    <label>من</label>
-    <div class="pair"><select id="rsFs"></select><button class="ayah" id="rsFa"></button></div>
-    <label>إلى</label>
-    <div class="pair"><select id="rsTs"></select><button class="ayah" id="rsTa"></button></div>
+    <div class="sum" id="rsSum"></div>
+    <div class="rng3">
+      <div><label>من آية</label><button class="ayah" id="rsFa"></button></div>
+      <div><label>السورة</label><select id="rsFs"></select></div>
+      <div><label>إلى آية</label><button class="ayah" id="rsTa"></button></div>
+    </div>
+    <button class="link" id="rsMulti" style="margin-top:2px">النهاية في سورة أخرى؟</button>
+    <div id="rsToWrap" class="hidden"><label>سورة النهاية</label><select id="rsTs"></select></div>
     <div class="count" id="rsCount"></div>
     <label>الدرجة من 10</label>
     <div class="scores" id="rsScores"></div>
     <div class="slabel" id="rsLabel"></div>
     <label for="rsNote">ملاحظة (اختياري)</label>
     <textarea id="rsNote" rows="2" maxlength="300"></textarea>
-    <div class="pair" style="grid-template-columns:2fr 1fr">
-      <button class="btn" id="rsSave">حفظ والتالي</button>
-      <button class="btn soft" id="rsSkip">التالي ←</button>
-    </div>
     <div id="rsMsg"></div>
+    <div class="pair" style="grid-template-columns:1fr 2fr;margin-top:4px">
+      <button class="btn soft" id="rsBack">→ رجوع</button>
+      <button class="btn" id="rsNext">التالي ←</button>
+    </div>
+    <button class="link" id="rsClear">مسح الخانة</button>
     <div id="rsToday"></div>
   </div>
 </div>
@@ -564,74 +575,76 @@ $('btnAllPresent').onclick = () => { studs.forEach(s => { if (!s.att || s.att ==
 window.addEventListener('pagehide', flushAtt);
 
 /* ---------- نافذة التسميع ---------- */
-let rs = { s:null, type:'حفظ', score:null };
+// الترتيب: حفظ ← مراجعة قريبة ← مراجعة بعيدة ← تلاوة. "التالي" و"رجوع" يحفظان الخانة تلقائياً إن كانت مكتملة.
+let rs = { s:null, type:'حفظ', score:null, multi:false };
 const ayahVal = id => +$(id).dataset.v || 0;
 function setAyah(id, v){ $(id).dataset.v = v || ''; $(id).textContent = v || ''; }
 function fillSurahs(){
-  ['rsFs','rsTs'].forEach(id => { const e = $(id); if (e.options.length) return; D.surah.forEach((n, i) => { const o = el('option', '', (i + 1) + ' - ' + n); o.value = i + 1; e.appendChild(o); }); });
+  ['rsFs','rsTs'].forEach(id => { const e = $(id); if (e.options.length) return;
+    const o0 = el('option', '', 'اختر السورة'); o0.value = ''; e.appendChild(o0);
+    D.surah.forEach((n, i) => { const o = el('option', '', n); o.value = i + 1; e.appendChild(o); }); });
   const t = $('rsType'); t.innerHTML = '';
-  D.types.forEach(x => { const b = el('button', '', x); b.dataset.t = x; b.onclick = () => { rs.type = x; markType(); prefill(); }; t.appendChild(b); });
+  D.types.forEach(x => { const b = el('button', '', x); b.dataset.t = x; b.onclick = () => go(D.types.indexOf(x)); t.appendChild(b); });
   const g = $('rsScores'); g.innerHTML = '';
   for (let n = D.maxScore; n >= 0; n--){ const b = el('button', '', n); b.dataset.n = n; b.onclick = () => setScore(n); g.appendChild(b); }
 }
-function markType(){
-  const i = D.types.indexOf(rs.type), last = i === D.types.length - 1;
-  $('rsType').querySelectorAll('button').forEach(x => { x.classList.toggle('on', x.dataset.t === rs.type); x.classList.toggle('done', rs.s.today.some(r => r.type === x.dataset.t)); });
-  $('rsSave').textContent = last ? 'حفظ وإنهاء' : 'حفظ والتالي';
-  $('rsSkip').textContent = last ? 'إنهاء' : 'التالي ←';
-}
-/* الانتقال للخانة التالية بالترتيب: حفظ ← مراجعة قريبة ← مراجعة بعيدة ← تلاوة */
-function nextStep(){
-  const i = D.types.indexOf(rs.type);
-  if (i >= D.types.length - 1){ closeRec(); return; }
-  rs.type = D.types[i + 1]; rs.score = null; $('rsNote').value = ''; msg('rsMsg', '', '');
-  setScore(null); markType(); prefill(); $('recSheet').querySelector('.panel').scrollTop = 0;
-}
-$('rsSkip').onclick = nextStep;
 function setScore(n){
   rs.score = n;
   $('rsScores').querySelectorAll('button').forEach(b => b.classList.toggle('on', n !== null && +b.dataset.n === n));
   $('rsLabel').textContent = n === null ? '' : n + ' من ' + D.maxScore + ' • ' + scoreLabel(n);
   $('rsLabel').className = 'slabel ' + (n === null ? '' : (PILL[scoreLabel(n)] || '').replace('p-', 'c-'));
 }
-/* الآية التالية بعد آخر تسجيل (للمتابعة من حيث توقف الطالب) */
-function nextAfter(r){
-  if (!r || !r.ts) return null;
-  const rev = r.ts < r.fs;
-  if (r.ta < D.ayat[r.ts - 1]) return { s:r.ts, a:r.ta + 1 };
-  const ns = rev ? r.ts - 1 : r.ts + 1;
-  return ns >= 1 && ns <= 114 ? { s:ns, a:1 } : null;
+function markType(){
+  const i = D.types.indexOf(rs.type);
+  $('rsType').querySelectorAll('button').forEach(x => { x.classList.toggle('on', x.dataset.t === rs.type); x.classList.toggle('done', rs.s.today.some(r => r.type === x.dataset.t)); });
+  $('rsBack').disabled = i === 0;
+  $('rsNext').textContent = i === D.types.length - 1 ? 'إنهاء ✓' : 'التالي ←';
 }
-function setRange(fs, fa, ts, ta){ $('rsFs').value = fs; setAyah('rsFa', fa); $('rsTs').value = ts; setAyah('rsTa', ta); countAyat(); }
-function prefill(){
-  const last = rs.s.last[rs.type];
-  $('rsLast').textContent = last ? 'آخر ' + rs.type + ': ' + last.from + ' ← ' + last.to + ' • ' + scoreTxt(last) + ' • ' + fmtD(last.date, { day:'numeric', month:'short' }) : 'لا يوجد ' + rs.type + ' سابق لهذا الطالب.';
-  const n = nextAfter(last);
-  if (n) setRange(n.s, n.a, n.s, ''); else setRange(rs.type === 'حفظ' ? 114 : 1, '', rs.type === 'حفظ' ? 114 : 1, '');
+/* ملخص الخانة: أين وصل الطالب في آخر تسميع من هذا النوع */
+function summary(){
+  const box = $('rsSum'); box.innerHTML = '';
+  const last = (rs.s.prev || {})[rs.type];
+  const todays = rs.s.today.filter(r => r.type === rs.type);
+  if (last){
+    box.appendChild(el('div', '', 'آخر ' + rs.type + ' (' + fmtD(last.date, { weekday:'long', day:'numeric', month:'short' }) + '):'));
+    const b = el('b', '', 'وصل إلى سورة ' + D.surah[last.ts - 1] + ' آية ' + last.ta); box.appendChild(b);
+    box.appendChild(el('div', '', 'من ' + last.from + ' • ' + last.ayat + ' آية • ' + scoreTxt(last)));
+  } else if (!todays.length) box.appendChild(el('div', '', 'لا يوجد ' + rs.type + ' سابق لهذا الطالب.'));
+  todays.forEach(r => box.appendChild(el('div', '', '✓ سُجّل اليوم: ' + r.from + ' ← ' + r.to + ' • ' + scoreTxt(r))));
+}
+function clearForm(){
+  $('rsFs').value = ''; $('rsTs').value = ''; setAyah('rsFa', ''); setAyah('rsTa', '');
+  rs.multi = false; $('rsToWrap').classList.add('hidden'); $('rsMulti').classList.remove('hidden');
+  setScore(null); $('rsNote').value = ''; msg('rsMsg', '', ''); countAyat();
 }
 function absAyah(s, a){ let n = 0; for (let i = 0; i < s - 1; i++) n += D.ayat[i]; return n + a; }
+const endSurah = () => rs.multi ? +$('rsTs').value : +$('rsFs').value;
 function countAyat(){
-  const fs = +$('rsFs').value, fa = ayahVal('rsFa'), ts = +$('rsTs').value, ta = ayahVal('rsTa');
-  if (fa > D.ayat[fs - 1]) setAyah('rsFa', ''); if (ta > D.ayat[ts - 1]) setAyah('rsTa', '');
-  if (!ayahVal('rsFa') || !ayahVal('rsTa')){ $('rsCount').textContent = 'اضغط خانة الآية لاختيار رقمها'; return; }
-  $('rsCount').textContent = 'المقدار: ' + (Math.abs(absAyah(ts, ayahVal('rsTa')) - absAyah(fs, ayahVal('rsFa'))) + 1) + ' آية';
+  const fs = +$('rsFs').value, ts = endSurah(), fa = ayahVal('rsFa'), ta = ayahVal('rsTa');
+  $('rsFa').disabled = !fs; $('rsTa').disabled = !ts;
+  if (!fs){ $('rsCount').textContent = 'اختر السورة ثم آية البداية والنهاية'; return; }
+  if (!fa || !ta){ $('rsCount').textContent = 'عدد آيات ' + D.surah[(ts || fs) - 1] + ': ' + D.ayat[(ts || fs) - 1]; return; }
+  $('rsCount').textContent = 'المقدار: ' + (Math.abs(absAyah(ts, ta) - absAyah(fs, fa)) + 1) + ' آية';
 }
-$('rsFs').onchange = () => { setAyah('rsFa', ''); if (+$('rsTs').value < +$('rsFs').value && rs.type === 'حفظ') $('rsTs').value = $('rsFs').value; countAyat(); openAyah('rsFa'); };
-$('rsTs').onchange = () => { setAyah('rsTa', ''); countAyat(); openAyah('rsTa'); };
+$('rsFs').onchange = () => { setAyah('rsFa', ''); setAyah('rsTa', ''); if (!rs.multi) $('rsTs').value = $('rsFs').value; countAyat(); if ($('rsFs').value) openAyah('rsFa'); };
+$('rsTs').onchange = () => { setAyah('rsTa', ''); countAyat(); if ($('rsTs').value) openAyah('rsTa'); };
+$('rsMulti').onclick = () => { rs.multi = true; $('rsToWrap').classList.remove('hidden'); $('rsMulti').classList.add('hidden'); $('rsTs').value = $('rsFs').value; setAyah('rsTa', ''); countAyat(); };
+$('rsClear').onclick = clearForm;
 
-/* شبكة أرقام الآيات (مثل تحديد البداية والنهاية) */
+/* شبكة أرقام الآيات: تحديد البداية ثم النهاية */
 function openAyah(which){
-  const isFrom = which === 'rsFa', su = +$(isFrom ? 'rsFs' : 'rsTs').value, n = D.ayat[su - 1];
-  const other = isFrom ? null : (+$('rsFs').value === su ? ayahVal('rsFa') : null);
+  const isFrom = which === 'rsFa', su = isFrom ? +$('rsFs').value : endSurah();
+  if (!su) return msg('rsMsg', 'اختر السورة أولاً.', 'err');
+  const n = D.ayat[su - 1], from = !isFrom && +$('rsFs').value === su ? ayahVal('rsFa') : 0;
   $('apTitle').textContent = (isFrom ? 'تحديد البداية' : 'تحديد النهاية') + ' • ' + D.surah[su - 1];
   $('apSub').textContent = 'عدد آيات السورة: ' + n;
   const g = $('apGrid'); g.innerHTML = '';
   for (let i = 1; i <= n; i++){
-    const b = el('button', i === ayahVal(which) ? 'on' : (other && i >= other ? '' : ''), i);
-    if (other && i === other) b.classList.add('in');
+    const b = el('button', i === ayahVal(which) ? 'on' : '', i);
+    if (from && i === from) b.classList.add('in');
     b.onclick = () => {
       setAyah(which, i);
-      if (isFrom && +$('rsTs').value === su && ayahVal('rsTa') && ayahVal('rsTa') < i && rs.type !== 'تلاوة') setAyah('rsTa', '');
+      if (isFrom && !rs.multi && ayahVal('rsTa') && ayahVal('rsTa') < i) setAyah('rsTa', '');
       countAyat(); $('ayahSheet').classList.add('hidden');
       if (isFrom && !ayahVal('rsTa')) openAyah('rsTa');
     };
@@ -645,14 +658,34 @@ $('apClose').onclick = () => $('ayahSheet').classList.add('hidden');
 $('ayahSheet').onclick = e => { if (e.target === $('ayahSheet')) $('ayahSheet').classList.add('hidden'); };
 
 function openRec(s, type){
-  rs = { s, type:type || 'حفظ', score:null };
-  $('rsName').textContent = s.name; $('rsNote').value = ''; msg('rsMsg', '', '');
-  markType(); setScore(null); prefill(); renderRsToday();
+  rs = { s, type:type || D.types[0], score:null, multi:false };
+  $('rsName').textContent = s.name; enterTab();
   $('recSheet').classList.remove('hidden'); document.body.style.overflow = 'hidden';
 }
-function closeRec(){ $('recSheet').classList.add('hidden'); document.body.style.overflow = ''; }
-$('rsClose').onclick = closeRec;
-$('recSheet').onclick = e => { if (e.target === $('recSheet')) closeRec(); };
+function enterTab(){ clearForm(); markType(); summary(); renderRsToday(); $('recSheet').querySelector('.panel').scrollTop = 0; }
+function closeRec(){ $('recSheet').classList.add('hidden'); document.body.style.overflow = ''; renderStuds(); }
+$('rsClose').onclick = () => go(-1);
+$('recSheet').onclick = e => { if (e.target === $('recSheet')) go(-1); };
+
+/* حالة الخانة: فارغة (تُتجاوز) أو مكتملة (تُحفظ) أو ناقصة */
+function formState(){
+  const any = $('rsFs').value || ayahVal('rsFa') || ayahVal('rsTa') || rs.score !== null || $('rsNote').value.trim();
+  if (!any) return 'empty';
+  return $('rsFs').value && endSurah() && ayahVal('rsFa') && ayahVal('rsTa') && rs.score !== null ? 'full' : 'partial';
+}
+/* الانتقال: يحفظ الخانة الحالية إن كانت مكتملة ثم ينتقل (‎-1 = إغلاق) */
+let moving = false;
+async function go(to){
+  if (moving) return;
+  const st = formState();
+  if (st === 'partial'){ msg('rsMsg', 'أكمل من آية والسورة وإلى آية والدرجة، أو اضغط "مسح الخانة" للتجاوز.', 'err'); return; }
+  if (st === 'full'){ moving = true; const ok = await saveCurrent(); moving = false; if (!ok) return; }
+  if (to === -1 || to >= D.types.length){ closeRec(); return; }
+  rs.type = D.types[to]; enterTab();
+}
+$('rsNext').onclick = () => go(D.types.indexOf(rs.type) + 1);
+$('rsBack').onclick = () => go(D.types.indexOf(rs.type) - 1);
+
 function renderRsToday(){
   const box = $('rsToday'); box.innerHTML = '';
   if (!rs.s.today.length) return;
@@ -670,24 +703,23 @@ async function delRec(r){
   try {
     const x = await api({ action:'delRecord', id:r.id });
     if (!x.ok) return msg('rsMsg', x.msg, 'err');
-    rs.s.today = rs.s.today.filter(y => y.id !== r.id); msg('rsMsg', 'تم الحذف.', 'ok'); renderRsToday(); renderStuds();
+    rs.s.today = rs.s.today.filter(y => y.id !== r.id); msg('rsMsg', 'تم الحذف.', 'ok'); renderRsToday(); markType(); summary();
   } catch(e){ msg('rsMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
 }
-$('rsSave').onclick = async () => {
-  const p = { action:'saveRecord', sid:rs.s.sid, date:day, type:rs.type, fs:+$('rsFs').value, fa:ayahVal('rsFa'), ts:+$('rsTs').value, ta:ayahVal('rsTa'), score:rs.score, note:$('rsNote').value.trim() };
-  if (!p.fa || !p.ta) return msg('rsMsg', 'حدّد آية البداية والنهاية.', 'err');
-  if (p.score === null) return msg('rsMsg', 'اختر الدرجة.', 'err');
-  $('rsSave').disabled = true; msg('rsMsg', 'جاري الحفظ...', 'info');
+async function saveCurrent(){
+  const fs = +$('rsFs').value, ts = endSurah();
+  const p = { action:'saveRecord', sid:rs.s.sid, date:day, type:rs.type, fs, fa:ayahVal('rsFa'), ts, ta:ayahVal('rsTa'), score:rs.score, note:$('rsNote').value.trim() };
+  $('rsNext').disabled = $('rsBack').disabled = true; msg('rsMsg', 'جاري الحفظ...', 'info');
   try {
     const r = await api(p);
-    if (!r.ok) return msg('rsMsg', r.msg, 'err');
-    const rec = { id:r.id, date:day, type:p.type, from:D.surah[p.fs - 1] + ' ' + p.fa, to:D.surah[p.ts - 1] + ' ' + p.ta, fs:p.fs, fa:p.fa, ts:p.ts, ta:p.ta, ayat:r.ayat, score:p.score, grade:r.grade || scoreLabel(p.score), note:p.note };
+    if (!r.ok){ msg('rsMsg', r.msg, 'err'); return false; }
+    const rec = { id:r.id, date:day, type:p.type, from:D.surah[fs - 1] + ' ' + p.fa, to:D.surah[ts - 1] + ' ' + p.ta, fs, fa:p.fa, ts, ta:p.ta, ayat:r.ayat, score:p.score, grade:r.grade || scoreLabel(p.score), note:p.note };
     rs.s.today.push(rec); rs.s.last[p.type] = rec;
     if (!isPresent(rs.s)){ rs.s.att = 'حاضر'; pending[rs.s.sid] = 'حاضر'; clearTimeout(saveTimer); saveTimer = setTimeout(flushAtt, 400); }
-    renderStuds(); renderRsToday(); toast(r.msg); nextStep();
-  } catch(e){ msg('rsMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
-  finally { $('rsSave').disabled = false; }
-};
+    toast(r.msg); return true;
+  } catch(e){ msg('rsMsg', 'تعذّر الاتصال بالخادم.', 'err'); return false; }
+  finally { $('rsNext').disabled = false; markType(); }
+}
 
 /* ---------- اعتماد التقييمات وفارس الحلقة ---------- */
 function renderAppr(){
