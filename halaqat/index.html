@@ -123,6 +123,17 @@
     nav.groups{position:fixed;top:0;right:0;bottom:0;width:min(300px,86vw);max-width:none;margin:0;padding:18px 14px;background:var(--bg);z-index:30;transform:translateX(105%);transition:transform .25s;overflow-y:auto;box-shadow:-10px 0 30px rgba(0,0,0,.25)}
     nav.groups.open{transform:none}
   }
+  .stchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .stchips button{border:1px solid var(--line);background:transparent;border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;color:inherit}
+  .stchips button.on{background:var(--navy);color:#fff;border-color:transparent}
+  .strow{padding:12px 0;border-bottom:1px solid var(--line)}
+  .strow:last-child{border-bottom:0}
+  .strow .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .strow .top b{flex:1;min-width:0;font-size:16px}
+  .strow .meta{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 12px;font-size:13px;margin-top:6px}
+  .strow .meta span{color:var(--muted)}
+  .strow .meta i{font-style:normal;font-weight:600;color:var(--text)}
+  .strow a{color:inherit}
   .asrow{padding:12px 0;border-bottom:1px solid var(--line)}
   .asrow:last-child{border-bottom:0}
   .asrow .top{display:flex;align-items:center;gap:8px}
@@ -388,6 +399,17 @@
         <input id="asSearch" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:10px">
       </div>
       <div class="card" id="asList"></div>
+    </div>
+
+    <!-- بيانات الموظفين -->
+    <div id="pStaff" class="hidden">
+      <div class="card">
+        <h2>بيانات الموظفين</h2>
+        <small>تُسحب تلقائياً من جدول الحضور والانصراف، وأي موظف جديد يُسجَّل هناك يظهر هنا ويدخل ترتيل برقم هويته والرمز الأولي 123456.</small>
+        <div class="stchips" id="stSum"></div>
+        <input id="stSearch" placeholder="ابحث بالاسم أو رقم الهوية أو الجوال" style="margin-top:10px">
+      </div>
+      <div class="card" id="stList"></div>
     </div>
 
     <!-- خيار سيُحدَّد لاحقاً -->
@@ -732,7 +754,7 @@ async function loadHome(){
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
   { t:'شؤون الطلاب', ic:'users', items:[['soon', 'تسجيل طالب جديد'], ['soon', 'تعديل / حذف طالب'], ['soon', 'بحث'], ['soon', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['soon', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
-  { t:'شؤون الموظفين', ic:'staff', items:[['soon', 'تسجيل موظف جديد'], ['soon', 'تعديل / حذف موظف'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
+  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['soon', 'تسجيل موظف جديد'], ['soon', 'تعديل / حذف موظف'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['soon', 'إضافة حلقة'], ['soon', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['soon', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل']] },
@@ -771,6 +793,8 @@ function openRole(r, title, group){
   $('pSoon').classList.toggle('hidden', r !== 'soon');
   $('pAssign').classList.toggle('hidden', r !== 'assign');
   if (r === 'assign') openAssign();
+  $('pStaff').classList.toggle('hidden', r !== 'staff');
+  if (r === 'staff') openStaff();
   if (r === 'soon'){ $('soonTitle').textContent = title; $('soonIc').innerHTML = ICONS[(group && group.ic) || 'settings']; }
   if (r === 'perms' || r === 'general'){ setSub(r); r = 'settings'; }
   $('pWelcome').classList.toggle('hidden', r !== 'welcome');
@@ -794,11 +818,11 @@ function renderWelcome(){
   const hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', hourCycle:'h23' }).format(new Date());
   const morning = hr >= 4 && hr < 12;
   $('sky').innerHTML = morning ? SUN : MOON;
-  $('greet').textContent = morning ? 'صباح الخير' : 'مساء الخير';
+  $('greet').textContent = (morning ? 'صباح الخير' : 'مساء الخير') + (D.title && D.title !== 'معلم' && D.roles.indexOf('admin') === -1 ? ' • ' + D.title : '');
   $('hello').textContent = 'أهلاً ' + (D.roles.indexOf('teacher') !== -1 ? 'أ. ' : '') + D.name;
   $('when').textContent = fmtD(D.today, { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + ' م • ' +
     ud(D.today).toLocaleDateString('ar-SA', { timeZone:'UTC', day:'numeric', month:'long', year:'numeric' });
-  fill('myHals', (D.halaqat || []).filter(h => h.mine || D.roles.indexOf('admin') === -1).slice(0, 4).map(h => el('span', '', h.name)));
+  fill('myHals', (D.halaqat || []).filter(h => h.mine || (D.roles.indexOf('admin') === -1 && (D.perms || []).indexOf('halaqat.evaluate_all') === -1)).slice(0, 4).map(h => el('span', '', h.name)));
   $('pinNotice').classList.toggle('hidden', store.get('hq_must') !== '1');
   const st = D.stats;
   const box = $('stats'); box.innerHTML = ''; box.classList.toggle('hidden', !st);
@@ -1183,6 +1207,41 @@ function renderAssign(){
   });
 }
 $('asSearch').oninput = () => AS && AS.ok && renderAssign();
+
+/* ---------- بيانات الموظفين (من جدول الحضور) ---------- */
+let SD = null, stF = '';
+async function openStaff(){
+  $('stList').innerHTML = '<div class="msg info">جاري التحميل...</div>'; $('stSum').innerHTML = '';
+  try { SD = await api({ action:'staff' }); } catch(e){ if (e.message !== 'expired') msg('stList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (!SD.ok) return msg('stList', SD.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : SD.msg, 'err');
+  if (!SD.linked) return msg('stList', 'لم يُربط جدول الحضور بعد: ضع معرّفه في تبويب «الإعدادات» بجدول ترتيل.', 'err');
+  renderStaff();
+}
+function renderStaff(){
+  const cnt = {}; SD.staff.forEach(s => cnt[s.title] = (cnt[s.title] || 0) + 1);
+  const sum = $('stSum'); sum.innerHTML = '';
+  [['', 'الكل', SD.staff.length]].concat(Object.keys(cnt).map(k => [k, k, cnt[k]])).forEach(x => {
+    const b = el('button', stF === x[0] ? 'on' : '', x[1] + ' (' + x[2] + ')'); b.onclick = () => { stF = x[0]; renderStaff(); }; sum.appendChild(b);
+  });
+  const q = $('stSearch').value.trim(), box = $('stList'); box.innerHTML = '';
+  const list = SD.staff.filter(s => (!stF || s.title === stF) && (!q || s.name.indexOf(q) !== -1 || s.nid.indexOf(q) !== -1 || s.phone.indexOf(q) !== -1));
+  if (!list.length) box.appendChild(el('small', '', SD.staff.length ? 'لا توجد نتائج.' : 'لا يوجد موظفون نشطون في جدول الحضور.'));
+  list.forEach(s => {
+    const w = el('div', 'strow'), top = el('div', 'top');
+    top.appendChild(el('b', '', s.name));
+    top.appendChild(el('span', 'pill ' + (s.title === 'معلم' ? 'p-none' : 'p-ok'), s.title));
+    top.appendChild(el('span', 'pill ' + (s.pin === 'changed' ? 'p-ok' : 'p-late'), s.pin === 'changed' ? 'غيّر الرمز' : 'الرمز الأولي'));
+    w.appendChild(top);
+    const m = el('div', 'meta');
+    const add = (k, v, href) => { if (!v) return; const d = el('span', '', k + ': '); const i = el(href ? 'a' : 'i', '', v); if (href){ i.href = href; i.style.fontWeight = '600'; } d.appendChild(i); m.appendChild(d); };
+    add('رقم الهوية', s.nid); add('الجوال', s.phone, 'tel:' + s.phone); add('الرقم الوظيفي', s.emp); add('الجنسية', s.nat);
+    add('المهمة', s.task && s.task !== s.sifa ? s.task : ''); add('الفترة', s.shift); add('المباشرة', s.start);
+    add('الحلقات', s.halaqat.join('، ') || (s.title === 'معلم' ? 'لم تُسند' : ''));
+    if (s.pin === 'changed' && /^\d{4}-/.test(s.last)) add('آخر دخول', s.last);
+    w.appendChild(m); box.appendChild(w);
+  });
+}
+$('stSearch').oninput = () => SD && SD.ok && renderStaff();
 
 /* ---------- الإعدادات والصلاحيات (للمدير) ---------- */
 const CAT_ICON = { 'الطلاب':'users', 'الموظفين':'staff', 'الحلقات':'halaqa', 'الاتصال والرسائل':'chat', 'الإعدادات العامة':'settings', 'المنافس':'trophy', 'الاختبارات':'exam' };
