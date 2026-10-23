@@ -122,6 +122,9 @@
   .types{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--light);padding:4px;border-radius:12px;margin-top:8px}
   .types button{padding:10px 4px;border-radius:9px;background:none;color:var(--muted);font-size:15px;font-weight:700}
   .types button.on{background:var(--navy);color:#fff}
+  .types button.done{color:var(--ok)}
+  .types button.done::before{content:'✓ '}
+  .types button.on.done{color:#fff}
   .scores{display:grid;grid-template-columns:repeat(11,1fr);gap:3px;margin-top:4px}
   .scores button{padding:10px 0;border-radius:8px;background:var(--light);color:var(--text);font-size:15px;font-weight:700;border:1.5px solid transparent}
   .scores button.on{border-color:var(--gold);background:var(--gold);color:#fff}
@@ -282,7 +285,10 @@
     <div class="slabel" id="rsLabel"></div>
     <label for="rsNote">ملاحظة (اختياري)</label>
     <textarea id="rsNote" rows="2" maxlength="300"></textarea>
-    <button class="btn" id="rsSave">حفظ التسجيل</button>
+    <div class="pair" style="grid-template-columns:2fr 1fr">
+      <button class="btn" id="rsSave">حفظ والتالي</button>
+      <button class="btn soft" id="rsSkip">التالي ←</button>
+    </div>
     <div id="rsMsg"></div>
     <div id="rsToday"></div>
   </div>
@@ -538,7 +544,9 @@ function renderStuds(){
   });
 }
 function setAtt(s, st){
+  const was = isPresent(s);
   s.att = st; pending[s.sid] = st; renderStuds();
+  if (!was && isPresent(s)) openRec(s, D.types[0]);   // الحاضر ينتقل مباشرة للتسميع بالتتابع
   $('saveState').textContent = 'جاري الحفظ...';
   clearTimeout(saveTimer); saveTimer = setTimeout(flushAtt, 900);
 }
@@ -566,7 +574,20 @@ function fillSurahs(){
   const g = $('rsScores'); g.innerHTML = '';
   for (let n = D.maxScore; n >= 0; n--){ const b = el('button', '', n); b.dataset.n = n; b.onclick = () => setScore(n); g.appendChild(b); }
 }
-function markType(){ $('rsType').querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.t === rs.type)); }
+function markType(){
+  const i = D.types.indexOf(rs.type), last = i === D.types.length - 1;
+  $('rsType').querySelectorAll('button').forEach(x => { x.classList.toggle('on', x.dataset.t === rs.type); x.classList.toggle('done', rs.s.today.some(r => r.type === x.dataset.t)); });
+  $('rsSave').textContent = last ? 'حفظ وإنهاء' : 'حفظ والتالي';
+  $('rsSkip').textContent = last ? 'إنهاء' : 'التالي ←';
+}
+/* الانتقال للخانة التالية بالترتيب: حفظ ← مراجعة قريبة ← مراجعة بعيدة ← تلاوة */
+function nextStep(){
+  const i = D.types.indexOf(rs.type);
+  if (i >= D.types.length - 1){ closeRec(); return; }
+  rs.type = D.types[i + 1]; rs.score = null; $('rsNote').value = ''; msg('rsMsg', '', '');
+  setScore(null); markType(); prefill(); $('recSheet').querySelector('.panel').scrollTop = 0;
+}
+$('rsSkip').onclick = nextStep;
 function setScore(n){
   rs.score = n;
   $('rsScores').querySelectorAll('button').forEach(b => b.classList.toggle('on', n !== null && +b.dataset.n === n));
@@ -663,7 +684,7 @@ $('rsSave').onclick = async () => {
     const rec = { id:r.id, date:day, type:p.type, from:D.surah[p.fs - 1] + ' ' + p.fa, to:D.surah[p.ts - 1] + ' ' + p.ta, fs:p.fs, fa:p.fa, ts:p.ts, ta:p.ta, ayat:r.ayat, score:p.score, grade:r.grade || scoreLabel(p.score), note:p.note };
     rs.s.today.push(rec); rs.s.last[p.type] = rec;
     if (!isPresent(rs.s)){ rs.s.att = 'حاضر'; pending[rs.s.sid] = 'حاضر'; clearTimeout(saveTimer); saveTimer = setTimeout(flushAtt, 400); }
-    renderStuds(); toast(r.msg); closeRec();
+    renderStuds(); renderRsToday(); toast(r.msg); nextStep();
   } catch(e){ msg('rsMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('rsSave').disabled = false; }
 };
