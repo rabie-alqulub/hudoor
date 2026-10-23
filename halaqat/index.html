@@ -45,6 +45,20 @@
   small,.muted{color:var(--muted)}
   small{display:block;line-height:1.6}
   .hidden{display:none !important}
+  .steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 4px}
+  .steps3 span{text-align:center;font-size:13px;font-weight:700;padding:8px 2px;border-radius:999px;background:var(--light);color:var(--muted)}
+  .steps3 span.on{background:var(--navy);color:#fff} .steps3 span.done{background:var(--okbg);color:var(--ok)}
+  .pick{display:flex;align-items:center;gap:10px;width:100%;padding:12px;margin-top:6px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);font-size:16px;text-align:right}
+  .pick .rd{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--muted);box-sizing:border-box}
+  .pick.on{border-color:var(--gold);background:var(--goldlight);font-weight:700}
+  .pick.on .rd{border:7px solid var(--gold)}
+  .pick:disabled{opacity:.45}
+  .pick small{margin-inline-start:auto;font-size:12px}
+  .endrow{display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .endrow b{flex:none;width:96px;font-size:14px}
+  .endrow span{flex:1;font-size:14px}
+  .endrow.miss span{color:var(--red)}
+  .miss-line{font-size:12px;color:var(--red);margin-top:4px}
   .att button.def{border-style:dashed;opacity:.85}
   .trow{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px}
   .trow button{padding:9px 2px;border-radius:9px;font-size:13px;font-weight:700;background:var(--navy);color:#fff}
@@ -281,6 +295,7 @@
   <div class="panel">
     <div class="head"><h2 id="rsName"></h2><button class="iconbtn" id="rsClose">إغلاق</button></div>
     <div class="types" id="rsType"></div>
+    <div id="rsForm">
     <div class="sum" id="rsSum"></div>
     <div class="rng3">
       <div><label>من آية</label><button class="ayah" id="rsFa"></button></div>
@@ -302,20 +317,44 @@
     </div>
     <button class="link" id="rsClear">مسح الخانة</button>
     <div id="rsToday"></div>
+    </div>
+    <div id="rsEnd" class="hidden">
+      <h3 style="margin-top:12px">ملخص تسميع اليوم</h3>
+      <div id="rsEndList"></div>
+      <div class="pair" style="grid-template-columns:1fr 2fr;margin-top:12px">
+        <button class="btn soft" id="rsEndBack">→ رجوع</button>
+        <button class="btn" id="rsEndDone">العودة لقائمة الطلاب</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- اعتماد التقييمات -->
+<!-- اعتماد التقييمات: ١ الاعتماد ← ٢ فارس الحلقة ← ٣ الإرسال -->
 <div class="sheet hidden" id="apprSheet">
   <div class="panel">
     <div class="head"><h2>اعتماد تقييمات اليوم</h2><button class="iconbtn" id="apprClose">إغلاق</button></div>
-    <small id="apprDate"></small>
-    <div class="tiles" id="apprTiles"></div>
-    <small style="margin-top:8px">عند الاعتماد يُسجَّل كل طالب لم يُحضَّر "غائب".</small>
-    <label>⭐ فارس الحلقة اليوم (طالب واحد من الحاضرين)</label>
-    <div class="chips wrap" id="apprStars"></div>
-    <button class="btn gold" id="apprGo">اعتماد</button>
-    <button class="btn soft" id="apprSend" disabled>إرسال التقارير لأولياء الأمور عبر واتساب (قريباً)</button>
+    <div class="steps3" id="apSteps"><span>١ الاعتماد</span><span>٢ فارس الحلقة</span><span>٣ الإرسال</span></div>
+    <div id="apS1">
+      <small id="apprDate"></small>
+      <div class="tiles" id="apprTiles"></div>
+      <div id="apprMiss"></div>
+      <small style="margin-top:8px">عند الاعتماد يُسجَّل كل طالب لم يُحضَّر "غائب".</small>
+      <button class="btn" id="apNext1">التالي: اختيار فارس الحلقة ←</button>
+    </div>
+    <div id="apS2" class="hidden">
+      <label style="margin-top:4px">⭐ اختر فارس الحلقة اليوم (طالب واحد فقط)</label>
+      <div id="apprStars"></div>
+      <div class="pair" style="grid-template-columns:1fr 2fr;margin-top:6px">
+        <button class="btn soft" id="apBack2">→ رجوع</button>
+        <button class="btn gold" id="apprGo">اعتماد ←</button>
+      </div>
+    </div>
+    <div id="apS3" class="hidden">
+      <div class="msg ok" id="apDone"></div>
+      <button class="btn soft" id="apprSend" disabled>إرسال التقارير لأولياء الأمور عبر واتساب (قريباً)</button>
+      <small style="text-align:center;margin-top:6px">سيُفعَّل الإرسال بعد الاتفاق على خدمة الرسائل.</small>
+      <button class="btn" id="apFinish">إنهاء</button>
+    </div>
     <div id="apprMsg"></div>
   </div>
 </div>
@@ -546,6 +585,10 @@ function renderStuds(){
       });
       w.appendChild(t);
     }
+    if (isPresent(s) && s.today.length){
+      const miss = D.types.filter(t => !s.today.some(r => r.type === t));
+      if (miss.length) w.appendChild(el('div', 'miss-line', 'لم يُسجَّل: ' + miss.join('، ')));
+    }
     if (s.today.length){
       const td = el('div', 'todays');
       s.today.forEach(r => td.appendChild(el('div', '', '• ' + r.type + ': ' + r.from + ' ← ' + r.to + ' • ' + scoreTxt(r))));
@@ -659,32 +702,47 @@ $('ayahSheet').onclick = e => { if (e.target === $('ayahSheet')) $('ayahSheet').
 
 function openRec(s, type){
   rs = { s, type:type || D.types[0], score:null, multi:false };
+  $('rsForm').classList.remove('hidden'); $('rsEnd').classList.add('hidden');
   $('rsName').textContent = s.name; enterTab();
   $('recSheet').classList.remove('hidden'); document.body.style.overflow = 'hidden';
 }
 function enterTab(){ clearForm(); markType(); summary(); renderRsToday(); $('recSheet').querySelector('.panel').scrollTop = 0; }
 function closeRec(){ $('recSheet').classList.add('hidden'); document.body.style.overflow = ''; renderStuds(); }
+function closeRecToList(){ closeRec(); }
 $('rsClose').onclick = () => go(-1);
 $('recSheet').onclick = e => { if (e.target === $('recSheet')) go(-1); };
 
-/* حالة الخانة: فارغة (تُتجاوز) أو مكتملة (تُحفظ) أو ناقصة */
+/* حالة الخانة: فارغة أو مكتملة (تُحفظ) أو ناقصة (تُتجاوز دون حفظ) */
 function formState(){
   const any = $('rsFs').value || ayahVal('rsFa') || ayahVal('rsTa') || rs.score !== null || $('rsNote').value.trim();
   if (!any) return 'empty';
   return $('rsFs').value && endSurah() && ayahVal('rsFa') && ayahVal('rsTa') && rs.score !== null ? 'full' : 'partial';
 }
-/* الانتقال: يحفظ الخانة الحالية إن كانت مكتملة ثم ينتقل (‎-1 = إغلاق) */
+/* الانتقال: "التالي" متاح دائماً؛ يحفظ الخانة إن كانت مكتملة، وإلا يتجاوزها. ‎-1 = إغلاق */
 let moving = false;
 async function go(to){
   if (moving) return;
-  const st = formState();
-  if (st === 'partial'){ msg('rsMsg', 'أكمل من آية والسورة وإلى آية والدرجة، أو اضغط "مسح الخانة" للتجاوز.', 'err'); return; }
-  if (st === 'full'){ moving = true; const ok = await saveCurrent(); moving = false; if (!ok) return; }
-  if (to === -1 || to >= D.types.length){ closeRec(); return; }
-  rs.type = D.types[to]; enterTab();
+  if (formState() === 'full'){ moving = true; const ok = await saveCurrent(); moving = false; if (!ok) return; }
+  if (to === -1){ closeRec(); return; }
+  if (to >= D.types.length){ showEnd(); return; }
+  rs.type = D.types[to]; $('rsForm').classList.remove('hidden'); $('rsEnd').classList.add('hidden'); enterTab();
 }
 $('rsNext').onclick = () => go(D.types.indexOf(rs.type) + 1);
 $('rsBack').onclick = () => go(D.types.indexOf(rs.type) - 1);
+/* نهاية الطالب: ما سُجّل وما لم يُسجَّل في كل خانة */
+function showEnd(){
+  $('rsForm').classList.add('hidden'); $('rsEnd').classList.remove('hidden');
+  $('rsType').querySelectorAll('button').forEach(x => { x.classList.remove('on'); x.classList.toggle('done', rs.s.today.some(r => r.type === x.dataset.t)); });
+  const box = $('rsEndList'); box.innerHTML = '';
+  D.types.forEach(t => {
+    const list = rs.s.today.filter(r => r.type === t);
+    if (!list.length){ const w = el('div', 'endrow miss'); w.appendChild(el('b', '', t)); w.appendChild(el('span', '', 'لم يتم تسجيل ' + t)); box.appendChild(w); return; }
+    list.forEach(r => { const w = el('div', 'endrow'); w.appendChild(el('b', '', '✓ ' + t)); w.appendChild(el('span', '', r.from + ' ← ' + r.to + ' (' + r.ayat + ' آية)')); w.appendChild(el('span', pillCls(r.grade) + ' pill', scoreTxt(r))); box.appendChild(w); });
+  });
+  $('recSheet').querySelector('.panel').scrollTop = 0;
+}
+$('rsEndBack').onclick = () => { rs.type = D.types[D.types.length - 1]; $('rsForm').classList.remove('hidden'); $('rsEnd').classList.add('hidden'); enterTab(); };
+$('rsEndDone').onclick = () => closeRec();
 
 function renderRsToday(){
   const box = $('rsToday'); box.innerHTML = '';
@@ -734,6 +792,11 @@ function renderAppr(){
     $('btnApprove').textContent = 'اعتماد التقييمات';
   }
 }
+function apStep(n){
+  ['apS1','apS2','apS3'].forEach((id, i) => $(id).classList.toggle('hidden', i !== n - 1));
+  $('apSteps').querySelectorAll('span').forEach((x, i) => { x.className = i + 1 === n ? 'on' : i + 1 < n ? 'done' : ''; });
+  msg('apprMsg', '', ''); $('apprSheet').querySelector('.panel').scrollTop = 0;
+}
 $('btnApprove').onclick = async () => {
   await flushAtt();
   apprStar = approval ? approval.star : '';
@@ -741,24 +804,38 @@ $('btnApprove').onclick = async () => {
   const c = { p:0, l:0, a:0, r:0 };
   studs.forEach(s => { const e = eff(s); if (e === 'حاضر') c.p++; else if (e === 'متأخر') c.l++; else c.a++; c.r += s.today.length; });
   fill('apprTiles', [tile(c.p, 'حاضر', 't-ok'), tile(c.l, 'متأخر', 't-late'), tile(c.a, 'غائب/مستأذن', 't-abs'), tile(c.r, 'تسميع', 't-nav')]);
+  const mb = $('apprMiss'); mb.innerHTML = '';
+  const noRec = studs.filter(s => isPresent(s) && !s.today.length);
+  if (noRec.length) mb.appendChild(el('div', 'msg info', 'حاضرون بلا تسميع: ' + noRec.map(s => s.name).join('، ')));
+  // قائمة فارس الحلقة: كل الطلاب، والاختيار لطالب واحد فقط من الحاضرين
   const box = $('apprStars'); box.innerHTML = '';
-  const pres = studs.filter(isPresent);
-  if (!pres.length) box.appendChild(el('small', '', 'لا يوجد طلاب حاضرون.'));
-  pres.forEach(s => { const b = el('button', s.sid === apprStar ? 'on' : '', s.name); b.onclick = () => { apprStar = apprStar === s.sid ? '' : s.sid; box.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b && apprStar === s.sid)); }; box.appendChild(b); });
-  msg('apprMsg', '', '');
+  studs.forEach(s => {
+    const b = el('button', 'pick' + (s.sid === apprStar ? ' on' : '')); b.appendChild(el('span', 'rd')); b.appendChild(el('span', '', s.name));
+    if (!isPresent(s)){ b.disabled = true; b.appendChild(el('small', '', eff(s))); }
+    b.onclick = () => { apprStar = s.sid; box.querySelectorAll('.pick').forEach(x => x.classList.toggle('on', x === b)); };
+    box.appendChild(b);
+  });
+  apStep(1);
   $('apprSheet').classList.remove('hidden'); document.body.style.overflow = 'hidden';
 };
 function closeAppr(){ $('apprSheet').classList.add('hidden'); document.body.style.overflow = ''; }
 $('apprClose').onclick = closeAppr;
 $('apprSheet').onclick = e => { if (e.target === $('apprSheet')) closeAppr(); };
+$('apNext1').onclick = () => apStep(2);
+$('apBack2').onclick = () => apStep(1);
+$('apFinish').onclick = closeAppr;
 $('apprGo').onclick = async () => {
+  const anyPresent = studs.some(isPresent);
+  if (anyPresent && !apprStar) return msg('apprMsg', 'اختر فارس الحلقة (طالب واحد).', 'err');
   $('apprGo').disabled = true; msg('apprMsg', 'جاري الاعتماد...', 'info');
   try {
     const r = await api({ action:'approve', hid:hal, date:day, star:apprStar });
     if (!r.ok) return msg('apprMsg', r.msg, 'err');
     studs.forEach(s => { if (!s.att) s.att = 'غائب'; });
     approval = { star:r.star, starName:r.starName, at:new Date().toLocaleTimeString('ar-SA', { hour:'numeric', minute:'2-digit' }) };
-    renderStuds(); renderAppr(); closeAppr(); toast(r.msg);
+    renderStuds(); renderAppr();
+    $('apDone').textContent = '✓ ' + r.msg + (r.starName ? ' • ⭐ فارس الحلقة: ' + r.starName : '');
+    apStep(3);
   } catch(e){ msg('apprMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('apprGo').disabled = false; }
 };
