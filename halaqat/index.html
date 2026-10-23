@@ -110,9 +110,28 @@
   .seg button{padding:10px;border-radius:9px;background:none;color:var(--muted);font-size:15px;font-weight:700}
   .seg button.on{background:var(--navy);color:#fff}
   .pair{display:grid;grid-template-columns:2fr 1fr;gap:8px}
-  .grades{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-  .grades button{padding:9px 12px;border-radius:10px;background:var(--light);color:var(--text);font-size:14px;border:1.5px solid transparent}
-  .grades button.on{border-color:var(--gold);background:var(--goldlight);color:var(--gold2);font-weight:700}
+  .types{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--light);padding:4px;border-radius:12px;margin-top:8px}
+  .types button{padding:10px 4px;border-radius:9px;background:none;color:var(--muted);font-size:15px;font-weight:700}
+  .types button.on{background:var(--navy);color:#fff}
+  .scores{display:grid;grid-template-columns:repeat(11,1fr);gap:3px;margin-top:4px}
+  .scores button{padding:10px 0;border-radius:8px;background:var(--light);color:var(--text);font-size:15px;font-weight:700;border:1.5px solid transparent}
+  .scores button.on{border-color:var(--gold);background:var(--gold);color:#fff}
+  .c-ok{color:var(--ok)} .c-late{color:var(--gold2)} .c-abs{color:var(--red)}
+  .slabel{text-align:center;margin-top:6px;font-weight:700;min-height:22px}
+  .ayah{font:inherit;font-size:17px;padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);text-align:center;font-weight:700}
+  .ayah:empty::before{content:'آية';color:var(--muted);font-weight:400}
+  .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
+  .grid button{padding:10px 0;border-radius:9px;background:var(--light);color:var(--text);font-size:15px;border:1.5px solid transparent}
+  .grid button.on{background:var(--navy);color:#fff}
+  .grid button.in{background:var(--goldlight);color:var(--gold2)}
+  .plan{font-size:12px;margin-top:3px;color:var(--ok);font-weight:500}
+  .plan.none{color:var(--red)}
+  .bar2{height:6px;border-radius:6px;background:var(--light);overflow:hidden;margin-top:6px}
+  .bar2 i{display:block;height:100%;background:var(--gold)}
+  .rng{display:flex;gap:6px;margin-top:12px}
+  .rng button{flex:1;padding:8px;border-radius:10px;background:var(--light);color:var(--muted);font-size:14px;font-weight:500;border:1.5px solid transparent}
+  .rng button.on{border-color:var(--gold);background:var(--goldlight);color:var(--gold2);font-weight:700}
+  .tile small{display:block;font-size:11px;opacity:.8}
   .count{margin-top:10px;text-align:center;font-size:15px;color:var(--navy);font-weight:700}
   @media (prefers-color-scheme: dark){ .count{color:#E8B867} }
   .del{background:none;color:var(--red);font-size:13px;padding:4px 8px}
@@ -209,8 +228,13 @@
         <div class="who"><b id="sName"></b><small id="sSub"></small></div>
         <button class="iconbtn" id="btnBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>رجوع</button>
       </div>
-      <div class="tiles" id="sTiles"></div>
-      <div class="tiles" id="sTiles2"></div>
+      <div class="rng" id="sRng"><button data-r="week">هذا الأسبوع</button><button data-r="month" class="on">هذا الشهر</button><button data-r="all">منذ البداية</button></div>
+      <label>الحضور</label>
+      <div class="tiles" id="sTiles2" style="margin-top:0"></div>
+      <label>الإنجاز (آيات)</label>
+      <div class="tiles" id="sTiles" style="margin-top:0"></div>
+      <div class="slabel" id="sAvg"></div>
+      <div id="sPlans"></div>
     </div>
     <div class="card"><h3>سجل الحفظ والمراجعة</h3><div id="sRecs"></div></div>
     <div class="card"><h3>الحضور</h3><div id="sAtt"></div></div>
@@ -224,19 +248,29 @@
   <div class="panel">
     <div class="head"><h2 id="rsName"></h2><button class="iconbtn" id="rsClose">إغلاق</button></div>
     <small id="rsLast"></small>
-    <div class="seg" id="rsType"><button data-t="حفظ" class="on">حفظ جديد</button><button data-t="مراجعة">مراجعة</button></div>
+    <div class="types" id="rsType"></div>
     <label>من</label>
-    <div class="pair"><select id="rsFs"></select><input id="rsFa" type="number" inputmode="numeric" min="1" placeholder="آية"></div>
+    <div class="pair"><select id="rsFs"></select><button class="ayah" id="rsFa"></button></div>
     <label>إلى</label>
-    <div class="pair"><select id="rsTs"></select><input id="rsTa" type="number" inputmode="numeric" min="1" placeholder="آية"></div>
+    <div class="pair"><select id="rsTs"></select><button class="ayah" id="rsTa"></button></div>
     <div class="count" id="rsCount"></div>
-    <label>التقدير</label>
-    <div class="grades" id="rsGrades"></div>
+    <label>الدرجة من 10</label>
+    <div class="scores" id="rsScores"></div>
+    <div class="slabel" id="rsLabel"></div>
     <label for="rsNote">ملاحظة (اختياري)</label>
     <textarea id="rsNote" rows="2" maxlength="300"></textarea>
     <button class="btn" id="rsSave">حفظ التسجيل</button>
     <div id="rsMsg"></div>
     <div id="rsToday"></div>
+  </div>
+</div>
+
+<!-- اختيار رقم الآية -->
+<div class="sheet hidden" id="ayahSheet">
+  <div class="panel">
+    <div class="head"><h2 id="apTitle"></h2><button class="iconbtn" id="apClose">إغلاق</button></div>
+    <small id="apSub"></small>
+    <div class="grid" id="apGrid"></div>
   </div>
 </div>
 
@@ -275,7 +309,9 @@ const iso = t => t.toISOString().slice(0, 10);
 const addDays = (d, n) => { const t = ud(d); t.setUTCDate(t.getUTCDate() + n); return iso(t); };
 const isStudy = d => (D ? D.studyDays : [0,1,2,3]).indexOf(ud(d).getUTCDay()) !== -1;
 const fmtD = (d, o) => ud(d).toLocaleDateString('ar-SA-u-ca-gregory', Object.assign({ timeZone:'UTC' }, o));
-const PILL = { 'حاضر':'p-ok', 'متأخر':'p-late', 'غائب':'p-abs', 'مستأذن':'p-none', 'ممتاز':'p-ok', 'جيد جداً':'p-ok', 'جيد':'p-late', 'مقبول':'p-late', 'لم يحفظ':'p-abs' };
+const PILL = { 'حاضر':'p-ok', 'متأخر':'p-late', 'غائب':'p-abs', 'مستأذن':'p-none', 'ممتاز':'p-ok', 'جيد جداً':'p-ok', 'جيد':'p-late', 'مقبول':'p-late', 'ضعيف':'p-abs' };
+const scoreLabel = n => n >= 9 ? 'ممتاز' : n >= 8 ? 'جيد جداً' : n >= 7 ? 'جيد' : n >= 5 ? 'مقبول' : 'ضعيف';
+const scoreTxt = x => x.score != null ? x.score + '/' + (D ? D.maxScore : 10) + ' ' + x.grade : x.grade;
 const pillCls = s => 'pill ' + (PILL[s] || 'p-none');
 function tile(n, label, cls){ const t = el('div', 'tile ' + (cls || '')); t.appendChild(el('b', '', n)); t.appendChild(el('span', '', label)); return t; }
 function fill(id, list){ const e = $(id); e.innerHTML = ''; list.forEach(x => e.appendChild(x)); }
@@ -342,7 +378,7 @@ async function loadHome(){
   // التبويبات حسب الأدوار
   const tabs = [];
   if (r.roles.indexOf('admin') !== -1) tabs.push(['report', 'التقارير'], ['teach', 'الحلقات']);
-  else if (r.roles.indexOf('teacher') !== -1) tabs.push(['teach', 'حلقتي']);
+  else if (r.roles.indexOf('teacher') !== -1) tabs.push(['teach', 'حلقتي'], ['report', 'إنجاز الحلقة']);
   if (r.roles.indexOf('parent') !== -1) tabs.push(['parent', 'أبنائي']);
   const t = $('roleTabs'); t.innerHTML = '';
   tabs.forEach(x => { const b = el('button', '', x[1]); b.dataset.r = x[0]; b.onclick = () => openRole(x[0]); t.appendChild(b); });
@@ -395,9 +431,10 @@ function attTiles(){
   fill('attTiles', [tile(c['حاضر'], 'حاضر', 't-ok'), tile(c['متأخر'], 'متأخر', 't-late'), tile(c['غائب'], 'غائب', 't-abs'), tile(c[''], 'لم يُحضَّر', 't-nav')]);
 }
 function lastText(s){
-  const h = s.lastHifz;
+  const h = s.last['حفظ'];
   return h ? 'آخر حفظ: ' + h.to + ' (' + fmtD(h.date, { day:'numeric', month:'short' }) + ')' : (s.level ? 'مقدار الحفظ: ' + s.level : 'لا يوجد تسجيل حفظ بعد');
 }
+function planText(p){ return p.daily + ' آية يومياً' + (p.pct != null ? ' • أنجز ' + p.done + ' من ' + p.total + ' (' + p.pct + '%)' : ''); }
 function renderStuds(){
   attTiles();
   const box = $('stuList'); box.innerHTML = '';
@@ -405,6 +442,8 @@ function renderStuds(){
   studs.forEach(s => {
     const w = el('div', 'stu'), top = el('div', 'top');
     const nm = el('button', 'nm'); nm.appendChild(el('b', '', s.name)); nm.appendChild(el('small', '', lastText(s)));
+    const hp = s.plans['حفظ'];
+    nm.appendChild(el('div', 'plan' + (hp ? '' : ' none'), hp ? 'خطة الحفظ: ' + planText(hp) : 'لا توجد خطة'));
     nm.onclick = () => openStudent(s.sid);
     const rb = el('button', 'rec' + (s.today.length ? ' done' : ''), s.today.length ? '✓ ' + s.today.length + ' تسجيل' : 'تسجيل');
     rb.onclick = () => openRec(s);
@@ -436,12 +475,23 @@ async function flushAtt(){
 $('btnAllPresent').onclick = () => { studs.forEach(s => { if (!s.att){ s.att = 'حاضر'; pending[s.sid] = 'حاضر'; } }); renderStuds(); $('saveState').textContent = 'جاري الحفظ...'; clearTimeout(saveTimer); saveTimer = setTimeout(flushAtt, 400); };
 window.addEventListener('pagehide', flushAtt);
 
-/* ---------- نافذة تسجيل الحفظ ---------- */
-let rs = { s:null, type:'حفظ', grade:'' };
+/* ---------- نافذة التسميع ---------- */
+let rs = { s:null, type:'حفظ', score:null };
+const ayahVal = id => +$(id).dataset.v || 0;
+function setAyah(id, v){ $(id).dataset.v = v || ''; $(id).textContent = v || ''; }
 function fillSurahs(){
   ['rsFs','rsTs'].forEach(id => { const e = $(id); if (e.options.length) return; D.surah.forEach((n, i) => { const o = el('option', '', (i + 1) + ' - ' + n); o.value = i + 1; e.appendChild(o); }); });
-  const g = $('rsGrades'); g.innerHTML = '';
-  D.grades.forEach(x => { const b = el('button', '', x); b.onclick = () => { rs.grade = x; g.querySelectorAll('button').forEach(y => y.classList.toggle('on', y === b)); }; g.appendChild(b); });
+  const t = $('rsType'); t.innerHTML = '';
+  D.types.forEach(x => { const b = el('button', '', x); b.dataset.t = x; b.onclick = () => { rs.type = x; markType(); prefill(); }; t.appendChild(b); });
+  const g = $('rsScores'); g.innerHTML = '';
+  for (let n = D.maxScore; n >= 0; n--){ const b = el('button', '', n); b.dataset.n = n; b.onclick = () => setScore(n); g.appendChild(b); }
+}
+function markType(){ $('rsType').querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.t === rs.type)); }
+function setScore(n){
+  rs.score = n;
+  $('rsScores').querySelectorAll('button').forEach(b => b.classList.toggle('on', n !== null && +b.dataset.n === n));
+  $('rsLabel').textContent = n === null ? '' : n + ' من ' + D.maxScore + ' • ' + scoreLabel(n);
+  $('rsLabel').className = 'slabel ' + (n === null ? '' : (PILL[scoreLabel(n)] || '').replace('p-', 'c-'));
 }
 /* الآية التالية بعد آخر تسجيل (للمتابعة من حيث توقف الطالب) */
 function nextAfter(r){
@@ -451,32 +501,59 @@ function nextAfter(r){
   const ns = rev ? r.ts - 1 : r.ts + 1;
   return ns >= 1 && ns <= 114 ? { s:ns, a:1 } : null;
 }
-function setRange(fs, fa, ts, ta){ $('rsFs').value = fs; $('rsFa').value = fa || ''; $('rsTs').value = ts; $('rsTa').value = ta || ''; countAyat(); }
+function setRange(fs, fa, ts, ta){ $('rsFs').value = fs; setAyah('rsFa', fa); $('rsTs').value = ts; setAyah('rsTa', ta); countAyat(); }
 function prefill(){
-  const last = rs.type === 'حفظ' ? rs.s.lastHifz : rs.s.lastMuraja;
-  $('rsLast').textContent = last ? 'آخر ' + rs.type + ': من ' + last.from + ' إلى ' + last.to + ' • ' + last.grade + ' • ' + fmtD(last.date, { day:'numeric', month:'short' }) : 'لا يوجد ' + rs.type + ' سابق لهذا الطالب.';
-  const n = nextAfter(last);
-  if (n) setRange(n.s, n.a, n.s, ''); else setRange(rs.type === 'حفظ' ? 114 : 1, 1, rs.type === 'حفظ' ? 114 : 1, '');
+  const last = rs.s.last[rs.type], plan = rs.s.plans[rs.type];
+  const parts = [];
+  parts.push(last ? 'آخر ' + rs.type + ': ' + last.from + ' ← ' + last.to + ' • ' + scoreTxt(last) + ' • ' + fmtD(last.date, { day:'numeric', month:'short' }) : 'لا يوجد ' + rs.type + ' سابق.');
+  parts.push(plan ? 'الخطة: ' + planText(plan) : 'لا توجد خطة لهذا النوع.');
+  $('rsLast').textContent = parts.join('  |  ');
+  let n = nextAfter(last);
+  if (!n && plan && plan.fs) n = { s:plan.fs, a:plan.fa };
+  if (!n){ setRange(rs.type === 'حفظ' ? 114 : 1, '', rs.type === 'حفظ' ? 114 : 1, ''); return; }
+  let ta = '';
+  if (plan && plan.daily) ta = Math.min(D.ayat[n.s - 1], n.a + plan.daily - 1);
+  setRange(n.s, n.a, n.s, ta);
 }
 function absAyah(s, a){ let n = 0; for (let i = 0; i < s - 1; i++) n += D.ayat[i]; return n + a; }
 function countAyat(){
-  const fs = +$('rsFs').value, fa = +$('rsFa').value, ts = +$('rsTs').value, ta = +$('rsTa').value;
-  $('rsFa').max = D.ayat[fs - 1]; $('rsTa').max = D.ayat[ts - 1];
-  if (!fa || !ta){ $('rsCount').textContent = 'عدد آيات سورة ' + D.surah[ts - 1] + ': ' + D.ayat[ts - 1]; return; }
-  if (fa > D.ayat[fs - 1] || ta > D.ayat[ts - 1]){ $('rsCount').textContent = 'رقم الآية أكبر من عدد آيات السورة'; return; }
-  $('rsCount').textContent = 'المقدار: ' + (Math.abs(absAyah(ts, ta) - absAyah(fs, fa)) + 1) + ' آية';
+  const fs = +$('rsFs').value, fa = ayahVal('rsFa'), ts = +$('rsTs').value, ta = ayahVal('rsTa');
+  if (fa > D.ayat[fs - 1]) setAyah('rsFa', ''); if (ta > D.ayat[ts - 1]) setAyah('rsTa', '');
+  if (!ayahVal('rsFa') || !ayahVal('rsTa')){ $('rsCount').textContent = 'اضغط خانة الآية لاختيار رقمها'; return; }
+  $('rsCount').textContent = 'المقدار: ' + (Math.abs(absAyah(ts, ayahVal('rsTa')) - absAyah(fs, ayahVal('rsFa'))) + 1) + ' آية';
 }
-['rsFs','rsFa','rsTs','rsTa'].forEach(id => $(id).oninput = countAyat);
-$('rsFs').onchange = () => { if (+$('rsTs').value < +$('rsFs').value && rs.type === 'حفظ') $('rsTs').value = $('rsFs').value; countAyat(); };
-document.querySelectorAll('#rsType button').forEach(b => b.onclick = () => {
-  rs.type = b.dataset.t; document.querySelectorAll('#rsType button').forEach(x => x.classList.toggle('on', x === b)); prefill();
-});
+$('rsFs').onchange = () => { setAyah('rsFa', ''); if (+$('rsTs').value < +$('rsFs').value && rs.type === 'حفظ') $('rsTs').value = $('rsFs').value; countAyat(); openAyah('rsFa'); };
+$('rsTs').onchange = () => { setAyah('rsTa', ''); countAyat(); openAyah('rsTa'); };
+
+/* شبكة أرقام الآيات (مثل تحديد البداية والنهاية) */
+function openAyah(which){
+  const isFrom = which === 'rsFa', su = +$(isFrom ? 'rsFs' : 'rsTs').value, n = D.ayat[su - 1];
+  const other = isFrom ? null : (+$('rsFs').value === su ? ayahVal('rsFa') : null);
+  $('apTitle').textContent = (isFrom ? 'تحديد البداية' : 'تحديد النهاية') + ' • ' + D.surah[su - 1];
+  $('apSub').textContent = 'عدد آيات السورة: ' + n;
+  const g = $('apGrid'); g.innerHTML = '';
+  for (let i = 1; i <= n; i++){
+    const b = el('button', i === ayahVal(which) ? 'on' : (other && i >= other ? '' : ''), i);
+    if (other && i === other) b.classList.add('in');
+    b.onclick = () => {
+      setAyah(which, i);
+      if (isFrom && +$('rsTs').value === su && ayahVal('rsTa') && ayahVal('rsTa') < i && rs.type !== 'تلاوة') setAyah('rsTa', '');
+      countAyat(); $('ayahSheet').classList.add('hidden');
+      if (isFrom && !ayahVal('rsTa')) openAyah('rsTa');
+    };
+    g.appendChild(b);
+  }
+  $('ayahSheet').classList.remove('hidden');
+}
+$('rsFa').onclick = () => openAyah('rsFa');
+$('rsTa').onclick = () => openAyah('rsTa');
+$('apClose').onclick = () => $('ayahSheet').classList.add('hidden');
+$('ayahSheet').onclick = e => { if (e.target === $('ayahSheet')) $('ayahSheet').classList.add('hidden'); };
+
 function openRec(s){
-  rs = { s, type:'حفظ', grade:'' };
+  rs = { s, type:'حفظ', score:null };
   $('rsName').textContent = s.name; $('rsNote').value = ''; msg('rsMsg', '', '');
-  document.querySelectorAll('#rsType button').forEach(x => x.classList.toggle('on', x.dataset.t === 'حفظ'));
-  $('rsGrades').querySelectorAll('button').forEach(y => y.classList.remove('on'));
-  prefill(); renderRsToday();
+  markType(); setScore(null); prefill(); renderRsToday();
   $('recSheet').classList.remove('hidden'); document.body.style.overflow = 'hidden';
 }
 function closeRec(){ $('recSheet').classList.add('hidden'); document.body.style.overflow = ''; }
@@ -485,11 +562,11 @@ $('recSheet').onclick = e => { if (e.target === $('recSheet')) closeRec(); };
 function renderRsToday(){
   const box = $('rsToday'); box.innerHTML = '';
   if (!rs.s.today.length) return;
-  box.appendChild(el('label', '', 'تسجيلات ' + (day === D.today ? 'اليوم' : 'هذا اليوم')));
+  box.appendChild(el('label', '', 'تسميع ' + (day === D.today ? 'اليوم' : 'هذا اليوم')));
   rs.s.today.forEach(r => {
     const w = el('div', 'row'), g = el('div', 'grow');
     g.appendChild(el('b', '', r.type + ': ' + r.from + ' ← ' + r.to)); g.appendChild(el('small', '', r.ayat + ' آية' + (r.note ? ' • ' + r.note : '')));
-    w.appendChild(g); w.appendChild(el('span', pillCls(r.grade), r.grade));
+    w.appendChild(g); w.appendChild(el('span', pillCls(r.grade), scoreTxt(r)));
     if (r.id){ const d = el('button', 'del', 'حذف'); d.onclick = () => delRec(r); w.appendChild(d); }
     box.appendChild(w);
   });
@@ -503,17 +580,16 @@ async function delRec(r){
   } catch(e){ msg('rsMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
 }
 $('rsSave').onclick = async () => {
-  const p = { action:'saveRecord', sid:rs.s.sid, date:day, type:rs.type, fs:+$('rsFs').value, fa:+$('rsFa').value, ts:+$('rsTs').value, ta:+$('rsTa').value, grade:rs.grade, note:$('rsNote').value.trim() };
-  if (!p.fa || !p.ta) return msg('rsMsg', 'أدخل رقم آية البداية والنهاية.', 'err');
-  if (p.fa > D.ayat[p.fs - 1] || p.ta > D.ayat[p.ts - 1]) return msg('rsMsg', 'رقم الآية أكبر من عدد آيات السورة.', 'err');
-  if (!p.grade) return msg('rsMsg', 'اختر التقدير.', 'err');
+  const p = { action:'saveRecord', sid:rs.s.sid, date:day, type:rs.type, fs:+$('rsFs').value, fa:ayahVal('rsFa'), ts:+$('rsTs').value, ta:ayahVal('rsTa'), score:rs.score, note:$('rsNote').value.trim() };
+  if (!p.fa || !p.ta) return msg('rsMsg', 'حدّد آية البداية والنهاية.', 'err');
+  if (p.score === null) return msg('rsMsg', 'اختر الدرجة.', 'err');
   $('rsSave').disabled = true; msg('rsMsg', 'جاري الحفظ...', 'info');
   try {
     const r = await api(p);
     if (!r.ok) return msg('rsMsg', r.msg, 'err');
-    const rec = { id:r.id, date:day, type:p.type, from:D.surah[p.fs - 1] + ' ' + p.fa, to:D.surah[p.ts - 1] + ' ' + p.ta, fs:p.fs, fa:p.fa, ts:p.ts, ta:p.ta, ayat:r.ayat, grade:p.grade, note:p.note };
-    rs.s.today.push(rec);
-    if (p.type === 'حفظ') rs.s.lastHifz = rec; else rs.s.lastMuraja = rec;
+    const rec = { id:r.id, date:day, type:p.type, from:D.surah[p.fs - 1] + ' ' + p.fa, to:D.surah[p.ts - 1] + ' ' + p.ta, fs:p.fs, fa:p.fa, ts:p.ts, ta:p.ta, ayat:r.ayat, score:p.score, grade:r.grade || scoreLabel(p.score), note:p.note };
+    rs.s.today.push(rec); rs.s.last[p.type] = rec;
+    if (rs.s.plans[p.type]) rs.s.plans[p.type].done += r.ayat;
     if (!rs.s.att && day === D.today){ rs.s.att = 'حاضر'; pending[rs.s.sid] = 'حاضر'; clearTimeout(saveTimer); saveTimer = setTimeout(flushAtt, 400); }
     renderStuds(); toast(r.msg); closeRec();
   } catch(e){ msg('rsMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
@@ -530,7 +606,7 @@ async function openStudent(sid){
   const s = r.student;
   $('sName').textContent = s.name; $('sAvatar').textContent = s.name.charAt(0);
   $('sSub').textContent = [s.halaqa, s.teacher && 'المعلم: ' + s.teacher, s.level && 'مقدار الحفظ: ' + s.level].filter(Boolean).join(' • ');
-  studentTiles(s, 'sTiles', 'sTiles2');
+  curStudent = s; renderStudentRange(); plansBlock(s, $('sPlans'));
   const rb = $('sRecs'); rb.innerHTML = '';
   if (!s.records.length) rb.appendChild(el('small', '', 'لا يوجد تسجيلات بعد.'));
   s.records.forEach(x => rb.appendChild(recRow(x)));
@@ -539,15 +615,48 @@ async function openStudent(sid){
   s.attendance.forEach(a => { const w = el('div', 'row'); w.appendChild(el('div', 'grow', fmtD(a.date, { weekday:'long', day:'numeric', month:'short' }))); w.appendChild(el('span', pillCls(a.status), a.status)); ab.appendChild(w); });
   show('vStudent');
 }
-function studentTiles(s, a, b){
-  fill(a, [tile(s.totalHifz, 'إجمالي الحفظ (آية)', 't-nav'), tile(s.month.hifz, 'حفظ الشهر', 't-ok'), tile(s.month.muraja, 'مراجعة الشهر', 't-late'), tile(s.records.length ? s.records[0].grade : '—', 'آخر تقدير', '')]);
-  fill(b, [tile(s.month.present, 'حاضر', 't-ok'), tile(s.month.late, 'متأخر', 't-late'), tile(s.month.absent, 'غائب', 't-abs'), tile(s.month.excused, 'مستأذن', 't-nav')]);
+let curStudent = null, sRange = 'month';
+/* إنجاز الطالب في فترة: الحضور بالنسب، وآيات كل نوع، ومعدل الدرجات */
+function achieve(s, range){
+  const t = D.today, from = range === 'week' ? addDays(t, -ud(t).getUTCDay()) : range === 'month' ? t.slice(0, 8) + '01' : '0000';
+  const att = { 'حاضر':0, 'متأخر':0, 'غائب':0, 'مستأذن':0 }, types = {}; let n = 0, sum = 0, cnt = 0;
+  s.attendance.forEach(a => { if (a.date >= from && a.status in att){ att[a.status]++; n++; } });
+  s.records.forEach(r => { if (r.date >= from){ types[r.type] = (types[r.type] || 0) + r.ayat; if (r.score != null){ sum += r.score; cnt++; } } });
+  return { att, n, types, avg: cnt ? Math.round(sum / cnt * 10) / 10 : null };
 }
+function studentTiles(s, a, b, range){
+  const x = achieve(s, range || 'month'), pct = k => x.n ? Math.round(x.att[k] / x.n * 100) + '%' : '—';
+  const t = (v, l, c, sub) => { const e = tile(v, l, c); if (sub) e.appendChild(el('small', '', sub)); return e; };
+  fill(b, [t(x.att['حاضر'], 'حاضر', 't-ok', pct('حاضر')), t(x.att['متأخر'], 'متأخر', 't-late', pct('متأخر')), t(x.att['غائب'], 'غائب', 't-abs', pct('غائب')), t(x.att['مستأذن'], 'مستأذن', 't-nav', pct('مستأذن'))]);
+  const cls = ['t-ok', 't-late', 't-nav', ''];
+  fill(a, D.types.map((ty, i) => t(x.types[ty] || 0, ty, cls[i])).concat(x.avg != null ? [] : []));
+  return x;
+}
+function plansBlock(s, box){
+  box.innerHTML = '';
+  const ks = Object.keys(s.plans || {});
+  box.appendChild(el('label', '', 'الخطة'));
+  if (!ks.length){ box.appendChild(el('div', 'plan none', 'لا توجد خطة')); return; }
+  ks.forEach(k => {
+    const p = s.plans[k], w = el('div', 'row'), g = el('div', 'grow');
+    g.appendChild(el('b', '', k + ': ' + (p.from && p.to ? p.from + ' ← ' + p.to : '')));
+    g.appendChild(el('small', '', planText(p) + (p.end ? ' • حتى ' + fmtD(p.end, { day:'numeric', month:'short' }) : '')));
+    if (p.pct != null){ const bar = el('div', 'bar2'), i = el('i'); i.style.width = p.pct + '%'; bar.appendChild(i); g.appendChild(bar); }
+    w.appendChild(g); box.appendChild(w);
+  });
+}
+function renderStudentRange(){
+  document.querySelectorAll('#sRng button').forEach(b => b.classList.toggle('on', b.dataset.r === sRange));
+  const x = studentTiles(curStudent, 'sTiles', 'sTiles2', sRange);
+  $('sSub2') && ($('sSub2').textContent = '');
+  $('sAvg').textContent = x.avg != null ? 'معدل الدرجات: ' + x.avg + ' من ' + D.maxScore + ' • ' + scoreLabel(x.avg) : 'لا توجد درجات في هذه الفترة';
+}
+document.querySelectorAll('#sRng button').forEach(b => b.onclick = () => { sRange = b.dataset.r; renderStudentRange(); });
 function recRow(x){
   const w = el('div', 'row'), g = el('div', 'grow');
   g.appendChild(el('b', '', x.type + ': ' + x.from + ' ← ' + x.to));
   g.appendChild(el('small', '', fmtD(x.date, { weekday:'short', day:'numeric', month:'short' }) + ' • ' + x.ayat + ' آية' + (x.note ? ' • ' + x.note : '')));
-  w.appendChild(g); w.appendChild(el('span', pillCls(x.grade), x.grade)); return w;
+  w.appendChild(g); w.appendChild(el('span', pillCls(x.grade), scoreTxt(x))); return w;
 }
 $('btnBack').onclick = () => { show('vHome'); if (role === 'teach') loadAtt(); };
 
@@ -555,21 +664,25 @@ $('btnBack').onclick = () => { show('vHome'); if (role === 'teach') loadAtt(); }
 function renderParent(){
   const box = $('pParent'); box.innerHTML = '';
   (D.children || []).forEach(s => {
-    const c = el('div', 'card');
-    const me = el('div', 'me'); const av = el('div', 'avatar', s.name.charAt(0)); const who = el('div', 'who');
+    const c = el('div', 'card'); box.appendChild(c);
+    const me = el('div', 'me'), who = el('div', 'who');
     who.appendChild(el('b', '', s.name)); who.appendChild(el('small', '', [s.halaqa, s.teacher && 'المعلم: ' + s.teacher].filter(Boolean).join(' • ')));
-    me.appendChild(av); me.appendChild(who); c.appendChild(me);
-    const t1 = el('div', 'tiles'), t2 = el('div', 'tiles'); t1.id = 'pt1_' + s.sid; t2.id = 'pt2_' + s.sid; c.appendChild(t1); c.appendChild(t2);
-    box.appendChild(c); studentTiles(s, t1.id, t2.id);
+    me.appendChild(el('div', 'avatar', s.name.charAt(0))); me.appendChild(who); c.appendChild(me);
+    const t2 = el('div', 'tiles'), t1 = el('div', 'tiles'); t1.id = 'pt1_' + s.sid; t2.id = 'pt2_' + s.sid;
+    c.appendChild(el('label', '', 'حضور هذا الشهر')); c.appendChild(t2);
+    c.appendChild(el('label', '', 'إنجاز هذا الشهر (آيات)')); c.appendChild(t1);
+    const x = studentTiles(s, t1.id, t2.id, 'month');
+    if (x.avg != null) c.appendChild(el('div', 'slabel ' + (PILL[scoreLabel(x.avg)] || '').replace('p-', 'c-'), 'معدل الدرجات هذا الشهر: ' + x.avg + ' من ' + D.maxScore + ' • ' + scoreLabel(x.avg)));
+    const pb = el('div'); c.appendChild(pb); plansBlock(s, pb);
     c.appendChild(el('label', '', 'آخر الحضور'));
     const dots = el('div', 'dots');
-    s.attendance.slice().reverse().forEach(a => { const d = el('div', 'dot ' + a.status, fmtD(a.date, { day:'numeric' })); d.title = a.status + ' • ' + a.date; dots.appendChild(d); });
+    s.attendance.slice(0, 14).reverse().forEach(a => { const d = el('div', 'dot ' + a.status, fmtD(a.date, { day:'numeric' })); d.title = a.status + ' • ' + a.date; dots.appendChild(d); });
     if (!s.attendance.length) dots.appendChild(el('small', '', 'لا يوجد حضور مسجل بعد.'));
     c.appendChild(dots);
-    c.appendChild(el('label', '', 'آخر التسجيلات'));
-    if (!s.records.length) c.appendChild(el('small', '', 'لا يوجد تسجيلات بعد.'));
-    s.records.slice(0, 5).forEach(x => c.appendChild(recRow(x)));
-    const more = el('button', 'btn soft', 'عرض السجل الكامل'); more.onclick = () => openStudent(s.sid); c.appendChild(more);
+    c.appendChild(el('label', '', 'آخر التسميع'));
+    if (!s.records.length) c.appendChild(el('small', '', 'لا يوجد تسميع بعد.'));
+    s.records.slice(0, 5).forEach(r => c.appendChild(recRow(r)));
+    const more = el('button', 'btn soft', 'إنجاز الطالب والسجل الكامل'); more.onclick = () => openStudent(s.sid); c.appendChild(more);
   });
   if (!(D.children || []).length) box.appendChild(el('div', 'card msg info', 'لا يوجد أبناء مسجلون باسمك.'));
 }
@@ -611,30 +724,35 @@ async function loadReport(){
   renderReport(r);
 }
 function renderReport(r){
-  const T = { present:0, late:0, absent:0, excused:0, hifz:0, muraja:0, recs:0 }; let students = 0, unmarked = 0;
-  r.halaqat.forEach(h => { Object.keys(T).forEach(k => T[k] += h.sum[k]); students += h.count; unmarked += h.unmarked; });
+  const T = { present:0, late:0, absent:0, excused:0, recs:0 }, TY = {}; let students = 0, unmarked = 0;
+  r.halaqat.forEach(h => { Object.keys(T).forEach(k => T[k] += h.sum[k]); Object.keys(h.sum.types).forEach(k => TY[k] = (TY[k] || 0) + h.sum.types[k]); students += h.count; unmarked += h.unmarked; });
   fill('repTiles', [tile(T.present, 'حاضر', 't-ok'), tile(T.late, 'متأخر', 't-late'), tile(T.absent, 'غائب', 't-abs'), tile(unmarked, 'لم يُحضَّر', 't-nav')]);
-  fill('repTiles2', [tile(T.hifz, 'آيات الحفظ', 't-ok'), tile(T.muraja, 'آيات المراجعة', 't-late'), tile(students, 'عدد الطلاب', 't-nav')]);
+  fill('repTiles2', r.types.map((k, i) => tile(TY[k] || 0, k, ['t-ok', 't-late', 't-nav', ''][i])));
+  $('repTiles2').className = 'tiles';
   const body = $('repBody'); body.innerHTML = '';
   if (!r.dates.length){ msg('repBody', 'ليس يوم دراسة. أيام الدراسة من الأحد إلى الأربعاء.', 'info'); return; }
-  body.appendChild(el('h3', '', 'الحلقات (' + r.halaqat.length + ')'));
-  r.halaqat.forEach(h => {
+  body.appendChild(el('h3', '', (r.admin ? 'الحلقات' : 'حلقاتي') + ' (' + r.halaqat.length + ') • ' + students + ' طالب'));
+  r.halaqat.forEach((h, idx) => {
     const w = el('div', 'hal'), top = el('div', 'top'), g = el('div', 'grow');
     g.appendChild(el('b', '', h.name)); g.appendChild(el('small', '', (h.teacher ? 'المعلم: ' + h.teacher + ' • ' : '') + h.count + ' طالب'));
     const ps = el('div', 'pills');
-    [['حاضر ' + (h.sum.present + h.sum.late), 'p-ok'], ['غائب ' + h.sum.absent, 'p-abs'], ['حفظ ' + h.sum.hifz, 'p-late']].forEach(p => ps.appendChild(el('span', 'pill ' + p[1], p[0])));
+    [['حاضر ' + (h.sum.present + h.sum.late), 'p-ok'], ['غائب ' + h.sum.absent, 'p-abs'], ['حفظ ' + (h.sum.types['حفظ'] || 0), 'p-late']].forEach(p => ps.appendChild(el('span', 'pill ' + p[1], p[0])));
     top.appendChild(g); top.appendChild(ps); w.appendChild(top);
     if (h.unmarked) w.appendChild(el('small', '', 'لم يُحضَّر: ' + h.unmarked + (r.period === 'day' ? ' طالب' : ' (طالب × يوم)')));
     const more = el('button', 'mini', 'تفاصيل الطلاب'); more.style.marginTop = '8px';
-    const tb = el('table', 'hidden');
-    tb.innerHTML = '<thead><tr><th>الطالب</th><th>حضور</th><th>غياب</th><th>حفظ</th><th>مراجعة</th></tr></thead>';
+    const tb = el('table', r.halaqat.length === 1 ? '' : 'hidden');
+    const head = ['الطالب', 'حضور', 'غياب'].concat(r.types.map(t => t.replace('مراجعة ', 'م.')), ['المعدل']);
+    const thead = el('thead'), hr = el('tr'); head.forEach(x => hr.appendChild(el('th', '', x))); thead.appendChild(hr); tb.appendChild(thead);
     const tbody = el('tbody');
-    h.students.slice().sort((a, b) => b.hifz - a.hifz).forEach(s => {
-      const tr = el('tr'); [s.name, s.present + s.late, s.absent, s.hifz, s.muraja].forEach((v, i) => { const td = el('td', '', v); if (i === 0){ td.style.cursor = 'pointer'; td.style.textDecoration = 'underline'; td.onclick = () => openStudent(s.sid); } tr.appendChild(td); });
+    h.students.slice().sort((a, b) => (b.types['حفظ'] || 0) - (a.types['حفظ'] || 0)).forEach(s => {
+      const tr = el('tr');
+      [s.name, s.present + s.late, s.absent].concat(r.types.map(t => s.types[t] || 0), [s.avg != null ? s.avg : '—']).forEach((v, i) => {
+        const td = el('td', '', v); if (i === 0){ td.style.cursor = 'pointer'; td.style.textDecoration = 'underline'; td.onclick = () => openStudent(s.sid); } tr.appendChild(td); });
       tbody.appendChild(tr);
     });
     tb.appendChild(tbody);
-    more.onclick = () => { tb.classList.toggle('hidden'); more.textContent = tb.classList.contains('hidden') ? 'تفاصيل الطلاب' : 'إخفاء التفاصيل'; };
+    const sync = () => more.textContent = tb.classList.contains('hidden') ? 'تفاصيل الطلاب' : 'إخفاء التفاصيل';
+    more.onclick = () => { tb.classList.toggle('hidden'); sync(); }; sync();
     w.appendChild(more); w.appendChild(tb); body.appendChild(w);
   });
 }
