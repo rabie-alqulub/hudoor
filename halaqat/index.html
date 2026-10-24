@@ -192,6 +192,15 @@
 
 
 
+
+  .mvbulk{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:14px} .mvbulk span{white-space:nowrap;color:var(--muted)} .mvbulk select{flex:1}
+  .mvtbl{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:8px}
+  .mvr{display:grid;grid-template-columns:auto 1fr minmax(120px,40%);gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
+  .mvr:last-child{border-bottom:0} .mvr.on{background:var(--goldlight)}
+  .mvr input[type=checkbox]{width:20px;height:20px}
+  .mvr b{display:block;font-size:15px;font-weight:600} .mvr small{color:var(--muted);font-size:12px}
+  .mvr select{font-size:14px;padding:7px}
+  .mvhead{position:sticky;top:0;z-index:1;background:var(--light);font-size:12px;font-weight:700;color:var(--muted)}
   .mvpair{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end}
   .mvpair .arr{padding-bottom:12px;font-size:22px;color:var(--gold2)}
   @media (max-width:560px){ .mvpair{grid-template-columns:1fr} .mvpair .arr{display:none} }
@@ -646,8 +655,9 @@
     <div id="pMoveMany" class="hidden">
       <div class="card">
         <h2>نقل الطلاب بين الحلقات</h2>
-        <small>اختر الحلقة الحالية ثم الطلاب والحلقة الجديدة. يُحفظ النقل في سجل كل طالب، ويمكن إشعار أولياء الأمور.</small>
-        <div class="mvpair">
+        <small>يُحفظ النقل في سجل كل طالب، ويمكن إشعار أولياء الأمور.</small>
+        <div class="seg" id="mvMode"><button data-m="a" class="on">من حلقة إلى حلقة</button><button data-m="b">نقل أكثر من طالب</button></div>
+        <div class="mvpair" id="mvPairBox">
           <div><label for="mvFrom">من حلقة</label><select id="mvFrom"></select></div>
           <span class="arr">←</span>
           <div><label for="mvTo">إلى حلقة</label><select id="mvTo"></select></div>
@@ -656,8 +666,14 @@
       </div>
       <div class="card">
         <h2>الطلاب</h2>
-        <label class="chk"><input type="checkbox" id="mvAll"> تحديد الكل</label>
-        <div class="stlist" id="mvList"></div>
+        <div id="mvA"><label class="chk"><input type="checkbox" id="mvAll"> تحديد الكل</label>
+        <div class="stlist" id="mvList"></div></div>
+        <div id="mvB" class="hidden">
+          <div class="edgrid"><div><input id="mvBQ" placeholder="ابحث بالاسم"></div><div><select id="mvBHal"></select></div></div>
+          <div class="mvbulk"><span>نقل كل المحددين إلى</span><select id="mvBAll"></select></div>
+          <div class="mvtbl" id="mvMulti"></div>
+          <div class="mvseat" id="mvBSum"></div>
+        </div>
         <label>سبب النقل</label>
         <div class="rfsel" id="mvWhy"></div>
         <input id="mvWhyT" class="hidden" maxlength="200" placeholder="اكتب السبب" style="margin-top:8px">
@@ -2196,7 +2212,39 @@ $('hlSave').onclick = async () => {
 };
 
 /* ---------- نقل الطلاب بين الحلقات ---------- */
-let MV = null, mvSelSet = new Set(), mvWhyBox = null;
+let MV = null, mvSelSet = new Set(), mvWhyBox = null, mvMode = 'a', mvB = {};
+document.querySelectorAll('#mvMode button').forEach(b => b.onclick = () => { mvMode = b.dataset.m; document.querySelectorAll('#mvMode button').forEach(x => x.classList.toggle('on', x === b));
+  $('mvPairBox').classList.toggle('hidden', mvMode !== 'a'); $('mvSeat').classList.toggle('hidden', mvMode !== 'a'); $('mvA').classList.toggle('hidden', mvMode !== 'a'); $('mvB').classList.toggle('hidden', mvMode !== 'b');
+  if (mvMode === 'b') renderMvB(); else mvSeat(); });
+/* نقل أكثر من طالب: كل طلاب المجمع، الحلقة الحالية ثابتة، واختيار «نقله إلى» لكل طالب */
+function renderMvB(){
+  if (!MV) return;
+  const hn = {}; MV.halaqat.forEach(h => hn[h.hid] = h.name);
+  if (!$('mvBHal').children.length){ fillSel('mvBHal', MV.halaqat.map(h => [h.hid, h.name]), 'كل الحلقات'); }
+  fillSel('mvBAll', MV.halaqat.map(h => [h.hid, h.name]), '— اختر —');
+  const q = normAr($('mvBQ').value), hf = $('mvBHal').value, box = $('mvMulti'); box.innerHTML = '';
+  const hd = el('div', 'mvr mvhead'); hd.appendChild(el('span', '', '')); hd.appendChild(el('span', '', 'الطالب • حلقته الحالية')); hd.appendChild(el('span', '', 'نقله إلى')); box.appendChild(hd);
+  const list = MV.students.filter(x => (!hf || x.hid === hf) && (!q || normAr(x.name).indexOf(q) !== -1));
+  if (!list.length) box.appendChild(el('div', 'mvr', 'لا توجد نتائج.'));
+  list.forEach(x => {
+    const r = el('div', 'mvr' + (mvB[x.sid] !== undefined ? ' on' : '')), c = el('input'); c.type = 'checkbox'; c.checked = mvB[x.sid] !== undefined;
+    const nm = el('div'); nm.appendChild(el('b', '', x.name)); nm.appendChild(el('small', '', hn[x.hid] || 'بدون حلقة'));
+    const sel = el('select'); fillSel2(sel, MV.halaqat.filter(h => h.hid !== x.hid).map(h => [h.hid, h.name]), '— نقله إلى —'); sel.value = mvB[x.sid] || '';
+    c.onchange = () => { if (c.checked) mvB[x.sid] = sel.value; else delete mvB[x.sid]; r.classList.toggle('on', c.checked); mvBSum(); };
+    sel.onchange = () => { mvB[x.sid] = sel.value; c.checked = true; r.classList.add('on'); mvBSum(); };
+    r.appendChild(c); r.appendChild(nm); r.appendChild(sel); box.appendChild(r);
+  });
+  mvBSum();
+}
+function mvBSum(){
+  const ids = Object.keys(mvB), miss = ids.filter(k => !mvB[k]).length, by = {}, out = {};
+  ids.forEach(k => { if (mvB[k]) by[mvB[k]] = (by[mvB[k]] || 0) + 1; const st = MV.students.find(x => x.sid === k); if (st) out[st.hid] = (out[st.hid] || 0) + 1; });
+  const over = MV.halaqat.filter(h => by[h.hid] && h.cap && by[h.hid] > h.cap - h.n + (out[h.hid] || 0));
+  const s = $('mvBSum'); s.className = 'mvseat' + (over.length ? ' bad' : '');
+  s.textContent = 'المحددون: ' + ids.length + ' طالب' + (miss ? ' • بدون حلقة جديدة: ' + miss : '') + (Object.keys(by).length ? ' • إلى: ' + MV.halaqat.filter(h => by[h.hid]).map(h => h.name + ' (' + by[h.hid] + ')').join('، ') : '') + (over.length ? ' — المقاعد لا تكفي في: ' + over.map(h => h.name).join('، ') : '');
+}
+$('mvBQ').oninput = renderMvB; $('mvBHal').onchange = renderMvB;
+$('mvBAll').onchange = () => { const v = $('mvBAll').value; if (!v) return; Object.keys(mvB).forEach(k => { const st = MV.students.find(x => x.sid === k); if (st && st.hid !== v) mvB[k] = v; }); renderMvB(); $('mvBAll').value = ''; };
 async function openMoveMany(){
   $('mvList').innerHTML = '<div class="msg info">جاري التحميل...</div>';
   const r = await cpCall({ action:'moveData' }, 'mvList'); if (!r || !r.ok) return; MV = r; mvSelSet.clear();
@@ -2206,7 +2254,7 @@ async function openMoveMany(){
   if (r.halaqat.some(h => h.hid === f)) $('mvFrom').value = f; if (r.halaqat.some(h => h.hid === t)) $('mvTo').value = t;
   if (!mvWhyBox){ mvWhyBox = selBox(['طلب ولي الأمر', 'مستوى الطالب', 'تنظيم الحلقات', 'انتقال المعلم', 'أخرى']); mvWhyBox.onpick = () => $('mvWhyT').classList.toggle('hidden', mvWhyBox.get() !== 'أخرى'); $('mvWhy').appendChild(mvWhyBox); }
   if (!$('mvText').value) $('mvText').value = r.tmpl;
-  renderMoveMany(); renderMvHist();
+  renderMoveMany(); renderMvHist(); if (mvMode === 'b') renderMvB();
 }
 function renderMoveMany(){
   const from = $('mvFrom').value, to = $('mvTo').value, box = $('mvList'); box.innerHTML = '';
@@ -2232,6 +2280,17 @@ $('mvTo').onchange = mvSeat;
 $('mvAll').onchange = () => { const from = $('mvFrom').value; MV.students.filter(x => x.hid === from).forEach(x => $('mvAll').checked ? mvSelSet.add(x.sid) : mvSelSet.delete(x.sid)); renderMoveMany(); };
 $('mvNotify').onchange = () => $('mvText').classList.toggle('hidden', !$('mvNotify').checked);
 $('mvGoMany').onclick = async () => {
+  if (mvMode === 'b'){
+    const ids = Object.keys(mvB);
+    if (!ids.length) return msg('mvMsg2', 'حدد الطلاب المراد نقلهم.', 'err');
+    if (ids.some(k => !mvB[k])) return msg('mvMsg2', 'اختر «نقله إلى» لكل طالب محدد.', 'err');
+    let why = mvWhyBox.get(); if (why === 'أخرى') why = $('mvWhyT').value.trim() || 'أخرى';
+    if (!confirm('نقل ' + ids.length + ' طالب إلى الحلقات المختارة؟')) return;
+    $('mvGoMany').disabled = true; msg('mvMsg2', 'جاري النقل...', 'info');
+    const r = await cpCall({ action:'moveStudents', moves:ids.map(k => ({ sid:k, to:mvB[k] })), reason:why, notify:$('mvNotify').checked, text:$('mvText').value.trim() }, 'mvMsg2');
+    $('mvGoMany').disabled = false; if (!r || !r.ok) return;
+    toast(r.msg); MV = r; mvB = {}; msg('mvMsg2', '✓ ' + r.msg, 'ok'); renderMvB(); renderMvHist(); SB = null; return;
+  }
   const from = $('mvFrom').value, to = $('mvTo').value, sids = [...mvSelSet];
   if (!from) return msg('mvMsg2', 'اختر الحلقة الحالية.', 'err');
   if (!sids.length) return msg('mvMsg2', 'اختر الطلاب المراد نقلهم.', 'err');
