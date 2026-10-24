@@ -3134,7 +3134,7 @@ function renderStudents(){
         btn('', 'edit', 'تعديل', () => openStudentEdit(x));
         btn('', 'move', 'نقل', () => openMove(x));
         if (x.st === 'موقوف') btn('good', 'restore', 'رفع الإيقاف', () => studentOp(x, 'restore'));
-        else if (x.st === 'منقطع') btn('good', 'restore', 'تفعيل الطالب', async () => { const r = await cpCall({ action:'stuReactivate', sid:x.sid }); if (r){ toast(r.msg); if (r.ok){ x.st = ''; renderStudents(); } } });
+        else if (x.st === 'منقطع') {}   // التفعيل من خانة «الطلاب المنقطعون» فقط
         else btn('warn', 'pause', 'إيقاف', () => confirmOp('إيقاف الطالب ' + x.name, 'يختفي من كشف حلقته في التقييم حتى ترفع الإيقاف. سجلاته وبياناته تبقى كما هي.', 'إيقاف الطالب', () => studentOp(x, 'suspend')));
         btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + x.name + ' من النظام', 'يُحذف من حلقته ومن قاعدة أولياء الأمور. سجلاته السابقة تبقى محفوظة، ويمكنك استعادته من «المحذوفون».', 'حذف من النظام', () => studentOp(x, 'delete')));
       }
