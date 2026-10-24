@@ -189,6 +189,16 @@
   .cptabs button.on svg{color:#F3D9AE}
 
 
+  /* ضبط الرسائل */
+  .cfst{display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px;border-radius:14px;background:var(--light)}
+  .cfst .lamp{width:14px;height:14px;border-radius:50%;flex:none;background:var(--muted)}
+  .cfst.on .lamp{background:#2BB673;box-shadow:0 0 0 4px rgba(43,182,115,.2)} .cfst.pause .lamp{background:var(--gold)} .cfst.off .lamp{background:var(--red)}
+  .cfst b{font-size:16px} .cfst small{display:block;color:var(--muted)}
+  .cfstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .cfstats div{padding:10px;border-radius:12px;background:var(--light);text-align:center} .cfstats b{display:block;font-size:22px;color:var(--navy)} .cfstats span{font-size:12px;color:var(--muted)}
+  @media (prefers-color-scheme: dark){ .cfstats b{color:#9CC1DC} }
+  .cfph{display:flex;gap:8px;align-items:stretch} .cfph span{display:flex;align-items:center;padding:0 10px;border-radius:12px;background:var(--light);font-size:15px;direction:ltr}
+  .tips{margin:8px 0 0;padding-inline-start:20px;font-size:14px;line-height:1.9} .tips b{color:var(--red)}
   /* رسائل أولياء الأمور */
   .mgph{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
   .mgph button{border:1px dashed var(--line);background:transparent;border-radius:8px;padding:4px 8px;font:inherit;font-size:13px;color:var(--gold2);cursor:pointer}
@@ -598,6 +608,65 @@
         <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
       </div>
       <div class="card" id="heList"></div>
+    </div>
+
+    <!-- ضبط الرسائل (المدير) -->
+    <div id="pMsgCfg" class="hidden">
+      <div class="card">
+        <h2>ضبط الرسائل</h2>
+        <small>الربط مع منصة برق لإرسال رسائل واتساب، ومتابعة فاعلية الإرسال، والتحكم في التقرير اليومي.</small>
+        <div class="cfst" id="cfSt"><span class="lamp"></span><div><b id="cfStT">جاري التحميل...</b><small id="cfStS"></small></div></div>
+        <div class="cfstats" id="cfStats"></div>
+        <small id="cfLast" style="display:block;margin-top:8px"></small>
+        <div class="stact"><button id="cfRetry" class="good">إعادة إرسال الفاشلة اليوم</button><button id="cfCancel" class="danger">إلغاء رسائل الانتظار</button></div>
+        <div id="cfQMsg"></div>
+      </div>
+      <div class="card">
+        <h2>رسالة تجريبية</h2>
+        <small>للتحقق من الربط: تُرسل رسالة واحدة مباشرة إلى الرقم المكتوب.</small>
+        <label for="cfTestPh">رقم الجوال</label><input id="cfTestPh" inputmode="numeric" maxlength="10" placeholder="05xxxxxxxx" dir="ltr">
+        <button class="btn" id="cfTest">إرسال رسالة تجريبية</button><div id="cfTestMsg"></div>
+      </div>
+      <div class="card">
+        <h2>بيانات الربط مع برق</h2>
+        <small>من لوحة برق: الملف الشخصي (Key و Secret). لا يُعرض المفتاح بعد حفظه، ويكفي تركه فارغاً للإبقاء على المحفوظ.</small>
+        <label for="cfPhone">رقم واتساب الإرسال</label><div class="cfph"><span>+966</span><input id="cfPhone" inputmode="numeric" maxlength="10" placeholder="05xxxxxxxx" dir="ltr"></div>
+        <label for="cfUrl">رابط الإرسال (API)</label><input id="cfUrl" dir="ltr" placeholder="https://...">
+        <label for="cfKey">Key</label><input id="cfKey" type="password" autocomplete="off" dir="ltr">
+        <label for="cfSecret">Secret</label><input id="cfSecret" type="password" autocomplete="off" dir="ltr">
+        <label for="cfDev">معرّف الجهاز (إن طلبه برق)</label><input id="cfDev" dir="ltr">
+        <button class="btn" id="cfSaveConn">حفظ بيانات الربط</button>
+        <div class="stact"><button id="cfClear" class="danger">مسح المفتاح والرمز السري</button></div>
+        <div id="cfConnMsg"></div>
+      </div>
+      <div class="card">
+        <h2>التشغيل</h2>
+        <label class="chk" style="margin-top:8px"><input type="checkbox" id="cfDaily"> تفعيل التقرير اليومي لأولياء الأمور بعد اعتماد المعلم</label>
+        <small>عند تفعيله هنا أوقف التقرير اليومي في النظام السابق حتى لا يصل لولي الأمر تقريران.</small>
+        <label class="chk" style="margin-top:12px"><input type="checkbox" id="cfPause"> إيقاف الإرسال مؤقتاً (تبقى الرسائل في الانتظار)</label>
+        <label for="cfGap">الفاصل بين الرسائل (ثوانٍ)</label><input id="cfGap" type="number" min="1" max="60" inputmode="numeric">
+        <button class="btn" id="cfSaveRun">حفظ</button><div id="cfRunMsg"></div>
+      </div>
+      <div class="card">
+        <h2>نص التقرير اليومي</h2>
+        <small>تُستبدل الخانات تلقائياً لكل طالب، والخانة {التفاصيل} إلزامية (الحضور والتسميع والتقدير وفارس الحلقة).</small>
+        <textarea id="cfTmpl" class="rftxt" style="min-height:170px" maxlength="2000"></textarea>
+        <div class="mgph" id="cfPh"></div>
+        <label>معاينة</label><div class="mgprev" id="cfPrev"></div>
+        <button class="btn" id="cfSaveTmpl">حفظ النص</button>
+        <div class="stact"><button id="cfDefTmpl">استعادة النص الافتراضي</button></div>
+        <div id="cfTmplMsg"></div>
+      </div>
+      <div class="card">
+        <h2>لتفادي حظر رقم الواتساب</h2>
+        <ul class="tips">
+          <li>لا ترسل رسائل دعائية.</li>
+          <li>ابدأ التواصل برسالة ترحيبية تعرّف فيها بالرقم والغرض من الإرسال.</li>
+          <li>استمر في المراسلة لمن يتفاعل ويرد، وأضف الرقم في جهات اتصال أولياء الأمور.</li>
+          <li>اجعل الفاصل بين الرسائل 3 ثوانٍ فأكثر عند الإرسال الجماعي.</li>
+          <li>تأكد من اتصال جوال الإرسال بالإنترنت وعدم انقطاعه أكثر من 5 أيام، وجدّد اشتراك برق قبل انتهائه.</li>
+        </ul>
+      </div>
     </div>
 
     <!-- رسائل أولياء الأمور -->
@@ -1231,7 +1300,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.msgs = ICONS.chat; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1276,7 +1345,7 @@ const ADMIN_NAV = [
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
-  { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل']] },
+  { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['soon', 'تقرير الطلاب'], ['soon', 'تقرير المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['soon', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
 ];
@@ -1321,6 +1390,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pMsgCfg').classList.toggle('hidden', r !== 'msgCfg');
+  if (r === 'msgCfg') openMsgCfg();
   $('pMsgs').classList.toggle('hidden', r !== 'msgs');
   if (r === 'msgs') openMsgs();
   $('pMyStu').classList.toggle('hidden', r !== 'myStu');
@@ -1998,6 +2069,74 @@ $('hlSave').onclick = async () => {
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
 };
+
+/* ---------- ضبط الرسائل ---------- */
+let CF = null;
+const DAILY_PH = ['الطالب', 'الحلقة', 'اليوم', 'التاريخ', 'التفاصيل', 'المعلم', 'المجمع'];
+async function openMsgCfg(){
+  $('cfStT').textContent = 'جاري التحميل...';
+  const r = await cpCall({ action:'msgCfg' }, 'cfQMsg'); if (!r || !r.ok) return; renderCfg(r, true);
+  if (!$('cfPh').children.length) DAILY_PH.forEach(k => { const b = el('button', '', '{' + k + '}'); b.type = 'button'; b.onclick = () => { const t = $('cfTmpl'), a = t.selectionStart || t.value.length; t.value = t.value.slice(0, a) + '{' + k + '}' + t.value.slice(t.selectionEnd || a); cfPrev(); t.focus(); }; $('cfPh').appendChild(b); });
+}
+function renderCfg(r, fill){
+  CF = r;
+  const st = $('cfSt'), on = r.ready && !r.pause;
+  st.className = 'cfst ' + (on ? 'on' : r.ready ? 'pause' : 'off');
+  $('cfStT').textContent = on ? 'الربط مُعد والإرسال يعمل' : r.ready ? 'الإرسال متوقف مؤقتاً' : 'الربط مع برق غير مُعد';
+  $('cfStS').textContent = (r.phone ? 'رقم الإرسال: +966' + r.phone.slice(1) + ' • ' : '') + 'التقرير اليومي: ' + (r.daily ? 'مفعّل' : 'غير مفعّل');
+  const S2 = r.stats, sb = $('cfStats'); sb.innerHTML = '';
+  [[S2.wait, 'في الانتظار'], [S2.sentToday, 'أُرسلت اليوم'], [S2.failToday, 'فشلت اليوم']].forEach(x => { const d = el('div'); d.appendChild(el('b', '', x[0])); d.appendChild(el('span', '', x[1])); sb.appendChild(d); });
+  $('cfLast').textContent = (S2.lastOk ? 'آخر إرسال ناجح: ' + S2.lastOk.slice(0, 16) : 'لا يوجد إرسال ناجح بعد') + (S2.lastErr ? ' • آخر خطأ: ' + S2.lastErr : '');
+  $('cfRetry').disabled = !S2.failToday; $('cfCancel').disabled = !S2.wait;
+  if (fill){
+    $('cfPhone').value = r.phone; $('cfUrl').value = r.url; $('cfDev').value = r.dev; $('cfKey').value = ''; $('cfSecret').value = '';
+    $('cfKey').placeholder = r.key || 'لم يُحفظ بعد'; $('cfSecret').placeholder = r.secret || 'لم يُحفظ بعد';
+    $('cfDaily').checked = r.daily; $('cfPause').checked = r.pause; $('cfGap').value = r.gap;
+    $('cfTmpl').value = r.tmpl || r.defTmpl; if (!$('cfTestPh').value) $('cfTestPh').value = r.phone || r.adminPhone || '';
+    cfPrev();
+  }
+}
+function cfPrev(){
+  if (!CF) return;
+  const sample = 'الحضور: حاضر\n• حفظ: النبأ 1 ← النبأ 20 — ممتاز (10/10)\n• مراجعة بعيدة: البقرة 1 ← البقرة 50 — جيد جداً (8/10)\n🌟 ابنكم فارس الحلقة اليوم، بارك الله فيه.';
+  const v = { 'الطالب':'أحمد خالد سعيد القحطاني', 'الحلقة':'حلقة أبي بكر الصديق', 'اليوم':'الأحد', 'التاريخ':'١٥ جمادى الأولى ١٤٤٨ هـ', 'التفاصيل':sample, 'المعلم':'أحمد الغامدي', 'المجمع':CF.org };
+  $('cfPrev').textContent = ($('cfTmpl').value || CF.defTmpl).replace(/\{([^}]+)\}/g, (m, k) => v[k] ?? m);
+}
+$('cfTmpl').oninput = cfPrev;
+async function cfSave(cfg, box, btn){
+  if (btn) btn.disabled = true; msg(box, 'جاري الحفظ...', 'info');
+  const r = await cpCall({ action:'msgCfgSave', cfg:cfg }, box); if (btn) btn.disabled = false;
+  if (!r || !r.ok) return; msg(box, '✓ ' + r.msg, 'ok'); renderCfg(r, false); $('cfKey').value = ''; $('cfSecret').value = ''; $('cfKey').placeholder = r.key || 'لم يُحفظ بعد'; $('cfSecret').placeholder = r.secret || 'لم يُحفظ بعد';
+}
+$('cfSaveConn').onclick = () => {
+  const ph = $('cfPhone').value.replace(/\D/g, '');
+  if (ph && !/^05\d{8}$/.test(ph)) return msg('cfConnMsg', 'رقم واتساب الإرسال يبدأ بـ 05 ويتكون من 10 أرقام.', 'err');
+  cfSave({ phone:ph, url:$('cfUrl').value.trim(), key:$('cfKey').value.trim(), secret:$('cfSecret').value.trim(), dev:$('cfDev').value.trim() }, 'cfConnMsg', $('cfSaveConn'));
+};
+$('cfClear').onclick = () => { if (confirm('مسح المفتاح والرمز السري؟ سيتوقف الإرسال حتى تُدخلهما من جديد.')) cfSave({ clearKeys:true }, 'cfConnMsg'); };
+$('cfSaveRun').onclick = () => {
+  const g = Number($('cfGap').value);
+  if (!(g >= 1 && g <= 60)) return msg('cfRunMsg', 'الفاصل بين الرسائل من 1 إلى 60 ثانية.', 'err');
+  cfSave({ daily:$('cfDaily').checked, pause:$('cfPause').checked, gap:g }, 'cfRunMsg', $('cfSaveRun'));
+};
+$('cfSaveTmpl').onclick = () => {
+  const t = $('cfTmpl').value.trim();
+  if (t.indexOf('{التفاصيل}') === -1) return msg('cfTmplMsg', 'يجب أن يحتوي النص الخانة {التفاصيل}.', 'err');
+  cfSave({ tmpl:t === CF.defTmpl ? '' : t }, 'cfTmplMsg', $('cfSaveTmpl'));
+};
+$('cfDefTmpl').onclick = () => { $('cfTmpl').value = CF.defTmpl; cfPrev(); };
+$('cfTest').onclick = async () => {
+  const ph = $('cfTestPh').value.replace(/\D/g, '');
+  if (!/^05\d{8}$/.test(ph)) return msg('cfTestMsg', 'اكتب رقم جوال صحيح يبدأ بـ 05.', 'err');
+  $('cfTest').disabled = true; msg('cfTestMsg', 'جاري الإرسال...', 'info');
+  const r = await cpCall({ action:'msgTest', phone:ph }, 'cfTestMsg'); $('cfTest').disabled = false;
+  if (r && r.ok) msg('cfTestMsg', '✓ ' + r.msg, 'ok');
+};
+async function cfQueue(op){
+  if (op === 'cancel' && !confirm('إلغاء جميع الرسائل التي في الانتظار؟')) return;
+  const r = await cpCall({ action:'msgQueue', op:op }, 'cfQMsg'); if (r && r.ok){ msg('cfQMsg', '✓ ' + r.msg, 'ok'); renderCfg(r, false); }
+}
+$('cfRetry').onclick = () => cfQueue('retry'); $('cfCancel').onclick = () => cfQueue('cancel');
 
 /* ---------- رسائل أولياء الأمور (برق) ---------- */
 const MG_TPL = [
