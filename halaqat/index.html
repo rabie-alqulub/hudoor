@@ -38,6 +38,7 @@
   .brand b{display:block;font-size:19px;line-height:1.1} .brand small{color:#F3D9AE;font-size:12px;white-space:nowrap;display:block}
   @media (max-width:380px){ .brand small{font-size:10.5px} .brand{gap:7px} }
   @media (max-width:340px){ .brand small{display:none} }
+  @media (max-width:440px){ .appbar{gap:5px;padding:10px} .appbar .iconbtn{padding:7px 6px;min-width:44px;font-size:11px} .brand .mark{width:36px;height:36px} .brand{gap:7px} }
   .appbar .grow{flex:1}
   .appbar .iconbtn{background:rgba(255,255,255,.12);color:#fff}
   .shell{max-width:1100px;margin:0 auto}
@@ -187,6 +188,17 @@
   .cptabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
   .cptabs button.on svg{color:#F3D9AE}
 
+
+  /* رسائل أولياء الأمور */
+  .mgph{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .mgph button{border:1px dashed var(--line);background:transparent;border-radius:8px;padding:4px 8px;font:inherit;font-size:13px;color:var(--gold2);cursor:pointer}
+  .mgprev{margin-top:10px;padding:12px;border-radius:14px;background:#E7F6E0;color:#1B2B16;font-size:14px;white-space:pre-line;line-height:1.7}
+  @media (prefers-color-scheme: dark){ .mgprev{background:#1E3320;color:#DDEFD6} }
+  .mgcount{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:14px}
+  .mgcount b{font-size:20px;color:var(--navy)}
+  .mgbar{height:8px;border-radius:99px;background:var(--light);overflow:hidden;margin-top:8px}
+  .mgbar i{display:block;height:100%;background:var(--ok);width:0}
+  .mgwarn{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--goldlight);color:var(--gold2);font-size:13px}
   /* الإحالات */
   .rfsel{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
   .rfsel button{border:1.5px solid var(--line);background:transparent;border-radius:99px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer;color:var(--text)}
@@ -586,6 +598,34 @@
         <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
       </div>
       <div class="card" id="heList"></div>
+    </div>
+
+    <!-- رسائل أولياء الأمور -->
+    <div id="pMsgs" class="hidden">
+      <div class="card">
+        <h2>رسائل أولياء الأمور</h2>
+        <small>رسالة خاصة لولي أمر، أو عامة لجميع أولياء الأمور أو لحلقات أو لمجموعة مختارة. تُرسل عبر منصة برق.</small>
+        <div id="mgWarn"></div>
+        <div class="seg" id="mgKind"><button data-k="عامة" class="on">رسالة عامة</button><button data-k="خاصة">رسالة خاصة</button></div>
+      </div>
+      <div class="card" id="mgTo"></div>
+      <div class="card">
+        <h2>نص الرسالة</h2>
+        <label>نموذج جاهز</label>
+        <div class="rfsel" id="mgTpl"></div>
+        <label for="mgText">النص *</label>
+        <textarea id="mgText" class="rftxt" style="min-height:150px" maxlength="3000"></textarea>
+        <small>اضغط لإدراج خانة تُستبدل تلقائياً لكل ولي أمر:</small>
+        <div class="mgph" id="mgPh"></div>
+        <label class="chk" style="margin-top:12px"><input type="checkbox" id="mgMerge" checked> رسالة واحدة لولي الأمر بأسماء جميع أبنائه</label>
+        <label>معاينة (أول مستلم)</label>
+        <div class="mgprev" id="mgPrev"></div>
+        <div class="mgcount" id="mgCount"></div>
+        <button class="btn" id="mgSend">إرسال</button>
+        <div id="mgMsg"></div>
+        <div id="mgProg"></div>
+      </div>
+      <div class="card"><h2>آخر الرسائل المرسلة</h2><div id="mgCamps"></div></div>
     </div>
 
     <!-- طلاب الحلقة (المعلم): الإحالات والترشيح ومتابعتها -->
@@ -1191,7 +1231,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.msgs = ICONS.chat; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1215,6 +1255,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && r.roles.indexOf('teacher') !== -1) TABS.push(['myStu', 'طلاب الحلقة']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.students') !== -1) TABS.push(['refsStu', 'إحالات شؤون الطلاب']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.edu') !== -1){ TABS.push(['refsEdu', 'الإحالات التعليمية']); TABS.push(['refsExam', 'ترشيحات المرحلية']); }
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1) TABS.push(['msgs', 'رسائل أولياء الأمور']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
@@ -1235,7 +1276,7 @@ const ADMIN_NAV = [
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
-  { t:'الاتصالات والرسائل', ic:'chat', items:[['soon', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل']] },
+  { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['soon', 'تقرير الطلاب'], ['soon', 'تقرير المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['soon', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
 ];
@@ -1280,6 +1321,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pMsgs').classList.toggle('hidden', r !== 'msgs');
+  if (r === 'msgs') openMsgs();
   $('pMyStu').classList.toggle('hidden', r !== 'myStu');
   if (r === 'myStu') openMyStu();
   $('pRefs').classList.toggle('hidden', !RB_KIND[r]);
@@ -1332,6 +1375,7 @@ function renderWelcome(){
     refsEdu:['الإحالات التعليمية', 'إحالات مستوى الحفظ والخطط', ''], refsExam:['ترشيحات المرحلية', 'مواعيد الاختبارات المرحلية ونتائجها', 'gold'],
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
+    msgs:['رسائل أولياء الأمور', 'رسالة خاصة أو عامة عبر برق', ''],
     halaqaNew:['إضافة حلقة', 'إضافة حلقة جديدة', ''], halaqaEdit:['تعديل حلقة', 'تعديل الحلقات وعدد طلابها', ''] };
   const acts = document.body.classList.contains('admin') ? [['teach'], ['report'], ['plans'], ['settings']] : TABS;
   ac.classList.toggle('one', acts.length === 1);
@@ -1667,7 +1711,7 @@ $('apprGo').onclick = async () => {
     studs.forEach(s => { if (!s.att) s.att = 'غائب'; });
     approval = { star:r.star, starName:r.starName, at:new Date().toLocaleTimeString('ar-SA', { hour:'numeric', minute:'2-digit' }) };
     renderStuds(); renderAppr();
-    $('apDone').textContent = '✓ ' + r.msg + (r.starName ? ' • ⭐ فارس الحلقة: ' + r.starName : '');
+    $('apDone').textContent = '✓ ' + r.msg + (r.report ? ' ' + r.report : '') + (r.starName ? ' • ⭐ فارس الحلقة: ' + r.starName : '');
     apStep(3);
   } catch(e){ msg('apprMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('apprGo').disabled = false; }
@@ -1955,6 +1999,119 @@ $('hlSave').onclick = async () => {
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
 };
 
+/* ---------- رسائل أولياء الأمور (برق) ---------- */
+const MG_TPL = [
+  ['إعلان عام', 'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ {الطالب}\n\nنفيدكم بأن \n\n{المجمع}'],
+  ['تنبيه غياب', 'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ {الطالب}\n\nنفيدكم بغياب ابنكم اليوم {التاريخ} عن {الحلقة}، نأمل الحرص على حضوره وإفادتنا بسبب الغياب.\n\n{المجمع}'],
+  ['تنبيه تأخر', 'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ {الطالب}\n\nنفيدكم بتأخر ابنكم اليوم عن موعد {الحلقة}، نأمل الحرص على الحضور في الوقت.\n\n{المجمع}'],
+  ['لم يُسمّع', 'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ {الطالب}\n\nنفيدكم بأن ابنكم لم يُسمّع اليوم في {الحلقة}، نأمل متابعته في التحضير والمراجعة.\n\n{المجمع}'],
+  ['إجازة', 'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ {الطالب}\n\nنفيدكم بأن الحلقات في إجازة يوم  وتُستأنف يوم  بإذن الله.\n\n{المجمع}'],
+  ['اجتماع أولياء الأمور', 'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ {الطالب}\n\nيسرنا دعوتكم لحضور لقاء أولياء الأمور يوم  الساعة  في الجامع.\nحضوركم يسعدنا.\n\n{المجمع}'],
+  ['تذكير بالاختبار', 'السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ {الطالب}\n\nنذكّركم بموعد اختبار ابنكم يوم ، نأمل متابعته في المراجعة.\n\n{المجمع}'],
+  ['رسالة حرة', '']
+];
+const MG_PH = ['الطالب', 'ولي الأمر', 'الحلقة', 'المعلم', 'التاريخ', 'المجمع'];
+let MG = null, mgKind = 'عامة', mgMode = 'all', mgHal = new Set(), mgSel = new Set(), mgPoll = null;
+async function openMsgs(){
+  $('mgCamps').innerHTML = '<div class="msg info">جاري التحميل...</div>';
+  const r = await cpCall({ action:'msgInfo' }, 'mgCamps'); if (!r || !r.ok) return; MG = r;
+  $('mgWarn').innerHTML = r.ready ? '' : '<div class="mgwarn">الربط مع منصة برق لم يُعدّ بعد: ستُحفظ الرسائل في الطابور وتُرسل تلقائياً بعد إضافة بيانات برق في الإعدادات.</div>';
+  const tp = $('mgTpl'); if (!tp.children.length){
+    MG_TPL.forEach(t => { const b = el('button', '', t[0]); b.type = 'button'; b.onclick = () => { tp.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('mgText').value = t[1]; mgPreview(); $('mgText').focus(); }; tp.appendChild(b); });
+    MG_PH.forEach(k => { const b = el('button', '', '{' + k + '}'); b.type = 'button'; b.onclick = () => { const t = $('mgText'), a = t.selectionStart || t.value.length; t.value = t.value.slice(0, a) + '{' + k + '}' + t.value.slice(t.selectionEnd || a); t.focus(); t.selectionStart = t.selectionEnd = a + k.length + 2; mgPreview(); }; $('mgPh').appendChild(b); });
+  }
+  renderMgTo(); renderCamps(r.camps);
+}
+document.querySelectorAll('#mgKind button').forEach(b => b.onclick = () => { mgKind = b.dataset.k; document.querySelectorAll('#mgKind button').forEach(x => x.classList.toggle('on', x === b)); mgSel.clear(); if (mgKind === 'خاصة') mgMode = 'pick'; else mgMode = 'all'; renderMgTo(); });
+function mgRecipients(){
+  if (!MG) return [];
+  const S = MG.students;
+  if (mgKind === 'خاصة' || mgMode === 'pick') return S.filter(s => mgSel.has(s.sid));
+  if (mgMode === 'all') return S;
+  if (mgMode === 'hal') return S.filter(s => mgHal.has(s.hid));
+  const ids = MG.cats[mgMode] || []; return S.filter(s => ids.indexOf(s.sid) !== -1);
+}
+function renderMgTo(){
+  const box = $('mgTo'); box.innerHTML = '';
+  box.appendChild(el('h2', '', mgKind === 'خاصة' ? 'ولي الأمر' : 'المستلمون'));
+  if (mgKind === 'عامة'){
+    const modes = [['all', 'جميع أولياء الأمور'], ['hal', 'حلقات محددة'], ['pick', 'طلاب محددون'], ['absent', 'غائبو اليوم (' + MG.cats.absent.length + ')'], ['late', 'متأخرو اليوم (' + MG.cats.late.length + ')'], ['norec', 'لم يُسمّعوا اليوم (' + MG.cats.norec.length + ')']];
+    const ms = selBox(modes.map(m => m[1])); ms.set(modes.find(m => m[0] === mgMode)[1]); ms.onpick = () => { mgMode = modes.find(m => m[1] === ms.get())[0]; renderMgTo(); }; box.appendChild(ms);
+    if (mgMode === 'hal'){
+      box.appendChild(lab('اختر الحلقات', true));
+      const hs = selBox(MG.halaqat.map(h => h.name), true); hs.set(MG.halaqat.filter(h => mgHal.has(h.hid)).map(h => h.name));
+      hs.onpick = () => { mgHal = new Set(MG.halaqat.filter(h => hs.get().indexOf(h.name) !== -1).map(h => h.hid)); mgPreview(); }; box.appendChild(hs);
+    }
+  }
+  if (mgKind === 'خاصة' || mgMode === 'pick'){
+    const q = el('input'); q.placeholder = 'ابحث باسم الطالب أو ولي الأمر أو الجوال'; q.style.marginTop = '10px'; box.appendChild(q);
+    const lst = el('div', 'stlist'); box.appendChild(lst);
+    const draw = () => { lst.innerHTML = ''; const k = normAr(q.value);
+      MG.students.filter(s => !k || normAr(s.name + ' ' + s.pname + ' ' + s.phone + ' ' + s.hname).indexOf(k) !== -1).slice(0, 150).forEach(s => {
+        const l = el('label'), c = el('input'); c.type = mgKind === 'خاصة' ? 'radio' : 'checkbox'; c.name = 'mgpick'; c.checked = mgSel.has(s.sid);
+        c.onchange = () => { if (mgKind === 'خاصة') mgSel.clear(); c.checked ? mgSel.add(s.sid) : mgSel.delete(s.sid); mgPreview(); };
+        l.appendChild(c); l.appendChild(el('span', '', s.name)); l.appendChild(el('small', '', s.phone ? s.hname : 'لا يوجد جوال')); lst.appendChild(l); }); };
+    q.oninput = draw; draw();
+  }
+  $('mgMerge').closest('label').classList.toggle('hidden', mgKind === 'خاصة');
+  mgPreview();
+}
+function mgFill(t, list){
+  const names = list.map(s => s.name), first = names.map(n => n.split(' ')[0]);
+  const st = names.length > 1 ? first.slice(0, -1).join('، ') + ' و' + first.slice(-1)[0] + ' ' + names[0].split(' ').slice(1).join(' ') : names[0];
+  const hs = [...new Set(list.map(s => s.hname))].join('، ');
+  return t.replace(/\{([^}]+)\}/g, (m, k) => ({ 'الطالب':st, 'ولي الأمر':list[0].pname, 'الحلقة':hs, 'المعلم':'(اسم المعلم)', 'التاريخ':MG.today, 'المجمع':MG.org })[k] ?? m);
+}
+function mgGroups(){
+  const rec = mgRecipients(), merge = mgKind === 'خاصة' || $('mgMerge').checked, g = {}, no = [];
+  rec.forEach(s => { if (!/^05\d{8}$/.test(s.phone)) return no.push(s); const k = merge ? s.phone : s.phone + '|' + s.sid; (g[k] = g[k] || []).push(s); });
+  return { rec:rec, groups:Object.values(g), no:no };
+}
+function mgPreview(){
+  if (!MG) return;
+  const G = mgGroups(), t = $('mgText').value;
+  $('mgPrev').textContent = t.trim() ? (G.groups.length ? mgFill(t, G.groups[0]) : t) : 'اكتب النص أو اختر نموذجاً جاهزاً.';
+  const c = $('mgCount'); c.innerHTML = '';
+  const add = (n, l) => { const d = el('span'); d.appendChild(el('b', '', n)); d.appendChild(document.createTextNode(' ' + l)); c.appendChild(d); };
+  add(G.groups.length, 'رسالة'); add(G.rec.length, 'طالب'); if (G.no.length) c.appendChild(el('span', 'pill p-red', G.no.length + ' بلا جوال'));
+}
+$('mgText').oninput = mgPreview; $('mgMerge').onchange = mgPreview;
+$('mgSend').onclick = async () => {
+  const G = mgGroups(), t = $('mgText').value.trim();
+  if (!G.rec.length) return msg('mgMsg', mgKind === 'خاصة' ? 'اختر ولي الأمر.' : 'اختر المستلمين.', 'err');
+  if (t.length < 3) return msg('mgMsg', 'اكتب نص الرسالة.', 'err');
+  if (!G.groups.length) return msg('mgMsg', 'لا يوجد أرقام جوال صحيحة للمستلمين.', 'err');
+  const tgt = mgKind === 'خاصة' ? 'ولي أمر ' + G.rec[0].name : mgMode === 'all' ? 'جميع أولياء الأمور' : mgMode === 'hal' ? MG.halaqat.filter(h => mgHal.has(h.hid)).map(h => h.name).join('، ') : mgMode === 'pick' ? G.rec.length + ' طالب محدد' : { absent:'غائبو اليوم', late:'متأخرو اليوم', norec:'لم يُسمّعوا اليوم' }[mgMode];
+  if (G.groups.length > 1 && !confirm('سيتم إرسال ' + G.groups.length + ' رسالة إلى: ' + tgt + '. متابعة؟')) return;
+  $('mgSend').disabled = true; msg('mgMsg', 'جاري الجدولة والإرسال...', 'info');
+  const r = await cpCall({ action:'msgSend', kind:mgKind, sids:G.rec.map(s => s.sid), merge:mgKind === 'خاصة' || $('mgMerge').checked, text:t, target:tgt }, 'mgMsg');
+  $('mgSend').disabled = false; if (!r || !r.ok) return;
+  msg('mgMsg', '✓ ' + r.msg, 'ok'); toast(r.msg); mgWatch(r.cid);
+};
+function mgWatch(cid){
+  clearTimeout(mgPoll);
+  const tick = async () => {
+    let r; try { r = await api({ action:'msgStatus', cid:cid }); } catch(e){ return; }
+    if (!r.ok) return;
+    const p = $('mgProg'); p.innerHTML = '';
+    const pc = r.total ? Math.round((r.sent + r.fail) / r.total * 100) : 0, bar = el('div', 'mgbar'), i = el('i'); i.style.width = pc + '%'; bar.appendChild(i);
+    p.appendChild(el('div', 'rfsec', 'حالة الإرسال: أُرسلت ' + r.sent + ' من ' + r.total + (r.fail ? ' • فشلت ' + r.fail : '') + (r.wait ? ' • في الانتظار ' + r.wait : ''))); p.appendChild(bar);
+    const fails = r.list.filter(x => x.status === 'فشلت'); if (fails.length){ const f = el('small', '', 'لم تصل: ' + fails.map(x => x.names + ' (' + x.err.slice(0, 40) + ')').join(' • ')); f.style.display = 'block'; f.style.marginTop = '6px'; p.appendChild(f); }
+    renderCamps(r.camps);
+    if (r.wait && role === 'msgs' && MG && MG.ready) mgPoll = setTimeout(tick, 3000);
+  };
+  tick();
+}
+function renderCamps(list){
+  const box = $('mgCamps'); box.innerHTML = '';
+  if (!list.length) return box.appendChild(el('small', '', 'لم تُرسل رسائل بعد.'));
+  list.forEach(c => { const w = el('div', 'strow'), top = el('div', 'top'); top.appendChild(el('b', '', c.kind + ' • ' + c.target)); w.appendChild(top);
+    const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill p-ok', 'أُرسلت ' + c.ok + '/' + c.count)); if (c.fail) pl.appendChild(el('span', 'pill p-red', 'فشلت ' + c.fail)); if (c.wait) pl.appendChild(el('span', 'pill p-late', 'في الانتظار ' + c.wait)); w.appendChild(pl);
+    const m = el('div', 'meta'); [['التاريخ', c.at.slice(0, 16)], ['المرسل', c.by]].forEach(p => { const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); }); w.appendChild(m);
+    if (c.text){ const t = el('small', '', c.text.replace(/\s+/g, ' ').slice(0, 110) + (c.text.length > 110 ? '…' : '')); t.style.display = 'block'; t.style.marginTop = '4px'; w.appendChild(t); }
+    box.appendChild(w); });
+}
+
 /* ---------- طلاب الحلقة: الإحالات وترشيح المرحلية ومتابعتها ---------- */
 const MS_TABS = [['stu', 'إحالة لشؤون الطلاب'], ['edu', 'إحالة للشؤون التعليمية'], ['exam', 'ترشيح لاختبار مرحلية'], ['track', 'متابعة الإحالات']];
 const MSI = {
@@ -1986,7 +2143,7 @@ function updBell(){
   const P = (D && D.perms) || [], adm = P.indexOf('*') !== -1, c = refUnread();
   const isT = D && D.roles && D.roles.indexOf('teacher') !== -1;
   const show = isT || adm || P.indexOf('refs.students') !== -1 || P.indexOf('refs.edu') !== -1;
-  $('btnBell').classList.toggle('hidden', !show);
+  $('btnBell').classList.toggle('hidden', !show); document.body.classList.toggle('bell', show);
   const n = c.mine + c.stu + c.edu + c.exam; $('bellN').textContent = n; $('bellN').classList.toggle('hidden', !n);
 }
 $('btnBell').onclick = () => {
