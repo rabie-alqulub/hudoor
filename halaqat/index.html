@@ -531,6 +531,31 @@
       <div class="card hidden" id="snDone"><h2 id="snDoneT"></h2><div class="bar" style="justify-content:flex-start;gap:6px;flex-wrap:wrap"><button class="mini" id="snAgain">تسجيل طالب آخر</button><button class="mini" id="snList">عرض بيانات الطلاب</button></div></div>
     </div>
 
+    <!-- إضافة حلقة -->
+    <div id="pHalNew" class="hidden">
+      <div class="card" id="hnForm">
+        <h2>إضافة حلقة</h2>
+        <small>تُضاف الحلقة وتظهر مباشرة في التقييم وإسناد الحلقات وتسكين الطلاب.</small>
+        <label for="hnName">اسم الحلقة *</label><input id="hnName" maxlength="60" placeholder="مثال: حلقة الفرقان">
+        <label for="hnT">معلم الحلقة</label><select id="hnT"></select>
+        <label for="hnNotes">ملاحظات</label><input id="hnNotes" maxlength="200" placeholder="مثال: المكان أو الفترة">
+        <button class="btn" id="hnSave">إضافة الحلقة</button>
+        <div id="hnMsg"></div>
+      </div>
+      <div class="card hidden" id="hnDone"><h2 id="hnDoneT"></h2><div class="bar" style="justify-content:flex-start;gap:6px;flex-wrap:wrap"><button class="mini" id="hnAgain">إضافة حلقة أخرى</button><button class="mini" id="hnList">عرض الحلقات</button></div></div>
+    </div>
+
+    <!-- تعديل حلقة -->
+    <div id="pHalEdit" class="hidden">
+      <div class="card">
+        <h2>تعديل حلقة</h2>
+        <small>تعديل اسم الحلقة ومعلمها وملاحظاتها، أو إيقافها وإعادة تفعيلها.</small>
+        <div class="stchips" id="heSum"></div>
+        <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
+      </div>
+      <div class="card" id="heList"></div>
+    </div>
+
     <!-- المنافس -->
     <div id="pCompete" class="hidden">
       <div class="card">
@@ -921,6 +946,20 @@
   </div>
 </div>
 
+<!-- تعديل حلقة -->
+<div class="sheet hidden" id="hlSheet">
+  <div class="panel">
+    <div class="head"><h2>تعديل حلقة</h2><button class="iconbtn" id="hlClose">إغلاق</button></div>
+    <small class="muted" id="hlNo"></small>
+    <label for="hlName">اسم الحلقة *</label><input id="hlName" maxlength="60">
+    <label for="hlT">معلم الحلقة</label><select id="hlT"></select>
+    <label for="hlNotes">ملاحظات</label><input id="hlNotes" maxlength="200">
+    <label class="chk" style="margin-top:12px"><input type="checkbox" id="hlOn"> الحلقة نشطة</label>
+    <button class="btn" id="hlSave">حفظ التعديلات</button>
+    <div id="hlMsg"></div>
+  </div>
+</div>
+
 <!-- صنف في المتجر -->
 <div class="sheet hidden" id="itSheet">
   <div class="panel">
@@ -1120,7 +1159,7 @@ const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['soon', 'بحث'], ['compete', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
-  { t:'الحلقات', ic:'halaqa', items:[['soon', 'إضافة حلقة'], ['soon', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
+  { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['soon', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['soon', 'تقرير الطلاب'], ['soon', 'تقرير المجمع']] },
@@ -1163,6 +1202,10 @@ function openRole(r, title, group){
   $('pStudents').classList.toggle('hidden', r !== 'studentsList');
   $('pStudentNew').classList.toggle('hidden', r !== 'studentNew');
   if (r === 'studentNew') openStudentNew();
+  $('pHalNew').classList.toggle('hidden', r !== 'halaqaNew');
+  if (r === 'halaqaNew') openHalNew();
+  $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
+  if (r === 'halaqaEdit') openHalEdit();
   $('pCompete').classList.toggle('hidden', r !== 'compete');
   if (r === 'compete') openCompete();
   $('pRegLink').classList.toggle('hidden', r !== 'regLink');
@@ -1756,6 +1799,74 @@ async function openStudentNew(){
     else { const a = await api({ action:'apps' }); if (a.ok) fillSel('snHal', a.halaqat.map(h => [h.hid, h.name]), '— اختر الحلقة —'); else msg('snMsg', a.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : a.msg, 'err'); }
   } catch(e){ if (e.message !== 'expired') msg('snMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
 }
+/* ---------- إضافة حلقة وتعديلها ---------- */
+let HL = null, hlCur = null, heF = 'on', hlForce = false;
+async function loadHal(box){
+  try { const r = await api({ action:'halaqatAdmin' }); if (!r.ok){ msg(box, needSrv(r), 'err'); return false; } HL = r; return true; }
+  catch(e){ if (e.message !== 'expired') msg(box, 'تعذّر الاتصال بالخادم.', 'err'); return false; }
+}
+const teacherOpts = id => fillSel(id, HL.teachers.map(t => [t.nid, t.name]), '— بدون معلم —');
+async function openHalNew(){
+  $('hnForm').classList.remove('hidden'); $('hnDone').classList.add('hidden'); msg('hnMsg', '', '');
+  fillSel('hnT', [], 'جاري التحميل...'); if (await loadHal('hnMsg')) teacherOpts('hnT');
+}
+$('hnSave').onclick = async () => {
+  const h = { name:$('hnName').value.trim(), tnid:$('hnT').value, notes:$('hnNotes').value.trim() };
+  if (h.name.length < 3) return msg('hnMsg', 'اكتب اسم الحلقة.', 'err');
+  $('hnSave').disabled = true; msg('hnMsg', 'جاري الإضافة...', 'info');
+  try {
+    const r = await api({ action:'halaqaSave', halaqa:h });
+    if (!r.ok) return msg('hnMsg', needSrv(r), 'err');
+    toast(r.msg); $('hnDoneT').textContent = '✓ ' + r.msg; $('hnForm').classList.add('hidden'); $('hnDone').classList.remove('hidden');
+    ['hnName', 'hnNotes'].forEach(id => $(id).value = ''); $('hnT').value = '';
+  } catch(e){ if (e.message !== 'expired') msg('hnMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+  finally { $('hnSave').disabled = false; }
+};
+$('hnAgain').onclick = () => openHalNew();
+$('hnList').onclick = () => openRole('halaqaEdit');
+async function openHalEdit(){
+  $('heList').innerHTML = '<div class="msg info">جاري التحميل...</div>';
+  if (await loadHal('heList')) renderHalEdit();
+}
+function renderHalEdit(){
+  const on = HL.halaqat.filter(h => h.active).length, off = HL.halaqat.length - on, sum = $('heSum'); sum.innerHTML = '';
+  if (heF === 'off' && !off) heF = 'on';
+  [['on', 'النشطة', on]].concat(off ? [['off', 'الموقوفة', off]] : []).forEach(x => { const b = el('button', heF === x[0] ? 'on' : '', x[1] + ' (' + x[2] + ')'); b.onclick = () => { heF = x[0]; renderHalEdit(); }; sum.appendChild(b); });
+  const q = normAr($('heQ').value), box = $('heList'); box.innerHTML = '';
+  const list = HL.halaqat.filter(h => (heF === 'on' ? h.active : !h.active) && (!q || normAr(h.name + ' ' + h.teacher).indexOf(q) !== -1));
+  if (!list.length) return box.appendChild(el('small', '', HL.halaqat.length ? 'لا توجد نتائج.' : 'لا توجد حلقات بعد.'));
+  list.forEach(h => {
+    const w = el('div', 'strow' + (h.active ? '' : ' off')), top = el('div', 'top');
+    top.appendChild(el('b', '', h.name)); top.appendChild(el('span', 'pill p-none', h.students + ' طالب'));
+    if (!h.active) top.appendChild(el('span', 'pill p-red', 'موقوفة'));
+    w.appendChild(top);
+    const m = el('div', 'meta'); [['رقم الحلقة', h.hid], ['المعلم', h.teacher || (h.tnid ? h.tnid : 'لم تُسند')], ['ملاحظات', h.notes]].forEach(x => { if (x[1]){ const d = el('span', '', x[0] + ': '); d.appendChild(el('i', '', x[1])); m.appendChild(d); } });
+    w.appendChild(m);
+    const ac = el('div', 'stact'), b = el('button'); b.innerHTML = ST_IC.edit; b.appendChild(el('span', '', 'تعديل')); b.onclick = () => openHl(h); ac.appendChild(b);
+    w.appendChild(ac); box.appendChild(w);
+  });
+}
+$('heQ').oninput = () => HL && renderHalEdit();
+function openHl(h){
+  hlCur = h; hlForce = false; msg('hlMsg', '', ''); $('hlSave').textContent = 'حفظ التعديلات';
+  $('hlNo').textContent = 'رقم الحلقة: ' + h.hid + ' • ' + h.students + ' طالب';
+  $('hlName').value = h.name; $('hlNotes').value = h.notes || ''; teacherOpts('hlT'); $('hlT').value = h.tnid || ''; $('hlOn').checked = h.active;
+  $('hlSheet').classList.remove('hidden');
+}
+$('hlOn').onchange = () => { hlForce = false; msg('hlMsg', '', ''); };
+$('hlClose').onclick = () => $('hlSheet').classList.add('hidden');
+$('hlSave').onclick = async () => {
+  const h = { hid:hlCur.hid, name:$('hlName').value.trim(), tnid:$('hlT').value, notes:$('hlNotes').value.trim(), on:$('hlOn').checked, force:hlForce };
+  if (h.name.length < 3) return msg('hlMsg', 'اكتب اسم الحلقة.', 'err');
+  $('hlSave').disabled = true; msg('hlMsg', 'جاري الحفظ...', 'info');
+  try {
+    const r = await api({ action:'halaqaSave', halaqa:h });
+    if (!r.ok){ if (r.needForce){ hlForce = true; $('hlSave').textContent = 'تأكيد إيقاف الحلقة'; } return msg('hlMsg', needSrv(r), 'err'); }
+    $('hlSheet').classList.add('hidden'); toast(r.msg); openHalEdit();
+  } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+  finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
+};
+
 /* ---------- المنافس: تبويبات داخل الصفحة ---------- */
 let CP = null, cpP = 'all', cpSec = 'bank';
 const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 6.9 7.5.7-5.7 5 1.7 7.4L12 18l-6.5 4 1.7-7.4-5.7-5 7.5-.7z"/></svg>';
