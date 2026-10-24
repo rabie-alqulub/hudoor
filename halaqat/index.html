@@ -641,8 +641,6 @@
       <div class="card">
         <h2>الطلاب المنقطعون</h2>
         <small id="abRule"></small>
-        <div class="cfstats" id="abStats"></div>
-        <div class="stchips" id="abTabs"></div>
         <input id="abQ" placeholder="ابحث باسم الطالب أو الحلقة" style="margin-top:8px">
       </div>
       <div class="card" id="abList"></div>
@@ -2172,9 +2170,7 @@ const wDays = n => ['', 'يوم واحد', 'يومان', 'ثلاثة أيام', 
 function renderAbsent(fill){
   const c = AB.cfg;
   $('abRule').textContent = c.on ? 'يُستبعد الطالب تلقائياً عند اعتماد المعلم إذا غاب ' + wDays(c.cons) + ' متتالية أو ' + wDays(c.total) + ' متفرقة' + (c.from ? ' (من ' + c.from + ')' : '') + '، وتصل رسالة لولي أمره.' : 'الاستبعاد التلقائي متوقف حالياً.';
-  const st = $('abStats'); st.innerHTML = ''; [[AB.excluded.length, 'منقطعون الآن'], [AB.risk.length, 'قريبون من الحد'], [AB.back.length, 'فُعّلوا مؤخراً']].forEach(x => { const d = el('div'); d.appendChild(el('b', '', x[0])); d.appendChild(el('span', '', x[1])); st.appendChild(d); });
-  const tb = $('abTabs'); tb.innerHTML = '';
-  [['ex', 'المنقطعون (' + AB.excluded.length + ')'], ['risk', 'القريبون من الحد (' + AB.risk.length + ')'], ['back', 'فُعّلوا مؤخراً']].forEach(x => { const b = el('button', abT === x[0] ? 'on' : '', x[1]); b.onclick = () => { abT = x[0]; renderAbsent(); }; tb.appendChild(b); });
+  abT = 'ex';   // الشاشة للمنقطعين فقط: من فُعّل يُزال منها تلقائياً
   const q = normAr($('abQ').value), box = $('abList'); box.innerHTML = '';
   const match = x => !q || normAr(x.name + ' ' + (x.hname || '')).indexOf(q) !== -1;
   if (abT === 'ex'){
