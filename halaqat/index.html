@@ -243,6 +243,14 @@
     #dsPrint h1{font-size:17px;margin:0} #dsPrint h3{font-size:13px;margin:12px 0 4px;border-bottom:1px solid #999}
     #dsPrint table{width:100%;border-collapse:collapse} #dsPrint td,#dsPrint th{border:1px solid #bbb;padding:2px 4px;text-align:right;font-size:10px}
     #dsPrint .ph{display:flex;justify-content:space-between;border-bottom:2px solid #D08E2C;padding-bottom:5px;margin-bottom:6px} }
+
+  /* أداء المعلمين */
+  .tcard{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer} .tcard:last-child{border-bottom:0}
+  .tcard .nm b{display:block;font-size:16px} .tcard .nm small{color:var(--muted);font-size:12.5px}
+  .tcard .sc{font-size:22px;font-weight:800;min-width:56px;text-align:center}
+  .tcard .meter{grid-column:2/4;height:7px;border-radius:99px;background:var(--light);overflow:hidden} .tcard .meter i{display:block;height:100%;border-radius:99px}
+  .tcard .mini4{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+  .sc.lv-g,.meter i.g{color:var(--ok)} .meter i.g{background:var(--ok)} .meter i.y{background:var(--gold)} .meter i.r{background:var(--red)}
   /* البحث العام */
   .gsr{position:relative;margin-bottom:12px}
   .gsr input{padding-inline-start:40px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);font-size:16px}
@@ -700,6 +708,21 @@
         <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
       </div>
       <div class="card" id="heList"></div>
+    </div>
+
+    <!-- أداء المعلمين -->
+    <div id="pTch" class="hidden">
+      <div class="card">
+        <h2>أداء المعلمين</h2>
+        <small>مؤشر الأداء من 100: اعتماد الحلقة يومياً (25)، تسميع الطلاب الحاضرين (25)، حضور الطلاب (20)، متوسط الدرجات (15)، إنجاز الخطط (15).</small>
+        <div class="stchips" id="tcPer"></div>
+        <div class="dsh-top"><button class="mini" id="tcPrev">السابق</button><span class="lbl" id="tcLbl"></span><button class="mini" id="tcNext">التالي</button></div>
+        <div class="edgrid hidden" id="tcCustom"><div><label for="tcFrom">من تاريخ</label><input type="date" id="tcFrom"></div><div><label for="tcTo">إلى تاريخ</label><input type="date" id="tcTo"></div></div>
+        <div class="stact"><button id="tcAllBtn" class="hidden">← كل المعلمين</button><button id="tcXls">تصدير Excel</button><button id="tcPdf">تصدير PDF</button></div>
+      </div>
+      <div class="card"><div class="kpis" id="tcKpi"></div></div>
+      <div class="card" id="tcRank"></div>
+      <div class="card"><h2 id="tcTblT">تفاصيل المؤشرات</h2><div class="dtw"><table class="dtbl" id="tcTbl"></table></div></div>
     </div>
 
     <!-- شاشة العرض العامة (تلفزيون الجامع) -->
@@ -1522,7 +1545,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1549,6 +1572,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.students') !== -1) TABS.push(['repStu', 'تقارير شؤون الطلاب']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.edu') !== -1) TABS.push(['repEdu', 'التقارير التعليمية']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.teachers') !== -1) TABS.push(['tchPerf', 'أداء المعلمين']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1) TABS.push(['msgs', 'رسائل أولياء الأمور']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
@@ -1568,11 +1592,11 @@ async function loadHome(){
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
-  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
+  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['tchPerf', 'أداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['tvCfg', 'شاشة العرض']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
-  { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['dash', 'شاشة عرض المجمع'], ['soon', 'تقرير المجمع']] },
+  { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع'], ['soon', 'تقرير المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['soon', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
 ];
 function buildAdminNav(n){
@@ -1616,6 +1640,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pTch').classList.toggle('hidden', r !== 'tchPerf');
+  if (r === 'tchPerf') openTch();
   $('pTv').classList.toggle('hidden', r !== 'tvCfg');
   if (r === 'tvCfg') openTv();
   $('pRep').classList.toggle('hidden', !REP_KIND[r]);
@@ -1685,6 +1711,7 @@ function renderWelcome(){
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
     repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
+    tchPerf:['أداء المعلمين', 'مؤشرات المعلمين وترتيبهم', ''],
     dash:['شاشة عرض المجمع', 'لوحة المجمع اليومية وتقاريرها الشاملة', 'gold'],
     absent:['الطلاب المنقطعون', 'المستبعدون لتجاوز حد الغياب وتفعيلهم', ''],
     stuFile:['ملف الطالب', 'بيانات الطالب وحفظه وحضوره وسجله كاملاً', ''],
@@ -2325,6 +2352,99 @@ $('hlSave').onclick = async () => {
     $('hlSheet').classList.add('hidden'); toast(r.msg); openHalEdit();
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
+};
+
+/* ---------- أداء المعلمين ---------- */
+let TC = null, tcP = 'week', tcDate = null, tcOne = '', tcSeq = 0, tcSort = ['score', -1];
+const lvSc = v => v == null ? '' : v >= 85 ? 'lv-g' : v >= 65 ? 'lv-y' : 'lv-r';
+function perRange(p, date, fromEl, toEl, term){
+  const t = D.today, d = date || t;
+  if (p === 'day') return [d, d];
+  if (p === 'week'){ const s = addDays(d, -ud(d).getUTCDay()), e = addDays(s, 6); return [s, e > t ? t : e]; }
+  if (p === 'month'){ const s = d.slice(0, 8) + '01', n = ud(s); n.setUTCMonth(n.getUTCMonth() + 1); const e = addDays(iso(n), -1); return [s, e > t ? t : e]; }
+  if (p === 'term'){ const tr = term || {}; return [tr.from || addDays(t, -90), tr.to && tr.to < t ? tr.to : t]; }
+  return [$(fromEl).value || addDays(t, -30), $(toEl).value || t];
+}
+function perShift(p, date, dir){
+  const d = date || D.today; let x = d;
+  if (p === 'day'){ x = addDays(d, dir); for (let i = 0; i < 7 && !isStudy(x); i++) x = addDays(x, dir); }
+  else if (p === 'week') x = addDays(d, 7 * dir);
+  else if (p === 'month'){ const n = ud(d.slice(0, 8) + '01'); n.setUTCMonth(n.getUTCMonth() + dir); x = iso(n); }
+  return x > D.today ? D.today : x;
+}
+const rgLabel = rg => rg[0] === rg[1] ? fmtD(rg[0], { weekday:'long', day:'numeric', month:'long', year:'numeric' }) : fmtD(rg[0], { day:'numeric', month:'short' }) + ' – ' + fmtD(rg[1], { day:'numeric', month:'short', year:'numeric' });
+function openTch(){
+  const per = $('tcPer'); per.innerHTML = '';
+  DS_PER.forEach(p => { const b = el('button', tcP === p[0] ? 'on' : '', p[1]); b.onclick = () => { tcP = p[0]; tcDate = null; openTch(); }; per.appendChild(b); });
+  $('tcCustom').classList.toggle('hidden', tcP !== 'custom');
+  ['tcPrev', 'tcNext'].forEach(id => $(id).classList.toggle('hidden', tcP === 'term' || tcP === 'custom'));
+  if (tcP === 'custom' && !$('tcFrom').value){ $('tcFrom').value = addDays(D.today, -30); $('tcTo').value = D.today; }
+  loadTch();
+}
+async function loadTch(){
+  const my = ++tcSeq, rg = perRange(tcP, tcDate, 'tcFrom', 'tcTo', (TC && TC.term) || (DS && DS.term));
+  $('tcLbl').textContent = rgLabel(rg); $('tcNext').disabled = rg[1] >= D.today; $('tcAllBtn').classList.toggle('hidden', !tcOne);
+  $('tcKpi').innerHTML = '<div class="msg info">جاري التحميل...</div>';
+  let r; try { r = await api({ action:'tch', from:rg[0], to:rg[1], tnid:tcOne }); } catch(e){ if (e.message !== 'expired') msg('tcKpi', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (my !== tcSeq) return; if (!r.ok) return msg('tcKpi', needSrv(r), 'err');
+  TC = r; renderTch();
+}
+function renderTch(){
+  const L = TC.teachers, k = $('tcKpi'); k.innerHTML = '';
+  const avg = f => { const v = L.map(f).filter(x => x != null); return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null; };
+  const kp = (v, l, cls) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', l)); k.appendChild(d); };
+  const sc = avg(x => x.score), ap = avg(x => x.apprPct), cv = avg(x => x.cover);
+  if (tcOne && L[0]){ kp(L[0].score, 'مؤشر الأداء', lvSc(L[0].score).replace('lv-', '')); kp(L[0].apprPct == null ? null : L[0].apprPct + '%', 'الاعتماد', ''); kp(L[0].cover == null ? null : L[0].cover + '%', 'تغطية التسميع'); kp(L[0].students, 'الطلاب'); }
+  else { kp(L.length, 'المعلمون'); kp(sc, 'متوسط الأداء', sc == null ? '' : sc >= 85 ? 'g' : sc >= 65 ? 'y' : 'r'); kp(ap == null ? null : ap + '%', 'متوسط الاعتماد'); kp(cv == null ? null : cv + '%', 'متوسط تغطية التسميع'); }
+  // الترتيب
+  const rk = $('tcRank'); rk.innerHTML = '';
+  if (tcOne && L[0]){
+    const T = L[0]; rk.appendChild(el('h2', '', T.name)); rk.appendChild(el('small', '', T.halaqat.join('، ') + ' • ' + T.students + ' طالب'));
+    rk.appendChild(kvBox([['أيام الاعتماد', T.approved + ' من ' + T.need], ['التسميع', T.recs + ' مرة' + (T.perStu != null ? ' (' + T.perStu + ' لكل طالب)' : '')], ['الحفظ / المراجعة', T.hifz + ' / ' + T.mur + ' آية'], ['حضور الطلاب', T.att == null ? '—' : T.att + '% (غياب ' + T.absent + ')'],
+      ['متوسط الدرجات', T.avg == null ? '—' : T.avg + ' من ' + D.maxScore], ['إنجاز الخطط', T.plan == null ? '—' : T.plan + '% (طلاب بخطة: ' + T.withPlan + ')'], ['الإحالات', T.refs], ['ترشيحات المرحلية', T.exams + (T.passed ? ' • اجتاز ' + T.passed : '')], ['منقطعون في حلقته', T.excluded]]));
+  } else {
+    rk.appendChild(el('h2', '', 'ترتيب المعلمين'));
+    if (!L.length) rk.appendChild(el('small', '', 'لا يوجد معلمون مسندة لهم حلقات.'));
+    sortBy(L, 'score', -1).forEach((T, i) => { const w = el('div', 'tcard'); w.appendChild(el('span', 'pill ' + (i < 3 ? 'p-late' : 'p-none'), i + 1)); 
+      const nm = el('div', 'nm'); nm.appendChild(el('b', '', T.name)); nm.appendChild(el('small', '', T.halaqat.join('، ') + ' • ' + T.students + ' طالب')); w.appendChild(nm);
+      w.appendChild(el('div', 'sc ' + lvSc(T.score), T.score == null ? '—' : T.score));
+      const m = el('div', 'meter'), f = el('i', T.score >= 85 ? 'g' : T.score >= 65 ? 'y' : 'r'); f.style.width = (T.score || 0) + '%'; m.appendChild(f); w.appendChild(el('span')); w.appendChild(m);
+      const mi = el('div', 'mini4'); [['الاعتماد', T.apprPct, '%', lvAtt], ['التسميع', T.cover, '%', lvPl], ['حضور الطلاب', T.att, '%', lvAtt], ['الدرجات', T.avg, '', lvAvg]].forEach(x => mi.appendChild(el('span', 'pill p-none ' + (x[3](x[1]) || ''), x[0] + ': ' + (x[1] == null ? '—' : x[1] + x[2])))); w.appendChild(mi);
+      w.onclick = () => { tcOne = T.tnid; loadTch(); }; rk.appendChild(w); });
+  }
+  // الجدول
+  const t = $('tcTbl'); t.innerHTML = '';
+  if (tcOne && L[0]){
+    $('tcTblT').textContent = 'أيام الدراسة في الفترة';
+    t.innerHTML = '<thead><tr><th>التاريخ</th><th>الاعتماد</th><th>وقت الاعتماد</th><th>الحاضرون</th><th>الغائبون</th><th>التسميع</th><th>فارس الحلقة</th></tr></thead>';
+    const tb = el('tbody'); (L[0].days || []).forEach(d => { const tr = el('tr'); tr.appendChild(el('td', '', fmtD(d.date, { weekday:'short', day:'numeric', month:'short' })));
+      tr.appendChild(el('td', d.approved >= d.of ? 'lv-g' : 'lv-r', d.approved >= d.of ? '✓ معتمد' : d.approved ? d.approved + '/' + d.of : '✗ لم يُعتمد')); [d.at || '—', d.present, d.absent, d.recs, d.star || '—'].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); });
+    t.appendChild(tb); return;
+  }
+  $('tcTblT').textContent = 'تفاصيل المؤشرات';
+  const cols = [['name', 'المعلم'], ['students', 'الطلاب'], ['score', 'الأداء'], ['apprPct', 'الاعتماد %'], ['cover', 'تغطية التسميع %'], ['recs', 'تسميع'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['att', 'حضور الطلاب %'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطط %'], ['refs', 'إحالات'], ['exams', 'ترشيحات'], ['excluded', 'منقطعون']];
+  const tr = el('tr'); cols.forEach(c => { const th = el('th', tcSort[0] === c[0] ? 's' + (tcSort[1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { tcSort = [c[0], tcSort[0] === c[0] ? -tcSort[1] : (c[0] === 'name' ? 1 : -1)]; renderTch(); }; tr.appendChild(th); });
+  const th = el('thead'); th.appendChild(tr); t.appendChild(th); const tb = el('tbody');
+  sortBy(L, tcSort[0], tcSort[1]).forEach(T => { const r = el('tr'); cols.forEach((c, i) => { const v = T[c[0]], cls = c[0] === 'score' ? lvSc(v) : c[0] === 'apprPct' || c[0] === 'att' ? lvAtt(v) : c[0] === 'cover' || c[0] === 'plan' ? lvPl(v) : c[0] === 'avg' ? lvAvg(v) : '';
+    const td = el('td', (i === 0 ? 'nm ' : '') + cls, v == null ? '—' : v); if (i === 0) td.onclick = () => { tcOne = T.tnid; loadTch(); }; r.appendChild(td); }); tb.appendChild(r); });
+  t.appendChild(tb);
+}
+$('tcPrev').onclick = () => { tcDate = perShift(tcP, tcDate, -1); loadTch(); }; $('tcNext').onclick = () => { tcDate = perShift(tcP, tcDate, 1); loadTch(); };
+['tcFrom', 'tcTo'].forEach(id => $(id).onchange = loadTch);
+$('tcAllBtn').onclick = () => { tcOne = ''; loadTch(); };
+$('tcXls').onclick = () => {
+  if (!TC) return; const t = 'أداء المعلمين — ' + $('tcLbl').textContent, sheets = [];
+  if (tcOne && TC.teachers[0]){ const T = TC.teachers[0]; sheets.push(['أيام ' + T.name.split(' ')[0], [[t + ' — ' + T.name], ['التاريخ', 'الاعتماد', 'وقت الاعتماد', 'الحاضرون', 'الغائبون', 'التسميع', 'فارس الحلقة']].concat((T.days || []).map(d => [d.date, d.approved >= d.of ? 'معتمد' : d.approved ? d.approved + '/' + d.of : 'لم يُعتمد', d.at, d.present, d.absent, d.recs, d.star]))]); }
+  else sheets.push(['المعلمون', [[t], ['المعلم', 'الحلقات', 'الطلاب', 'مؤشر الأداء', 'الاعتماد %', 'أيام الاعتماد', 'تغطية التسميع %', 'التسميع', 'حفظ (آية)', 'مراجعة (آية)', 'حضور الطلاب %', 'الغياب', 'متوسط الدرجة', 'إنجاز الخطط %', 'إحالات', 'ترشيحات', 'اجتازوا', 'منقطعون']]
+    .concat(sortBy(TC.teachers, 'score', -1).map(T => [T.name, T.halaqat.join('، '), T.students, T.score, T.apprPct, T.approved + '/' + T.need, T.cover, T.recs, T.hifz, T.mur, T.att, T.absent, T.avg, T.plan, T.refs, T.exams, T.passed, T.excluded].map(v => v == null ? '' : v)))]);
+  const a = el('a'); a.href = URL.createObjectURL(xlsxBlob(sheets)); a.download = 'أداء-المعلمين-' + TC.from + (TC.to !== TC.from ? '_' + TC.to : '') + '.xlsx';
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel');
+};
+$('tcPdf').onclick = () => {
+  if (!TC) return; const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'أداء المعلمين' + (tcOne && TC.teachers[0] ? ': ' + TC.teachers[0].name : ''))); l.appendChild(el('div', '', $('tcLbl').textContent)); hd.appendChild(l); hd.appendChild(el('div', '', TC.org)); p.appendChild(hd);
+  [$('tcKpi'), $('tcRank'), $('tcTbl').parentNode.parentNode].forEach(n => { const c = n.cloneNode(true); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); c.removeAttribute('id'); p.appendChild(c); });
+  setTimeout(() => window.print(), 50);
 };
 
 /* ---------- شاشة العرض العامة ---------- */
