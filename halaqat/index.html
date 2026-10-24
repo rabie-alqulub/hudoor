@@ -210,6 +210,39 @@
   .abrow .dates{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px} .abrow .dates span{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--errbg);color:var(--red)}
   .absum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
 
+
+  /* شاشة عرض المجمع */
+  .dsh-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .dsh-top .lbl{flex:1;font-weight:700;font-size:16px;text-align:center;min-width:160px}
+  .dsh-f{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  @media (max-width:560px){ .dsh-f{grid-template-columns:1fr 1fr} }
+  .dsh-f select,.dsh-f input{font-size:14px;padding:9px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  @media (max-width:560px){ .kpis{grid-template-columns:repeat(2,1fr)} }
+  .kpi{padding:12px 10px;border-radius:14px;background:var(--light);text-align:center}
+  .kpi b{display:block;font-size:24px;color:var(--navy);line-height:1.2} .kpi span{font-size:12.5px;color:var(--muted)} .kpi small{display:block;font-size:11px;color:var(--muted)}
+  .kpi.g b{color:var(--ok)} .kpi.y b{color:var(--gold2)} .kpi.r b{color:var(--red)}
+  @media (prefers-color-scheme: dark){ .kpi b{color:#9CC1DC} }
+  .dtw{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:10px;max-height:560px}
+  .dtbl{width:100%;border-collapse:collapse;font-size:13.5px;white-space:nowrap}
+  .dtbl th{position:sticky;top:0;background:var(--light);font-size:12px;color:var(--muted);font-weight:700;padding:8px;text-align:right;cursor:pointer;user-select:none;z-index:1}
+  .dtbl th.s::after{content:' ▾'} .dtbl th.s.up::after{content:' ▴'}
+  .dtbl td{padding:8px;border-top:1px solid var(--line)} .dtbl tr:hover td{background:var(--goldlight)}
+  .dtbl td.nm{font-weight:600;cursor:pointer;color:var(--navy)} .dtbl tfoot td{font-weight:700;background:var(--light)}
+  @media (prefers-color-scheme: dark){ .dtbl td.nm{color:#9CC1DC} }
+  .lv-g{color:var(--ok);font-weight:700} .lv-y{color:var(--gold2);font-weight:700} .lv-r{color:var(--red);font-weight:700}
+  .chart{display:flex;align-items:flex-end;gap:3px;height:140px;margin-top:10px;padding:0 2px;border-bottom:1px solid var(--line)}
+  .chart div{flex:1;min-width:4px;max-width:44px;background:var(--navy);border-radius:4px 4px 0 0;position:relative} .chart div.lo{background:var(--red)} .chart div.mid{background:var(--gold)}
+  .chart-x{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media (max-width:700px){ .duo{grid-template-columns:1fr} }
+  .rank{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;cursor:pointer} .rank:last-child{border-bottom:0}
+  .rank i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
+  .rank span{flex:1} .rank small{color:var(--muted)} .rank b{font-size:14px}
+  #dsPrint{display:none}
+  @media print{ #dsPrint,#dsPrint *{visibility:visible} #dsPrint{display:block;position:absolute;top:0;right:0;left:0;padding:0 6mm;background:#fff;color:#000;font-size:11px}
+    #dsPrint h1{font-size:17px;margin:0} #dsPrint h3{font-size:13px;margin:12px 0 4px;border-bottom:1px solid #999}
+    #dsPrint table{width:100%;border-collapse:collapse} #dsPrint td,#dsPrint th{border:1px solid #bbb;padding:2px 4px;text-align:right;font-size:10px}
+    #dsPrint .ph{display:flex;justify-content:space-between;border-bottom:2px solid #D08E2C;padding-bottom:5px;margin-bottom:6px} }
   /* البحث العام */
   .gsr{position:relative;margin-bottom:12px}
   .gsr input{padding-inline-start:40px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);font-size:16px}
@@ -667,6 +700,25 @@
         <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
       </div>
       <div class="card" id="heList"></div>
+    </div>
+
+    <!-- شاشة عرض المجمع -->
+    <div id="pDash" class="hidden">
+      <div class="card">
+        <h2>شاشة عرض المجمع</h2>
+        <div class="stchips" id="dsPer"></div>
+        <div class="dsh-top"><button class="mini" id="dsPrev">السابق</button><span class="lbl" id="dsLbl"></span><button class="mini" id="dsNext">التالي</button></div>
+        <div class="edgrid hidden" id="dsCustom"><div><label for="dsFrom">من تاريخ</label><input type="date" id="dsFrom"></div><div><label for="dsTo">إلى تاريخ</label><input type="date" id="dsTo"></div></div>
+        <div class="hidden" id="dsTerm"></div>
+        <div class="dsh-f"><select id="dsHal"></select><select id="dsStage"></select><select id="dsSt"><option value="نشط">الطلاب النشطون</option><option value="منقطع">المنقطعون</option><option value="موقوف">الموقوفون</option><option value="الكل">الكل</option></select></div>
+        <div class="stact"><button id="dsXls">تصدير Excel</button><button id="dsPdf">تصدير PDF</button><button id="dsRef">تحديث</button></div>
+        <div id="dsMsg"></div>
+      </div>
+      <div class="card"><div class="kpis" id="dsKpi"></div></div>
+      <div class="card" id="dsChartC"><h2 id="dsChartT">الحضور والتسميع</h2><div id="dsChart"></div></div>
+      <div class="card"><h2>الحلقات</h2><div class="dtw"><table class="dtbl" id="dsHalT"></table></div></div>
+      <div class="card"><div class="duo"><div><h2>الأفضل</h2><div id="dsBest"></div></div><div><h2>يحتاجون متابعة</h2><div id="dsWeak"></div></div></div></div>
+      <div class="card"><h2>تقرير الطلاب الشامل</h2><input id="dsQ" placeholder="ابحث باسم الطالب"><div class="dtw"><table class="dtbl" id="dsStuT"></table></div></div>
     </div>
 
     <!-- نقل الطلاب بين الحلقات -->
@@ -1246,7 +1298,7 @@
   </div>
 </div>
 
-<div id="sfPrint"></div>
+<div id="sfPrint"></div><div id="dsPrint"></div>
 <!-- تفاصيل الإحالة والردود -->
 <div class="sheet hidden" id="rfSheet">
   <div class="panel">
@@ -1435,7 +1487,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1460,6 +1512,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.students') !== -1) TABS.push(['refsStu', 'إحالات شؤون الطلاب']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.edu') !== -1){ TABS.push(['refsEdu', 'الإحالات التعليمية']); TABS.push(['refsExam', 'ترشيحات المرحلية']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1) TABS.push(['msgs', 'رسائل أولياء الأمور']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
@@ -1472,17 +1525,17 @@ async function loadHome(){
   if (admin) buildAdminNav(n);
   else TABS.forEach(x => { const b = el('button'); b.dataset.r = x[0]; b.innerHTML = ICONS[x[0]]; b.appendChild(el('span', '', x[1])); b.onclick = () => openRole(x[0]); n.appendChild(b); });
   show('vHome');
-  openRole('welcome');
+  openRole(admin ? 'dash' : 'welcome');   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
 }
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
-  { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['soon', 'تقرير الطلاب'], ['soon', 'تقرير المجمع']] },
+  { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['dash', 'شاشة عرض المجمع'], ['soon', 'تقرير المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['soon', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
 ];
 function buildAdminNav(n){
@@ -1526,6 +1579,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pDash').classList.toggle('hidden', r !== 'dash');
+  if (r === 'dash') openDash();
   $('pMoveMany').classList.toggle('hidden', r !== 'moveMany');
   if (r === 'moveMany') openMoveMany();
   $('pAbsent').classList.toggle('hidden', r !== 'absent');
@@ -1565,7 +1620,7 @@ function openRole(r, title, group){
   if (r === 'report') openReport();
   window.scrollTo(0, 0);
 }
-$('brandHome').onclick = () => { if (D){ show('vHome'); openRole('welcome'); } };
+$('brandHome').onclick = () => { if (D){ show('vHome'); openRole(document.body.classList.contains('admin') ? 'dash' : 'welcome'); } };
 
 /* ---------- الترحيب ---------- */
 function renderWelcome(){
@@ -1588,6 +1643,7 @@ function renderWelcome(){
     refsEdu:['الإحالات التعليمية', 'إحالات مستوى الحفظ والخطط', ''], refsExam:['ترشيحات المرحلية', 'مواعيد الاختبارات المرحلية ونتائجها', 'gold'],
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
+    dash:['شاشة عرض المجمع', 'لوحة المجمع اليومية وتقاريرها الشاملة', 'gold'],
     absent:['الطلاب المنقطعون', 'المستبعدون لتجاوز حد الغياب وتفعيلهم', ''],
     stuFile:['ملف الطالب', 'بيانات الطالب وحفظه وحضوره وسجله كاملاً', ''],
     msgs:['رسائل أولياء الأمور', 'رسالة خاصة أو عامة عبر برق', ''],
@@ -2229,6 +2285,174 @@ $('hlSave').onclick = async () => {
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
 };
 
+/* ---------- شاشة عرض المجمع ---------- */
+let DS = null, dsP = 'day', dsDate = null, dsSort = { stu:['hifz', -1], hal:['name', 1] }, dsSeq = 0;
+const DS_PER = [['day', 'اليوم'], ['week', 'أسبوعي'], ['month', 'شهري'], ['term', 'فصلي'], ['custom', 'من تاريخ إلى تاريخ']];
+function dsRange(){
+  const t = D.today, d = dsDate || t;
+  if (dsP === 'day') return [d, d];
+  if (dsP === 'week'){ const s = addDays(d, -ud(d).getUTCDay()); return [s, addDays(s, 6) > t ? t : addDays(s, 6)]; }
+  if (dsP === 'month'){ const s = d.slice(0, 8) + '01', n = ud(s); n.setUTCMonth(n.getUTCMonth() + 1); const e = addDays(iso(n), -1); return [s, e > t ? t : e]; }
+  if (dsP === 'term'){ const tr = (DS && DS.term) || {}; return [tr.from || addDays(t, -90), tr.to && tr.to < t ? tr.to : t]; }
+  return [$('dsFrom').value || addDays(t, -30), $('dsTo').value || t];
+}
+function dsShift(dir){
+  const d = dsDate || D.today;
+  if (dsP === 'day'){ let x = addDays(d, dir); for (let i = 0; i < 7 && !isStudy(x); i++) x = addDays(x, dir); dsDate = x; }
+  else if (dsP === 'week') dsDate = addDays(d, 7 * dir);
+  else if (dsP === 'month'){ const n = ud(d.slice(0, 8) + '01'); n.setUTCMonth(n.getUTCMonth() + dir); dsDate = iso(n); }
+  if (dsDate > D.today) dsDate = D.today;
+  loadDash();
+}
+function openDash(){
+  const per = $('dsPer'); per.innerHTML = '';
+  DS_PER.forEach(p => { const b = el('button', dsP === p[0] ? 'on' : '', p[1]); b.onclick = () => { dsP = p[0]; dsDate = null; openDash(); }; per.appendChild(b); });
+  $('dsCustom').classList.toggle('hidden', dsP !== 'custom');
+  ['dsPrev', 'dsNext'].forEach(id => $(id).classList.toggle('hidden', dsP === 'term' || dsP === 'custom'));
+  if (dsP === 'custom' && !$('dsFrom').value){ $('dsFrom').value = addDays(D.today, -30); $('dsTo').value = D.today; }
+  loadDash();
+}
+async function loadDash(){
+  const my = ++dsSeq, rg = dsRange();
+  $('dsLbl').textContent = rg[0] === rg[1] ? fmtD(rg[0], { weekday:'long', day:'numeric', month:'long', year:'numeric' }) : fmtD(rg[0], { day:'numeric', month:'short' }) + ' – ' + fmtD(rg[1], { day:'numeric', month:'short', year:'numeric' });
+  $('dsNext').disabled = rg[1] >= D.today;
+  $('dsKpi').innerHTML = '<div class="msg info">جاري تحميل البيانات...</div>';
+  let r; try { r = await api({ action:'dash', from:rg[0], to:rg[1], hid:$('dsHal').value, stage:$('dsStage').value, st:$('dsSt').value }); } catch(e){ if (e.message !== 'expired') msg('dsKpi', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (my !== dsSeq) return;
+  if (!r.ok) return msg('dsKpi', needSrv(r), 'err');
+  DS = r;
+  if (!$('dsHal').children.length){ fillSel('dsHal', r.allHalaqat.map(h => [h.hid, h.name]), 'كل الحلقات'); fillSel('dsStage', r.stages.map(v => [v, v]), 'كل المراحل'); }
+  // الفصل غير محدد
+  const tm = $('dsTerm'); tm.innerHTML = ''; tm.classList.toggle('hidden', dsP !== 'term');
+  if (dsP === 'term'){
+    if (!r.term.from) tm.appendChild(el('div', 'mgwarn', 'لم تُحدَّد تواريخ الفصل بعد، والعرض الحالي لآخر 90 يوماً.'));
+    if (r.admin){ const g = el('div', 'edgrid'), f = el('input'), t = el('input'); f.type = t.type = 'date'; f.value = r.term.from || ''; t.value = r.term.to || '';
+      const a = el('div'); a.appendChild(lab('بداية الفصل')); a.appendChild(f); const b = el('div'); b.appendChild(lab('نهاية الفصل')); b.appendChild(t); g.appendChild(a); g.appendChild(b); tm.appendChild(g);
+      const sv = el('button', 'mini', 'حفظ تواريخ الفصل'); sv.style.marginTop = '8px'; sv.onclick = async () => { const x = await cpCall({ action:'termSave', from:f.value, to:t.value }, 'dsMsg'); if (x && x.ok){ toast(x.msg); DS.term = x.term; loadDash(); } }; tm.appendChild(sv); }
+  }
+  renderDash();
+}
+const lvAtt = v => v == null ? '' : v >= 90 ? 'lv-g' : v >= 75 ? 'lv-y' : 'lv-r';
+const lvAvg = v => v == null ? '' : v >= 8 ? 'lv-g' : v >= 6.5 ? 'lv-y' : 'lv-r';
+const lvPl = v => v == null ? '' : v >= 75 ? 'lv-g' : v >= 40 ? 'lv-y' : 'lv-r';
+function renderDash(){
+  const K = DS.kpi, day = DS.from === DS.to, box = $('dsKpi'); box.innerHTML = '';
+  const k = (v, l, cls, sub) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', l)); if (sub) d.appendChild(el('small', '', sub)); box.appendChild(d); };
+  k(K.students, 'الطلاب');
+  k(K.att == null ? null : K.att + '%', 'نسبة الحضور', K.att == null ? '' : K.att >= 90 ? 'g' : K.att >= 75 ? 'y' : 'r');
+  k(K.absent, 'حالات الغياب', K.absent ? 'r' : ''); k(K.late, 'حالات التأخر', K.late ? 'y' : '');
+  k(K.hifz, 'آيات الحفظ', 'g'); k(K.mur, 'آيات المراجعة'); k(K.recs, 'مرات التسميع');
+  k(K.avg == null ? null : K.avg + '/' + D.maxScore, 'متوسط الدرجات', K.avg == null ? '' : K.avg >= 8 ? 'g' : K.avg >= 6.5 ? 'y' : 'r');
+  k(K.approvals + '/' + K.apprNeed, day ? 'الحلقات المعتمدة اليوم' : 'اعتمادات الحلقات', K.approvals >= K.apprNeed ? 'g' : 'y');
+  k(K.excluded, 'منقطعون الآن', K.excluded ? 'r' : ''); k(K.refs, 'إحالات وترشيحات'); k(K.apps, 'طلبات تسجيل', '', K.appsWait ? 'بانتظار القبول: ' + K.appsWait : '');
+  // الرسم: يومياً للفترة، وللحلقات في اليوم الواحد
+  const ch = $('dsChart'); ch.innerHTML = '';
+  if (day){
+    $('dsChartT').textContent = 'نسبة الحضور في الحلقات اليوم';
+    const hs = DS.halaqat.filter(h => h.att != null); if (!hs.length){ ch.appendChild(el('small', '', 'لا يوجد حضور مسجل في هذا اليوم.')); }
+    else { const c = el('div', 'chart'); hs.forEach(h => { const b = el('div', h.att < 75 ? 'lo' : h.att < 90 ? 'mid' : ''); b.style.height = Math.max(3, h.att) + '%'; b.title = h.name + ': ' + h.att + '%'; c.appendChild(b); }); ch.appendChild(c);
+      const x = el('div', 'chart-x'); x.appendChild(el('span', '', hs[0].name)); x.appendChild(el('span', '', hs[hs.length - 1].name)); ch.appendChild(x); }
+  } else {
+    $('dsChartT').textContent = 'نسبة الحضور يومياً';
+    const sr = DS.series.filter(x => x.att != null); if (!sr.length) ch.appendChild(el('small', '', 'لا يوجد حضور مسجل في هذه الفترة.'));
+    else { const c = el('div', 'chart'); sr.forEach(x => { const b = el('div', x.att < 75 ? 'lo' : x.att < 90 ? 'mid' : ''); b.style.height = Math.max(3, x.att) + '%'; b.title = x.d + ': حضور ' + x.att + '% • تسميع ' + x.recs; c.appendChild(b); }); ch.appendChild(c);
+      const xl = el('div', 'chart-x'); xl.appendChild(el('span', '', fmtD(sr[0].d, { day:'numeric', month:'short' }))); xl.appendChild(el('span', '', fmtD(sr[sr.length - 1].d, { day:'numeric', month:'short' }))); ch.appendChild(xl); }
+  }
+  dsHalTable(); dsRanks(); dsStuTable();
+}
+const DS_HCOLS = [['name', 'الحلقة'], ['teacher', 'المعلم'], ['students', 'الطلاب'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['recs', 'تسميع'], ['avg', 'متوسط الدرجة'], ['appr', 'الاعتماد']];
+const DS_SCOLS = [['name', 'الطالب'], ['hname', 'الحلقة'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %'], ['stars', 'فارس الحلقة'], ['points', 'النقاط'], ['refs', 'إحالات']];
+const hAppr = h => DS.from === DS.to ? (h.apprToday ? '✓ معتمدة' + (h.star ? ' • ⭐ ' + h.star : '') : '✗ لم تُعتمد') : h.approved + '/' + h.studyDays;
+function sortBy(list, key, dir){ return list.slice().sort((a, b) => { const x = a[key], y = b[key]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return (typeof x === 'string' ? x.localeCompare(y, 'ar') : x - y) * dir; }); }
+function dsHead(t, cols, which, redraw){
+  const tr = el('tr'); cols.forEach(c => { const th = el('th', dsSort[which][0] === c[0] ? 's' + (dsSort[which][1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { dsSort[which] = [c[0], dsSort[which][0] === c[0] ? -dsSort[which][1] : (c[0] === 'name' || c[0] === 'hname' || c[0] === 'teacher' ? 1 : -1)]; redraw(); }; tr.appendChild(th); });
+  const th = el('thead'); th.appendChild(tr); t.appendChild(th);
+}
+function dsHalTable(){
+  const t = $('dsHalT'); t.innerHTML = ''; dsHead(t, DS_HCOLS, 'hal', dsHalTable);
+  const tb = el('tbody'), key = dsSort.hal[0] === 'appr' ? 'approved' : dsSort.hal[0];
+  sortBy(DS.halaqat, key, dsSort.hal[1]).forEach(h => { const tr = el('tr');
+    [[h.name], [h.teacher], [h.students + (h.cap ? '/' + h.cap : '')], [h.att == null ? '—' : h.att + '%', lvAtt(h.att)], [h.absent], [h.late], [h.hifz], [h.mur], [h.recs], [h.avg == null ? '—' : h.avg, lvAvg(h.avg)], [hAppr(h), DS.from === DS.to ? (h.apprToday ? 'lv-g' : 'lv-r') : '']]
+      .forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tb.appendChild(tr); });
+  t.appendChild(tb);
+}
+function dsRanks(){
+  const S = DS.students, act = S.filter(x => x.days), rk = (box, list, fmt) => { const b = $(box); list.forEach((x, i) => { const r = el('div', 'rank'); r.appendChild(el('i', '', i + 1)); const sp = el('span'); sp.appendChild(el('b', '', x.name)); sp.appendChild(el('small', '', ' • ' + x.hname)); r.appendChild(sp); r.appendChild(el('b', '', fmt(x))); r.onclick = () => goFile(x.sid); b.appendChild(r); }); };
+  $('dsBest').innerHTML = ''; $('dsWeak').innerHTML = '';
+  const bh = sortBy(S.filter(x => x.hifz), 'hifz', -1).slice(0, 5), ba = sortBy(act.filter(x => x.att === 100), 'days', -1).slice(0, 5);
+  if (bh.length){ $('dsBest').appendChild(el('label', '', 'الأعلى حفظاً')); rk('dsBest', bh, x => x.hifz + ' آية'); }
+  if (ba.length){ $('dsBest').appendChild(el('label', '', 'حضور كامل')); rk('dsBest', ba, x => x.days + ' يوم'); }
+  if (!bh.length && !ba.length) $('dsBest').appendChild(el('small', '', 'لا توجد بيانات كافية.'));
+  const wa = sortBy(S.filter(x => x.avg != null && x.avg < 7), 'avg', 1).slice(0, 5), wb = sortBy(S.filter(x => x.absent), 'absent', -1).slice(0, 5);
+  if (wb.length){ $('dsWeak').appendChild(el('label', '', 'الأكثر غياباً')); rk('dsWeak', wb, x => x.absent + ' غياب'); }
+  if (wa.length){ $('dsWeak').appendChild(el('label', '', 'الأقل درجات')); rk('dsWeak', wa, x => x.avg + '/' + D.maxScore); }
+  if (!wa.length && !wb.length) $('dsWeak').appendChild(el('small', '', 'لا يوجد من يحتاج متابعة في هذه الفترة. 👍'));
+}
+function dsStuTable(){
+  const t = $('dsStuT'); t.innerHTML = ''; dsHead(t, DS_SCOLS, 'stu', dsStuTable);
+  const q = normAr($('dsQ').value), list = sortBy(DS.students.filter(x => !q || normAr(x.name).indexOf(q) !== -1), dsSort.stu[0], dsSort.stu[1]), tb = el('tbody');
+  list.forEach(x => { const tr = el('tr'), nm = el('td', 'nm', x.name + (x.st ? ' (' + x.st + ')' : '')); nm.onclick = () => goFile(x.sid); tr.appendChild(nm);
+    [[x.hname], [x.att == null ? '—' : x.att + '%', lvAtt(x.att)], [x.absent, x.absent ? 'lv-r' : ''], [x.late], [x.hifz], [x.mur], [x.avg == null ? '—' : x.avg, lvAvg(x.avg)], [x.plan == null ? '—' : x.plan + '%', lvPl(x.plan)], [x.stars], [x.points], [x.refs]]
+      .forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tb.appendChild(tr); });
+  if (!list.length){ const tr = el('tr'), td = el('td', '', 'لا يوجد طلاب.'); td.colSpan = DS_SCOLS.length; tr.appendChild(td); tb.appendChild(tr); }
+  t.appendChild(tb);
+}
+$('dsPrev').onclick = () => dsShift(-1); $('dsNext').onclick = () => dsShift(1); $('dsRef').onclick = loadDash;
+['dsHal', 'dsStage', 'dsSt', 'dsFrom', 'dsTo'].forEach(id => $(id).onchange = loadDash);
+$('dsQ').oninput = () => DS && dsStuTable();
+function dsTitle(){ return 'شاشة عرض المجمع — ' + $('dsLbl').textContent + ($('dsHal').value ? ' — ' + $('dsHal').selectedOptions[0].textContent : ''); }
+/* تصدير Excel: ملف xlsx حقيقي (بلا مكتبات خارجية) بورقتين: الحلقات والطلاب */
+function xlsxBlob(sheets){
+  const esc = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const col = i => { let s = ''; i++; while (i){ const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+  const sheetXml = rows => { const w = rows[0].map((_, i) => Math.min(40, Math.max(8, ...rows.map(r => String(r[i] == null ? '' : r[i]).length + 2))));
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0" rightToLeft="1"><pane ySplit="2" topLeftCell="A3" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>' +
+      w.map((x, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + x + '" customWidth="1"/>').join('') + '</cols><sheetData>' +
+      rows.map((r, ri) => '<row r="' + (ri + 1) + '">' + r.map((v, ci) => { const ref = col(ci) + (ri + 1), st = ri === 0 ? ' s="2"' : ri === 1 ? ' s="1"' : '';
+        if (v == null || v === '') return '<c r="' + ref + '"' + st + '/>';
+        return typeof v === 'number' ? '<c r="' + ref + '"' + st + '><v>' + v + '</v></c>' : '<c r="' + ref + '" t="inlineStr"' + st + '><is><t>' + esc(v) + '</t></is></c>'; }).join('') + '</row>').join('') +
+      '</sheetData>' + (rows[0].length > 1 ? '<mergeCells count="1"><mergeCell ref="A1:' + col(rows[1].length - 1) + '1"/></mergeCells>' : '') + '</worksheet>'; };
+  const files = [
+    ['[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + sheets.map((s, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '</Types>'],
+    ['_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+    ['xl/workbook.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets>' + sheets.map((s, i) => '<sheet name="' + esc(s[0]) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets></workbook>'],
+    ['xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + sheets.map((s, i) => '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+    ['xl/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="13"/><color rgb="FF2C4A60"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF3B5F78"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>']
+  ].concat(sheets.map((s, i) => ['xl/worksheets/sheet' + (i + 1) + '.xml', sheetXml(s[1])]));
+  // ملف zip مخزّن (بلا ضغط) مع CRC32
+  const enc = new TextEncoder(), crcT = (() => { const t = []; for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  const crc = b => { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = crcT[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  const parts = [], cen = []; let off = 0;
+  const u16 = n => [n & 255, (n >>> 8) & 255], u32 = n => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
+  files.forEach(f => { const nm = enc.encode(f[0]), data = enc.encode(f[1]), c = crc(data);
+    const lh = new Uint8Array([...u32(0x04034b50), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21), ...u32(c), ...u32(data.length), ...u32(data.length), ...u16(nm.length), ...u16(0)]);
+    parts.push(lh, nm, data);
+    cen.push(new Uint8Array([...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21), ...u32(c), ...u32(data.length), ...u32(data.length), ...u16(nm.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(off)]), nm);
+    off += lh.length + nm.length + data.length; });
+  const cs = cen.reduce((m, x) => m + x.length, 0);
+  const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length), ...u32(cs), ...u32(off), ...u16(0)]);
+  return new Blob([...parts, ...cen, end], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+$('dsXls').onclick = () => {
+  if (!DS) return;
+  const t = dsTitle(), hal = [[t], DS_HCOLS.map(c => c[1])].concat(DS.halaqat.map(h => [h.name, h.teacher, h.students, h.att, h.absent, h.late, h.hifz, h.mur, h.recs, h.avg, hAppr(h)]));
+  const stu = [[t], ['رقم الطالب'].concat(DS_SCOLS.map(c => c[1])).concat(['المرحلة', 'الحالة'])].concat(sortBy(DS.students, 'hname', 1).map(x => [Number(x.sid) || x.sid, x.name, x.hname, x.att, x.absent, x.late, x.hifz, x.mur, x.avg, x.plan, x.stars, x.points, x.refs, x.stage, x.st || 'نشط']));
+  const K = DS.kpi, sum = [[t], ['المؤشر', 'القيمة'], ['عدد الطلاب', K.students], ['نسبة الحضور %', K.att], ['حالات الغياب', K.absent], ['حالات التأخر', K.late], ['آيات الحفظ', K.hifz], ['آيات المراجعة', K.mur], ['مرات التسميع', K.recs], ['متوسط الدرجات', K.avg], ['اعتمادات الحلقات', K.approvals + '/' + K.apprNeed], ['المنقطعون الآن', K.excluded], ['الإحالات والترشيحات', K.refs], ['طلبات التسجيل', K.apps]];
+  const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['الملخص', sum], ['الحلقات', hal], ['الطلاب', stu]])); a.download = 'شاشة-عرض-المجمع-' + DS.from + (DS.to !== DS.from ? '_' + DS.to : '') + '.xlsx';
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel');
+};
+$('dsPdf').onclick = () => {
+  if (!DS) return;
+  const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'شاشة عرض المجمع')); l.appendChild(el('div', '', $('dsLbl').textContent + ($('dsHal').value ? ' • ' + $('dsHal').selectedOptions[0].textContent : '')));
+  hd.appendChild(l); hd.appendChild(el('div', '', DS.org)); p.appendChild(hd);
+  const K = DS.kpi; p.appendChild(el('div', '', ['الطلاب: ' + K.students, 'الحضور: ' + (K.att == null ? '—' : K.att + '%'), 'الغياب: ' + K.absent, 'التأخر: ' + K.late, 'الحفظ: ' + K.hifz + ' آية', 'المراجعة: ' + K.mur + ' آية', 'متوسط الدرجات: ' + (K.avg == null ? '—' : K.avg), 'الاعتماد: ' + K.approvals + '/' + K.apprNeed, 'المنقطعون: ' + K.excluded].join('  |  ')));
+  const tbl = (title, head, rows) => { p.appendChild(el('h3', '', title)); const t = el('table'), tr = el('tr'); head.forEach(h => tr.appendChild(el('th', '', h))); t.appendChild(tr); rows.forEach(r => { const x = el('tr'); r.forEach(v => x.appendChild(el('td', '', v == null ? '—' : v))); t.appendChild(x); }); p.appendChild(t); };
+  tbl('الحلقات', DS_HCOLS.map(c => c[1]), DS.halaqat.map(h => [h.name, h.teacher, h.students, h.att == null ? null : h.att + '%', h.absent, h.late, h.hifz, h.mur, h.recs, h.avg, hAppr(h)]));
+  tbl('تقرير الطلاب الشامل', DS_SCOLS.map(c => c[1]), sortBy(DS.students, 'hname', 1).map(x => [x.name, x.hname, x.att == null ? null : x.att + '%', x.absent, x.late, x.hifz, x.mur, x.avg, x.plan == null ? null : x.plan + '%', x.stars, x.points, x.refs]));
+  setTimeout(() => window.print(), 50);
+};
+
 /* ---------- نقل الطلاب بين الحلقات ---------- */
 let MV = null, mvSelSet = new Set(), mvWhyBox = null, mvMode = 'a', mvB = {};
 document.querySelectorAll('#mvMode button').forEach(b => b.onclick = () => { mvMode = b.dataset.m; document.querySelectorAll('#mvMode button').forEach(x => x.classList.toggle('on', x === b));
@@ -2575,7 +2799,7 @@ function sfSection(k, box, print){
   }
 }
 function sfPrint(){
-  const p = $('sfPrint'), I = SF.info; p.innerHTML = '';
+  const p = $('sfPrint'), I = SF.info; p.innerHTML = ''; $('dsPrint').innerHTML = '';
   const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'ملف الطالب: ' + I.name)); l.appendChild(el('div', '', ['رقم الطالب ' + I.sid, I.hname, I.teacher && 'المعلم: ' + I.teacher].filter(Boolean).join(' • ')));
   hd.appendChild(l); hd.appendChild(el('div', '', ($('orgName').textContent || '') + ' — ' + D.today)); p.appendChild(hd);
   p.appendChild(el('div', '', sfStats().map(x => x[1] + ': ' + x[0]).join('   |   ')));
