@@ -729,7 +729,8 @@
         <h2 id="asTitle">اختبارات الجمعية</h2>
         <small id="asSub"></small>
         <div class="stchips" id="asTabs"></div>
-        <div class="stact"><button class="good" id="asAdd">+ إضافة طلاب للاختبار الداخلي</button><button id="asXls">تصدير Excel</button></div>
+        <div class="stchips hidden" id="asDates"></div>
+        <div class="stact"><button class="good" id="asAdd">+ إضافة طلاب للاختبار الداخلي</button><button id="asXls">تصدير Excel</button><button id="asPdf" class="hidden">طباعة / PDF</button></div>
         <input id="asQ" placeholder="ابحث باسم الطالب أو الحلقة" style="margin-top:8px">
       </div>
       <div class="card" id="asBox"></div>
@@ -1805,6 +1806,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1){ TABS.push(['msgs', 'رسائل أولياء الأمور']); TABS.push(['msgsStu', 'رسائل الطلاب']); TABS.push(['msgsStaff', 'رسائل الموظفين']); TABS.push(['msgArc', 'أرشيف الرسائل']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['preTest', 'الاختبار قبل الترشيح']); TABS.push(['assocNom', 'ترشيحات الجمعية']); TABS.push(['strug', 'الطلاب المتعثرون']); TABS.push(['planF', 'متابعة الخطط']); }
+  else if (r.roles.indexOf('admin') === -1 && P.indexOf('assoc.nominate') !== -1) TABS.push(['assocNom', 'ترشيحات الجمعية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
@@ -2616,20 +2618,26 @@ $('hlSave').onclick = async () => {
 };
 
 /* ---------- اختبارات الجمعية: الاختبار الداخلي والترشيح ---------- */
-let AX = null, asT = 'wait', asMode = 'preTest', asAct = null;
-const AS_TABS = { preTest:[['wait', 'بانتظار الاختبار الداخلي'], ['pass', 'اجتازوا الداخلي'], ['fail', 'لم يجتازوا']], assocNom:[['pass', 'جاهزون للترشيح'], ['nom', 'مرشحون للجمعية'], ['ok', 'اجتازوا الجمعية'], ['no', 'لم يجتازوا الجمعية']] };
+let AX = null, asT = 'wait', asMode = 'preTest', asAct = null, asDate = '';
+const AS_TABS = { preTest:[['wait', 'بانتظار الاختبار الداخلي'], ['pass', 'اجتازوا الداخلي'], ['fail', 'لم يجتازوا']], assocNom:[['nom', 'المرشحون'], ['ok', 'اجتازوا الجمعية'], ['no', 'لم يجتازوا الجمعية'], ['pass', 'اجتازوا الداخلي']] };
 async function openAssoc(mode){
   if (mode !== asMode){ asMode = mode; asT = AS_TABS[mode][0][0]; }
   $('asTitle').textContent = mode === 'preTest' ? 'اختبار طالب قبل الترشيح' : 'ترشيح الطلاب لاختبارات الجمعية';
-  $('asSub').textContent = mode === 'preTest' ? 'يُختبر الطالب داخلياً أولاً، ومن يجتاز يصبح جاهزاً للترشيح للجمعية.' : 'ترشيح من اجتاز الاختبار الداخلي لاختبار الجمعية، ورصد نتيجته وشهادته.';
-  $('asAdd').classList.toggle('hidden', mode !== 'preTest');
+  $('asSub').textContent = mode === 'preTest' ? 'اختبار داخلي اختياري يسبق الترشيح، ومن يجتازه يظهر بعلامة ✓ عند الترشيح.' : 'اختر الحلقات ثم الطلاب والمرحلية وموعد الاختبار، ثم صدّر قائمة المرشحين للجمعية.';
+  $('asAdd').classList.add('hidden');
   $('asBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'assoc' }, 'asBox'); if (r && r.ok){ AX = r; renderAssoc(); }
 }
 function renderAssoc(){
+  $('asAdd').textContent = asMode === 'preTest' ? '+ إضافة طلاب للاختبار الداخلي' : '+ ترشيح طلاب';
+  $('asAdd').classList.toggle('hidden', asMode === 'assocNom' && !AX.canNom);
+  const isNom = asMode === 'assocNom' && asT === 'nom', dts = [...new Set(AX.list.filter(x => x.status === AX.st.nom).map(x => x.examDate || ''))].sort();
+  if (asDate && dts.indexOf(asDate) === -1) asDate = ''; const dc = $('asDates'); dc.innerHTML = ''; dc.classList.toggle('hidden', !isNom || dts.length < 1); $('asPdf').classList.toggle('hidden', !isNom);
+  if (isNom){ const a = el('button', asDate ? '' : 'on', 'كل المواعيد'); a.onclick = () => { asDate = ''; renderAssoc(); }; dc.appendChild(a);
+    dts.forEach(d => { const n = AX.list.filter(x => x.status === AX.st.nom && (x.examDate || '') === d).length, b = el('button', asDate === d ? 'on' : '', (d || 'بلا موعد') + ' (' + n + ')'); b.onclick = () => { asDate = d; renderAssoc(); }; dc.appendChild(b); }); }
   const st = AX.st, tb = $('asTabs'); tb.innerHTML = '';
   AS_TABS[asMode].forEach(t => { const n = AX.list.filter(x => x.status === st[t[0]]).length; const b = el('button', asT === t[0] ? 'on' : '', t[1] + ' (' + n + ')'); b.onclick = () => { asT = t[0]; renderAssoc(); }; tb.appendChild(b); });
   const q = normAr($('asQ').value), box = $('asBox'); box.innerHTML = '';
-  const list = AX.list.filter(x => x.status === st[asT] && (!q || normAr(x.sname + ' ' + x.hname).indexOf(q) !== -1));
+  const list = asList().filter(x => !q || normAr(x.sname + ' ' + x.hname).indexOf(q) !== -1);
   if (!list.length) return box.appendChild(el('small', '', 'لا يوجد طلاب في هذا التصنيف.'));
   list.forEach(x => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', x.sname)); w.appendChild(tp);
     const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill p-late', x.level)); pl.appendChild(el('span', 'pill ' + (/اجتاز/.test(x.status) && !/لم/.test(x.status) ? 'p-ok' : /لم/.test(x.status) ? 'p-red' : 'p-none'), x.status)); w.appendChild(pl);
@@ -2638,18 +2646,39 @@ function renderAssoc(){
     if (x.cert){ const a = el('a', '', 'الشهادة'); if (/^https?:/.test(x.cert)){ a.href = x.cert; a.target = '_blank'; } else a.textContent = 'الشهادة: ' + x.cert; w.appendChild(a); }
     const ac = el('div', 'stact'), b = (t, cls, fn) => { const y = el('button', cls, t); y.onclick = fn; ac.appendChild(y); };
     if (asT === 'wait') b('تسجيل الاختبار الداخلي', 'good', () => asSheet('pre', x));
-    if (asT === 'pass' && asMode === 'assocNom') b('ترشيح للجمعية', 'good', () => asSheet('nom', x));
+    if (asT === 'pass' && asMode === 'assocNom' && AX.canNom) b('ترشيح للجمعية', 'good', () => asSheet('nom', x));
     if (asT === 'nom') b('تسجيل نتيجة الجمعية', 'good', () => asSheet('result', x));
     if (asT === 'fail') b('إعادة الاختبار الداخلي', '', () => asDo('retry', x.id, {}));
     b('الملف', '', () => goFile(x.sid)); if (asT === 'wait' || asT === 'fail') b('حذف', 'danger', () => { if (confirm('حذف ' + x.sname + ' من القائمة؟')) asDo('del', x.id, {}); });
     w.appendChild(ac); box.appendChild(w); });
 }
 $('asQ').oninput = () => AX && renderAssoc();
+const asList = () => AX.list.filter(x => x.status === AX.st[asT] && (asT !== 'nom' || asMode !== 'assocNom' || !asDate || (x.examDate || '') === asDate));
 async function asDo(op, id, data, box){ const r = await cpCall({ action:'assocSave', op:op, id:id, data:data }, box || 'asBox'); if (r && r.ok){ AX = r; toast(r.msg); $('asSheet').classList.add('hidden'); renderAssoc(); } return r; }
 function asSheet(op, x){
   asAct = { op:op, x:x }; msg('asShMsg', '', ''); const b = $('asShBody'); b.innerHTML = ''; const F = {};
   const inp = (l, type, val, attrs) => { b.appendChild(lab(l)); const i = el(type === 'textarea' ? 'textarea' : 'input'); if (type !== 'textarea') i.type = type; if (val) i.value = val; Object.assign(i, attrs || {}); b.appendChild(i); return i; };
-  if (op === 'add'){
+  if (op === 'nomMany'){
+    $('asShT').textContent = 'ترشيح طلاب لاختبار الجمعية';
+    F.examDate = inp('تاريخ الاختبار *', 'date', asDate || '');
+    b.appendChild(lab('الحلقات', true)); const hs = selBox(AX.halaqat.map(h => h.name), true); b.appendChild(hs);
+    const allH = el('button', 'mini', 'كل الحلقات'); allH.type = 'button'; allH.onclick = () => { hs.set(AX.halaqat.map(h => h.name)); draw(); }; b.appendChild(allH);
+    const bulk = el('div', 'dsh-f'); bulk.style.gridTemplateColumns = '1fr auto'; const bl = el('select'); [''].concat(AX.levels).forEach(l => { const o = el('option', '', l || 'مرحلية واحدة لكل المحددين...'); o.value = l; bl.appendChild(o); });
+    const ba = el('button', 'mini', 'تطبيق'); ba.type = 'button'; bulk.appendChild(bl); bulk.appendChild(ba); b.appendChild(bulk);
+    const cnt = el('div', 'slabel'); b.appendChild(cnt); const lst = el('div'); b.appendChild(lst); const sel = {}, lv = {};
+    const upd = () => { const n = Object.keys(sel).length; cnt.textContent = n ? 'المحددون: ' + n + ' طالب' : 'اختر حلقة أو أكثر ثم حدّد الطلاب'; };
+    const draw = () => { lst.innerHTML = ''; const on = hs.get();
+      AX.halaqat.filter(h => on.indexOf(h.name) !== -1).forEach(h => { const ss = AX.students.filter(s => s.hid === h.hid); const hd = el('div', 'rfsec', h.name + ' (' + ss.length + ')');
+        const all = el('button', 'mini', 'تحديد الكل'); all.type = 'button'; all.style.marginInlineStart = '8px'; all.onclick = () => { const every = ss.every(s => sel[s.sid]); ss.forEach(s => every ? delete sel[s.sid] : sel[s.sid] = 1); draw(); }; hd.appendChild(all); lst.appendChild(hd);
+        const box = el('div', 'stlist'); ss.forEach(s => { const l = el('label'), c = el('input'); c.type = 'checkbox'; c.checked = !!sel[s.sid]; c.onchange = () => { c.checked ? sel[s.sid] = 1 : delete sel[s.sid]; upd(); };
+          const nm = el('span', '', s.name + (s.pre ? ' ✓' : '')); nm.title = s.pre ? 'اجتاز الاختبار الداخلي: ' + s.pre : ''; l.appendChild(c); l.appendChild(nm);
+          const ls = el('select'); ls.style.cssText = 'width:auto;max-width:150px;padding:6px 8px;font-size:13px;margin:0;margin-inline-start:auto'; [''].concat(AX.levels).forEach(x => { const o = el('option', '', x || 'المرحلية'); o.value = x; ls.appendChild(o); });
+          ls.value = lv[s.sid] || s.tStage || s.pre || ''; lv[s.sid] = ls.value; ls.onclick = e => e.stopPropagation(); ls.onchange = () => { lv[s.sid] = ls.value; if (ls.value && !sel[s.sid]){ sel[s.sid] = 1; c.checked = true; upd(); } }; l.appendChild(ls); box.appendChild(l); });
+        lst.appendChild(box); }); upd(); };
+    hs.onpick = draw; ba.onclick = () => { if (!bl.value) return; Object.keys(sel).forEach(k => lv[k] = bl.value); draw(); };
+    if (AX.halaqat.length === 1){ hs.set([AX.halaqat[0].name]); } draw();
+    F.items = () => Object.keys(sel).map(k => ({ sid:k, level:lv[k] || '' })); F.notes = inp('ملاحظات (اختياري)', 'text', '');
+  } else if (op === 'add'){
     $('asShT').textContent = 'إضافة طلاب للاختبار الداخلي';
     b.appendChild(lab('المستوى', true)); const lv = selBox(AX.levels); b.appendChild(lv); F.level = lv.get;
     const q = inp('الطلاب', 'text', '', { placeholder:'ابحث بالاسم' }); const lst = el('div', 'stlist'); b.appendChild(lst); const sel = new Set();
@@ -2667,20 +2696,31 @@ function asSheet(op, x){
   }
   asAct.F = F; $('asSheet').classList.remove('hidden');
 }
-$('asAdd').onclick = () => AX && asSheet('add', null); $('asClose').onclick = () => $('asSheet').classList.add('hidden');
+$('asAdd').onclick = () => AX && asSheet(asMode === 'preTest' ? 'add' : 'nomMany', null); $('asClose').onclick = () => $('asSheet').classList.add('hidden');
 $('asShSave').onclick = async () => {
   const F = asAct.F, d = {}; Object.keys(F).forEach(k => d[k] = typeof F[k] === 'function' ? F[k]() : F[k].value.trim());
-  if (asAct.op === 'add' && (!d.level || !d.sids.length)) return msg('asShMsg', 'اختر المستوى والطلاب.', 'err');
+  if (asAct.op === 'add' && (!d.level || !d.sids.length)) return msg('asShMsg', 'اختر المرحلية والطلاب.', 'err');
+  if (asAct.op === 'nomMany'){ if (!d.examDate) return msg('asShMsg', 'حدد تاريخ الاختبار.', 'err'); if (!d.items.length) return msg('asShMsg', 'حدد طالباً واحداً على الأقل.', 'err');
+    const miss = d.items.filter(x => !x.level).length; if (miss) return msg('asShMsg', 'حدد المرحلية لكل طالب محدد (' + miss + ' بدون مرحلية).', 'err'); }
   if (asAct.op === 'pre' && !(d.score !== '' && +d.score >= 0 && +d.score <= 100)) return msg('asShMsg', 'اكتب الدرجة من 0 إلى 100.', 'err');
   if (asAct.op === 'result' && !d.result) return msg('asShMsg', 'اختر النتيجة.', 'err');
-  $('asShSave').disabled = true; await asDo(asAct.op, asAct.x ? asAct.x.id : '', d, 'asShMsg'); $('asShSave').disabled = false;
+  $('asShSave').disabled = true; const r = await asDo(asAct.op, asAct.x ? asAct.x.id : '', d, 'asShMsg'); $('asShSave').disabled = false;
+  if (r && r.ok && asAct.op === 'nomMany'){ asT = 'nom'; asDate = r.examDate || ''; renderAssoc(); }
 };
 $('asXls').onclick = () => {
-  if (!AX) return; const list = AX.list.filter(x => x.status === AX.st[asT]);
+  if (!AX) return; const list = asList();
+  if (asMode === 'assocNom' && asT === 'nom'){ const rows = [['المرشحون لاختبارات الجمعية' + (asDate ? ' — موعد الاختبار ' + asDate : '')], ['م', 'اسم الطالب', 'رقم الهوية', 'الحلقة', 'المرحلية', 'تاريخ الاختبار']].concat(asSorted(list).map((x, i) => [i + 1, x.sname, x.nid, x.hname, x.level, x.examDate]));
+    const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['المرشحون', rows]])); a.download = 'مرشحو-الجمعية' + (asDate ? '-' + asDate : '') + '.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); return toast('جاري تنزيل ملف Excel'); }
   const rows = [[$('asTitle').textContent + ' — ' + AS_TABS[asMode].find(t => t[0] === asT)[1]], ['رقم الطالب', 'الطالب', 'الحلقة', 'المستوى', 'الحالة', 'الدرجة الداخلية', 'تاريخ الترشيح', 'موعد الجمعية', 'النتيجة', 'الدرجة', 'الشهادة']]
     .concat(list.map(x => [Number(x.sid) || x.sid, x.sname, x.hname, x.level, x.status, x.preScore, x.nomDate, x.examDate, x.result, x.score, x.cert]));
   const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['الطلاب', rows]])); a.download = 'اختبارات-الجمعية.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel');
 };
+const asSorted = l => l.slice().sort((a, b) => (a.examDate || '').localeCompare(b.examDate || '') || a.hname.localeCompare(b.hname, 'ar') || a.sname.localeCompare(b.sname, 'ar'));
+$('asPdf').onclick = () => { if (!AX) return; const list = asSorted(asList()), p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'قائمة المرشحين لاختبارات الجمعية')); l.appendChild(el('div', '', (asDate ? 'موعد الاختبار: ' + asDate + ' • ' : '') + 'عدد الطلاب: ' + list.length)); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
+  const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>الحلقة</th><th>المرحلية</th><th>تاريخ الاختبار</th></tr></thead>'; const tb = el('tbody');
+  list.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.hname, x.level, x.examDate].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
+  setTimeout(() => window.print(), 50); };
 /* ---------- الطلاب المتعثرون ---------- */
 let SG = null, sgP = 'month', sgSeq = 0;
 function openStrug(){
