@@ -181,6 +181,44 @@
   .cptab td small{display:block;color:var(--muted);font-size:12px}
   .cptab tr.top1 td.rk,.cptab tr.top2 td.rk,.cptab tr.top3 td.rk{font-size:20px}
   @media (max-width:560px){ #pCompete .fgrid > div{grid-column:1/-1} }
+  .cptabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .cptabs button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:58px;padding:8px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);color:var(--text);font:inherit;font-size:15px;font-weight:600;cursor:pointer;text-align:center}
+  .cptabs button svg{width:22px;height:22px;flex:none;color:var(--gold2)}
+  .cptabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .cptabs button.on svg{color:#F3D9AE}
+  .cptabs .bdg{background:var(--red);color:#fff;border-radius:99px;font-size:12px;padding:0 7px;min-width:20px}
+  @media (max-width:560px){ .cptabs{grid-template-columns:1fr 1fr} .cptabs button{font-size:14px;min-height:54px} }
+  .cph{margin:0 0 4px;font-size:17px;color:var(--navy)}
+  @media (prefers-color-scheme: dark){ .cph{color:#E8B867} }
+  .cpbar{display:flex;align-items:center;gap:8px} .cpbar .cph{flex:1}
+  .shop{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+  @media (max-width:760px){ .shop{grid-template-columns:1fr 1fr;gap:10px} }
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 14px rgba(20,40,60,.06)}
+  .pcard.off{opacity:.55}
+  .pimg{aspect-ratio:1/1;background:linear-gradient(145deg,var(--goldlight),var(--light));display:flex;align-items:center;justify-content:center;position:relative}
+  .pimg img{width:100%;height:100%;object-fit:cover}
+  .pimg svg{width:46%;height:46%;color:var(--gold)}
+  .pimg .tag{position:absolute;top:8px;right:8px;background:rgba(31,53,70,.85);color:#fff;font-size:11.5px;border-radius:99px;padding:2px 9px}
+  .pimg .tag.out{background:var(--red)}
+  .pbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+  .pbody b{font-size:15.5px}
+  .pbody .d{font-size:12.5px;color:var(--muted);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .price{display:inline-flex;align-items:center;gap:4px;background:var(--goldlight);color:var(--gold2);font-weight:700;border-radius:99px;padding:3px 10px;font-size:14px;width:max-content;margin-top:2px}
+  .price svg{width:14px;height:14px}
+  .pact{display:flex;gap:6px;margin-top:auto;padding-top:8px}
+  .pact .buy{flex:1;border:0;border-radius:10px;background:var(--navy);color:#fff;font:inherit;font-size:14px;font-weight:700;padding:8px 4px;white-space:nowrap;cursor:pointer}
+  @media (max-width:430px){ .pimg{aspect-ratio:4/3} .pact .ib{width:32px} .pact .buy{font-size:13px} }
+  .pact .buy:disabled{opacity:.45}
+  .pact .ib{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:10px;width:36px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .pact .ib svg{width:16px;height:16px} .pact .ib.danger{color:var(--red)}
+  .addrow{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .addrow:last-child{border-bottom:0}
+  .addrow .nm{flex:1;min-width:140px} .addrow .nm small{display:block;color:var(--muted);font-size:12.5px}
+  .addrow .frm{display:flex;gap:6px;width:100%;margin-top:4px}
+  .addrow .frm input{padding:8px 10px;font-size:15px} .addrow .frm input[type=number]{width:90px;flex:none}
+  .dangerzone{border-color:rgba(179,38,30,.35)}
+  .btn.red{background:var(--red)}
+  label.chk{display:flex;align-items:center;gap:8px;color:var(--text)} label.chk input{width:auto}
   .cpsum{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:13px;color:var(--muted)}
   .warnbox{background:var(--errbg);color:var(--red);border-radius:10px;padding:6px 10px;font-size:13px;margin-top:6px}
   .edgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
@@ -497,14 +535,73 @@
     <div id="pCompete" class="hidden">
       <div class="card">
         <h2>المنافس</h2>
-        <small>نقاط فرسان الحلقات: كل مرة يُختار فيها الطالب فارساً لحلقته عند اعتماد اليوم = نقطة، وتُجمع تلقائياً.</small>
-        <div class="stchips" id="cpPeriod"></div>
-        <div class="fgrid" style="grid-template-columns:1fr 1fr">
-          <div><label for="cpHal">الحلقة</label><select id="cpHal"></select></div>
-          <div><label for="cpQ">بحث باسم الطالب</label><input id="cpQ" autocomplete="off"></div>
+        <small>نقاط الطلاب ومتجر الجوائز: فارس الحلقة = نقطة، ويمكن إضافة نقاط يدوياً، ويشتري الطالب بنقاطه من المتجر.</small>
+        <div class="cptabs" id="cpTabs"></div>
+      </div>
+
+      <div id="cpBank" class="cpsec">
+        <div class="card">
+          <h3 class="cph">رصيد بنك نقاط الطلاب</h3>
+          <div class="stchips" id="cpPeriod"></div>
+          <div class="fgrid" style="grid-template-columns:1fr 1fr">
+            <div><label for="cpHal">الحلقة</label><select id="cpHal"></select></div>
+            <div><label for="cpQ">بحث باسم الطالب</label><input id="cpQ" autocomplete="off"></div>
+          </div>
+        </div>
+        <div class="card" id="cpList"></div>
+      </div>
+
+      <div id="cpStore" class="cpsec hidden">
+        <div class="card">
+          <div class="cpbar"><h3 class="cph">متجر الجوائز</h3><button class="mini" id="stAdd">+ إضافة صنف</button></div>
+          <small id="stNote">أصناف المتجر وأسعارها بالنقاط. يشتري الطالب ما يناسب رصيده، وتصل طلباته إلى «طلبات الجوائز».</small>
+          <input id="stQ" placeholder="ابحث عن صنف" style="margin-top:10px">
+        </div>
+        <div class="shop" id="stGrid"></div>
+      </div>
+
+      <div id="cpAdd" class="cpsec hidden">
+        <div class="card">
+          <h3 class="cph">إضافة نقاط</h3>
+          <small>اختر الحلقة، ثم اضغط «إضافة نقاط» بجانب الطالب واكتب عدد النقاط.</small>
+          <label for="adHal">الحلقة</label><select id="adHal"></select>
+        </div>
+        <div class="card" id="adList"></div>
+      </div>
+
+      <div id="cpDel" class="cpsec hidden">
+        <div class="card">
+          <h3 class="cph">حذف أرصدة فترة</h3>
+          <small>تُحذف النقاط التي اكتسبها الطلاب بين التاريخين (فرسان الحلقات والنقاط المضافة)، وتنعكس على رصيدهم في المنافس.</small>
+          <div class="fgrid" style="grid-template-columns:1fr 1fr">
+            <div><label for="dlFrom">من تاريخ</label><input id="dlFrom" type="date"></div>
+            <div><label for="dlTo">إلى تاريخ</label><input id="dlTo" type="date"></div>
+          </div>
+          <button class="btn" id="dlGo">حذف أرصدة الفترة</button>
+        </div>
+        <div class="card dangerzone">
+          <h3 class="cph">تصفير النقاط</h3>
+          <small>يصبح رصيد جميع الطلاب صفراً، وتبدأ النقاط الجديدة من لحظة التصفير. السجلات السابقة تبقى محفوظة.</small>
+          <div class="muted" id="dlLast" style="font-size:13px;margin-top:6px"></div>
+          <button class="btn red" id="rsGo">تصفير نقاط جميع الطلاب</button>
         </div>
       </div>
-      <div class="card" id="cpList"></div>
+
+      <div id="cpOrders" class="cpsec hidden">
+        <div class="card">
+          <h3 class="cph">طلبات الجوائز</h3>
+          <small>الجوائز التي اشتراها الطلاب بنقاطهم وتنتظر التسليم. عند الرفض تعود النقاط للطالب.</small>
+        </div>
+        <div class="card" id="odList"></div>
+      </div>
+
+      <div id="cpRecv" class="cpsec hidden">
+        <div class="card">
+          <h3 class="cph">الجوائز المستلمة</h3>
+          <input id="rcQ" placeholder="ابحث باسم الطالب أو الجائزة" style="margin-top:8px">
+        </div>
+        <div class="card" id="rcList"></div>
+      </div>
     </div>
 
     <!-- رابط التسجيل العام -->
@@ -824,6 +921,35 @@
   </div>
 </div>
 
+<!-- صنف في المتجر -->
+<div class="sheet hidden" id="itSheet">
+  <div class="panel">
+    <div class="head"><h2 id="itTitle">إضافة صنف</h2><button class="iconbtn" id="itClose">إغلاق</button></div>
+    <div class="edgrid">
+      <div class="full"><label for="itName">اسم الصنف *</label><input id="itName" maxlength="60"></div>
+      <div class="full"><label for="itDesc">وصف مختصر</label><input id="itDesc" maxlength="300"></div>
+      <div><label for="itPrice">السعر بالنقاط *</label><input id="itPrice" type="number" min="1" step="1" inputmode="numeric"></div>
+      <div><label for="itStock">الكمية المتوفرة</label><input id="itStock" type="number" min="0" step="1" inputmode="numeric" placeholder="فارغ = غير محدودة"></div>
+      <div class="full"><label for="itImg">رابط صورة (اختياري)</label><input id="itImg" dir="ltr" placeholder="https://..."></div>
+      <div class="full"><label class="chk"><input type="checkbox" id="itOn" checked> متاح في المتجر</label></div>
+    </div>
+    <button class="btn" id="itSave">حفظ الصنف</button>
+    <div id="itMsg"></div>
+  </div>
+</div>
+
+<!-- طلب جائزة لطالب -->
+<div class="sheet hidden" id="byShe">
+  <div class="panel">
+    <div class="head"><h2>طلب جائزة لطالب</h2><button class="iconbtn" id="byClose">إلغاء</button></div>
+    <p id="byItem" style="margin:4px 0 6px;line-height:1.8"></p>
+    <label for="byHal">الحلقة</label><select id="byHal"></select>
+    <label for="byStu">الطالب</label><select id="byStu"></select>
+    <button class="btn" id="byGo">تأكيد الطلب وخصم النقاط</button>
+    <div id="byMsg"></div>
+  </div>
+</div>
+
 <!-- تأكيد -->
 <div class="sheet hidden" id="cfSheet">
   <div class="panel">
@@ -975,7 +1101,7 @@ async function loadHome(){
   if (r.roles.indexOf('teacher') !== -1 || r.roles.indexOf('admin') !== -1) TABS.push(['teach', 'التقييم']);
   if (P.indexOf('students.plans_all') !== -1) TABS.push(['plans', 'بناء الخطط التعليمية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.view_all') !== -1) TABS.push(['studentsList', 'بيانات الطلاب']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('competition.manage') !== -1) TABS.push(['compete', 'المنافس']);
+  if (r.roles.indexOf('admin') === -1 && (P.indexOf('competition.manage') !== -1 || P.indexOf('competition.store') !== -1)) TABS.push(['compete', 'المنافس']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.add') !== -1){ TABS.push(['studentNew', 'تسجيل طالب']); TABS.push(['regLink', 'رابط التسجيل']); TABS.push(['apps', 'طلبات المتقدمين']); }
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
@@ -1630,21 +1756,48 @@ async function openStudentNew(){
     else { const a = await api({ action:'apps' }); if (a.ok) fillSel('snHal', a.halaqat.map(h => [h.hid, h.name]), '— اختر الحلقة —'); else msg('snMsg', a.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : a.msg, 'err'); }
   } catch(e){ if (e.message !== 'expired') msg('snMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
 }
-/* ---------- المنافس ---------- */
-let CP = null, cpP = 'all';
+/* ---------- المنافس: تبويبات داخل الصفحة ---------- */
+let CP = null, cpP = 'all', cpSec = 'bank';
 const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3 6.9 7.5.7-5.7 5 1.7 7.4L12 18l-6.5 4 1.7-7.4-5.7-5 7.5-.7z"/></svg>';
+const CPI = {
+  store:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M10 20v-5h4v5"/></svg>',
+  add:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
+  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>',
+  bank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/></svg>',
+  orders:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18"/><path d="M12 8c-2-4-6-4-6-1s6 1 6 1 6 2 6-1-4-3-6 1"/></svg>',
+  recv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>',
+  gift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18"/><path d="M12 8c-2-4-6-4-6-1s6 1 6 1 6 2 6-1-4-3-6 1"/></svg>'
+};
+const CP_TABS = [['store', 'متجر الجوائز'], ['add', 'إضافة نقاط'], ['del', 'حذف نقاط'], ['bank', 'رصيد بنك نقاط الطلاب'], ['orders', 'طلبات الجوائز'], ['recv', 'الجوائز المستلمة']];
+const SEC_ID = { store:'cpStore', add:'cpAdd', del:'cpDel', bank:'cpBank', orders:'cpOrders', recv:'cpRecv' };
+function openCompete(){
+  const P = (D && D.perms) || [], adm = P.indexOf('*') !== -1, mng = adm || P.indexOf('competition.manage') !== -1, sto = adm || P.indexOf('competition.store') !== -1;
+  const tabs = CP_TABS.filter(t => t[0] === 'store' ? (mng || sto) : mng);
+  if (!tabs.some(t => t[0] === cpSec)) cpSec = tabs.length ? tabs[0][0] : 'bank';
+  const box = $('cpTabs'); box.innerHTML = '';
+  tabs.forEach(t => { const b = el('button', cpSec === t[0] ? 'on' : ''); b.innerHTML = CPI[t[0]]; b.appendChild(el('span', '', t[1])); b.dataset.k = t[0]; b.onclick = () => { cpSec = t[0]; openCompete(); }; box.appendChild(b); });
+  Object.keys(SEC_ID).forEach(k => $(SEC_ID[k]).classList.toggle('hidden', k !== cpSec));
+  ({ bank:openBank, store:openStore, add:openAdd, del:openDel, orders:openOrders, recv:openRecv })[cpSec]();
+}
+const needSrv = r => r && r.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : (r ? r.msg : '');
+async function cpCall(data, box){
+  try { const r = await api(data); if (!r.ok && box) msg(box, needSrv(r), 'err'); return r; }
+  catch(e){ if (e.message !== 'expired' && box) msg(box, 'تعذّر الاتصال بالخادم.', 'err'); return null; }
+}
+
+/* رصيد بنك نقاط الطلاب */
 function cpRange(){
   const t = (D && D.today) || new Date().toISOString().slice(0, 10), d = new Date(t + 'T00:00:00Z');
   if (cpP === 'month') return t.slice(0, 8) + '01';
   if (cpP === 'week'){ d.setUTCDate(d.getUTCDate() - d.getUTCDay()); return d.toISOString().slice(0, 10); }
   return '';
 }
-async function openCompete(){
+async function openBank(){
   const per = $('cpPeriod'); per.innerHTML = '';
-  [['all', 'منذ البداية'], ['month', 'هذا الشهر'], ['week', 'هذا الأسبوع']].forEach(x => { const b = el('button', cpP === x[0] ? 'on' : '', x[1]); b.onclick = () => { cpP = x[0]; openCompete(); }; per.appendChild(b); });
+  [['all', 'الرصيد الحالي'], ['month', 'مكتسب هذا الشهر'], ['week', 'مكتسب هذا الأسبوع']].forEach(x => { const b = el('button', cpP === x[0] ? 'on' : '', x[1]); b.onclick = () => { cpP = x[0]; openBank(); }; per.appendChild(b); });
   $('cpList').innerHTML = '<div class="msg info">جاري التحميل...</div>';
-  try { CP = await api({ action:'compete', from:cpRange() }); } catch(e){ if (e.message !== 'expired') msg('cpList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
-  if (!CP.ok) return msg('cpList', CP.msg === 'إجراء غير معروف' ? 'هذا الخيار يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : CP.msg, 'err');
+  const r = await cpCall({ action:'compete', from:cpRange() }, 'cpList'); if (!r || !r.ok) return;
+  CP = r;
   const cur = $('cpHal').value; fillSel('cpHal', CP.halaqat.map(h => [h.hid, h.name]), 'كل الحلقات'); $('cpHal').value = CP.halaqat.some(h => h.hid === cur) ? cur : '';
   renderCompete();
 }
@@ -1652,16 +1805,18 @@ function renderCompete(){
   const hal = $('cpHal').value, q = normAr($('cpQ').value), box = $('cpList'); box.innerHTML = '';
   const all = CP.list.filter(x => !hal || x.hid === hal);
   const list = all.filter(x => !q || normAr(x.name).indexOf(q) !== -1);
-  const sum = el('div', 'cpsum'); sum.appendChild(el('span', '', 'عدد الفرسان: ' + all.length)); sum.appendChild(el('span', '', '• مجموع النقاط: ' + all.reduce((n, x) => n + x.points, 0))); box.appendChild(sum);
-  if (!list.length) return box.appendChild(el('small', '', CP.list.length ? 'لا توجد نتائج.' : 'لا توجد نقاط بعد. تُضاف النقاط عند اختيار فارس الحلقة واعتماد تقييمات اليوم.'));
+  const sum = el('div', 'cpsum'); sum.appendChild(el('span', '', 'عدد الطلاب: ' + all.length)); sum.appendChild(el('span', '', '• مجموع النقاط: ' + all.reduce((n, x) => n + x.points, 0)));
+  if (CP.resetAt) sum.appendChild(el('span', '', '• آخر تصفير: ' + CP.resetAt.slice(0, 10).split('-').reverse().join('/'))); box.appendChild(sum);
+  if (!list.length) return box.appendChild(el('small', '', CP.list.length ? 'لا توجد نتائج.' : 'لا توجد نقاط بعد. تُضاف النقاط عند اختيار فارس الحلقة، أو من «إضافة نقاط».'));
   const tb = el('table', 'cptab'), hd = el('tr');
-  ['#', 'الطالب', hal ? '' : 'الحلقة', 'النقاط'].filter((x, i) => !(i === 2 && hal)).forEach(t => hd.appendChild(el('th', '', t))); tb.appendChild(hd);
+  ['#', 'الطالب', 'الحلقة', cpP === 'all' ? 'الرصيد' : 'النقاط'].filter((x, i) => !(i === 2 && hal)).forEach(t => hd.appendChild(el('th', '', t))); tb.appendChild(hd);
   let rank = 0, prev = null;
   all.forEach((x, i) => { if (x.points !== prev){ rank = i + 1; prev = x.points; } x.rank = rank; });
   list.forEach(x => {
-    const tr = el('tr', x.rank <= 3 ? 'top' + x.rank : '');
-    tr.appendChild(el('td', 'rk', x.rank === 1 ? '🥇' : x.rank === 2 ? '🥈' : x.rank === 3 ? '🥉' : x.rank));
-    const n = el('td'); n.appendChild(el('b', '', x.name)); if (x.last) n.appendChild(el('small', '', 'آخر مرة: ' + x.last.split('-').reverse().join('/') + (x.off ? ' • غير نشط' : ''))); tr.appendChild(n);
+    const tr = el('tr', x.rank <= 3 && x.points > 0 ? 'top' + x.rank : '');
+    tr.appendChild(el('td', 'rk', x.points > 0 && x.rank === 1 ? '🥇' : x.points > 0 && x.rank === 2 ? '🥈' : x.points > 0 && x.rank === 3 ? '🥉' : x.rank));
+    const n = el('td'); n.appendChild(el('b', '', x.name));
+    n.appendChild(el('small', '', 'فارس ' + x.stars + (x.added ? ' • مضاف ' + x.added : '') + (x.spent ? ' • مصروف ' + x.spent : '') + (x.off ? ' • غير نشط' : ''))); tr.appendChild(n);
     if (!hal) tr.appendChild(el('td', '', x.hname));
     const p = el('td', 'pt'), b = el('b'); b.innerHTML = STAR_SVG; b.appendChild(document.createTextNode(x.points)); p.appendChild(b); tr.appendChild(p);
     tb.appendChild(tr);
@@ -1670,6 +1825,153 @@ function renderCompete(){
 }
 $('cpHal').onchange = () => CP && CP.ok && renderCompete();
 $('cpQ').oninput = () => CP && CP.ok && renderCompete();
+
+/* متجر الجوائز */
+let ST = null, itCur = null, byItem = null;
+async function openStore(){
+  $('stGrid').innerHTML = '<div class="card"><div class="msg info">جاري التحميل...</div></div>';
+  const r = await cpCall({ action:'store' }); if (!r){ $('stGrid').innerHTML = ''; return; }
+  if (!r.ok){ $('stGrid').innerHTML = '<div class="card"><div class="msg err"></div></div>'; $('stGrid').querySelector('.msg').textContent = needSrv(r); return; }
+  ST = r; $('stAdd').classList.toggle('hidden', !ST.manage); renderStore();
+}
+function renderStore(){
+  const q = normAr($('stQ').value), g = $('stGrid'); g.innerHTML = '';
+  const items = ST.items.filter(x => (ST.manage || x.on) && (!q || normAr(x.name + ' ' + x.desc).indexOf(q) !== -1)).sort((a, b) => (b.on - a.on) || a.price - b.price);
+  if (!items.length){ const c = el('div', 'card'); c.appendChild(el('small', '', ST.items.length ? 'لا توجد نتائج.' : 'لا توجد أصناف بعد.' + (ST.manage ? ' اضغط «+ إضافة صنف».' : ''))); g.appendChild(c); g.style.display = 'block'; return; }
+  g.style.display = '';
+  items.forEach(x => {
+    const c = el('div', 'pcard' + (x.on ? '' : ' off')), im = el('div', 'pimg');
+    if (x.img){ const i = el('img'); i.src = x.img; i.alt = x.name; i.loading = 'lazy'; i.onerror = () => { i.remove(); im.insertAdjacentHTML('afterbegin', CPI.gift); }; im.appendChild(i); } else im.innerHTML = CPI.gift;
+    const out = x.stock !== null && x.stock < 1;
+    if (!x.on) im.appendChild(el('span', 'tag', 'مخفي')); else if (out) im.appendChild(el('span', 'tag out', 'نفدت الكمية')); else if (x.stock !== null) im.appendChild(el('span', 'tag', 'متبقي ' + x.stock));
+    c.appendChild(im);
+    const bd = el('div', 'pbody'); bd.appendChild(el('b', '', x.name)); if (x.desc) bd.appendChild(el('div', 'd', x.desc));
+    const pr = el('span', 'price'); pr.innerHTML = STAR_SVG; pr.appendChild(document.createTextNode(x.price + ' نقطة')); bd.appendChild(pr);
+    const ac = el('div', 'pact');
+    if (ST.order){ const bb = el('button', 'buy', 'طلب لطالب'); bb.disabled = !x.on || out; bb.onclick = () => openBuy(x); ac.appendChild(bb); }
+    if (ST.manage){
+      const e = el('button', 'ib'); e.title = 'تعديل'; e.innerHTML = ST_IC.edit; e.onclick = () => openItem(x); ac.appendChild(e);
+      const d = el('button', 'ib danger'); d.title = 'حذف'; d.innerHTML = ST_IC.trash; d.onclick = () => confirmOp('حذف ' + x.name, 'يُحذف الصنف من المتجر. الطلبات السابقة عليه تبقى كما هي.', 'حذف الصنف', async () => { const r = await cpCall({ action:'storeDel', id:x.id }); if (r){ toast(r.msg); if (r.ok) openStore(); } }); ac.appendChild(d);
+    }
+    bd.appendChild(ac); c.appendChild(bd); g.appendChild(c);
+  });
+}
+$('stQ').oninput = () => ST && renderStore();
+function openItem(x){
+  itCur = x || null; msg('itMsg', '', '');
+  $('itTitle').textContent = x ? 'تعديل صنف' : 'إضافة صنف';
+  $('itName').value = x ? x.name : ''; $('itDesc').value = x ? x.desc : ''; $('itPrice').value = x ? x.price : '';
+  $('itStock').value = x && x.stock !== null ? x.stock : ''; $('itImg').value = x ? x.img : ''; $('itOn').checked = x ? x.on : true;
+  $('itSheet').classList.remove('hidden'); $('itName').focus();
+}
+$('stAdd').onclick = () => openItem(null);
+$('itClose').onclick = () => $('itSheet').classList.add('hidden');
+$('itSave').onclick = async () => {
+  const item = { id:itCur ? itCur.id : '', name:$('itName').value.trim(), desc:$('itDesc').value.trim(), price:Number($('itPrice').value), stock:$('itStock').value.trim(), img:$('itImg').value.trim(), on:$('itOn').checked };
+  if (!item.name) return msg('itMsg', 'اكتب اسم الصنف.', 'err');
+  if (!(item.price >= 1)) return msg('itMsg', 'اكتب السعر بالنقاط.', 'err');
+  $('itSave').disabled = true; msg('itMsg', 'جاري الحفظ...', 'info');
+  const r = await cpCall({ action:'storeSave', item:item }, 'itMsg'); $('itSave').disabled = false;
+  if (r && r.ok){ $('itSheet').classList.add('hidden'); toast(r.msg); openStore(); }
+};
+async function openBuy(x){
+  byItem = x; msg('byMsg', '', '');
+  $('byItem').innerHTML = ''; $('byItem').appendChild(el('b', '', x.name)); $('byItem').appendChild(document.createTextNode(' — ' + x.price + ' نقطة'));
+  fillSel('byHal', (ST.halaqat || []).map(h => [h.hid, h.name]), '— اختر الحلقة —'); fillSel('byStu', [], '—');
+  $('byShe').classList.remove('hidden');
+}
+$('byHal').onchange = async () => {
+  fillSel('byStu', [], 'جاري التحميل...'); if (!$('byHal').value) return fillSel('byStu', [], '—');
+  const r = await cpCall({ action:'compStudents', hid:$('byHal').value }, 'byMsg'); if (!r || !r.ok) return;
+  fillSel('byStu', r.students.map(s => [s.sid, s.name + ' — ' + s.balance + ' نقطة' + (s.balance < byItem.price ? ' (لا يكفي)' : '')]), '— اختر الطالب —');
+  [...$('byStu').options].forEach((o, i) => { const s = r.students[i - 1]; if (s && s.balance < byItem.price) o.disabled = true; });
+};
+$('byClose').onclick = () => $('byShe').classList.add('hidden');
+$('byGo').onclick = async () => {
+  if (!$('byStu').value) return msg('byMsg', 'اختر الطالب.', 'err');
+  $('byGo').disabled = true; const r = await cpCall({ action:'orderCreate', sid:$('byStu').value, item:byItem.id }, 'byMsg'); $('byGo').disabled = false;
+  if (r && r.ok){ $('byShe').classList.add('hidden'); toast(r.msg); openStore(); }
+};
+
+/* إضافة نقاط */
+let AD = null;
+async function openAdd(){
+  if (!$('adHal').options.length || !CP){ const r = await cpCall({ action:'compete' }, 'adList'); if (!r || !r.ok) return; CP = r; }
+  const cur = $('adHal').value; fillSel('adHal', CP.halaqat.map(h => [h.hid, h.name]), '— اختر الحلقة —'); $('adHal').value = cur;
+  if (!cur) { $('adList').innerHTML = ''; $('adList').appendChild(el('small', '', 'اختر الحلقة لتظهر أسماء طلابها.')); } else loadAdd();
+}
+async function loadAdd(){
+  const box = $('adList'); box.innerHTML = '<div class="msg info">جاري التحميل...</div>';
+  const r = await cpCall({ action:'compStudents', hid:$('adHal').value }, 'adList'); if (!r || !r.ok) return;
+  box.innerHTML = '';
+  if (!r.students.length) return box.appendChild(el('small', '', 'لا يوجد طلاب في هذه الحلقة.'));
+  r.students.forEach(s => {
+    const w = el('div', 'addrow'), nm = el('div', 'nm'); nm.appendChild(el('b', '', s.name)); const bl = el('small', '', 'الرصيد: ' + s.balance + ' نقطة'); nm.appendChild(bl); w.appendChild(nm);
+    const open = el('button', 'mini', '+ إضافة نقاط'); w.appendChild(open);
+    const f = el('div', 'frm hidden'), n = el('input'); n.type = 'number'; n.min = 1; n.max = 1000; n.placeholder = 'النقاط'; n.inputMode = 'numeric';
+    const note = el('input'); note.placeholder = 'السبب (اختياري)'; note.maxLength = 200; const sv = el('button', 'mini', 'حفظ');
+    f.appendChild(n); f.appendChild(note); f.appendChild(sv); w.appendChild(f);
+    open.onclick = () => { f.classList.toggle('hidden'); if (!f.classList.contains('hidden')) n.focus(); };
+    sv.onclick = async () => {
+      const v = Number(n.value); if (!(v >= 1)) return toast('اكتب عدد النقاط');
+      sv.disabled = true; const x = await cpCall({ action:'pointsAdd', sid:s.sid, points:v, note:note.value.trim() }); sv.disabled = false;
+      if (!x) return; toast(needSrv(x) || x.msg);
+      if (x.ok){ bl.textContent = 'الرصيد: ' + x.balance + ' نقطة'; n.value = ''; note.value = ''; f.classList.add('hidden'); }
+    };
+    box.appendChild(w);
+  });
+}
+$('adHal').onchange = () => $('adHal').value ? loadAdd() : openAdd();
+
+/* حذف نقاط */
+async function openDel(){
+  const r = await cpCall({ action:'compete' }); if (r && r.ok){ CP = r; $('dlLast').textContent = r.resetAt ? 'آخر تصفير: ' + r.resetAt : 'لم تُصفّر النقاط من قبل.'; }
+}
+$('dlGo').onclick = () => {
+  const f = $('dlFrom').value, t = $('dlTo').value;
+  if (!f || !t || f > t) return toast('حدد الفترة: من تاريخ وإلى تاريخ');
+  confirmOp('حذف أرصدة الفترة', 'ستُحذف كل النقاط المكتسبة من ' + f.split('-').reverse().join('/') + ' إلى ' + t.split('-').reverse().join('/') + ' لجميع الطلاب، وتنعكس على أرصدتهم.', 'حذف أرصدة الفترة', async () => {
+    const x = await cpCall({ action:'pointsDelete', op:'range', from:f, to:t }); if (x) toast(needSrv(x) || x.msg);
+  });
+};
+$('rsGo').onclick = () => confirmOp('تصفير نقاط جميع الطلاب', 'سيصبح رصيد كل الطلاب صفراً، وتبدأ النقاط من جديد. لا يمكن التراجع عن التصفير.', 'تصفير النقاط', async () => {
+  const x = await cpCall({ action:'pointsDelete', op:'reset' }); if (x){ toast(needSrv(x) || x.msg); openDel(); }
+});
+
+/* طلبات الجوائز والجوائز المستلمة */
+let OD = null;
+async function loadOrders(box){ const r = await cpCall({ action:'orders' }, box); if (r && r.ok) OD = r; return r && r.ok; }
+async function openOrders(){
+  const box = $('odList'); box.innerHTML = '<div class="msg info">جاري التحميل...</div>';
+  if (!(await loadOrders('odList'))) return;
+  box.innerHTML = '';
+  const list = OD.orders.filter(o => o.status === 'جديد');
+  if (!list.length) return box.appendChild(el('small', '', 'لا توجد طلبات جوائز جديدة.'));
+  list.forEach(o => {
+    const w = el('div', 'strow'), top = el('div', 'top'); top.appendChild(el('b', '', o.sname)); top.appendChild(el('span', 'pill p-late', o.iname));
+    const pr = el('span', 'price'); pr.innerHTML = STAR_SVG; pr.appendChild(document.createTextNode(o.price)); top.appendChild(pr); w.appendChild(top);
+    const m = el('div', 'meta'); [['الحلقة', o.hname], ['تاريخ الطلب', o.date], ['طلبها', o.by]].forEach(x => { if (x[1]){ const d = el('span', '', x[0] + ': '); d.appendChild(el('i', '', x[1])); m.appendChild(d); } }); w.appendChild(m);
+    const ac = el('div', 'stact'), b1 = el('button', 'good'); b1.innerHTML = ST_IC.restore; b1.appendChild(el('span', '', 'تم التسليم'));
+    b1.onclick = async () => { const x = await cpCall({ action:'orderDecide', id:o.id, op:'deliver' }); if (x){ toast(needSrv(x) || x.msg); if (x.ok) openOrders(); } };
+    const b2 = el('button', 'danger'); b2.innerHTML = ST_IC.trash; b2.appendChild(el('span', '', 'رفض'));
+    b2.onclick = () => confirmOp('رفض طلب ' + o.sname, 'تعود ' + o.price + ' نقطة إلى رصيد الطالب، وتعود الكمية إلى المتجر.', 'رفض الطلب', async () => { const x = await cpCall({ action:'orderDecide', id:o.id, op:'reject' }); if (x){ toast(needSrv(x) || x.msg); if (x.ok) openOrders(); } });
+    ac.appendChild(b1); ac.appendChild(b2); w.appendChild(ac); box.appendChild(w);
+  });
+}
+async function openRecv(){
+  const box = $('rcList'); box.innerHTML = '<div class="msg info">جاري التحميل...</div>';
+  if (!(await loadOrders('rcList'))) return; renderRecv();
+}
+function renderRecv(){
+  const q = normAr($('rcQ').value), box = $('rcList'); box.innerHTML = '';
+  const list = OD.orders.filter(o => o.status === 'مُسلّم' && (!q || normAr(o.sname + ' ' + o.iname).indexOf(q) !== -1));
+  if (!list.length) return box.appendChild(el('small', '', 'لا توجد جوائز مستلمة بعد.'));
+  const tb = el('table', 'cptab'), hd = el('tr'); ['الطالب', 'الحلقة', 'الجائزة', 'التاريخ'].forEach(t => hd.appendChild(el('th', '', t))); tb.appendChild(hd);
+  list.forEach(o => { const tr = el('tr'); const n = el('td'); n.appendChild(el('b', '', o.sname)); n.appendChild(el('small', '', o.price + ' نقطة • سلّمها ' + (o.doneBy || ''))); tr.appendChild(n);
+    tr.appendChild(el('td', '', o.hname)); tr.appendChild(el('td', '', o.iname)); tr.appendChild(el('td', '', (o.doneAt || o.date).slice(0, 10).split('-').reverse().join('/'))); tb.appendChild(tr); });
+  box.appendChild(tb);
+}
+$('rcQ').oninput = () => OD && renderRecv();
 
 function openRegLink(){
   $('qrLink').textContent = APPLY_URL; $('qrLink').href = APPLY_URL; $('qrOpen').href = APPLY_URL;
