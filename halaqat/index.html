@@ -723,6 +723,40 @@
       <div class="card" id="heList"></div>
     </div>
 
+    <!-- الإعدادات: الشؤون التعليمية -->
+    <div id="pEduCfg" class="hidden">
+      <div class="card">
+        <h2>إعدادات الشؤون التعليمية</h2>
+        <small>تنطبق على التقييم والتقارير والاستبعاد التلقائي وشاشة العرض.</small>
+        <label>أيام الدراسة</label><div class="rfsel" id="ecDays"></div>
+        <div class="edgrid"><div><label for="ecTF">بداية الفصل الدراسي</label><input type="date" id="ecTF"></div><div><label for="ecTT">نهاية الفصل الدراسي</label><input type="date" id="ecTT"></div></div>
+        <label>حدود التقدير (من <span id="ecMax"></span>)</label>
+        <div class="edgrid" style="grid-template-columns:repeat(4,1fr)">
+          <div><label for="ec0">ممتاز من</label><input id="ec0" type="number" step="0.5" min="0"></div><div><label for="ec1">جيد جداً من</label><input id="ec1" type="number" step="0.5" min="0"></div>
+          <div><label for="ec2">جيد من</label><input id="ec2" type="number" step="0.5" min="0"></div><div><label for="ec3">مقبول من</label><input id="ec3" type="number" step="0.5" min="0"></div>
+        </div>
+        <small>أقل من «مقبول» = ضعيف.</small>
+        <label for="ecPass">درجة اجتياز الاختبار المرحلي (من 100)</label><input id="ecPass" type="number" min="1" max="100">
+      </div>
+      <div class="card">
+        <h2>المرحليات</h2>
+        <small>اكتب مقدار كل مرحلية ليظهر للمعلم عند الترشيح (مثال: جزء عمّ وتبارك).</small>
+        <div id="ecMar"></div>
+        <button class="btn" id="ecSave">حفظ الإعدادات</button><div id="ecMsg"></div>
+      </div>
+    </div>
+
+    <!-- الإعدادات: بيانات دخول المستخدمين -->
+    <div id="pAccs" class="hidden">
+      <div class="card">
+        <h2>بيانات دخول المستخدمين</h2>
+        <small>حالة دخول كل مستخدم: الرمز (أولي أو مخصص)، وآخر دخول، والأجهزة المسجلة، والقفل بعد المحاولات الخاطئة.</small>
+        <div class="stchips" id="acSum"></div>
+        <input id="acQ" placeholder="ابحث بالاسم أو رقم الهوية" style="margin-top:8px">
+      </div>
+      <div class="card" id="acBox"></div>
+    </div>
+
     <!-- الإعلانات (الإدارة) -->
     <div id="pAnn" class="hidden">
       <div class="card">
@@ -1591,7 +1625,7 @@ const addDays = (d, n) => { const t = ud(d); t.setUTCDate(t.getUTCDate() + n); r
 const isStudy = d => (D ? D.studyDays : [0,1,2,3]).indexOf(ud(d).getUTCDay()) !== -1;
 const fmtD = (d, o) => ud(d).toLocaleDateString('ar-SA-u-ca-gregory', Object.assign({ timeZone:'UTC' }, o));
 const PILL = { 'حاضر':'p-ok', 'متأخر':'p-late', 'غائب':'p-abs', 'مستأذن':'p-none', 'ممتاز':'p-ok', 'جيد جداً':'p-ok', 'جيد':'p-late', 'مقبول':'p-late', 'ضعيف':'p-abs' };
-const scoreLabel = n => n >= 9 ? 'ممتاز' : n >= 8 ? 'جيد جداً' : n >= 7 ? 'جيد' : n >= 5 ? 'مقبول' : 'ضعيف';
+const scoreLabel = n => { const t = (D && D.gradeCuts) || [9, 8, 7, 5]; return n >= t[0] ? 'ممتاز' : n >= t[1] ? 'جيد جداً' : n >= t[2] ? 'جيد' : n >= t[3] ? 'مقبول' : 'ضعيف'; };
 const scoreTxt = x => x.score != null ? x.score + '/' + (D ? D.maxScore : 10) + ' ' + x.grade : x.grade;
 const pillCls = s => 'pill ' + (PILL[s] || 'p-none');
 function tile(n, label, cls){ const t = el('div', 'tile ' + (cls || '')); t.appendChild(el('b', '', n)); t.appendChild(el('span', '', label)); return t; }
@@ -1663,7 +1697,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.ann = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.ann = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; ICONS.eduCfg = ICONS.settings; ICONS.accs = ICONS.settings; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1719,7 +1753,7 @@ const ADMIN_NAV = [
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع'], ['soon', 'تقرير المجمع']] },
-  { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['ann', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
+  { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['eduCfg', 'الشؤون التعليمية']] }
 ];
 function buildAdminNav(n){
   n.appendChild(el('div', 'gtitle', 'لوحة المدير'));
@@ -1762,6 +1796,10 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pEduCfg').classList.toggle('hidden', r !== 'eduCfg');
+  if (r === 'eduCfg') openEduCfg();
+  $('pAccs').classList.toggle('hidden', r !== 'accs');
+  if (r === 'accs') openAccs();
   $('pAnn').classList.toggle('hidden', r !== 'ann');
   if (r === 'ann') openAnn();
   $('pStfFile').classList.toggle('hidden', r !== 'staffFile');
@@ -2489,6 +2527,44 @@ $('hlSave').onclick = async () => {
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
 };
+
+/* ---------- الإعدادات: الشؤون التعليمية ---------- */
+let EC = null, ecDaysB = null;
+const WD = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+async function openEduCfg(){ const r = await cpCall({ action:'eduCfg' }, 'ecMsg'); if (r && r.ok) fillEc(r); }
+function fillEc(r){
+  EC = r; if (!ecDaysB){ ecDaysB = selBox(WD, true); $('ecDays').appendChild(ecDaysB); }
+  ecDaysB.set(r.studyDays.map(i => WD[i])); $('ecTF').value = r.term.from || ''; $('ecTT').value = r.term.to || ''; $('ecMax').textContent = r.maxScore;
+  r.cuts.forEach((v, i) => $('ec' + i).value = v); $('ecPass').value = r.pass;
+  const m = $('ecMar'); m.innerHTML = ''; r.marhala.forEach((x, i) => { const g = el('div', 'mvpair'); g.style.gridTemplateColumns = '150px 1fr'; g.style.alignItems = 'center'; g.style.marginTop = '6px'; g.appendChild(el('b', '', x.name)); const inp = el('input'); inp.maxLength = 80; inp.value = x.desc; inp.dataset.i = i; inp.placeholder = 'مقدار المرحلية'; g.appendChild(inp); m.appendChild(g); });
+}
+$('ecSave').onclick = async () => {
+  const cfg = { studyDays:ecDaysB.get().map(d => WD.indexOf(d)), cuts:[0, 1, 2, 3].map(i => +$('ec' + i).value), pass:+$('ecPass').value, termFrom:$('ecTF').value, termTo:$('ecTT').value, marhala:[...$('ecMar').querySelectorAll('input')].map(x => x.value.trim()) };
+  if (!cfg.studyDays.length) return msg('ecMsg', 'اختر يوماً دراسياً واحداً على الأقل.', 'err');
+  $('ecSave').disabled = true; const r = await cpCall({ action:'eduCfgSave', cfg:cfg }, 'ecMsg'); $('ecSave').disabled = false;
+  if (r && r.ok){ fillEc(r); msg('ecMsg', '✓ ' + r.msg, 'ok'); D.studyDays = r.studyDays; D.gradeCuts = r.cuts; D.marhala = r.marhala; }
+};
+/* ---------- الإعدادات: بيانات دخول المستخدمين ---------- */
+let AC = null, acF = '';
+async function openAccs(){ $('acBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'accData' }, 'acBox'); if (r && r.ok){ AC = r; renderAccs(); } }
+function renderAccs(){
+  const L = AC.list, sum = $('acSum'); sum.innerHTML = '';
+  [['', 'الكل', L.length], ['custom', 'غيّروا الرمز', L.filter(x => x.pin === 'مخصص').length], ['default', 'الرمز الأولي', L.filter(x => x.pin === 'الرمز الأولي').length], ['online', 'لديهم دخول نشط', L.filter(x => x.sessions).length], ['locked', 'مقفلون', L.filter(x => x.locked).length], ['parents', 'أولياء الأمور', L.filter(x => x.type === 'ولي أمر').length]]
+    .forEach(x => { if (x[0] && !x[2]) return; const b = el('button', acF === x[0] ? 'on' : '', x[1] + ' (' + x[2] + ')'); b.onclick = () => { acF = x[0]; renderAccs(); }; sum.appendChild(b); });
+  const q = normAr($('acQ').value), box = $('acBox'); box.innerHTML = '';
+  const list = L.filter(x => (!acF || (acF === 'custom' ? x.pin === 'مخصص' : acF === 'default' ? x.pin === 'الرمز الأولي' : acF === 'online' ? x.sessions : acF === 'locked' ? x.locked : x.type === 'ولي أمر')) && (!q || normAr(x.name).indexOf(q) !== -1 || x.nid.indexOf(q) !== -1));
+  if (!list.length) return box.appendChild(el('small', '', 'لا توجد نتائج.'));
+  list.slice(0, 300).forEach(x => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', x.name)); w.appendChild(tp);
+    const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill p-none', x.type)); pl.appendChild(el('span', 'pill ' + (x.pin === 'مخصص' ? 'p-ok' : 'p-late'), x.pin));
+    if (x.sessions) pl.appendChild(el('span', 'pill p-ok', 'داخل على ' + x.sessions + (x.sessions > 1 ? ' أجهزة' : ' جهاز'))); if (x.locked) pl.appendChild(el('span', 'pill p-red', 'مقفل مؤقتاً')); if (x.st) pl.appendChild(el('span', 'pill p-red', x.st)); w.appendChild(pl);
+    const m = el('div', 'meta'); [['الهوية', x.nid], ['آخر دخول', x.last], ['أنشأ الرمز', x.created]].forEach(p => { if (p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } }); w.appendChild(m);
+    const ac = el('div', 'stact'), b = (t, cls, op, cf) => { const y = el('button', cls, t); y.onclick = async () => { if (cf && !confirm(cf)) return; const r = await cpCall({ action:'accOp', nid:x.nid, op:op }, 'acBox'); if (r && r.ok){ AC = r; toast(r.msg); renderAccs(); } }; ac.appendChild(y); };
+    if (x.pin === 'مخصص') b('إعادة تعيين الرمز', 'warn', 'reset', 'إعادة تعيين رمز ' + x.name + '؟ ' + (x.type === 'ولي أمر' ? 'سينشئ رمزاً جديداً بآخر 4 أرقام من جواله.' : 'سيدخل بالرمز الأولي 123456 ثم يغيّره.'));
+    if (x.sessions) b('تسجيل خروج من كل الأجهزة', '', 'logout', 'تسجيل خروج ' + x.name + ' من كل الأجهزة؟');
+    if (x.locked) b('فك القفل', 'good', 'unlock');
+    if (ac.children.length) w.appendChild(ac); box.appendChild(w); });
+}
+$('acQ').oninput = () => AC && renderAccs();
 
 /* ---------- الإعلانات ---------- */
 let AN = null, anF = 'نشط', anCur = null, anAudB = null, anTitB = null, anPrB = null;
@@ -3782,7 +3858,7 @@ function renderRefForm(k){
     const lst = el('div', 'stlist'); MS.students.forEach(s => { const l = el('label'); const c = el('input'); c.type = 'checkbox'; c.value = s.sid; l.appendChild(c); l.appendChild(el('span', '', s.name)); if (MS.students.some(x => x.hid !== s.hid)) l.appendChild(el('small', '', s.hname)); lst.appendChild(l); });
     ca.onchange = () => lst.querySelectorAll('input').forEach(c => c.checked = ca.checked);
     f.appendChild(lst); F.sids = () => [...lst.querySelectorAll('input:checked')].map(c => c.value);
-    f.appendChild(lab('المرحلية', true)); const st = el('select'); fillSel2(st, MS.marhala, '— اختر المرحلية —'); f.appendChild(st); F.stage = () => st.value;
+    f.appendChild(lab('المرحلية', true)); const st = el('select'); fillSel2(st, MS.marhala.map(m => { const x = (D.marhala || []).find(y => y.name === m); return [m, m + (x && x.desc ? ' — ' + x.desc : '')]; }), '— اختر المرحلية —'); f.appendChild(st); F.stage = () => st.value;
     f.appendChild(lab('اتجاه الحفظ')); const dir = selBox(['من الناس', 'من الفاتحة']); f.appendChild(dir); F.dir = dir.get;
     f.appendChild(lab('جاهزية الطالب في رأي المعلم', true)); const rd = selBox(['ممتاز', 'جيد جداً', 'جيد']); f.appendChild(rd); F.ready = rd.get;
     f.appendChild(lab('عدد مرات مراجعة المقدار كاملاً')); const rv = el('input'); rv.type = 'number'; rv.min = 0; rv.max = 99; rv.inputMode = 'numeric'; f.appendChild(rv); F.reviews = () => rv.value;
