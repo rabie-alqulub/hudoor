@@ -189,6 +189,27 @@
   .cptabs button.on svg{color:#F3D9AE}
 
 
+
+  /* ملف الطالب */
+  .sfres{margin-top:8px}
+  .sfres button{display:flex;width:100%;align-items:center;gap:10px;padding:10px 4px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;color:var(--text);text-align:right;cursor:pointer}
+  .sfres button small{margin-inline-start:auto;color:var(--muted)}
+  .sfhead .me b{font-size:19px} .sfhead .me small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+  .sftabs{grid-template-columns:repeat(4,1fr)} .sftabs button{min-height:50px;font-size:14px}
+  @media (max-width:560px){ .sftabs{grid-template-columns:repeat(2,1fr)} }
+  .sfgrp{margin-top:6px}
+  .sfmsg{cursor:pointer} .sfmsg p{margin:6px 0 0;font-size:13px;white-space:pre-line;color:var(--muted);max-height:3.2em;overflow:hidden} .sfmsg.open p{max-height:none;color:var(--text)}
+  .tl{position:relative;margin-top:8px;padding-inline-start:18px;border-inline-start:2px solid var(--line)}
+  .tl div{position:relative;padding:0 0 14px} .tl div::before{content:'';position:absolute;inset-inline-start:-25px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--card)}
+  .tl b{font-size:15px} .tl small{display:block;color:var(--muted)}
+  #sfPrint{display:none}
+  @media print{
+    body *{visibility:hidden} #sfPrint,#sfPrint *{visibility:visible}
+    #sfPrint{display:block;position:absolute;top:0;right:0;left:0;padding:0 8mm;color:#000;background:#fff;font-size:12px}
+    #sfPrint h1{font-size:18px;margin:0 0 4px} #sfPrint h3{font-size:14px;margin:14px 0 4px;border-bottom:1px solid #999;padding-bottom:2px}
+    #sfPrint table{width:100%;border-collapse:collapse} #sfPrint td,#sfPrint th{border:1px solid #bbb;padding:3px 5px;text-align:right;font-size:11px}
+    #sfPrint .ph{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #D08E2C;padding-bottom:6px;margin-bottom:8px}
+  }
   /* ضبط الرسائل */
   .cfst{display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px;border-radius:14px;background:var(--light)}
   .cfst .lamp{width:14px;height:14px;border-radius:50%;flex:none;background:var(--muted)}
@@ -608,6 +629,20 @@
         <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
       </div>
       <div class="card" id="heList"></div>
+    </div>
+
+    <!-- ملف الطالب -->
+    <div id="pStuFile" class="hidden">
+      <div class="card" id="sfFind">
+        <h2>ملف الطالب</h2>
+        <input id="sfQ" placeholder="ابحث بالاسم أو رقم الطالب أو الهوية أو جوال ولي الأمر">
+        <div class="sfres" id="sfRes"></div>
+      </div>
+      <div id="sfFile" class="hidden">
+        <div class="card sfhead" id="sfHead"></div>
+        <div class="card"><div class="cptabs sftabs" id="sfTabs" style="margin-top:0"></div></div>
+        <div class="card" id="sfBody"></div>
+      </div>
     </div>
 
     <!-- ضبط الرسائل (المدير) -->
@@ -1112,6 +1147,7 @@
   </div>
 </div>
 
+<div id="sfPrint"></div>
 <!-- تفاصيل الإحالة والردود -->
 <div class="sheet hidden" id="rfSheet">
   <div class="panel">
@@ -1300,7 +1336,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1318,7 +1354,7 @@ async function loadHome(){
   const P = r.perms || [];
   if (r.roles.indexOf('teacher') !== -1 || r.roles.indexOf('admin') !== -1) TABS.push(['teach', 'التقييم']);
   if (P.indexOf('students.plans_all') !== -1) TABS.push(['plans', 'بناء الخطط التعليمية']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('students.view_all') !== -1) TABS.push(['studentsList', 'بيانات الطلاب']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('students.view_all') !== -1){ TABS.push(['studentsList', 'بيانات الطلاب']); TABS.push(['stuFile', 'ملف الطالب']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('competition.manage') !== -1 || P.indexOf('competition.store') !== -1)) TABS.push(['compete', 'المنافس']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.add') !== -1){ TABS.push(['studentNew', 'تسجيل طالب']); TABS.push(['regLink', 'رابط التسجيل']); TABS.push(['apps', 'طلبات المتقدمين']); }
   if (r.roles.indexOf('admin') === -1 && r.roles.indexOf('teacher') !== -1) TABS.push(['myStu', 'طلاب الحلقة']);
@@ -1341,7 +1377,7 @@ async function loadHome(){
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['soon', 'بحث'], ['compete', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['soon', 'بحث'], ['compete', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['stuFile', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
@@ -1390,6 +1426,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pStuFile').classList.toggle('hidden', r !== 'stuFile');
+  if (r === 'stuFile') openStuFile(sfOpen);
   $('pMsgCfg').classList.toggle('hidden', r !== 'msgCfg');
   if (r === 'msgCfg') openMsgCfg();
   $('pMsgs').classList.toggle('hidden', r !== 'msgs');
@@ -1446,6 +1484,7 @@ function renderWelcome(){
     refsEdu:['الإحالات التعليمية', 'إحالات مستوى الحفظ والخطط', ''], refsExam:['ترشيحات المرحلية', 'مواعيد الاختبارات المرحلية ونتائجها', 'gold'],
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
+    stuFile:['ملف الطالب', 'بيانات الطالب وحفظه وحضوره وسجله كاملاً', ''],
     msgs:['رسائل أولياء الأمور', 'رسالة خاصة أو عامة عبر برق', ''],
     halaqaNew:['إضافة حلقة', 'إضافة حلقة جديدة', ''], halaqaEdit:['تعديل حلقة', 'تعديل الحلقات وعدد طلابها', ''] };
   const acts = document.body.classList.contains('admin') ? [['teach'], ['report'], ['plans'], ['settings']] : TABS;
@@ -2070,6 +2109,161 @@ $('hlSave').onclick = async () => {
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
 };
 
+/* ---------- ملف الطالب ---------- */
+let SF = null, sfSec = 'info', sfOpen = null, sfRng = 'month', sfQT = null, sfMore = 60;
+const SF_TABS = [['info', 'البيانات الشخصية'], ['hifz', 'الحفظ والخطة'], ['att', 'الحضور'], ['refs', 'الإحالات والاختبارات'], ['pts', 'المنافس'], ['msgs', 'الرسائل'], ['log', 'سجل الطالب'], ['notes', 'ملاحظات إدارية']];
+function goFile(sid){ sfOpen = sid; openRole('stuFile'); }
+async function openStuFile(sid){
+  sfOpen = null;
+  if (!sid){ $('sfFile').classList.add('hidden'); $('sfFind').classList.remove('hidden'); $('sfQ').value = ''; sfSearch(); return; }
+  $('sfFind').classList.add('hidden'); $('sfFile').classList.remove('hidden');
+  $('sfHead').innerHTML = '<div class="msg info">جاري تحميل الملف...</div>'; $('sfBody').innerHTML = ''; $('sfTabs').innerHTML = '';
+  const r = await cpCall({ action:'stuFile', sid:sid }, 'sfHead'); if (!r || !r.ok) return;
+  SF = r; sfMore = 60; renderSF();
+}
+async function sfSearch(){
+  clearTimeout(sfQT);
+  sfQT = setTimeout(async () => {
+    const q = $('sfQ').value.trim(), box = $('sfRes');
+    if (!q){ box.innerHTML = '<small>اكتب جزءاً من الاسم أو الرقم.</small>'; return; }
+    const r = await cpCall({ action:'stuSearch', q:q }, 'sfRes'); if (!r || !r.ok) return;
+    box.innerHTML = '';
+    if (!r.list.length) return box.appendChild(el('small', '', 'لا توجد نتائج.'));
+    r.list.forEach(x => { const b = el('button'); b.appendChild(el('b', '', x.name)); if (x.st) b.appendChild(el('span', 'pill p-red', x.st)); b.appendChild(el('small', '', x.sid + ' • ' + x.hname)); b.onclick = () => openStuFile(x.sid); box.appendChild(b); });
+  }, 250);
+}
+$('sfQ').oninput = sfSearch;
+const ageOf = b => { if (!/^\d{4}-\d{2}-\d{2}$/.test(b || '')) return ''; const t = D.today, y = +t.slice(0, 4) - +b.slice(0, 4) - (t.slice(5) < b.slice(5) ? 1 : 0); return y >= 0 ? y + ' سنة' : ''; };
+function sfStats(){
+  const all = achieve({ attendance:SF.attendance, records:SF.records }, 'all'), n = all.n, pres = all.att['حاضر'] + all.att['متأخر'];
+  return [[n ? Math.round(pres / n * 100) + '%' : '—', 'نسبة الحضور'], [all.avg != null ? all.avg + '/' + D.maxScore : '—', 'متوسط الدرجات'], [SF.points.balance, 'رصيد النقاط'], [SF.points.stars, 'فارس الحلقة']];
+}
+function renderSF(){
+  const I = SF.info, h = $('sfHead'); h.innerHTML = '';
+  const top = el('div', 'stact'); top.style.marginTop = '0'; const back = el('button', '', '→ بحث عن طالب آخر'); back.onclick = () => openStuFile(null); top.appendChild(back); h.appendChild(top);
+  const me = el('div', 'me'), who = el('div'); me.style.marginTop = '10px';
+  who.appendChild(el('b', '', I.name)); who.appendChild(el('small', '', ['رقم الطالب: ' + I.sid, I.hname, I.teacher && 'المعلم: ' + I.teacher].filter(Boolean).join(' • ')));
+  me.appendChild(el('div', 'avatar', I.name.charAt(0))); me.appendChild(who); if (I.st) me.appendChild(el('span', 'pill p-red', I.st)); h.appendChild(me);
+  const st = el('div', 'cfstats'); st.style.gridTemplateColumns = 'repeat(4,1fr)'; sfStats().forEach(x => { const d = el('div'); d.appendChild(el('b', '', x[0])); d.appendChild(el('span', '', x[1])); st.appendChild(d); }); h.appendChild(st);
+  if (SF.access === 'full'){
+    const ac = el('div', 'stact');
+    const b = (t, fn) => { const x = el('button', '', t); x.onclick = fn; ac.appendChild(x); };
+    if (SF.canEdit) b('تعديل البيانات', sfEdit);
+    const P = D.perms || []; if (P.indexOf('*') !== -1 || P.indexOf('messages.send') !== -1) b('رسالة لولي الأمر', () => { mgPre = I.sid; openRole('msgs'); });
+    b('طباعة الملف (PDF)', sfPrint);
+    h.appendChild(ac);
+  }
+  const tb = $('sfTabs'); tb.innerHTML = '';
+  const tabs = SF_TABS.filter(t => t[0] !== 'notes' || SF.notes);
+  if (!tabs.some(t => t[0] === sfSec)) sfSec = 'info';
+  tabs.forEach(t => { const x = el('button', sfSec === t[0] ? 'on' : '', t[1]); x.dataset.k = t[0]; x.onclick = () => { sfSec = t[0]; renderSF(); }; tb.appendChild(x); });
+  const body = $('sfBody'); body.innerHTML = ''; sfSection(sfSec, body, false);
+}
+async function sfEdit(){
+  if (!SB || !SB.ok){ try { SB = await api({ action:'students' }); } catch(e){ return toast('تعذّر الاتصال بالخادم'); } }
+  const x = SB.ok && SB.students.find(z => z.sid === SF.info.sid); if (!x) return toast('تعذّر فتح التعديل');
+  openStudentEdit(x);
+}
+function kvBox(rows){ const g = el('div', 'kv'); rows.forEach(r => kvRow(g, r[0], r[1])); return g; }
+function rngChips(box, cb){
+  const c = el('div', 'stchips'); [['week', 'هذا الأسبوع'], ['month', 'هذا الشهر'], ['all', 'الكل']].forEach(x => { const b = el('button', sfRng === x[0] ? 'on' : '', x[1]); b.onclick = () => { sfRng = x[0]; cb(); }; c.appendChild(b); }); box.appendChild(c);
+}
+const rngFrom = () => { const t = D.today; return sfRng === 'week' ? addDays(t, -ud(t).getUTCDay()) : sfRng === 'month' ? t.slice(0, 8) + '01' : '0000'; };
+function sfSection(k, box, print){
+  const I = SF.info, H = t => box.appendChild(el(print ? 'h3' : 'div', print ? '' : 'rfsec', t));
+  if (k === 'info'){
+    H('بيانات الطالب');
+    box.appendChild(kvBox([['الاسم', I.name], ['رقم الطالب', I.sid], ['الهوية / الإقامة', I.nid], ['تاريخ الميلاد', bFmt(I.birth, I.birthH)], ['العمر', ageOf(I.birth)], ['المرحلة الدراسية', I.stage], ['جوال الطالب', I.sphone]]));
+    H('ولي الأمر');
+    box.appendChild(kvBox([['اسم ولي الأمر', I.pname], ['جوال ولي الأمر', I.pphone], ['هوية ولي الأمر', I.pnid]]));
+    H('الحلقة والتسجيل');
+    box.appendChild(kvBox([['الحلقة', I.hname], ['المعلم', I.teacher], ['تاريخ الالتحاق', I.joined], ['طريقة التسجيل', I.src], ['رقم الانتظار', I.wait ? I.wait + (I.appDate ? ' (طلب ' + I.appDate + ')' : '') : ''], ['مقدار الحفظ', I.level], ['الحالة', I.st || 'نشط']]));
+    if (SF.siblings.length){ H('إخوته في المجمع'); SF.siblings.forEach(x => { const w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', x.name)); g.appendChild(el('small', '', x.hname + (x.st ? ' • ' + x.st : ''))); w.appendChild(g);
+      if (!print && SF.access === 'full'){ const b = el('button', 'mini', 'الملف'); b.onclick = () => openStuFile(x.sid); w.appendChild(b); } box.appendChild(w); }); }
+    return;
+  }
+  if (k === 'hifz'){
+    const pb = el('div'); box.appendChild(pb); plansBlock({ plans:SF.plans }, pb);
+    const lh = SF.records.find(r => r.type === 'حفظ'); box.appendChild(kvBox([['آخر حفظ', lh ? lh.from + ' ← ' + lh.to + ' (' + lh.date + ')' : 'لا يوجد']]));
+    if (!print) rngChips(box, () => renderSF());
+    const from = print ? '0000' : rngFrom(), x = achieve({ attendance:SF.attendance, records:SF.records }, print ? 'all' : sfRng);
+    const ty = el('div', 'tiles'); D.types.forEach((t, i) => ty.appendChild(tile(x.types[t] || 0, t + ' (آية)', ['t-ok', 't-late', 't-nav', ''][i]))); box.appendChild(ty);
+    if (x.avg != null) box.appendChild(el('div', 'slabel ' + (PILL[scoreLabel(x.avg)] || '').replace('p-', 'c-'), 'متوسط الدرجات: ' + x.avg + ' من ' + D.maxScore + ' • ' + scoreLabel(x.avg)));
+    H('سجل التسميع');
+    const list = SF.records.filter(r => r.date >= from), lim = print ? 25 : sfMore;
+    if (!list.length) box.appendChild(el('small', '', 'لا يوجد تسميع في هذه الفترة.'));
+    if (print){ const t = el('table'); t.innerHTML = '<tr><th>التاريخ</th><th>النوع</th><th>من</th><th>إلى</th><th>الآيات</th><th>الدرجة</th></tr>'; list.slice(0, lim).forEach(r => { const tr = el('tr'); [r.date, r.type, r.from, r.to, r.ayat, scoreTxt(r)].forEach(v => tr.appendChild(el('td', '', v))); t.appendChild(tr); }); box.appendChild(t); }
+    else { list.slice(0, lim).forEach(r => box.appendChild(recRow(r))); if (list.length > lim){ const m = el('button', 'btn soft', 'عرض المزيد (' + (list.length - lim) + ')'); m.onclick = () => { sfMore += 100; renderSF(); }; box.appendChild(m); } }
+    return;
+  }
+  if (k === 'att'){
+    if (!print) rngChips(box, () => renderSF());
+    const from = print ? '0000' : rngFrom(), list = SF.attendance.filter(a => a.date >= from), c = { 'حاضر':0, 'متأخر':0, 'غائب':0, 'مستأذن':0 };
+    list.forEach(a => { if (a.status in c) c[a.status]++; });
+    const n = list.length, pc = v => n ? Math.round(v / n * 100) + '%' : '—';
+    const tl = el('div', 'tiles'); [['حاضر', 't-ok'], ['متأخر', 't-late'], ['غائب', 't-abs'], ['مستأذن', 't-nav']].forEach(x => { const t = tile(c[x[0]], x[0], x[1]); t.appendChild(el('small', '', pc(c[x[0]]))); tl.appendChild(t); }); box.appendChild(tl);
+    box.appendChild(el('div', 'slabel c-ok', 'نسبة الحضور: ' + (n ? Math.round((c['حاضر'] + c['متأخر']) / n * 100) + '%' : '—') + ' من ' + n + ' يوم'));
+    if (print){ const ab = list.filter(a => a.status !== 'حاضر').slice(0, 40); if (ab.length){ H('أيام الغياب والتأخر والاستئذان'); box.appendChild(el('div', '', ab.map(a => a.date + ' ' + a.status).join(' • '))); } return; }
+    const dots = el('div', 'dots'); list.slice(0, 120).reverse().forEach(a => { const d = el('div', 'dot ' + a.status, fmtD(a.date, { day:'numeric' })); d.title = a.status + ' • ' + a.date; dots.appendChild(d); }); box.appendChild(dots);
+    if (!list.length) box.appendChild(el('small', '', 'لا يوجد حضور مسجل في هذه الفترة.'));
+    const ab = list.filter(a => a.status !== 'حاضر'); if (ab.length){ H('الغياب والتأخر والاستئذان'); ab.slice(0, 60).forEach(a => { const w = el('div', 'row'); w.appendChild(el('div', 'grow', fmtD(a.date, { weekday:'long', day:'numeric', month:'short' }))); w.appendChild(el('span', pillCls(a.status), a.status)); box.appendChild(w); }); }
+    return;
+  }
+  if (k === 'refs'){
+    if (!SF.refs.length) return box.appendChild(el('small', '', 'لا توجد إحالات أو ترشيحات لهذا الطالب.'));
+    SF.refs.forEach(x => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', x.kind === 'exam' ? 'ترشيح ' + (x.data.stage || 'مرحلية') : 'إحالة ' + x.type)); w.appendChild(tp);
+      const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (RF_ST_CLS[x.status] || 'p-none'), x.status)); if (x.urgent) pl.appendChild(el('span', 'pill p-red', 'عاجلة'));
+      if (x.result) pl.appendChild(el('span', 'pill ' + (x.result === 'اجتاز' ? 'p-ok' : 'p-red'), x.result + (x.score ? ' ' + x.score : ''))); w.appendChild(pl);
+      w.appendChild(kvBox([['التاريخ', x.date], ['المعلم', x.tname], [x.kind === 'exam' ? 'الترشيح' : 'السبب', x.summary], ['الوصف', x.data.details], ['موعد الاختبار', x.examDate], ['المختبِر', x.examiner]]));
+      const last = (x.thread || []).filter(e => e.side === 'h').slice(-1)[0]; if (last && last.text) w.appendChild(el('small', '', 'آخر رد: ' + last.text));
+      box.appendChild(w); });
+    return;
+  }
+  if (k === 'pts'){
+    const P = SF.points, tl = el('div', 'tiles'); [[P.balance, 'الرصيد', 't-ok'], [P.stars, 'فارس الحلقة', 't-late'], [P.added, 'نقاط مضافة', 't-nav'], [P.spent, 'نقاط مصروفة', '']].forEach(x => tl.appendChild(tile(x[0], x[1], x[2]))); box.appendChild(tl);
+    if (P.starDays.length){ H('أيام فارس الحلقة'); box.appendChild(el('div', '', P.starDays.slice(0, 60).map(d => '⭐ ' + d.date).join('   '))); }
+    if (P.ledger.length){ H('سجل النقاط'); P.ledger.slice(0, 60).forEach(l => { const w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', l.type + (l.points ? ' ' + l.points + ' نقطة' : ''))); g.appendChild(el('small', '', [l.date, l.note, l.by].filter(Boolean).join(' • '))); w.appendChild(g); box.appendChild(w); }); }
+    H('الجوائز'); if (!P.orders.length) box.appendChild(el('small', '', 'لا توجد جوائز.'));
+    P.orders.forEach(o => { const w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', o.item + ' (' + o.price + ' نقطة)')); g.appendChild(el('small', '', o.date + (o.doneAt ? ' • سُلّمت ' + o.doneAt.slice(0, 10) : ''))); w.appendChild(g); w.appendChild(el('span', 'pill ' + (o.status === 'مستلم' || o.status === 'سُلّمت' ? 'p-ok' : o.status === 'مرفوض' ? 'p-red' : 'p-late'), o.status)); box.appendChild(w); });
+    return;
+  }
+  if (k === 'msgs'){
+    if (!SF.msgs.length) return box.appendChild(el('small', '', 'لم تُرسل رسائل لولي أمر هذا الطالب بعد.'));
+    SF.msgs.forEach(m => { const w = el('div', 'strow sfmsg'), tp = el('div', 'top'); tp.appendChild(el('b', '', m.kind)); w.appendChild(tp);
+      const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (m.status === 'أُرسلت' ? 'p-ok' : m.status === 'فشلت' ? 'p-red' : 'p-late'), m.status)); pl.appendChild(el('span', 'pill p-none', (m.sentAt || m.at).slice(0, 16))); w.appendChild(pl);
+      w.appendChild(el('p', '', m.text + (m.err ? '\n⚠️ ' + m.err : ''))); w.onclick = () => w.classList.toggle('open'); box.appendChild(w); });
+    return;
+  }
+  if (k === 'log'){
+    if (!SF.log.length) return box.appendChild(el('small', '', 'لا توجد أحداث مسجلة بعد. يبدأ تسجيل الأحداث (النقل، الإيقاف، التعديل...) من الآن.'));
+    const tl = el('div', 'tl'); SF.log.forEach(l => { const d = el('div'); d.appendChild(el('b', '', l.event)); if (l.details) d.appendChild(el('small', '', l.details)); d.appendChild(el('small', '', l.at.slice(0, 16) + ' • ' + l.by)); tl.appendChild(d); }); box.appendChild(tl);
+    return;
+  }
+  if (k === 'notes'){
+    box.appendChild(el('small', '', 'ملاحظات خاصة بالإدارة والمشرفين، لا يراها المعلم ولا ولي الأمر.'));
+    const tx = el('textarea', 'rftxt'); tx.maxLength = 1500; tx.placeholder = 'اكتب ملاحظة...'; box.appendChild(tx);
+    const b = el('button', 'btn', 'إضافة الملاحظة'), m = el('div'); m.id = 'sfNoteMsg'; box.appendChild(b); box.appendChild(m);
+    b.onclick = async () => { if (tx.value.trim().length < 2) return msg('sfNoteMsg', 'اكتب الملاحظة.', 'err'); b.disabled = true; const r = await cpCall({ action:'noteAdd', sid:SF.info.sid, text:tx.value.trim() }, 'sfNoteMsg'); b.disabled = false; if (r && r.ok){ SF = r; toast(r.msg); renderSF(); } };
+    SF.notes.forEach(n => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', n.by)); tp.appendChild(el('small', '', n.at.slice(0, 16))); w.appendChild(tp);
+      const p = el('div', '', n.text); p.style.whiteSpace = 'pre-line'; p.style.marginTop = '6px'; w.appendChild(p);
+      if (n.mine || (D.perms || []).indexOf('*') !== -1){ const ac = el('div', 'stact'), d = el('button', 'danger', 'حذف'); d.onclick = async () => { if (!confirm('حذف الملاحظة؟')) return; const r = await cpCall({ action:'noteDel', id:n.id }, 'sfNoteMsg'); if (r && r.ok){ SF = r; toast(r.msg); renderSF(); } }; ac.appendChild(d); w.appendChild(ac); }
+      box.appendChild(w); });
+  }
+}
+function sfPrint(){
+  const p = $('sfPrint'), I = SF.info; p.innerHTML = '';
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'ملف الطالب: ' + I.name)); l.appendChild(el('div', '', ['رقم الطالب ' + I.sid, I.hname, I.teacher && 'المعلم: ' + I.teacher].filter(Boolean).join(' • ')));
+  hd.appendChild(l); hd.appendChild(el('div', '', ($('orgName').textContent || '') + ' — ' + D.today)); p.appendChild(hd);
+  p.appendChild(el('div', '', sfStats().map(x => x[1] + ': ' + x[0]).join('   |   ')));
+  [['info', 'البيانات الشخصية'], ['hifz', 'الحفظ والخطة'], ['att', 'الحضور'], ['refs', 'الإحالات والاختبارات'], ['pts', 'المنافس'], ['log', 'سجل الطالب']].forEach(t => { p.appendChild(el('h3', '', t[1])); const b = el('div'); sfSection(t[0], b, true); p.appendChild(b); });
+  setTimeout(() => window.print(), 50);
+}
+function renderMsFiles(){
+  const f = $('msForm'); f.innerHTML = ''; f.appendChild(el('h2', '', 'ملفات الطلاب'));
+  if (!MS.students.length) return f.appendChild(el('small', '', 'لا يوجد طلاب في حلقتك.'));
+  const box = el('div', 'sfres'); MS.students.forEach(x => { const b = el('button'); b.appendChild(el('b', '', x.name)); b.appendChild(el('small', '', x.sid + (MS.students.some(z => z.hid !== x.hid) ? ' • ' + x.hname : ''))); b.onclick = () => goFile(x.sid); box.appendChild(b); }); f.appendChild(box);
+}
+
 /* ---------- ضبط الرسائل ---------- */
 let CF = null;
 const DAILY_PH = ['الطالب', 'الحلقة', 'اليوم', 'التاريخ', 'التفاصيل', 'المعلم', 'المجمع'];
@@ -2150,7 +2344,7 @@ const MG_TPL = [
   ['رسالة حرة', '']
 ];
 const MG_PH = ['الطالب', 'ولي الأمر', 'الحلقة', 'المعلم', 'التاريخ', 'المجمع'];
-let MG = null, mgKind = 'عامة', mgMode = 'all', mgHal = new Set(), mgSel = new Set(), mgPoll = null;
+let mgPre = null, MG = null, mgKind = 'عامة', mgMode = 'all', mgHal = new Set(), mgSel = new Set(), mgPoll = null;
 async function openMsgs(){
   $('mgCamps').innerHTML = '<div class="msg info">جاري التحميل...</div>';
   const r = await cpCall({ action:'msgInfo' }, 'mgCamps'); if (!r || !r.ok) return; MG = r;
@@ -2159,6 +2353,7 @@ async function openMsgs(){
     MG_TPL.forEach(t => { const b = el('button', '', t[0]); b.type = 'button'; b.onclick = () => { tp.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('mgText').value = t[1]; mgPreview(); $('mgText').focus(); }; tp.appendChild(b); });
     MG_PH.forEach(k => { const b = el('button', '', '{' + k + '}'); b.type = 'button'; b.onclick = () => { const t = $('mgText'), a = t.selectionStart || t.value.length; t.value = t.value.slice(0, a) + '{' + k + '}' + t.value.slice(t.selectionEnd || a); t.focus(); t.selectionStart = t.selectionEnd = a + k.length + 2; mgPreview(); }; $('mgPh').appendChild(b); });
   }
+  if (mgPre){ mgKind = 'خاصة'; mgMode = 'pick'; mgSel = new Set([mgPre]); document.querySelectorAll('#mgKind button').forEach(x => x.classList.toggle('on', x.dataset.k === 'خاصة')); mgPre = null; }
   renderMgTo(); renderCamps(r.camps);
 }
 document.querySelectorAll('#mgKind button').forEach(b => b.onclick = () => { mgKind = b.dataset.k; document.querySelectorAll('#mgKind button').forEach(x => x.classList.toggle('on', x === b)); mgSel.clear(); if (mgKind === 'خاصة') mgMode = 'pick'; else mgMode = 'all'; renderMgTo(); });
@@ -2252,11 +2447,12 @@ function renderCamps(list){
 }
 
 /* ---------- طلاب الحلقة: الإحالات وترشيح المرحلية ومتابعتها ---------- */
-const MS_TABS = [['stu', 'إحالة لشؤون الطلاب'], ['edu', 'إحالة للشؤون التعليمية'], ['exam', 'ترشيح لاختبار مرحلية'], ['track', 'متابعة الإحالات']];
+const MS_TABS = [['stu', 'إحالة لشؤون الطلاب'], ['edu', 'إحالة للشؤون التعليمية'], ['exam', 'ترشيح لاختبار مرحلية'], ['track', 'متابعة الإحالات'], ['files', 'ملفات الطلاب']];
 const MSI = {
   stu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 11h6M19 8l3 3-3 3"/></svg>',
   edu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"/></svg>',
   exam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>',
+  files:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><circle cx="12" cy="13" r="2.5"/><path d="M8 19a4 4 0 0 1 8 0"/></svg>',
   track:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
 };
 const RF_PRIOR = { stu:['تنبيه شفهي', 'تواصل مع ولي الأمر', 'لم يُتخذ إجراء'], edu:['تكثيف المراجعة', 'تقليل مقدار الحفظ', 'تواصل مع ولي الأمر', 'لم يُتخذ إجراء'] };
@@ -2302,6 +2498,7 @@ async function openMyStu(){
   $('msForm').classList.toggle('hidden', msSec === 'track'); $('msTrack').classList.toggle('hidden', msSec !== 'track');
   const tgt = msSec === 'track' ? $('mtList') : $('msForm');
   if (!MS){ tgt.innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'myStu' }, tgt.id); if (!r || !r.ok) return; MS = r; }
+  if (msSec === 'files') return renderMsFiles();
   msSec === 'track' ? renderTrack() : renderRefForm(msSec);
 }
 function renderRefForm(k){
@@ -2827,6 +3024,7 @@ function renderStudents(){
     const add = (k, v, href) => { if (!v) return; const d = el('span', '', k + ': '); const i = el(href ? 'a' : 'i', '', v); if (href){ i.href = href; i.style.fontWeight = '600'; } d.appendChild(i); m.appendChild(d); };
     add('رقم الطالب', x.sid); add('الهوية', x.nid); add('المرحلة', x.stage); add('ولي الأمر', x.pname); add('الجوال', x.pphone, 'tel:' + x.pphone); add('هوية ولي الأمر', x.pnid); add('جوال الطالب', x.sphone, 'tel:' + x.sphone); add('الميلاد', bFmt(x.birth, x.birthH)); add('مقدار الحفظ', x.level); add('الالتحاق', x.joined);
     w.appendChild(m);
+    { const fb = el('div', 'stact'), b = el('button', '', 'الملف'); b.onclick = () => goFile(x.sid); fb.appendChild(b); if (!SB.admin) w.appendChild(fb); else w._fb = b; }
     if (SB.admin){
       const ac = el('div', 'stact'), btn = (cls, ic, t, fn) => { const b = el('button', cls); b.title = t; b.setAttribute('aria-label', t); b.innerHTML = ST_IC[ic]; b.appendChild(el('span', '', t)); b.onclick = fn; ac.appendChild(b); };
       if (x.st === 'محذوف') btn('good', 'restore', 'استعادة', () => studentOp(x, 'restore'));
@@ -2837,6 +3035,7 @@ function renderStudents(){
         else btn('warn', 'pause', 'إيقاف', () => confirmOp('إيقاف الطالب ' + x.name, 'يختفي من كشف حلقته في التقييم حتى ترفع الإيقاف. سجلاته وبياناته تبقى كما هي.', 'إيقاف الطالب', () => studentOp(x, 'suspend')));
         btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + x.name + ' من النظام', 'يُحذف من حلقته ومن قاعدة أولياء الأمور. سجلاته السابقة تبقى محفوظة، ويمكنك استعادته من «المحذوفون».', 'حذف من النظام', () => studentOp(x, 'delete')));
       }
+      if (w._fb) ac.insertBefore(w._fb, ac.firstChild);
       w.appendChild(ac);
     }
     box.appendChild(w);
@@ -2888,7 +3087,7 @@ $('sdSave').onclick = async () => {
   try {
     const r = await api({ action:'saveStudent', sid:sdCur.sid, data:data });
     if (!r.ok) return msg('sdMsg', r.msg, 'err');
-    $('sdSheet').classList.add('hidden'); toast(r.msg); openStudents();
+    $('sdSheet').classList.add('hidden'); toast(r.msg); if (role === 'stuFile') openStuFile(sdCur.sid); else openStudents();
   } catch(e){ if (e.message !== 'expired') msg('sdMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('sdSave').disabled = false; }
 };
@@ -3190,6 +3389,7 @@ function renderParent(){
     c.appendChild(el('label', '', 'إنجاز هذا الشهر (آيات)')); c.appendChild(t1);
     const x = studentTiles(s, t1.id, t2.id, 'month');
     if (x.avg != null) c.appendChild(el('div', 'slabel ' + (PILL[scoreLabel(x.avg)] || '').replace('p-', 'c-'), 'معدل الدرجات هذا الشهر: ' + x.avg + ' من ' + D.maxScore + ' • ' + scoreLabel(x.avg)));
+    if (s.points != null) c.appendChild(el('div', 'slabel c-late', 'رصيد نقاط المنافس: ' + s.points + ' • فارس الحلقة: ' + (s.stars || 0) + ' مرة'));
     const pb = el('div'); c.appendChild(pb); plansBlock(s, pb);
     c.appendChild(el('label', '', 'آخر الحضور'));
     const dots = el('div', 'dots');
