@@ -710,6 +710,21 @@
       <div class="card" id="heList"></div>
     </div>
 
+    <!-- تقرير حضور الموظفين -->
+    <div id="pSAtt" class="hidden">
+      <div class="card">
+        <h2>تقرير الحضور</h2>
+        <small>من نظام البصمة (الحضور والانصراف): أيام الدوام بعد خصم العطل الرسمية، والإجازات المعتمدة لا تُحتسب غياباً.</small>
+        <div class="stchips" id="saPer"></div>
+        <div class="dsh-top"><button class="mini" id="saPrev">السابق</button><span class="lbl" id="saLbl"></span><button class="mini" id="saNext">التالي</button></div>
+        <div class="edgrid hidden" id="saCustom"><div><label for="saFrom">من تاريخ</label><input type="date" id="saFrom"></div><div><label for="saTo">إلى تاريخ</label><input type="date" id="saTo"></div></div>
+        <div class="dsh-f" style="grid-template-columns:1fr 1fr"><select id="saSifa"></select><input id="saQ" placeholder="ابحث بالاسم"></div>
+        <div class="stact"><button id="saAllBtn" class="hidden">← كل الموظفين</button><button id="saXls">تصدير Excel</button><button id="saPdf">تصدير PDF</button></div>
+      </div>
+      <div class="card"><div class="kpis" id="saKpi"></div></div>
+      <div class="card"><h2 id="saTblT">الموظفون</h2><div class="dtw"><table class="dtbl" id="saTbl"></table></div></div>
+    </div>
+
     <!-- أداء المعلمين -->
     <div id="pTch" class="hidden">
       <div class="card">
@@ -1545,7 +1560,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1572,6 +1587,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.students') !== -1) TABS.push(['repStu', 'تقارير شؤون الطلاب']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.edu') !== -1) TABS.push(['repEdu', 'التقارير التعليمية']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.staffAtt') !== -1) TABS.push(['staffAtt', 'تقرير حضور الموظفين']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.teachers') !== -1) TABS.push(['tchPerf', 'أداء المعلمين']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1) TABS.push(['msgs', 'رسائل أولياء الأمور']);
@@ -1592,7 +1608,7 @@ async function loadHome(){
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
-  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['tchPerf', 'أداء المعلمين'], ['soon', 'الدورات التدريبية']] },
+  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['tchPerf', 'أداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['tvCfg', 'شاشة العرض']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
@@ -1640,6 +1656,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pSAtt').classList.toggle('hidden', r !== 'staffAtt');
+  if (r === 'staffAtt') openSAtt();
   $('pTch').classList.toggle('hidden', r !== 'tchPerf');
   if (r === 'tchPerf') openTch();
   $('pTv').classList.toggle('hidden', r !== 'tvCfg');
@@ -1711,6 +1729,7 @@ function renderWelcome(){
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
     repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
+    staffAtt:['تقرير حضور الموظفين', 'الحضور والتأخير والغياب من البصمة', ''],
     tchPerf:['أداء المعلمين', 'مؤشرات المعلمين وترتيبهم', ''],
     dash:['شاشة عرض المجمع', 'لوحة المجمع اليومية وتقاريرها الشاملة', 'gold'],
     absent:['الطلاب المنقطعون', 'المستبعدون لتجاوز حد الغياب وتفعيلهم', ''],
@@ -2352,6 +2371,69 @@ $('hlSave').onclick = async () => {
     $('hlSheet').classList.add('hidden'); toast(r.msg); openHalEdit();
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
+};
+
+/* ---------- تقرير حضور الموظفين ---------- */
+let SA = null, saP = 'day', saDate = null, saOne = '', saSeq = 0, saSort = ['name', 1];
+function openSAtt(){
+  const per = $('saPer'); per.innerHTML = '';
+  DS_PER.forEach(p => { const b = el('button', saP === p[0] ? 'on' : '', p[1]); b.onclick = () => { saP = p[0]; saDate = null; openSAtt(); }; per.appendChild(b); });
+  $('saCustom').classList.toggle('hidden', saP !== 'custom');
+  ['saPrev', 'saNext'].forEach(id => $(id).classList.toggle('hidden', saP === 'term' || saP === 'custom'));
+  if (saP === 'custom' && !$('saFrom').value){ $('saFrom').value = addDays(D.today, -30); $('saTo').value = D.today; }
+  loadSAtt();
+}
+async function loadSAtt(){
+  const my = ++saSeq, rg = perRange(saP, saDate, 'saFrom', 'saTo', (SA && SA.term) || (DS && DS.term));
+  $('saLbl').textContent = rgLabel(rg); $('saNext').disabled = rg[1] >= D.today; $('saAllBtn').classList.toggle('hidden', !saOne);
+  $('saKpi').innerHTML = '<div class="msg info">جاري قراءة جدول البصمة...</div>';
+  let r; try { r = await api({ action:'staffAtt', from:rg[0], to:rg[1], emp:saOne, sifa:$('saSifa').value }); } catch(e){ if (e.message !== 'expired') msg('saKpi', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (my !== saSeq) return; if (!r.ok) return msg('saKpi', needSrv(r), 'err');
+  SA = r; if (!$('saSifa').children.length){ fillSel('saSifa', r.titles.map(t => [t, t]), 'كل الصفات'); }
+  renderSAtt();
+}
+function renderSAtt(){
+  const L = SA.list, day = SA.from === SA.to, k = $('saKpi'); k.innerHTML = '';
+  const kp = (v, l, cls, sub) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', l)); if (sub) d.appendChild(el('small', '', sub)); k.appendChild(d); };
+  const sum = f => L.reduce((a, x) => a + (x[f] || 0), 0), req = sum('required'), pr = sum('present'), ab = sum('absent');
+  if (day){ const due = L.filter(x => x.required).length; kp(due, 'عليهم دوام اليوم'); kp(pr, 'حضروا', 'g'); kp(sum('late'), 'متأخرون', sum('late') ? 'y' : ''); kp(L.filter(x => x.required && !x.present && !x.leave).length, day && SA.to === D.today ? 'لم يحضروا بعد' : 'غائبون', 'r'); }
+  else { kp(L.length, 'الموظفون'); const pc = pr + ab ? Math.round(pr / (pr + ab) * 100) : null; kp(pc == null ? null : pc + '%', 'نسبة الحضور', pc == null ? '' : pc >= 90 ? 'g' : pc >= 75 ? 'y' : 'r'); kp(sum('late'), 'مرات التأخير', 'y', sum('lateMin') + ' دقيقة'); kp(ab, 'أيام الغياب', ab ? 'r' : '', 'إجازات معتمدة: ' + sum('leave')); }
+  const t = $('saTbl'); t.innerHTML = '';
+  if (saOne && L[0]){
+    const E = L[0]; $('saTblT').textContent = E.name + ' • ' + E.title + (E.shift ? ' • ' + E.shift : '');
+    t.innerHTML = '<thead><tr><th>التاريخ</th><th>الحالة</th><th>الحضور</th><th>الانصراف</th><th>التأخير (د)</th><th>الخروج المبكر (د)</th><th>الساعات</th><th>الإثبات</th></tr></thead>';
+    const tb = el('tbody'); (E.days || []).forEach(d => { const tr = el('tr'); tr.appendChild(el('td', '', fmtD(d.date, { weekday:'short', day:'numeric', month:'short' })));
+      tr.appendChild(el('td', d.status === 'غائب' ? 'lv-r' : d.status === 'متأخر' || d.late ? 'lv-y' : d.in ? 'lv-g' : '', d.status));
+      [d.in || '—', d.out || (d.in ? 'لم يسجّل' : '—'), d.late || '', d.early || '', d.hours || '', d.method || ''].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); });
+    if (!(E.days || []).length){ const tr = el('tr'), td = el('td', '', 'لا توجد أيام دوام في هذه الفترة.'); td.colSpan = 8; tr.appendChild(td); tb.appendChild(tr); }
+    t.appendChild(tb); return;
+  }
+  $('saTblT').textContent = 'الموظفون (' + L.length + ')';
+  const cols = day ? [['name', 'الموظف'], ['today', 'حالة اليوم'], ['lateMin', 'دقائق التأخير'], ['title', 'الصفة']]
+    : [['name', 'الموظف'], ['title', 'الصفة'], ['required', 'أيام الدوام'], ['present', 'حضور'], ['late', 'تأخير'], ['lateMin', 'دقائق التأخير'], ['early', 'خروج مبكر'], ['absent', 'غياب'], ['leave', 'إجازات'], ['hours', 'ساعات العمل'], ['noOut', 'بلا انصراف'], ['pct', 'الحضور %']];
+  const tr = el('tr'); cols.forEach(c => { const th = el('th', saSort[0] === c[0] ? 's' + (saSort[1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { saSort = [c[0], saSort[0] === c[0] ? -saSort[1] : (c[0] === 'name' || c[0] === 'title' ? 1 : -1)]; renderSAtt(); }; tr.appendChild(th); });
+  const th = el('thead'); th.appendChild(tr); t.appendChild(th); const tb = el('tbody'), q = normAr($('saQ').value);
+  sortBy(L.filter(x => !q || normAr(x.name).indexOf(q) !== -1), saSort[0], saSort[1]).forEach(E => { const r = el('tr'); cols.forEach((c, i) => { const v = E[c[0]];
+    const cls = c[0] === 'pct' ? lvAtt(v) : c[0] === 'absent' && v ? 'lv-r' : c[0] === 'late' && v ? 'lv-y' : c[0] === 'today' ? (/غائب|لم يحضر/.test(v || '') ? 'lv-r' : /متأخر/.test(v || '') ? 'lv-y' : /حاضر/.test(v || '') ? 'lv-g' : '') : '';
+    const td = el('td', (i === 0 ? 'nm ' : '') + cls, v == null || v === '' ? '—' : c[0] === 'pct' ? v + '%' : v); if (i === 0) td.onclick = () => { saOne = E.emp; if (saP === 'day'){ saP = 'month'; saDate = null; openSAtt(); } else loadSAtt(); }; r.appendChild(td); }); tb.appendChild(r); });
+  t.appendChild(tb);
+}
+$('saPrev').onclick = () => { saDate = perShift(saP, saDate, -1); loadSAtt(); }; $('saNext').onclick = () => { saDate = perShift(saP, saDate, 1); loadSAtt(); };
+['saFrom', 'saTo', 'saSifa'].forEach(id => $(id).onchange = loadSAtt); $('saQ').oninput = () => SA && renderSAtt();
+$('saAllBtn').onclick = () => { saOne = ''; loadSAtt(); };
+$('saXls').onclick = () => {
+  if (!SA) return; const t = 'تقرير حضور الموظفين — ' + $('saLbl').textContent, sheets = [];
+  if (saOne && SA.list[0]){ const E = SA.list[0]; sheets.push(['الحضور اليومي', [[t + ' — ' + E.name], ['التاريخ', 'الحالة', 'الحضور', 'الانصراف', 'التأخير (د)', 'الخروج المبكر (د)', 'الساعات', 'الإثبات']].concat((E.days || []).map(d => [d.date, d.status, d.in || '', d.out || '', d.late || '', d.early || '', d.hours || '', d.method || '']))]); }
+  else sheets.push(['الموظفون', [[t], ['الرقم الوظيفي', 'الموظف', 'الصفة', 'الفترة', 'أيام الدوام', 'حضور', 'تأخير', 'دقائق التأخير', 'خروج مبكر', 'دقائق الخروج المبكر', 'غياب', 'إجازات', 'ساعات العمل', 'بلا انصراف', 'الحضور %']]
+    .concat(sortBy(SA.list, 'name', 1).map(E => [Number(E.emp) || E.emp, E.name, E.title, E.shift, E.required, E.present, E.late, E.lateMin, E.early, E.earlyMin, E.absent, E.leave, E.hours, E.noOut, E.pct == null ? '' : E.pct]))]);
+  const a = el('a'); a.href = URL.createObjectURL(xlsxBlob(sheets)); a.download = 'حضور-الموظفين-' + SA.from + (SA.to !== SA.from ? '_' + SA.to : '') + '.xlsx';
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel');
+};
+$('saPdf').onclick = () => {
+  if (!SA) return; const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'تقرير حضور الموظفين' + (saOne && SA.list[0] ? ': ' + SA.list[0].name : ''))); l.appendChild(el('div', '', $('saLbl').textContent)); hd.appendChild(l); hd.appendChild(el('div', '', SA.org)); p.appendChild(hd);
+  [$('saKpi'), $('saTbl').parentNode.parentNode].forEach(n => { const c = n.cloneNode(true); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); c.removeAttribute('id'); p.appendChild(c); });
+  setTimeout(() => window.print(), 50);
 };
 
 /* ---------- أداء المعلمين ---------- */
