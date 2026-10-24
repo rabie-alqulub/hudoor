@@ -51,8 +51,13 @@
   @media (max-width:520px){ nav{gap:6px} nav:not(.groups) > button{padding:9px 11px;font-size:14px;gap:6px;border-radius:12px} nav svg{width:18px;height:18px} }
   @media (max-width:430px){ nav:not(.groups) > button{padding:9px 13px} nav:not(.groups) > button svg{display:none} }
   @media (min-width:860px){
-    .shell{display:grid;grid-template-columns:270px minmax(0,640px);gap:24px;padding:20px;justify-content:center}
-    nav{flex-direction:column;position:sticky;top:90px;align-self:start;padding:0;margin:0;max-width:none}
+    .shell{display:grid;grid-template-columns:280px minmax(0,980px);gap:24px;padding:20px;justify-content:center;max-width:1340px}
+    body:not(.in) .shell{display:block;padding:0}
+    nav{flex-direction:column;position:sticky;top:90px;align-self:start;padding:0 0 0 6px;margin:0;max-width:none;max-height:calc(100vh - 110px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--navy) transparent}
+    nav::-webkit-scrollbar{display:block;width:8px} nav::-webkit-scrollbar-thumb{background:var(--navy);border-radius:8px} nav::-webkit-scrollbar-track{background:var(--light);border-radius:8px}
+    body.in nav#nav{overflow-y:auto;max-height:calc(100vh - 110px)} nav > *{flex-shrink:0}
+    body:not(.in) main{max-width:480px;margin-top:-28px}
+    #vLogin{padding:28px}
     nav button{width:100%;padding:14px 16px}
     body.in main{margin:0;padding:0 0 40px;max-width:none}
   }
@@ -341,6 +346,13 @@
   .rfpills{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
   .newdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);flex:none}
   #btnBell{position:relative}
+  .gitems button .nbdg,.ghead .nbdg{background:var(--red);color:#fff;padding:0 6px;font-size:11px}
+  #rbSub,#mgSub,#rpSub,#asSub{display:none}
+  .nbdg{background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;line-height:18px;margin-inline-start:auto;text-align:center}
+  .welcome .role{font-size:14px;color:#F3D9AE;margin:-2px 0 6px;font-weight:700}
+  #pTeach.ro .att button{pointer-events:none} #pTeach.ro .trow,#pTeach.ro #btnAllPresent,#pTeach.ro #btnApprove{display:none!important}
+  .navlogo{display:flex;align-items:center;gap:10px;padding:2px 6px 10px} .navlogo img{width:46px;height:46px;border-radius:50%;background:#fff;padding:3px;border:2px solid var(--gold);object-fit:contain} .navlogo b{font-size:14px;color:var(--navy)}
+  @media (prefers-color-scheme: dark){ .navlogo b{color:var(--text)} }
   #btnBell .bdg{position:absolute;top:2px;left:4px;background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;line-height:18px}
   .cptabs .bdg{background:var(--red);color:#fff;border-radius:99px;font-size:12px;padding:0 7px;min-width:20px}
   @media (max-width:560px){ .cptabs{grid-template-columns:1fr 1fr} .cptabs button{font-size:14px;min-height:54px} }
@@ -557,9 +569,9 @@
 <header class="appbar hidden" id="appbar">
   <button class="brand" id="brandHome" aria-label="الرئيسية"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg><span><b>مثاني</b><small>لحلقات تحفيظ القرآن</small></span></button>
   <span class="grow"></span>
-  <button class="iconbtn hidden" id="btnBell" aria-label="الإحالات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>الإحالات<span class="bdg hidden" id="bellN"></span></button>
+  <button class="iconbtn hidden" style="display:none" id="btnBell" aria-label="الإحالات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>الإحالات<span class="bdg hidden" id="bellN"></span></button>
   <button class="iconbtn menubtn" id="btnMenu" aria-label="القائمة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>القائمة</button>
-  <button class="iconbtn" id="btnPin" aria-label="تغيير الرمز السري"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/></svg>الرمز</button>
+  <button class="iconbtn" style="display:none" id="btnPin" aria-label="تغيير الرمز السري"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/></svg>الرمز</button>
   <button class="iconbtn" id="btnLogout" aria-label="تسجيل الخروج"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>خروج</button>
 </header>
 
@@ -569,7 +581,6 @@
   <!-- الدخول -->
   <section id="vLogin" class="card hidden">
     <h2>الدخول</h2>
-    <small>أدخل رقم هويتك والرمز السري</small>
     <div id="stepNid">
       <label for="nid">رقم الهوية / الإقامة</label>
       <input id="nid" class="big" inputmode="numeric" autocomplete="username" placeholder="10 أرقام" maxlength="15">
@@ -602,7 +613,7 @@
     <!-- البحث العام: عن خانة أو طالب أو حلقة أو موظف -->
     <div class="gsr" id="gsWrap">
       <svg class="gic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="gsQ" type="search" autocomplete="off" placeholder="ابحث في النظام: خانة، طالب، حلقة، موظف...">
+      <input id="gsQ" type="search" autocomplete="off" placeholder="بحث">
       <div class="gsbox hidden" id="gsBox"></div>
     </div>
     <!-- الترحيب -->
@@ -613,6 +624,7 @@
         <svg class="sky" id="sky" viewBox="0 0 120 120"></svg>
         <div class="greet" id="greet"></div>
         <h2 id="hello"></h2>
+        <div class="role" id="roleLine"></div>
         <div class="when" id="when"></div>
         <div class="hals" id="myHals"></div>
       </div>
@@ -625,6 +637,7 @@
     <div id="pTeach" class="hidden">
       <div class="card">
         <div class="chips" id="halChips"></div>
+        <div class="msg info hidden" id="roNote">عرض فقط: التقييم يسجّله معلم الحلقة.</div>
         <div class="pnav"><button id="dPrev">السابق</button><b id="dLabel"></b><button id="dNext">التالي</button></div>
         <div class="tiles" id="attTiles"></div>
         <div class="bar"><span class="muted" id="saveState"></span><button class="mini" id="btnAllPresent">الكل حاضر</button></div>
@@ -640,7 +653,6 @@
     <div id="pPlans" class="hidden">
       <div class="card">
         <h2>بناء الخطط التعليمية</h2>
-        <small>خطة كل طالب لكل نوع: المقدار اليومي ونطاق الخطة ومدتها. التقييم اليومي مستقل عنها.</small>
         <div class="chips" id="planHal" style="margin-top:10px"></div>
       </div>
       <div class="card" id="planList"></div>
@@ -650,7 +662,6 @@
     <div id="pAssign" class="hidden">
       <div class="card">
         <h2>إسناد حلقة لمعلم</h2>
-        <small>اختر معلم كل حلقة ثم اضغط «حفظ». تظهر الحلقة للمعلم فور دخوله.</small>
         <input id="asSearch" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:10px">
       </div>
       <div class="card" id="asList"></div>
@@ -660,7 +671,6 @@
     <div id="pStaff" class="hidden">
       <div class="card">
         <h2>بيانات الموظفين</h2>
-        <small>تُسحب تلقائياً من جدول الحضور والانصراف، وأي موظف جديد يُسجَّل هناك يظهر هنا ويدخل مثاني برقم هويته والرمز الأولي 123456.</small>
         <div class="stchips" id="stSum"></div>
         <input id="stSearch" placeholder="ابحث بالاسم أو رقم الهوية أو الجوال" style="margin-top:10px">
       </div>
@@ -671,7 +681,6 @@
     <div id="pStudents" class="hidden">
       <div class="card">
         <h2>بيانات الطلاب</h2>
-        <small>جميع طلاب المجمع وأولياء أمورهم. أي تعديل هنا يُحدّث قاعدة أولياء الأمور تلقائياً.</small>
         <div class="stchips" id="sdSum"></div>
         <select id="sdHal" style="margin-top:10px"></select>
         <div class="fgrid">
@@ -687,7 +696,6 @@
     <div id="pStudentNew" class="hidden">
       <div class="card" id="snForm">
         <h2>تسجيل طالب جديد</h2>
-        <small>الحقول المعلّمة بـ * مطلوبة. يُسكَّن الطالب في الحلقة مباشرة.</small>
         <div id="snFields"></div>
         <div style="margin-top:4px"><label for="snHal">إسناد الطالب إلى حلقة *</label><select id="snHal"></select></div>
         <button class="btn" id="snSave">تسجيل الطالب</button>
@@ -700,7 +708,6 @@
     <div id="pHalNew" class="hidden">
       <div class="card" id="hnForm">
         <h2>إضافة حلقة</h2>
-        <small>تُضاف الحلقة وتظهر مباشرة في التقييم وإسناد الحلقات وتسكين الطلاب.</small>
         <label for="hnName">اسم الحلقة *</label><input id="hnName" maxlength="60" placeholder="مثال: حلقة الفرقان">
         <label for="hnCap">عدد الطلاب المسموح *</label><input id="hnCap" type="number" min="1" max="200" step="1" inputmode="numeric" placeholder="مثال: 15">
         <small>لا يمكن تسكين طالب في الحلقة بعد اكتمال هذا العدد.</small>
@@ -716,7 +723,6 @@
     <div id="pHalEdit" class="hidden">
       <div class="card">
         <h2>تعديل حلقة</h2>
-        <small>تعديل اسم الحلقة ومعلمها وعدد طلابها المسموح وملاحظاتها، أو إيقافها وإعادة تفعيلها.</small>
         <div class="stchips" id="heSum"></div>
         <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
       </div>
@@ -730,7 +736,7 @@
         <small id="asSub"></small>
         <div class="stchips" id="asTabs"></div>
         <div class="stchips hidden" id="asDates"></div>
-        <div class="stact"><button class="good" id="asAdd">+ إضافة طلاب للاختبار الداخلي</button><button id="asXls">تصدير Excel</button><button id="asPdf" class="hidden">طباعة / PDF</button></div>
+        <div class="stact"><button class="good" id="asAdd">+ إضافة طلاب للاختبار الداخلي</button><button id="asXls">تصدير Excel</button><button id="asPdf" class="hidden">طباعة / PDF</button><button id="asSetDate" class="hidden">تحديد موعد الاختبار للقائمة</button></div>
         <input id="asQ" placeholder="ابحث باسم الطالب أو الحلقة" style="margin-top:8px">
       </div>
       <div class="card" id="asBox"></div>
@@ -753,7 +759,6 @@
     <div id="pPlanF" class="hidden">
       <div class="card">
         <h2>متابعة الخطط</h2>
-        <small>إنجاز كل خطة مقارنة بالمتوقع حتى اليوم حسب تاريخ بدايتها ونهايتها.</small>
         <div class="dsh-f"><select id="pfHal"></select><select id="pfType"></select><input id="pfQ" placeholder="ابحث باسم الطالب"></div>
         <div class="stchips" id="pfSum"></div>
         <div class="stact"><button id="pfXls">تصدير Excel</button></div>
@@ -771,6 +776,19 @@
         <div class="seg" id="maTab" style="grid-template-columns:repeat(3,1fr)"><button data-t="stats" class="on">الإحصائيات</button><button data-t="arc">الأرشيف</button><button data-t="find">بحث</button></div>
       </div>
       <div class="card" id="maBox"></div>
+    </div>
+
+    <!-- الإعدادات: تعديل البيانات -->
+    <div id="pMe" class="hidden">
+      <div class="card">
+        <h2>تعديل البيانات</h2>
+        <div class="kv" id="meKv"></div>
+        <div class="msg info" style="margin-top:10px">البيانات الأساسية ثابتة، ولتصحيح أي منها راجع إدارة المجمع.</div>
+      </div>
+      <div class="card">
+        <h2>الرمز السري</h2>
+        <button class="btn" id="meChangePin">تغيير الرمز السري</button>
+      </div>
     </div>
 
     <!-- الأرشفة السنوية -->
@@ -815,7 +833,6 @@
     <div id="pAccs" class="hidden">
       <div class="card">
         <h2>بيانات دخول المستخدمين</h2>
-        <small>حالة دخول كل مستخدم: الرمز (أولي أو مخصص)، وآخر دخول، والأجهزة المسجلة، والقفل بعد المحاولات الخاطئة.</small>
         <div class="stchips" id="acSum"></div>
         <input id="acQ" placeholder="ابحث بالاسم أو رقم الهوية" style="margin-top:8px">
       </div>
@@ -826,7 +843,6 @@
     <div id="pAnn" class="hidden">
       <div class="card">
         <h2>الإعلانات</h2>
-        <small>انشر إعلاناً للموظفين (كلهم أو بحسب الصفة) أو لأولياء الأمور أو على شاشة العرض، بمدة ظهور وأهمية، مع إمكانية إرساله واتساب، ومتابعة من اطلع عليه.</small>
         <div class="stchips" id="anSum"></div>
         <button class="btn" id="anAdd" style="margin-top:10px">+ إعلان جديد</button>
       </div>
@@ -837,7 +853,6 @@
     <div id="pStfFile" class="hidden">
       <div class="card" id="efFind">
         <h2>ملف الموظف</h2>
-        <small>تقرير شامل لكل موظف يجمع: بياناته، وحضوره من البصمة، وأداءه في حلقاته، ودوراته التدريبية.</small>
         <input id="efQ" placeholder="ابحث باسم الموظف أو رقمه الوظيفي" style="margin-top:8px">
         <div class="sfres" id="efRes"></div>
       </div>
@@ -857,7 +872,6 @@
     <div id="pCourses" class="hidden">
       <div class="card">
         <h2>الدورات التدريبية</h2>
-        <small>دورات الموظفين: إضافتها، وتسجيل المتدربين، ومتابعة إتمامها وشهاداتها، وسجل كل موظف التدريبي.</small>
         <div class="seg" id="crTab"><button data-t="list" class="on">الدورات</button><button data-t="sum">سجل الموظفين التدريبي</button></div>
       </div>
       <div id="crList">
@@ -903,7 +917,6 @@
     <div id="pTv" class="hidden">
       <div class="card">
         <h2>شاشة العرض</h2>
-        <small>شاشة تحفيزية تُعرض على تلفزيون الجامع للجميع: فرسان الحلقات، والأعلى حفظاً، والحضور الكامل، وتنافس الحلقات، وأبطال المنافس. لا تعرض غياباً ولا درجات ولا أرقام جوال.</small>
         <label>رابط الشاشة</label>
         <div class="cfph"><input id="tvLink" readonly dir="ltr" style="font-size:13px"></div>
         <div class="stact"><button id="tvOpen" class="good">فتح الشاشة</button><button id="tvCopy">نسخ الرابط</button><button id="tvNew" class="danger">رابط جديد</button></div>
@@ -957,7 +970,6 @@
     <div id="pMoveMany" class="hidden">
       <div class="card">
         <h2>نقل الطلاب بين الحلقات</h2>
-        <small>يُحفظ النقل في سجل كل طالب، ويمكن إشعار أولياء الأمور.</small>
         <div class="seg" id="mvMode"><button data-m="a" class="on">من حلقة إلى حلقة</button><button data-m="b">نقل أكثر من طالب</button></div>
         <div class="mvpair" id="mvPairBox">
           <div><label for="mvFrom">من حلقة</label><select id="mvFrom"></select></div>
@@ -1032,7 +1044,6 @@
     <div id="pMsgCfg" class="hidden">
       <div class="card">
         <h2>ضبط الرسائل</h2>
-        <small>الربط مع منصة برق لإرسال رسائل واتساب، ومتابعة فاعلية الإرسال، والتحكم في التقرير اليومي.</small>
         <div class="cfst" id="cfSt"><span class="lamp"></span><div><b id="cfStT">جاري التحميل...</b><small id="cfStS"></small></div></div>
         <div class="cfstats" id="cfStats"></div>
         <small id="cfLast" style="display:block;margin-top:8px"></small>
@@ -1041,7 +1052,6 @@
       </div>
       <div class="card">
         <h2>رسالة تجريبية</h2>
-        <small>للتحقق من الربط: تُرسل رسالة واحدة مباشرة إلى الرقم المكتوب.</small>
         <label for="cfTestPh">رقم الجوال</label><input id="cfTestPh" inputmode="numeric" maxlength="10" placeholder="05xxxxxxxx" dir="ltr">
         <button class="btn" id="cfTest">إرسال رسالة تجريبية</button><div id="cfTestMsg"></div>
       </div>
@@ -1119,7 +1129,6 @@
     <div id="pMyStu" class="hidden">
       <div class="card">
         <h2>طلاب الحلقة</h2>
-        <small>إحالة طالب لشؤون الطلاب أو الشؤون التعليمية، وترشيح الطلاب للاختبارات المرحلية، ومتابعة الردود.</small>
         <div class="cptabs" id="msTabs"></div>
       </div>
       <div class="card" id="msForm"></div>
@@ -1144,7 +1153,6 @@
     <div id="pCompete" class="hidden">
       <div class="card">
         <h2>المنافس</h2>
-        <small>نقاط الطلاب ومتجر الجوائز: فارس الحلقة = نقطة، ويمكن إضافة نقاط يدوياً، ويشتري الطالب بنقاطه من المتجر.</small>
         <div class="cptabs" id="cpTabs"></div>
       </div>
 
@@ -1228,7 +1236,6 @@
     <div id="pApps" class="hidden">
       <div class="card">
         <h2>طلبات المتقدمين</h2>
-        <small>طلبات التسجيل الواردة من رابط/باركود التسجيل، مرتبة برقم الانتظار.</small>
         <div class="stchips" id="apSum"></div>
         <input id="apSearch" placeholder="ابحث بالاسم أو الهوية أو الجوال" style="margin-top:8px">
       </div>
@@ -1239,19 +1246,19 @@
     <div id="pNewStaff" class="hidden">
       <div class="card" id="nsForm">
         <h2>تسجيل موظف جديد</h2>
-        <small>يُسجَّل في جدول الحضور والانصراف بنفس خاناته، فيستطيع تسجيل بصمته في صفحة الحضور، ويدخل مثاني برقم هويته والرمز 123456.</small>
-        <div class="empno">الرقم الوظيفي <b id="nsEmp">—</b><small>يُعطى تلقائياً بالتسلسل</small></div>
+        <div class="empno">الرقم الوظيفي <b id="nsEmp">—</b></div>
         <div class="edgrid">
           <div><label for="nsN1">الاسم الأول *</label><input id="nsN1" autocomplete="off"></div>
           <div><label for="nsN2">اسم الأب *</label><input id="nsN2" autocomplete="off"></div>
-          <div><label for="nsN3">اسم الجد</label><input id="nsN3" autocomplete="off"></div>
+          <div><label for="nsN3">اسم الجد *</label><input id="nsN3" autocomplete="off"></div>
           <div><label for="nsN4">الاسم الأخير *</label><input id="nsN4" autocomplete="off"></div>
           <div><label for="nsNid">رقم الهوية / الإقامة *</label><input id="nsNid" inputmode="numeric" maxlength="15" autocomplete="off"></div>
           <div><label for="nsNat">الجنسية</label><select id="nsNat"><option>سعودي</option><option>مقيم</option></select></div>
           <div><label for="nsPhone">رقم الجوال</label><input id="nsPhone" inputmode="tel" maxlength="10" placeholder="05xxxxxxxx"></div>
           <div><label for="nsSifa">الصفة *</label><select id="nsSifa"></select></div>
+          <div><label for="nsBirth">تاريخ الميلاد</label><input id="nsBirth" type="date"></div>
           <div><label for="nsStart">تاريخ المباشرة</label><input id="nsStart" type="date"></div>
-          <div class="full"><label for="nsHal">إسناد حلقة في مثاني (اختياري)</label><select id="nsHal"></select></div>
+          <div class="full"><label for="nsHal">إسناد حلقة في مجمع ربيع القلوب (اختياري)</label><select id="nsHal"></select></div>
         </div>
         <button class="btn" id="nsSave">تسجيل الموظف</button>
         <div id="nsMsg"></div>
@@ -1771,7 +1778,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.ann = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; ICONS.preTest = ICONS.exam || ICONS.book; ICONS.assocNom = ICONS.exam || ICONS.book; ICONS.strug = ICONS.book; ICONS.planF = ICONS.plans; ICONS.msgArc = ICONS.chat; ICONS.eduCfg = ICONS.settings; ICONS.arc = ICONS.settings; ICONS.accs = ICONS.settings; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgsStu = ICONS.chat; ICONS.msgsStaff = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.ann = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; ICONS.preTest = ICONS.exam || ICONS.book; ICONS.assocNom = ICONS.exam || ICONS.book; ICONS.strug = ICONS.book; ICONS.planF = ICONS.plans; ICONS.msgArc = ICONS.chat; ICONS.eduCfg = ICONS.settings; ICONS.me = ICONS.settings; ICONS.arc = ICONS.settings; ICONS.accs = ICONS.settings; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgsStu = ICONS.chat; ICONS.msgsStaff = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1787,12 +1794,13 @@ async function loadHome(){
   // التبويبات على يمين الصفحة
   TABS = [];
   const P = r.perms || [];
-  if (r.roles.indexOf('teacher') !== -1 || r.roles.indexOf('admin') !== -1) TABS.push(['teach', 'التقييم']);
+  const mineH = (r.halaqat || []).some(h => h.mine), evAll = P.indexOf('halaqat.evaluate_all') !== -1;
+  if (r.roles.indexOf('admin') === -1){ if (mineH || evAll) TABS.push(['teach', 'التقييم']); else if (r.evalView && (r.halaqat || []).length) TABS.push(['teach', 'التقييم (اطلاع)']); }
   if (P.indexOf('students.plans_all') !== -1) TABS.push(['plans', 'بناء الخطط التعليمية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.view_all') !== -1){ TABS.push(['studentsList', 'بيانات الطلاب']); TABS.push(['stuFile', 'ملف الطالب']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('competition.manage') !== -1 || P.indexOf('competition.store') !== -1)) TABS.push(['compete', 'المنافس']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.add') !== -1){ TABS.push(['studentNew', 'تسجيل طالب']); TABS.push(['regLink', 'رابط التسجيل']); TABS.push(['apps', 'طلبات المتقدمين']); }
-  if (r.roles.indexOf('admin') === -1 && r.roles.indexOf('teacher') !== -1) TABS.push(['myStu', 'طلاب الحلقة']);
+  if (r.roles.indexOf('admin') === -1 && mineH){ TABS.push(['myStu', 'طلاب الحلقة']); if (P.indexOf('halaqat.reports_all') === -1) TABS.push(['report', 'تقارير الحلقة']); }
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.students') !== -1) TABS.push(['refsStu', 'إحالات شؤون الطلاب']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.edu') !== -1){ TABS.push(['refsEdu', 'الإحالات التعليمية']); TABS.push(['refsExam', 'ترشيحات المرحلية']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
@@ -1804,13 +1812,14 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.teachers') !== -1) TABS.push(['tchPerf', 'أداء المعلمين']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('ann.manage') !== -1) TABS.push(['ann', 'الإعلانات']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1){ TABS.push(['msgs', 'رسائل أولياء الأمور']); TABS.push(['msgsStu', 'رسائل الطلاب']); TABS.push(['msgsStaff', 'رسائل الموظفين']); TABS.push(['msgArc', 'أرشيف الرسائل']); }
-  if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['preTest', 'الاختبار قبل الترشيح']); TABS.push(['assocNom', 'ترشيحات الجمعية']); TABS.push(['strug', 'الطلاب المتعثرون']); TABS.push(['planF', 'متابعة الخطط']); }
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1){ TABS.push(['msgs', 'رسائل أولياء الأمور']); TABS.push(['msgsStaff', 'رسائل الموظفين']); TABS.push(['msgArc', 'أرشيف الرسائل']); }
+  if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['preTest', 'الاختبار قبل الترشيح']); TABS.push(['assocNom', 'ترشيحات الجمعية']); TABS.push(['planF', 'متابعة الخطط']); }
   else if (r.roles.indexOf('admin') === -1 && P.indexOf('assoc.nominate') !== -1) TABS.push(['assocNom', 'ترشيحات الجمعية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
   if (r.roles.indexOf('parent') !== -1) TABS.push(['parent', 'أبنائي']);
+  if (r.roles.indexOf('admin') === -1) TABS.push(['me', 'الإعدادات']);
   const n = $('nav'); n.innerHTML = '';
   const admin = r.roles.indexOf('admin') !== -1;
   document.body.classList.toggle('admin', admin);
@@ -1818,21 +1827,21 @@ async function loadHome(){
   if (admin) buildAdminNav(n);
   else TABS.forEach(x => { const b = el('button'); b.dataset.r = x[0]; b.innerHTML = ICONS[x[0]]; b.appendChild(el('span', '', x[1])); b.onclick = () => openRole(x[0]); n.appendChild(b); });
   show('vHome');
-  openRole(admin ? 'dash' : 'welcome');   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
+  openRole(admin ? 'dash' : 'welcome'); updBell();   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
 }
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
-  { t:'التقييم', ic:'teach', r:'teach' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['teach', 'التقييم (اطلاع)'], ['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير الحضور'], ['staffFile', 'ملف الموظف (التقرير الشامل)'], ['tchPerf', 'أداء المعلمين'], ['courses', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['tvCfg', 'شاشة العرض']] },
-  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['assocNom', 'ترشيح الطلاب لاختبارات الجمعية'], ['planF', 'شاشة عرض متابعة الخطط'], ['preTest', 'اختبار طالب قبل الترشيح'], ['strug', 'الطلاب المتعثرون']] },
-  { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStu', 'رسائل الطلاب'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
+  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['planF', 'شاشة عرض متابعة الخطط']] },
+  { t:'الاختبارات', ic:'exam', items:[['refsExam', 'ترشيحات المعلمين للمرحلية'], ['assocNom', 'ترشيح الطلاب لاختبارات الجمعية'], ['preTest', 'اختبار طالب قبل الترشيح']] },
+  { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع']] },
-  { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['eduCfg', 'الشؤون التعليمية'], ['arc', 'الأرشفة السنوية']] }
+  { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
 ];
 function buildAdminNav(n){
-  n.appendChild(el('div', 'gtitle', 'لوحة المدير'));
+  const lg = el('div', 'navlogo'), im = el('img'); im.src = '../logo.jpg'; im.alt = ''; lg.appendChild(im); lg.appendChild(el('b', '', (D && D.orgShort) || 'مجمع ربيع القلوب')); n.appendChild(lg);
   ADMIN_NAV.forEach((g, gi) => {
     const w = el('div', 'ngroup'); w.dataset.g = gi;
     if (g.r){   // تبويب مباشر بلا خيارات (التقييم)
@@ -1880,6 +1889,8 @@ function openRole(r, title, group){
   if (r === 'planF') openPlanF();
   $('pMsgArc').classList.toggle('hidden', r !== 'msgArc');
   if (r === 'msgArc') openMsgArc();
+  $('pMe').classList.toggle('hidden', r !== 'me');
+  if (r === 'me') openMe();
   $('pArc').classList.toggle('hidden', r !== 'arc');
   if (r === 'arc') openArc();
   $('pEduCfg').classList.toggle('hidden', r !== 'eduCfg');
@@ -1941,19 +1952,29 @@ function openRole(r, title, group){
   if (r === 'report') openReport();
   window.scrollTo(0, 0);
 }
-$('brandHome').onclick = () => { if (D){ show('vHome'); openRole(document.body.classList.contains('admin') ? 'dash' : 'welcome'); } };
+$('brandHome').onclick = () => { if (D){ show('vHome'); closeMenu(); openRole('welcome'); window.scrollTo(0, 0); } };
 
 /* ---------- الترحيب ---------- */
+function roleText(){
+  const mine = (D.halaqat || []).filter(h => h.mine).map(h => h.name), kids = (D.children || []).map(c => String(c.name || '').split(' ')[0]);
+  if (D.roles.indexOf('admin') !== -1) return D.title || 'مدير المجمع';
+  if (D.title && D.title !== 'معلم') return D.title;
+  if (mine.length) return 'معلم ' + mine.join(' و');
+  if (D.roles.indexOf('teacher') !== -1) return D.title || 'موظف';
+  if (kids.length) return 'ولي أمر الطالب' + (kids.length > 1 ? 'ين' : '') + ': ' + kids.join(' و');
+  return '';
+}
 function renderWelcome(){
   renderAnnFor('annWelcome');
   const hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', hourCycle:'h23' }).format(new Date());
   const morning = hr >= 4 && hr < 12;
   $('sky').innerHTML = morning ? SUN : MOON;
-  $('greet').textContent = (morning ? 'صباح الخير' : 'مساء الخير') + (D.title && D.title !== 'معلم' && D.roles.indexOf('admin') === -1 ? ' • ' + D.title : '');
-  $('hello').textContent = 'أهلاً ' + (D.roles.indexOf('teacher') !== -1 ? 'أ. ' : '') + D.name;
+  $('greet').textContent = morning ? 'صباح الخير' : 'مساء الخير';
+  $('hello').textContent = 'أهلاً ' + String(D.name || '').split(' ')[0];
+  $('roleLine').textContent = roleText();
   $('when').textContent = fmtD(D.today, { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + ' م • ' +
     ud(D.today).toLocaleDateString('ar-SA', { timeZone:'UTC', day:'numeric', month:'long', year:'numeric' });
-  fill('myHals', (D.halaqat || []).filter(h => h.mine || (D.roles.indexOf('admin') === -1 && (D.perms || []).indexOf('halaqat.evaluate_all') === -1)).slice(0, 4).map(h => el('span', '', h.name)));
+  fill('myHals', []);
   $('pinNotice').classList.toggle('hidden', store.get('hq_must') !== '1');
   const st = D.stats;
   const box = $('stats'); box.innerHTML = ''; box.classList.toggle('hidden', !st);
@@ -1968,6 +1989,7 @@ function renderWelcome(){
     repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
     preTest:['الاختبار قبل الترشيح', 'اختبار داخلي قبل ترشيح الجمعية', ''], assocNom:['ترشيحات الجمعية', 'ترشيح المجتازين ونتائج الجمعية', 'gold'],
     strug:['الطلاب المتعثرون', 'من يحتاج متابعة تعليمية', ''], planF:['متابعة الخطط', 'إنجاز الخطط مقارنة بالمتوقع', ''], msgArc:['أرشيف الرسائل', 'سجل الرسائل وإحصائياتها', ''],
+    me:['الإعدادات', 'بياناتك وتغيير الرمز السري', ''],
     arc:['الأرشفة السنوية', 'نقل السجلات القديمة لملف أرشيف', ''],
     ann:['الإعلانات', 'نشر الإعلانات ومتابعة الاطلاع عليها', ''],
     staffFile:['ملف الموظف', 'تقرير شامل: البيانات والحضور والأداء والدورات', ''],
@@ -2000,12 +2022,13 @@ $('cpSave').onclick = async () => {
 };
 
 /* ---------- المعلم: الحضور ---------- */
+let teachRO = false;
 function openTeach(){
   const list = D.halaqat || [];
   if (!list.length){ fill('halChips', []); $('stuList').innerHTML = ''; msg('stuList', 'لا توجد حلقات مسندة إليك. راجع إدارة المجمع.', 'info'); return; }
   const saved = store.get('hq_hal');
   if (!hal || !list.some(h => h.hid === hal)) hal = list.some(h => h.hid === saved) ? saved : (list.find(h => h.mine) || list[0]).hid;
-  fill('halChips', list.map(h => { const b = el('button', h.hid === hal ? 'on' : '', h.name + (h.teacher && D.roles.indexOf('admin') !== -1 ? ' - ' + h.teacher : ''));
+  fill('halChips', list.map(h => { const b = el('button', h.hid === hal ? 'on' : '', h.name + (h.teacher && !h.mine ? ' - ' + h.teacher : ''));
     b.onclick = () => { flushAtt(); hal = h.hid; store.set('hq_hal', hal); openTeach(); }; return b; }));
   $('halChips').classList.toggle('hidden', list.length < 2);
   if (!day) day = D.today;
@@ -2023,6 +2046,7 @@ async function loadAtt(){
   let r;
   try { r = await api({ action:'attendance', hid:hal, date:day }); } catch(e){ if (e.message !== 'expired') msg('stuList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (!r.ok) return msg('stuList', r.msg, 'err');
+  teachRO = !!r.ro; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !teachRO);
   studs = r.students; exStuds = r.excluded || []; approval = r.approval; renderStuds(); renderAppr();
   if (!r.studyDay) $('saveState').textContent = 'تنبيه: هذا اليوم ليس من أيام الدراسة.';
 }
@@ -2090,6 +2114,7 @@ function renderExStuds(){
   });
 }
 function setAtt(s, st){
+  if (teachRO) return;
   const was = isPresent(s);
   s.att = st; pending[s.sid] = st; renderStuds();
   if (!was && isPresent(s)) openRec(s, D.types[0]);   // الحاضر ينتقل مباشرة للتسميع بالتتابع
@@ -2193,6 +2218,7 @@ $('apClose').onclick = () => $('ayahSheet').classList.add('hidden');
 $('ayahSheet').onclick = e => { if (e.target === $('ayahSheet')) $('ayahSheet').classList.add('hidden'); };
 
 function openRec(s, type){
+  if (teachRO) return;
   rs = { s, type:type || D.types[0], score:null, multi:false };
   $('rsForm').classList.remove('hidden'); $('rsEnd').classList.add('hidden');
   $('rsName').textContent = s.name; enterTab();
@@ -2623,7 +2649,7 @@ const AS_TABS = { preTest:[['wait', 'بانتظار الاختبار الداخ�
 async function openAssoc(mode){
   if (mode !== asMode){ asMode = mode; asT = AS_TABS[mode][0][0]; }
   $('asTitle').textContent = mode === 'preTest' ? 'اختبار طالب قبل الترشيح' : 'ترشيح الطلاب لاختبارات الجمعية';
-  $('asSub').textContent = mode === 'preTest' ? 'اختبار داخلي اختياري يسبق الترشيح، ومن يجتازه يظهر بعلامة ✓ عند الترشيح.' : 'اختر الحلقات ثم الطلاب والمرحلية وموعد الاختبار، ثم صدّر قائمة المرشحين للجمعية.';
+  $('asSub').textContent = '';
   $('asAdd').classList.add('hidden');
   $('asBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'assoc' }, 'asBox'); if (r && r.ok){ AX = r; renderAssoc(); }
 }
@@ -2631,7 +2657,7 @@ function renderAssoc(){
   $('asAdd').textContent = asMode === 'preTest' ? '+ إضافة طلاب للاختبار الداخلي' : '+ ترشيح طلاب';
   $('asAdd').classList.toggle('hidden', asMode === 'assocNom' && !AX.canNom);
   const isNom = asMode === 'assocNom' && asT === 'nom', dts = [...new Set(AX.list.filter(x => x.status === AX.st.nom).map(x => x.examDate || ''))].sort();
-  if (asDate && dts.indexOf(asDate) === -1) asDate = ''; const dc = $('asDates'); dc.innerHTML = ''; dc.classList.toggle('hidden', !isNom || dts.length < 1); $('asPdf').classList.toggle('hidden', !isNom);
+  if (asDate && dts.indexOf(asDate) === -1) asDate = ''; const dc = $('asDates'); dc.innerHTML = ''; dc.classList.toggle('hidden', !isNom || dts.length < 1); $('asPdf').classList.toggle('hidden', !isNom); $('asSetDate').classList.toggle('hidden', !isNom || !AX.canNom);
   if (isNom){ const a = el('button', asDate ? '' : 'on', 'كل المواعيد'); a.onclick = () => { asDate = ''; renderAssoc(); }; dc.appendChild(a);
     dts.forEach(d => { const n = AX.list.filter(x => x.status === AX.st.nom && (x.examDate || '') === d).length, b = el('button', asDate === d ? 'on' : '', (d || 'بلا موعد') + ' (' + n + ')'); b.onclick = () => { asDate = d; renderAssoc(); }; dc.appendChild(b); }); }
   const st = AX.st, tb = $('asTabs'); tb.innerHTML = '';
@@ -2658,7 +2684,9 @@ async function asDo(op, id, data, box){ const r = await cpCall({ action:'assocSa
 function asSheet(op, x){
   asAct = { op:op, x:x }; msg('asShMsg', '', ''); const b = $('asShBody'); b.innerHTML = ''; const F = {};
   const inp = (l, type, val, attrs) => { b.appendChild(lab(l)); const i = el(type === 'textarea' ? 'textarea' : 'input'); if (type !== 'textarea') i.type = type; if (val) i.value = val; Object.assign(i, attrs || {}); b.appendChild(i); return i; };
-  if (op === 'nomMany'){
+  if (op === 'date'){
+    const ids = asList().map(y => y.id); $('asShT').textContent = 'موعد اختبار الجمعية لـ ' + ids.length + ' طالب'; F.examDate = inp('تاريخ الاختبار *', 'date', asDate || ''); F.ids = () => ids;
+  } else if (op === 'nomMany'){
     $('asShT').textContent = 'ترشيح طلاب لاختبار الجمعية';
     F.examDate = inp('تاريخ الاختبار *', 'date', asDate || '');
     b.appendChild(lab('الحلقات', true)); const hs = selBox(AX.halaqat.map(h => h.name), true); b.appendChild(hs);
@@ -2696,10 +2724,12 @@ function asSheet(op, x){
   }
   asAct.F = F; $('asSheet').classList.remove('hidden');
 }
+$('asSetDate').onclick = () => { if (AX && asList().length) asSheet('date', null); };
 $('asAdd').onclick = () => AX && asSheet(asMode === 'preTest' ? 'add' : 'nomMany', null); $('asClose').onclick = () => $('asSheet').classList.add('hidden');
 $('asShSave').onclick = async () => {
   const F = asAct.F, d = {}; Object.keys(F).forEach(k => d[k] = typeof F[k] === 'function' ? F[k]() : F[k].value.trim());
   if (asAct.op === 'add' && (!d.level || !d.sids.length)) return msg('asShMsg', 'اختر المرحلية والطلاب.', 'err');
+  if (asAct.op === 'date'){ if (!d.examDate) return msg('asShMsg', 'حدد التاريخ.', 'err'); $('asShSave').disabled = true; const r = await asDo('dateMany', '', d, 'asShMsg'); $('asShSave').disabled = false; if (r && r.ok){ asDate = r.examDate; renderAssoc(); } return; }
   if (asAct.op === 'nomMany'){ if (!d.examDate) return msg('asShMsg', 'حدد تاريخ الاختبار.', 'err'); if (!d.items.length) return msg('asShMsg', 'حدد طالباً واحداً على الأقل.', 'err');
     const miss = d.items.filter(x => !x.level).length; if (miss) return msg('asShMsg', 'حدد المرحلية لكل طالب محدد (' + miss + ' بدون مرحلية).', 'err'); }
   if (asAct.op === 'pre' && !(d.score !== '' && +d.score >= 0 && +d.score <= 100)) return msg('asShMsg', 'اكتب الدرجة من 0 إلى 100.', 'err');
@@ -2803,6 +2833,14 @@ function renderMsgArc(){
     const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (m.status === 'أُرسلت' ? 'p-ok' : m.status === 'فشلت' ? 'p-red' : 'p-late'), m.status)); pl.appendChild(el('span', 'pill p-none', m.kind)); pl.appendChild(el('span', 'pill p-none', (m.sentAt || m.at).slice(0, 16))); pl.appendChild(el('span', 'pill p-none', m.phone)); w.appendChild(pl);
     w.appendChild(el('p', '', m.text + (m.err ? '\n⚠️ ' + m.err : ''))); w.onclick = () => w.classList.toggle('open'); b.appendChild(w); });
 }
+
+/* ---------- الإعدادات: تعديل البيانات ---------- */
+function openMe(){
+  const g = $('meKv'); g.innerHTML = ''; const m = D.me || {};
+  kvRow(g, 'الاسم', D.name); kvRow(g, 'رقم الهوية', m.nid); kvRow(g, 'الصفة', roleText()); kvRow(g, 'الجوال', m.phone); kvRow(g, 'الرقم الوظيفي', m.emp);
+  kvRow(g, 'الجنسية', m.nat); kvRow(g, 'تاريخ المباشرة', m.start); kvRow(g, 'حلقاتي', (D.halaqat || []).filter(h => h.mine).map(h => h.name)); kvRow(g, 'الأبناء', (D.children || []).map(c => c.name));
+}
+$('meChangePin').onclick = () => openPin();
 
 /* ---------- الأرشفة السنوية ---------- */
 let AR = null;
@@ -4123,7 +4161,7 @@ function renderCamps(list){
 }
 
 /* ---------- طلاب الحلقة: الإحالات وترشيح المرحلية ومتابعتها ---------- */
-const MS_TABS = [['stu', 'إحالة لشؤون الطلاب'], ['edu', 'إحالة للشؤون التعليمية'], ['exam', 'ترشيح لاختبار مرحلية'], ['track', 'متابعة الإحالات'], ['files', 'ملفات الطلاب']];
+const MS_TABS = [['stu', 'إحالة لشؤون الطلاب'], ['edu', 'إحالة للشؤون التعليمية'], ['exam', 'ترشيح طالب لاختبار مرحلية'], ['track', 'متابعة الإحالات'], ['files', 'ملفات الطلاب']];
 const MSI = {
   stu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 11h6M19 8l3 3-3 3"/></svg>',
   edu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"/></svg>',
@@ -4154,7 +4192,12 @@ function updBell(){
   const P = (D && D.perms) || [], adm = P.indexOf('*') !== -1, c = refUnread();
   const isT = D && D.roles && D.roles.indexOf('teacher') !== -1;
   const show = isT || adm || P.indexOf('refs.students') !== -1 || P.indexOf('refs.edu') !== -1;
-  $('btnBell').classList.toggle('hidden', !show); document.body.classList.toggle('bell', show);
+  $('btnBell').classList.toggle('hidden', !show);
+  const bm = { myStu:c.mine, refsStu:c.stu, refsEdu:c.edu, refsExam:c.exam };
+  document.querySelectorAll('#nav button[data-r]').forEach(b => { const k = b.dataset.r; let x = b.querySelector('.nbdg'); const v = bm[k] || 0;
+    if (!(k in bm)) return; if (!v){ if (x) x.remove(); return; } if (!x){ x = el('span', 'nbdg'); b.appendChild(x); } x.textContent = v; });
+  document.querySelectorAll('#nav .ngroup').forEach(w => { const h = w.querySelector('.ghead'); if (!h) return; let x = h.querySelector('.nbdg'); const v = [...w.querySelectorAll('.gitems .nbdg')].reduce((a, y) => a + (+y.textContent || 0), 0);
+    if (!v){ if (x) x.remove(); return; } if (!x){ x = el('span', 'nbdg'); h.insertBefore(x, h.querySelector('.chev')); } x.textContent = v; });
   const n = c.mine + c.stu + c.edu + c.exam; $('bellN').textContent = n; $('bellN').classList.toggle('hidden', !n);
 }
 $('btnBell').onclick = () => {
@@ -4314,6 +4357,12 @@ function openRf(x, side){
       const sc = el('input'); sc.type = 'number'; sc.min = 0; sc.max = 100; sc.inputMode = 'numeric'; sc.value = x.score; fld('الدرجة (من 100)', sc);
       const rs = el('select'); fillSel2(rs, ['اجتاز', 'يعيد الاختبار'], '— النتيجة —'); rs.value = x.result; fld('النتيجة', rs);
       rp.appendChild(g4); R.exam = () => ({ date:dt.value, examiner:ex.value.trim(), score:sc.value.trim(), result:rs.value });
+    }
+    if (x.kind === 'exam' && ((D.perms || []).indexOf('*') !== -1 || (D.perms || []).indexOf('assoc.nominate') !== -1)){
+      const mv = el('button', 'btn gold', 'نقل إلى ترشيحات اختبار الجمعية'); mv.type = 'button'; mv.style.marginBottom = '10px';
+      mv.onclick = async () => { mv.disabled = true; const r = await cpCall({ action:'assocSave', op:'fromRef', data:{ refId:x.id } }, 'rfMsg'); mv.disabled = false; if (!r || !r.ok) return;
+        toast(r.msg); $('rfSheet').classList.add('hidden'); AX = r; asT = 'nom'; asDate = ''; openRole('assocNom'); };
+      rp.appendChild(mv);
     }
     rp.appendChild(lab('الحالة')); const st = selBox(['قيد المعالجة', 'مغلقة']); st.set(x.status === 'جديدة' ? '' : x.status); rp.appendChild(st); R.status = st.get;
   }
@@ -4781,13 +4830,13 @@ async function openNewStaff(){
   fillSel('nsSifa', L.sifa.map(x => [x, x])); $('nsSifa').value = 'معلم';
   const tn = {}; SD.staff.forEach(x => tn[x.nid] = x.name);
   fillSel('nsHal', (SD.halaqat || []).map(h => [h.hid, h.name + (h.tnid ? ' (حالياً: ' + (tn[h.tnid] || h.tnid) + ')' : ' (بدون معلم)')]), '— بدون —');
-  ['nsN1','nsN2','nsN3','nsN4','nsNid','nsPhone'].forEach(id => $(id).value = '');
+  ['nsN1','nsN2','nsN3','nsN4','nsNid','nsPhone','nsBirth'].forEach(id => $(id).value = '');
   $('nsEmp').textContent = SD.nextEmp || '—'; $('nsNat').value = 'سعودي'; $('nsStart').value = D.today || '';
   msg('nsMsg', '', ''); $('nsSave').disabled = false; $('nsN1').focus();
 }
 $('nsSave').onclick = async () => {
-  const data = { n1:$('nsN1').value.trim(), n2:$('nsN2').value.trim(), n3:$('nsN3').value.trim(), n4:$('nsN4').value.trim(), nid:$('nsNid').value, nat:$('nsNat').value, phone:$('nsPhone').value, sifa:$('nsSifa').value, start:$('nsStart').value };
-  const miss = [['n1','الاسم الأول'],['n2','اسم الأب'],['n4','الاسم الأخير']].filter(x => !data[x[0]]).map(x => x[1]);
+  const data = { n1:$('nsN1').value.trim(), n2:$('nsN2').value.trim(), n3:$('nsN3').value.trim(), n4:$('nsN4').value.trim(), nid:$('nsNid').value, nat:$('nsNat').value, phone:$('nsPhone').value, sifa:$('nsSifa').value, start:$('nsStart').value, birth:$('nsBirth').value };
+  const miss = [['n1','الاسم الأول'],['n2','اسم الأب'],['n3','اسم الجد'],['n4','الاسم الأخير']].filter(x => !data[x[0]]).map(x => x[1]);
   if (miss.length) return msg('nsMsg', 'أكمل: ' + miss.join('، '), 'err');
   if (!data.nid.trim()) return msg('nsMsg', 'أدخل رقم الهوية / الإقامة.', 'err');
   $('nsSave').disabled = true; msg('nsMsg', 'جاري التسجيل...', 'info');
