@@ -245,6 +245,13 @@
     #dsPrint .ph{display:flex;justify-content:space-between;border-bottom:2px solid #D08E2C;padding-bottom:5px;margin-bottom:6px} }
 
 
+
+  /* الإعلانات */
+  .annc{border-radius:16px;padding:14px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-inline-start:5px solid var(--navy3);cursor:pointer}
+  .annc.p-مهم{border-inline-start-color:var(--gold)} .annc.p-عاجل{border-inline-start-color:var(--red);background:var(--errbg)}
+  .annc .h{display:flex;align-items:center;gap:8px} .annc .h b{flex:1;font-size:16px} .annc .h small{color:var(--muted);font-size:12px}
+  .annc p{margin:6px 0 0;white-space:pre-line;font-size:14.5px;line-height:1.7;max-height:3.4em;overflow:hidden} .annc.open p{max-height:none}
+  .annc.read{opacity:.75} .annc .new{width:9px;height:9px;border-radius:50%;background:var(--red);flex:none}
   /* الدورات */
   .trrow{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)} .trrow:last-child{border-bottom:0}
   .trrow input[type=checkbox]{width:20px;height:20px} .trrow b{font-size:15px;font-weight:600} .trrow small{color:var(--muted)}
@@ -600,6 +607,7 @@
     </div>
     <!-- الترحيب -->
     <div id="pWelcome" class="hidden">
+      <div id="annWelcome"></div>
       <div class="notice hidden" id="pinNotice">أنت تستخدم الرمز الأولي. غيّره لحماية حسابك.<button id="btnPin2">تغيير الآن</button></div>
       <div class="welcome">
         <svg class="sky" id="sky" viewBox="0 0 120 120"></svg>
@@ -713,6 +721,17 @@
         <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
       </div>
       <div class="card" id="heList"></div>
+    </div>
+
+    <!-- الإعلانات (الإدارة) -->
+    <div id="pAnn" class="hidden">
+      <div class="card">
+        <h2>الإعلانات</h2>
+        <small>انشر إعلاناً للموظفين (كلهم أو بحسب الصفة) أو لأولياء الأمور أو على شاشة العرض، بمدة ظهور وأهمية، مع إمكانية إرساله واتساب، ومتابعة من اطلع عليه.</small>
+        <div class="stchips" id="anSum"></div>
+        <button class="btn" id="anAdd" style="margin-top:10px">+ إعلان جديد</button>
+      </div>
+      <div class="card" id="anBox"></div>
     </div>
 
     <!-- ملف الموظف (التقرير الشامل) -->
@@ -1413,6 +1432,21 @@
 </div>
 
 
+
+<!-- إعلان -->
+<div class="sheet hidden" id="anSheet">
+  <div class="panel">
+    <div class="head"><h2 id="anTitle">إعلان جديد</h2><button class="iconbtn" id="anClose">إغلاق</button></div>
+    <label for="anT">العنوان *</label><input id="anT" maxlength="120">
+    <label for="anB">النص</label><textarea id="anB" class="rftxt" maxlength="2000"></textarea>
+    <label>يظهر لـ *</label><div class="rfsel" id="anAud"></div>
+    <div id="anTitlesW" class="hidden"><label>صفات الموظفين (بدون اختيار = كل الموظفين)</label><div class="rfsel" id="anTitles"></div></div>
+    <div class="edgrid"><div><label for="anFrom">يبدأ من</label><input type="date" id="anFrom"></div><div><label for="anTo">ينتهي في</label><input type="date" id="anTo"></div></div>
+    <label>الأهمية</label><div class="rfsel" id="anPrio"></div>
+    <label class="chk" style="margin-top:12px"><input type="checkbox" id="anWa"> إرساله أيضاً برسالة واتساب للفئات المختارة</label>
+    <button class="btn" id="anSave">نشر الإعلان</button><div id="anMsg"></div>
+  </div>
+</div>
 <!-- دورة تدريبية -->
 <div class="sheet hidden" id="crSheet">
   <div class="panel">
@@ -1629,7 +1663,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.ann = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1660,6 +1694,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && P.indexOf('staff.courses') !== -1) TABS.push(['courses', 'الدورات التدريبية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.staffAtt') !== -1) TABS.push(['staffAtt', 'تقرير حضور الموظفين']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.teachers') !== -1) TABS.push(['tchPerf', 'أداء المعلمين']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('ann.manage') !== -1) TABS.push(['ann', 'الإعلانات']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1) TABS.push(['msgs', 'رسائل أولياء الأمور']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
@@ -1684,7 +1719,7 @@ const ADMIN_NAV = [
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع'], ['soon', 'تقرير المجمع']] },
-  { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['soon', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
+  { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['ann', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
 ];
 function buildAdminNav(n){
   n.appendChild(el('div', 'gtitle', 'لوحة المدير'));
@@ -1727,6 +1762,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pAnn').classList.toggle('hidden', r !== 'ann');
+  if (r === 'ann') openAnn();
   $('pStfFile').classList.toggle('hidden', r !== 'staffFile');
   if (r === 'staffFile') openStfFile(sfNid);
   $('pCourses').classList.toggle('hidden', r !== 'courses');
@@ -1784,6 +1821,7 @@ $('brandHome').onclick = () => { if (D){ show('vHome'); openRole(document.body.c
 
 /* ---------- الترحيب ---------- */
 function renderWelcome(){
+  renderAnnFor('annWelcome');
   const hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', hourCycle:'h23' }).format(new Date());
   const morning = hr >= 4 && hr < 12;
   $('sky').innerHTML = morning ? SUN : MOON;
@@ -1804,6 +1842,7 @@ function renderWelcome(){
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
     repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
+    ann:['الإعلانات', 'نشر الإعلانات ومتابعة الاطلاع عليها', ''],
     staffFile:['ملف الموظف', 'تقرير شامل: البيانات والحضور والأداء والدورات', ''],
     courses:['الدورات التدريبية', 'دورات الموظفين ومتدربوها وشهاداتهم', ''],
     staffAtt:['تقرير حضور الموظفين', 'الحضور والتأخير والغياب من البصمة', ''],
@@ -2449,6 +2488,58 @@ $('hlSave').onclick = async () => {
     $('hlSheet').classList.add('hidden'); toast(r.msg); openHalEdit();
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
+};
+
+/* ---------- الإعلانات ---------- */
+let AN = null, anF = 'نشط', anCur = null, anAudB = null, anTitB = null, anPrB = null;
+const AN_AUD = [['staff', 'الموظفون'], ['parents', 'أولياء الأمور'], ['tv', 'شاشة العرض']];
+/* عرض الإعلانات للمستخدم (الترحيب / أبنائي) */
+function renderAnnFor(id){
+  const box = $(id); if (!box) return; box.innerHTML = '';
+  (D.ann || []).forEach(a => { const c = el('div', 'annc p-' + a.prio + (a.read ? ' read' : '')), h = el('div', 'h');
+    if (!a.read) h.appendChild(el('span', 'new')); h.appendChild(el('b', '', (a.prio === 'عاجل' ? '🔴 ' : a.prio === 'مهم' ? '📌 ' : '📢 ') + a.title)); h.appendChild(el('small', '', a.at)); c.appendChild(h);
+    if (a.body) c.appendChild(el('p', '', a.body));
+    c.onclick = () => { c.classList.toggle('open'); if (!a.read){ a.read = true; c.classList.add('read'); const n = c.querySelector('.new'); if (n) n.remove(); api({ action:'annRead', id:a.id }).catch(() => {}); } };
+    box.appendChild(c); });
+}
+async function openAnn(){ $('anBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'annList' }, 'anBox'); if (r && r.ok){ AN = r; renderAnn(); } }
+function renderAnn(){
+  const sum = $('anSum'); sum.innerHTML = '';
+  ['نشط', 'مجدول', 'منتهٍ', 'مؤرشف'].forEach(k => { const n = AN.list.filter(a => a.state === k).length; if (k !== 'نشط' && !n) return; const b = el('button', anF === k ? 'on' : '', ({ 'نشط':'النشطة', 'مجدول':'المجدولة', 'منتهٍ':'المنتهية', 'مؤرشف':'المؤرشفة' })[k] + ' (' + n + ')'); b.onclick = () => { anF = k; renderAnn(); }; sum.appendChild(b); });
+  const box = $('anBox'); box.innerHTML = ''; const list = AN.list.filter(a => a.state === anF);
+  if (!list.length) return box.appendChild(el('small', '', AN.list.length ? 'لا توجد إعلانات في هذا التصنيف.' : 'لم تُنشر إعلانات بعد.'));
+  list.forEach(a => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', a.title)); w.appendChild(tp);
+    const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (a.prio === 'عاجل' ? 'p-red' : a.prio === 'مهم' ? 'p-late' : 'p-none'), a.prio)); a.aud.forEach(x => pl.appendChild(el('span', 'pill p-none', (AN_AUD.find(y => y[0] === x) || [x, x])[1] + (x === 'staff' && a.titles.length ? ' (' + a.titles.join('، ') + ')' : ''))));
+    if (a.aud.indexOf('staff') !== -1) pl.appendChild(el('span', 'pill ' + (a.staffRead.length === a.staffN ? 'p-ok' : 'p-late'), 'اطلع ' + a.staffRead.length + ' من ' + a.staffN + ' موظف'));
+    if (a.aud.indexOf('parents') !== -1 && a.parentRead) pl.appendChild(el('span', 'pill p-ok', 'اطلع ' + a.parentRead + ' ولي أمر')); w.appendChild(pl);
+    if (a.body){ const p = el('div', '', a.body); p.style.whiteSpace = 'pre-line'; p.style.marginTop = '6px'; p.style.fontSize = '14px'; w.appendChild(p); }
+    const m = el('div', 'meta'); [['النشر', a.at.slice(0, 16)], ['بواسطة', a.by], ['من', a.from], ['إلى', a.to]].forEach(x => { if (x[1]){ const d = el('span', '', x[0] + ': '); d.appendChild(el('i', '', x[1])); m.appendChild(d); } }); w.appendChild(m);
+    if (a.staffUnread.length && a.staffUnread.length <= 30) w.appendChild(el('small', '', 'لم يطلع: ' + a.staffUnread.join('، ')));
+    const ac = el('div', 'stact'), b = (t, cls, fn) => { const x = el('button', cls, t); x.onclick = fn; ac.appendChild(x); };
+    b('تعديل', '', () => openAnSheet(a));
+    if (a.state === 'مؤرشف') b('إعادة النشر', 'good', () => anOp(a, 'restore')); else b('أرشفة', 'warn', () => anOp(a, 'archive'));
+    b('حذف', 'danger', () => { if (confirm('حذف الإعلان نهائياً؟')) anOp(a, 'del'); });
+    w.appendChild(ac); box.appendChild(w); });
+}
+async function anOp(a, op){ const r = await cpCall({ action:'annOp', id:a.id, op:op }, 'anBox'); if (r && r.ok){ AN = r; toast(r.msg); renderAnn(); } }
+function openAnSheet(a){
+  anCur = a || null; msg('anMsg', '', ''); $('anTitle').textContent = a ? 'تعديل الإعلان' : 'إعلان جديد'; $('anSave').textContent = a ? 'حفظ التعديل' : 'نشر الإعلان';
+  if (!anAudB){ anAudB = selBox(AN_AUD.map(x => x[1]), true); $('anAud').appendChild(anAudB); anAudB.onpick = () => $('anTitlesW').classList.toggle('hidden', anAudB.get().indexOf('الموظفون') === -1);
+    anPrB = selBox(AN.prios); $('anPrio').appendChild(anPrB); }
+  $('anTitles').innerHTML = ''; anTitB = selBox(AN.titles, true); $('anTitles').appendChild(anTitB);
+  $('anT').value = a ? a.title : ''; $('anB').value = a ? a.body : ''; $('anFrom').value = a ? a.from : ''; $('anTo').value = a ? a.to : ''; $('anWa').checked = false;
+  anAudB.set(a ? a.aud.map(x => (AN_AUD.find(y => y[0] === x) || [x, x])[1]) : ['الموظفون']); anTitB.set(a ? a.titles : []); anPrB.set(a ? a.prio : 'عادي');
+  $('anTitlesW').classList.toggle('hidden', anAudB.get().indexOf('الموظفون') === -1);
+  $('anSheet').classList.remove('hidden');
+}
+$('anAdd').onclick = () => AN && openAnSheet(null); $('anClose').onclick = () => $('anSheet').classList.add('hidden');
+$('anSave').onclick = async () => {
+  const a = { id:anCur ? anCur.id : '', title:$('anT').value.trim(), body:$('anB').value.trim(), aud:AN_AUD.filter(x => anAudB.get().indexOf(x[1]) !== -1).map(x => x[0]), titles:anTitB.get(), from:$('anFrom').value, to:$('anTo').value, prio:anPrB.get() || 'عادي', wa:$('anWa').checked };
+  if (a.title.length < 3) return msg('anMsg', 'اكتب عنوان الإعلان.', 'err'); if (!a.aud.length) return msg('anMsg', 'اختر لمن يظهر الإعلان.', 'err');
+  if (a.from && a.to && a.to < a.from) return msg('anMsg', 'تاريخ الانتهاء قبل البداية.', 'err');
+  if (a.wa && !confirm('سيُرسل الإعلان واتساب لكل المستهدفين. متابعة؟')) return;
+  $('anSave').disabled = true; const r = await cpCall({ action:'annSave', ann:a }, 'anMsg'); $('anSave').disabled = false;
+  if (r && r.ok){ AN = r; toast(r.msg); $('anSheet').classList.add('hidden'); anF = 'نشط'; renderAnn(); }
 };
 
 /* ---------- ملف الموظف (التقرير الشامل) ---------- */
@@ -4559,6 +4650,7 @@ $('btnBack').onclick = () => { show('vHome'); if (role === 'teach') loadAtt(); }
 /* ---------- ولي الأمر ---------- */
 function renderParent(){
   const box = $('pParent'); box.innerHTML = '';
+  const ab = el('div'); ab.id = 'annParent'; box.appendChild(ab); renderAnnFor('annParent');
   (D.children || []).forEach(s => {
     const c = el('div', 'card'); box.appendChild(c);
     const me = el('div', 'me'), who = el('div', 'who');
