@@ -156,6 +156,12 @@
   <!-- 1) إدخال الرقم الوظيفي -->
   <section id="vLogin" class="card hidden">
     <h2>الدخول</h2>
+    <div id="rebindBox" class="hidden">
+      <label for="rbPin">رمزك السري في برنامج مثاني</label>
+      <input id="rbPin" type="password" inputmode="numeric" maxlength="6" placeholder="الرمز السري">
+      <button class="primary" id="btnRebind">نقل بصمتي إلى هذا الجوال</button>
+      <button class="link" id="btnRebindNo">رقم هوية آخر</button>
+    </div>
     <label for="empId">رقم الهوية / الإقامة</label>
     <input id="empId" inputmode="numeric" autocomplete="off" placeholder="10 أرقام" maxlength="15">
     <button class="primary" id="btnLogin">متابعة</button>
@@ -509,7 +515,8 @@ async function route(){
     empName = st.name || '';
     $('mainName').textContent = st.name || ''; $('mainAvatar').textContent = (st.name || '؟').trim().charAt(0);
     $('mainId').textContent = 'رقم الهوية: ' + empId.slice(0,2) + '••••••' + empId.slice(-2);
-    if (st.otherDevice){ show('vLogin'); store.del('rq_emp'); msg('loginMsg', 'هذا الجوال غير مسجل لك. البصمة تعمل من جوالك المسجل فقط.', 'err'); return; }
+    if (st.otherDevice){ show('vLogin'); rbMode(true); $('rbPin').value = ''; msg('loginMsg', 'هذا ليس جوالك المسجل. يمكنك نقل بصمتك إلى هذا الجوال برمزك في برنامج مثاني.', 'info'); return; }
+    rbMode(false);
     loadModels();
     gateVerify();
   }
@@ -871,6 +878,18 @@ $('btnLvSend').onclick = async () => {
   catch(e){ msg('lvFMsg', 'تعذّر الاتصال بالخادم.', 'err'); } finally { $('btnLvSend').disabled = false; }
 };
 $('btnLeave').onclick = openLeave;
+/* نقل البصمة لجوال جديد برمز مثاني (لمن غيّر جواله أو فتح الصفحة من متصفح آخر) */
+$('btnRebind').onclick = async () => {
+  const pin = $('rbPin').value; if (!/^\d{4,6}$/.test(pin)) return msg('loginMsg', 'أدخل رمزك في برنامج مثاني.', 'err');
+  $('btnRebind').disabled = true;
+  try {
+    const l = await mApi({ action:'login', nid:empId, pin:pin }); if (!l.ok) return msg('loginMsg', l.msg, 'err'); store.set('lv_token', l.token);
+    const r = await mApi({ action:'fpRebind', device:deviceId() }); if (!r.ok) return msg('loginMsg', r.msg, 'err');
+    rbMode(false); msg('loginMsg', r.msg, 'ok'); await route();
+  } catch(e){ msg('loginMsg', 'تعذّر الاتصال بالخادم.', 'err'); } finally { $('btnRebind').disabled = false; }
+};
+function rbMode(on){ $('rebindBox').classList.toggle('hidden', !on); ['empId', 'btnLogin'].forEach(id => $(id).classList.toggle('hidden', on)); document.querySelector('label[for=empId]').classList.toggle('hidden', on); }
+$('btnRebindNo').onclick = () => { rbMode(false); store.del('rq_emp'); msg('loginMsg', '', ''); };
 $('btnLvBack').onclick = () => { show('vMain'); lockPunch(!inRange); };
 $('btnRepBack').onclick = () => { show('vMain'); lockPunch(!inRange); };
 $('repPrev').onclick = () => shiftPeriod(-1);
