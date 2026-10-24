@@ -244,6 +244,11 @@
     #dsPrint table{width:100%;border-collapse:collapse} #dsPrint td,#dsPrint th{border:1px solid #bbb;padding:2px 4px;text-align:right;font-size:10px}
     #dsPrint .ph{display:flex;justify-content:space-between;border-bottom:2px solid #D08E2C;padding-bottom:5px;margin-bottom:6px} }
 
+
+  /* الدورات */
+  .trrow{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)} .trrow:last-child{border-bottom:0}
+  .trrow input[type=checkbox]{width:20px;height:20px} .trrow b{font-size:15px;font-weight:600} .trrow small{color:var(--muted)}
+  .trrow .x{grid-column:2;display:grid;grid-template-columns:1fr 1.4fr;gap:6px} .trrow .x select,.trrow .x input{font-size:13px;padding:7px}
   /* أداء المعلمين */
   .tcard{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer} .tcard:last-child{border-bottom:0}
   .tcard .nm b{display:block;font-size:16px} .tcard .nm small{color:var(--muted);font-size:12.5px}
@@ -708,6 +713,22 @@
         <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
       </div>
       <div class="card" id="heList"></div>
+    </div>
+
+    <!-- الدورات التدريبية -->
+    <div id="pCourses" class="hidden">
+      <div class="card">
+        <h2>الدورات التدريبية</h2>
+        <small>دورات الموظفين: إضافتها، وتسجيل المتدربين، ومتابعة إتمامها وشهاداتها، وسجل كل موظف التدريبي.</small>
+        <div class="seg" id="crTab"><button data-t="list" class="on">الدورات</button><button data-t="sum">سجل الموظفين التدريبي</button></div>
+      </div>
+      <div id="crList">
+        <div class="card"><div class="stchips" id="crSum"></div><button class="btn" id="crAdd" style="margin-top:10px">+ إضافة دورة</button></div>
+        <div class="card" id="crBox"></div>
+      </div>
+      <div id="crSumBox" class="hidden">
+        <div class="card"><input id="crQ" placeholder="ابحث باسم الموظف"><div class="dtw"><table class="dtbl" id="crTbl"></table></div><div class="stact"><button id="crXls">تصدير Excel</button></div></div>
+      </div>
     </div>
 
     <!-- تقرير حضور الموظفين -->
@@ -1371,6 +1392,34 @@
   </div>
 </div>
 
+
+<!-- دورة تدريبية -->
+<div class="sheet hidden" id="crSheet">
+  <div class="panel">
+    <div class="head"><h2 id="crTitle">إضافة دورة</h2><button class="iconbtn" id="crClose">إغلاق</button></div>
+    <div class="edgrid">
+      <div class="full"><label for="crName">اسم الدورة *</label><input id="crName" maxlength="120"></div>
+      <div><label for="crProv">الجهة المقدمة</label><input id="crProv" maxlength="100"></div>
+      <div><label for="crMode">طريقة التقديم</label><select id="crMode"><option>حضوري</option><option>عن بعد</option><option>مدمج</option></select></div>
+      <div><label for="crFrom">من تاريخ</label><input type="date" id="crFrom"></div>
+      <div><label for="crTo">إلى تاريخ</label><input type="date" id="crTo"></div>
+      <div><label for="crHours">عدد الساعات</label><input id="crHours" type="number" min="0" max="1000" inputmode="numeric"></div>
+      <div><label for="crPlace">المكان / الرابط</label><input id="crPlace" maxlength="300"></div>
+      <div class="full"><label for="crNotes">ملاحظات</label><input id="crNotes" maxlength="500"></div>
+    </div>
+    <button class="btn" id="crSave">حفظ الدورة</button><div id="crMsg"></div>
+  </div>
+</div>
+<!-- متدربو الدورة -->
+<div class="sheet hidden" id="trSheet">
+  <div class="panel">
+    <div class="head"><h2 id="trTitle">المتدربون</h2><button class="iconbtn" id="trClose">إغلاق</button></div>
+    <small>حدد الموظفين المسجلين في الدورة، ثم حالة كل منهم ورابط شهادته إن وُجد.</small>
+    <input id="trQ" placeholder="ابحث باسم الموظف" style="margin-top:8px">
+    <div id="trBox" style="margin-top:6px"></div>
+    <button class="btn" id="trSave">حفظ المتدربين</button><div id="trMsg"></div>
+  </div>
+</div>
 <div id="sfPrint"></div><div id="dsPrint"></div>
 <!-- تفاصيل الإحالة والردود -->
 <div class="sheet hidden" id="rfSheet">
@@ -1560,7 +1609,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1587,6 +1636,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.students') !== -1) TABS.push(['repStu', 'تقارير شؤون الطلاب']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.edu') !== -1) TABS.push(['repEdu', 'التقارير التعليمية']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('staff.courses') !== -1) TABS.push(['courses', 'الدورات التدريبية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.staffAtt') !== -1) TABS.push(['staffAtt', 'تقرير حضور الموظفين']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.teachers') !== -1) TABS.push(['tchPerf', 'أداء المعلمين']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
@@ -1608,7 +1658,7 @@ async function loadHome(){
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
-  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['tchPerf', 'أداء المعلمين'], ['soon', 'الدورات التدريبية']] },
+  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['tchPerf', 'أداء المعلمين'], ['courses', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['tvCfg', 'شاشة العرض']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
@@ -1656,6 +1706,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pCourses').classList.toggle('hidden', r !== 'courses');
+  if (r === 'courses') openCourses();
   $('pSAtt').classList.toggle('hidden', r !== 'staffAtt');
   if (r === 'staffAtt') openSAtt();
   $('pTch').classList.toggle('hidden', r !== 'tchPerf');
@@ -1729,6 +1781,7 @@ function renderWelcome(){
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
     repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
+    courses:['الدورات التدريبية', 'دورات الموظفين ومتدربوها وشهاداتهم', ''],
     staffAtt:['تقرير حضور الموظفين', 'الحضور والتأخير والغياب من البصمة', ''],
     tchPerf:['أداء المعلمين', 'مؤشرات المعلمين وترتيبهم', ''],
     dash:['شاشة عرض المجمع', 'لوحة المجمع اليومية وتقاريرها الشاملة', 'gold'],
@@ -2371,6 +2424,67 @@ $('hlSave').onclick = async () => {
     $('hlSheet').classList.add('hidden'); toast(r.msg); openHalEdit();
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
+};
+
+/* ---------- الدورات التدريبية ---------- */
+let CR = null, crF = '', crCur = null, trSel = {};
+const CR_ST = { 'جارية':'p-ok', 'قادمة':'p-late', 'منتهية':'p-none', 'مخططة':'p-none' };
+document.querySelectorAll('#crTab button').forEach(b => b.onclick = () => { document.querySelectorAll('#crTab button').forEach(x => x.classList.toggle('on', x === b)); $('crList').classList.toggle('hidden', b.dataset.t !== 'list'); $('crSumBox').classList.toggle('hidden', b.dataset.t !== 'sum'); if (CR) b.dataset.t === 'sum' ? renderCrSum() : renderCourses(); });
+async function openCourses(){ $('crBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'courses' }, 'crBox'); if (r && r.ok){ CR = r; renderCourses(); renderCrSum(); } }
+function renderCourses(){
+  const sum = $('crSum'); sum.innerHTML = '';
+  [['', 'الكل'], ['جارية', 'جارية'], ['قادمة', 'قادمة'], ['منتهية', 'منتهية'], ['مخططة', 'مخططة']].forEach(x => { const n = CR.courses.filter(c => !x[0] || c.state === x[0]).length; if (x[0] && !n) return; const b = el('button', crF === x[0] ? 'on' : '', x[1] + ' (' + n + ')'); b.onclick = () => { crF = x[0]; renderCourses(); }; sum.appendChild(b); });
+  const box = $('crBox'); box.innerHTML = ''; const list = CR.courses.filter(c => !crF || c.state === crF);
+  if (!list.length) return box.appendChild(el('small', '', CR.courses.length ? 'لا توجد دورات في هذا التصنيف.' : 'لم تُضف دورات بعد. اضغط «إضافة دورة».'));
+  list.forEach(c => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', c.title)); w.appendChild(tp);
+    const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (CR_ST[c.state] || 'p-none'), c.state)); pl.appendChild(el('span', 'pill p-none', c.mode)); if (c.hours) pl.appendChild(el('span', 'pill p-none', c.hours + ' ساعة'));
+    const done = c.trainees.filter(t => t.status === 'أتمّ الدورة').length; pl.appendChild(el('span', 'pill ' + (c.trainees.length ? 'p-ok' : 'p-none'), c.trainees.length + ' متدرب' + (done ? ' • أتمّ ' + done : ''))); w.appendChild(pl);
+    const m = el('div', 'meta'); [['الجهة', c.provider], ['من', c.from], ['إلى', c.to !== c.from ? c.to : ''], ['المكان', c.place], ['ملاحظات', c.notes]].forEach(p => { if (p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } }); w.appendChild(m);
+    if (c.trainees.length) w.appendChild(el('small', '', c.trainees.map(t => t.name.split(' ').slice(0, 2).join(' ') + (t.status !== 'مسجّل' ? ' (' + t.status + ')' : '')).join('، ')));
+    const ac = el('div', 'stact'), b1 = el('button', 'good', 'المتدربون'), b2 = el('button', '', 'تعديل'), b3 = el('button', 'danger', 'حذف');
+    b1.onclick = () => openTr(c); b2.onclick = () => openCr(c); b3.onclick = async () => { if (!confirm('حذف دورة «' + c.title + '» ومتدربيها؟')) return; const r = await cpCall({ action:'courseDel', id:c.id }, 'crBox'); if (r && r.ok){ CR = r; toast(r.msg); renderCourses(); } };
+    [b1, b2, b3].forEach(x => ac.appendChild(x)); w.appendChild(ac); box.appendChild(w); });
+}
+function openCr(c){
+  crCur = c || null; msg('crMsg', '', ''); $('crTitle').textContent = c ? 'تعديل الدورة' : 'إضافة دورة';
+  $('crName').value = c ? c.title : ''; $('crProv').value = c ? c.provider : ''; $('crMode').value = c ? c.mode || 'حضوري' : 'حضوري'; $('crFrom').value = c ? c.from : ''; $('crTo').value = c ? c.to : '';
+  $('crHours').value = c && c.hours ? c.hours : ''; $('crPlace').value = c ? c.place : ''; $('crNotes').value = c ? c.notes : ''; $('crSheet').classList.remove('hidden');
+}
+$('crAdd').onclick = () => openCr(null); $('crClose').onclick = () => $('crSheet').classList.add('hidden');
+$('crSave').onclick = async () => {
+  const c = { id:crCur ? crCur.id : '', title:$('crName').value.trim(), provider:$('crProv').value.trim(), mode:$('crMode').value, from:$('crFrom').value, to:$('crTo').value, hours:$('crHours').value, place:$('crPlace').value.trim(), notes:$('crNotes').value.trim() };
+  if (c.title.length < 3) return msg('crMsg', 'اكتب اسم الدورة.', 'err');
+  if (c.from && c.to && c.to < c.from) return msg('crMsg', 'تاريخ النهاية قبل البداية.', 'err');
+  $('crSave').disabled = true; const r = await cpCall({ action:'courseSave', course:c }, 'crMsg'); $('crSave').disabled = false;
+  if (r && r.ok){ CR = r; toast(r.msg); $('crSheet').classList.add('hidden'); renderCourses(); renderCrSum(); }
+};
+function openTr(c){
+  crCur = c; trSel = {}; c.trainees.forEach(t => trSel[t.nid] = { status:t.status, cert:t.cert }); $('trTitle').textContent = 'المتدربون: ' + c.title; $('trQ').value = ''; msg('trMsg', '', ''); drawTr(); $('trSheet').classList.remove('hidden');
+}
+function drawTr(){
+  const box = $('trBox'), q = normAr($('trQ').value); box.innerHTML = '';
+  CR.staff.filter(p => !q || normAr(p.name).indexOf(q) !== -1).forEach(p => { const w = el('div', 'trrow'), c = el('input'); c.type = 'checkbox'; c.checked = !!trSel[p.nid];
+    const nm = el('div'); nm.appendChild(el('b', '', p.name)); nm.appendChild(el('small', '', ' • ' + p.title)); w.appendChild(c); w.appendChild(nm);
+    if (trSel[p.nid]){ const x = el('div', 'x'), st = el('select'); fillSel2(st, CR.statuses); st.value = trSel[p.nid].status || 'مسجّل'; st.onchange = () => trSel[p.nid].status = st.value;
+      const ce = el('input'); ce.placeholder = 'رابط أو رقم الشهادة'; ce.dir = 'ltr'; ce.value = trSel[p.nid].cert || ''; ce.oninput = () => trSel[p.nid].cert = ce.value; x.appendChild(st); x.appendChild(ce); w.appendChild(el('span')); w.appendChild(x); }
+    c.onchange = () => { if (c.checked) trSel[p.nid] = { status:'مسجّل', cert:'' }; else delete trSel[p.nid]; drawTr(); }; box.appendChild(w); });
+}
+$('trQ').oninput = drawTr; $('trClose').onclick = () => $('trSheet').classList.add('hidden');
+$('trSave').onclick = async () => {
+  $('trSave').disabled = true; const r = await cpCall({ action:'courseTrainees', id:crCur.id, members:Object.keys(trSel).map(n => ({ nid:n, status:trSel[n].status, cert:trSel[n].cert })) }, 'trMsg'); $('trSave').disabled = false;
+  if (r && r.ok){ CR = r; toast(r.msg); $('trSheet').classList.add('hidden'); renderCourses(); renderCrSum(); }
+};
+function renderCrSum(){
+  const t = $('crTbl'), q = normAr($('crQ').value); t.innerHTML = '<thead><tr><th>الموظف</th><th>الصفة</th><th>الدورات المسجل فيها</th><th>الدورات المكتملة</th><th>ساعات التدريب</th></tr></thead>';
+  const tb = el('tbody'); sortBy(CR.summary.filter(x => !q || normAr(x.name).indexOf(q) !== -1), 'hours', -1).forEach(x => { const tr = el('tr'); [x.name, x.title, x.enrolled, x.done, x.hours].forEach((v, i) => tr.appendChild(el('td', i === 4 && v ? 'lv-g' : '', v))); tb.appendChild(tr); }); t.appendChild(tb);
+}
+$('crQ').oninput = () => CR && renderCrSum();
+$('crXls').onclick = () => {
+  if (!CR) return;
+  const sheets = [['سجل الموظفين', [['السجل التدريبي للموظفين'], ['الموظف', 'الصفة', 'الدورات المسجل فيها', 'الدورات المكتملة', 'ساعات التدريب']].concat(sortBy(CR.summary, 'hours', -1).map(x => [x.name, x.title, x.enrolled, x.done, x.hours]))],
+    ['الدورات', [['الدورات التدريبية'], ['الدورة', 'الجهة', 'الطريقة', 'من', 'إلى', 'الساعات', 'الحالة', 'المتدربون', 'أتمّوا']].concat(CR.courses.map(c => [c.title, c.provider, c.mode, c.from, c.to, c.hours, c.state, c.trainees.length, c.trainees.filter(t => t.status === 'أتمّ الدورة').length]))],
+    ['المتدربون', [['المتدربون في الدورات'], ['الدورة', 'الموظف', 'الحالة', 'الشهادة']].concat([].concat(...CR.courses.map(c => c.trainees.map(t => [c.title, t.name, t.status, t.cert]))))]];
+  const a = el('a'); a.href = URL.createObjectURL(xlsxBlob(sheets)); a.download = 'الدورات-التدريبية.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel');
 };
 
 /* ---------- تقرير حضور الموظفين ---------- */
