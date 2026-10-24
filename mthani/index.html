@@ -2094,7 +2094,7 @@ function renderWelcome(){
   $('hello').textContent = 'أهلاً ' + String(D.name || '').split(' ')[0];
   $('roleLine').textContent = roleText();
   $('when').textContent = fmtD(D.today, { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + ' م • ' +
-    ud(D.today).toLocaleDateString('ar-SA', { timeZone:'UTC', day:'numeric', month:'long', year:'numeric' });
+    ud(D.today).toLocaleDateString('ar-SA-u-ca-islamic-umalqura', { timeZone:'UTC', day:'numeric', month:'long', year:'numeric' });
   fill('myHals', []);
   $('pinNotice').classList.toggle('hidden', store.get('hq_must') !== '1');
   const st = D.stats;
