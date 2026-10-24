@@ -186,6 +186,35 @@
   .cptabs button svg{width:22px;height:22px;flex:none;color:var(--gold2)}
   .cptabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
   .cptabs button.on svg{color:#F3D9AE}
+
+  /* الإحالات */
+  .rfsel{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .rfsel button{border:1.5px solid var(--line);background:transparent;border-radius:99px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer;color:var(--text)}
+  .rfsel button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .rfsel.urg button.on[data-v="عاجلة"]{background:var(--red);border-color:var(--red)}
+  .rfauto{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--light);font-size:13px;color:var(--muted)}
+  .stlist{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:6px}
+  .stlist label{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);color:var(--text);font-size:15px;margin:0;cursor:pointer}
+  .stlist label:last-child{border-bottom:0}
+  .stlist input{width:20px;height:20px;flex:none}
+  .stlist small{margin-inline-start:auto;color:var(--muted)}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px;margin-top:10px}
+  .kv span{color:var(--muted)} .kv b{font-weight:600;white-space:pre-line}
+  .rfsec{margin-top:14px;font-size:14px;font-weight:700;color:var(--navy)}
+  @media (prefers-color-scheme: dark){ .rfsec{color:#9CC1DC} }
+  .thread{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .bub{padding:10px 12px;border-radius:14px;background:var(--light);font-size:14px;max-width:92%}
+  .bub.h{align-self:flex-start;background:var(--goldlight)}
+  .bub.t{align-self:flex-end}
+  .bub .who{display:flex;gap:8px;font-size:12px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+  .bub .who b{color:var(--text)}
+  .bub p{margin:0;white-space:pre-line}
+  .bub .chg{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .rftxt{min-height:80px;resize:vertical;font-size:15px}
+  .rfpills{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .newdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);flex:none}
+  #btnBell{position:relative}
+  #btnBell .bdg{position:absolute;top:2px;left:4px;background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;line-height:18px}
   .cptabs .bdg{background:var(--red);color:#fff;border-radius:99px;font-size:12px;padding:0 7px;min-width:20px}
   @media (max-width:560px){ .cptabs{grid-template-columns:1fr 1fr} .cptabs button{font-size:14px;min-height:54px} }
   .cph{margin:0 0 4px;font-size:17px;color:var(--navy)}
@@ -400,6 +429,7 @@
 <header class="appbar hidden" id="appbar">
   <button class="brand" id="brandHome" aria-label="الرئيسية"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A7393"/><stop offset="1" stop-color="#1F3546"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#tg)"/><path d="M14 31a18 18 0 0 1 36 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".35" stroke-linecap="round"/><path d="M19 32a13 13 0 0 1 26 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" opacity=".65" stroke-linecap="round"/><path d="M24.5 33a7.5 7.5 0 0 1 15 0" stroke="#F3D9AE" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 41c7.5-3.2 14-3 21 1.2 7-4.2 13.5-4.4 21-1.2v10.5c-7.5-3.2-14-3-21 1.2-7-4.2-13.5-4.4-21-1.2z" fill="#D08E2C"/><path d="M32 42.2v10.4" stroke="#1F3546" stroke-width="1.6"/><path d="M49 9.5l1.5 3.3 3.3 1.5-3.3 1.5-1.5 3.3-1.5-3.3-3.3-1.5 3.3-1.5z" fill="#F3D9AE"/></svg><span><b>مثاني</b><small>لحلقات تحفيظ القرآن</small></span></button>
   <span class="grow"></span>
+  <button class="iconbtn hidden" id="btnBell" aria-label="الإحالات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>الإحالات<span class="bdg hidden" id="bellN"></span></button>
   <button class="iconbtn menubtn" id="btnMenu" aria-label="القائمة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>القائمة</button>
   <button class="iconbtn" id="btnPin" aria-label="تغيير الرمز السري"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/></svg>الرمز</button>
   <button class="iconbtn" id="btnLogout" aria-label="تسجيل الخروج"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>خروج</button>
@@ -556,6 +586,31 @@
         <input id="heQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
       </div>
       <div class="card" id="heList"></div>
+    </div>
+
+    <!-- طلاب الحلقة (المعلم): الإحالات والترشيح ومتابعتها -->
+    <div id="pMyStu" class="hidden">
+      <div class="card">
+        <h2>طلاب الحلقة</h2>
+        <small>إحالة طالب لشؤون الطلاب أو الشؤون التعليمية، وترشيح الطلاب للاختبارات المرحلية، ومتابعة الردود.</small>
+        <div class="cptabs" id="msTabs"></div>
+      </div>
+      <div class="card" id="msForm"></div>
+      <div id="msTrack" class="hidden">
+        <div class="card"><h2>متابعة الإحالات</h2><div class="stchips" id="mtSum"></div></div>
+        <div class="card" id="mtList"></div>
+      </div>
+    </div>
+
+    <!-- صندوق الإحالات لدى الجهة المختصة -->
+    <div id="pRefs" class="hidden">
+      <div class="card">
+        <h2 id="rbTitle"></h2>
+        <small id="rbSub"></small>
+        <div class="stchips" id="rbSum"></div>
+        <input id="rbQ" placeholder="ابحث باسم الطالب أو المعلم أو الحلقة" style="margin-top:8px">
+      </div>
+      <div class="card" id="rbList"></div>
     </div>
 
     <!-- المنافس -->
@@ -948,6 +1003,16 @@
   </div>
 </div>
 
+<!-- تفاصيل الإحالة والردود -->
+<div class="sheet hidden" id="rfSheet">
+  <div class="panel">
+    <div class="head"><h2 id="rfTitle"></h2><button class="iconbtn" id="rfClose">إغلاق</button></div>
+    <div id="rfBody"></div>
+    <div id="rfReply"></div>
+    <div id="rfMsg"></div>
+  </div>
+</div>
+
 <!-- تعديل حلقة -->
 <div class="sheet hidden" id="hlSheet">
   <div class="panel">
@@ -1126,6 +1191,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
+ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1135,7 +1201,7 @@ async function loadHome(){
   let r;
   try { r = await api({ action:'home' }); } catch(e){ if (e.message !== 'expired') showLogin('تعذّر الاتصال بالخادم. ' + e.message); return; }
   if (!r.ok) return showLogin(r.msg);
-  D = r;
+  D = r; MS = null; RB = null; updBell();
   if (r.org) $('orgName').textContent = r.org;
   fillSurahs();
   // التبويبات على يمين الصفحة
@@ -1146,6 +1212,9 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.view_all') !== -1) TABS.push(['studentsList', 'بيانات الطلاب']);
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('competition.manage') !== -1 || P.indexOf('competition.store') !== -1)) TABS.push(['compete', 'المنافس']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.add') !== -1){ TABS.push(['studentNew', 'تسجيل طالب']); TABS.push(['regLink', 'رابط التسجيل']); TABS.push(['apps', 'طلبات المتقدمين']); }
+  if (r.roles.indexOf('admin') === -1 && r.roles.indexOf('teacher') !== -1) TABS.push(['myStu', 'طلاب الحلقة']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.students') !== -1) TABS.push(['refsStu', 'إحالات شؤون الطلاب']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.edu') !== -1){ TABS.push(['refsEdu', 'الإحالات التعليمية']); TABS.push(['refsExam', 'ترشيحات المرحلية']); }
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
@@ -1162,10 +1231,10 @@ async function loadHome(){
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['soon', 'بحث'], ['compete', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['soon', 'بحث'], ['compete', 'المنافس'], ['soon', 'تقرير شامل لطالب'], ['soon', 'ملف الطالب'], ['soon', 'نقل الطلاب بين الحلقات'], ['soon', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'بحث'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
-  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
+  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['soon', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['soon', 'تقرير الطلاب'], ['soon', 'تقرير المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['soon', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
@@ -1211,6 +1280,10 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pMyStu').classList.toggle('hidden', r !== 'myStu');
+  if (r === 'myStu') openMyStu();
+  $('pRefs').classList.toggle('hidden', !RB_KIND[r]);
+  if (RB_KIND[r]) openRefs(RB_KIND[r]);
   $('pCompete').classList.toggle('hidden', r !== 'compete');
   if (r === 'compete') openCompete();
   $('pRegLink').classList.toggle('hidden', r !== 'regLink');
@@ -1254,10 +1327,15 @@ function renderWelcome(){
   if (st) [['users', st.students, 'طلابي'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
     .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', x[2])); box.appendChild(d); });
   const ac = $('actions'); ac.innerHTML = '';
-  const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['بناء الخطط التعليمية', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['تقرير الحلقات', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''] };
+  const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['بناء الخطط التعليمية', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['تقرير الحلقات', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''],
+    myStu:['طلاب الحلقة', 'إحالة الطلاب وترشيحهم للمرحلية ومتابعة الردود', 'gold'], refsStu:['إحالات شؤون الطلاب', 'استقبال إحالات المعلمين والرد عليها', ''],
+    refsEdu:['الإحالات التعليمية', 'إحالات مستوى الحفظ والخطط', ''], refsExam:['ترشيحات المرحلية', 'مواعيد الاختبارات المرحلية ونتائجها', 'gold'],
+    studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
+    regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
+    halaqaNew:['إضافة حلقة', 'إضافة حلقة جديدة', ''], halaqaEdit:['تعديل حلقة', 'تعديل الحلقات وعدد طلابها', ''] };
   const acts = document.body.classList.contains('admin') ? [['teach'], ['report'], ['plans'], ['settings']] : TABS;
   ac.classList.toggle('one', acts.length === 1);
-  acts.forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]]; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
+  acts.filter(t => DESC[t[0]]).forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]]; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
 }
 
 /* ---------- تغيير الرمز السري ---------- */
@@ -1876,6 +1954,218 @@ $('hlSave').onclick = async () => {
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
 };
+
+/* ---------- طلاب الحلقة: الإحالات وترشيح المرحلية ومتابعتها ---------- */
+const MS_TABS = [['stu', 'إحالة لشؤون الطلاب'], ['edu', 'إحالة للشؤون التعليمية'], ['exam', 'ترشيح لاختبار مرحلية'], ['track', 'متابعة الإحالات']];
+const MSI = {
+  stu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 11h6M19 8l3 3-3 3"/></svg>',
+  edu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"/></svg>',
+  exam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>',
+  track:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
+};
+const RF_PRIOR = { stu:['تنبيه شفهي', 'تواصل مع ولي الأمر', 'أخذ تعهد على الطالب', 'لم يُتخذ إجراء'], edu:['تكثيف المراجعة', 'تقليل مقدار الحفظ', 'تواصل مع ولي الأمر', 'لم يُتخذ إجراء'] };
+const RF_LBL = { reasons:'سبب الإحالة', details:'الوصف', repeat:'تكرار الملاحظة', prior:'ما اتُّخذ قبل الإحالة', suggest:'الإجراء المقترح', stage:'المرحلية', dir:'اتجاه الحفظ',
+  ready:'جاهزية الطالب', reviews:'مرات مراجعة المقدار', prev:'سبق اختباره فيها', prevInfo:'الاختبار السابق', days:'الأيام المناسبة', times:'الأوقات المناسبة', notes:'ملاحظات' };
+const RF_ST_CLS = { 'جديدة':'p-late', 'قيد المعالجة':'p-none', 'مغلقة':'p-ok' };
+let MS = null, msSec = 'stu', mtF = 'open', RB = null, rbKind = 'stu', rbF = 'open', rfCur = null, rfMode = 't';
+const RB_KIND = { refsStu:'stu', refsEdu:'edu', refsExam:'exam' };
+/* أزرار اختيار (واحد أو متعدد) */
+function selBox(opts, multi, cls){
+  const w = el('div', 'rfsel' + (cls ? ' ' + cls : '')), val = new Set();
+  opts.forEach(o => { const b = el('button', '', o); b.type = 'button'; b.dataset.v = o; b.onclick = () => {
+    if (multi){ val.has(o) ? val.delete(o) : val.add(o); b.classList.toggle('on', val.has(o)); }
+    else { val.clear(); val.add(o); w.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); }
+    if (w.onpick) w.onpick(); }; w.appendChild(b); });
+  w.get = () => multi ? [...val] : ([...val][0] || '');
+  w.set = v => { val.clear(); [].concat(v || []).forEach(x => val.add(x)); w.querySelectorAll('button').forEach(x => x.classList.toggle('on', val.has(x.dataset.v))); };
+  return w;
+}
+const lab = (t, req) => el('label', '', t + (req ? ' *' : ''));
+function refUnread(){ const c = (D && D.refs) || {}; return { mine:c.mine || 0, stu:c.stu || 0, edu:c.edu || 0, exam:c.exam || 0 }; }
+function updBell(){
+  const P = (D && D.perms) || [], adm = P.indexOf('*') !== -1, c = refUnread();
+  const isT = D && D.roles && D.roles.indexOf('teacher') !== -1;
+  const show = isT || adm || P.indexOf('refs.students') !== -1 || P.indexOf('refs.edu') !== -1;
+  $('btnBell').classList.toggle('hidden', !show);
+  const n = c.mine + c.stu + c.edu + c.exam; $('bellN').textContent = n; $('bellN').classList.toggle('hidden', !n);
+}
+$('btnBell').onclick = () => {
+  const c = refUnread(), isT = D.roles.indexOf('teacher') !== -1;
+  if (c.mine || (isT && !c.stu && !c.edu && !c.exam)){ msSec = 'track'; return openRole('myStu'); }
+  const k = c.stu ? 'stu' : c.edu ? 'edu' : c.exam ? 'exam' : (D.perms.indexOf('refs.students') !== -1 || D.perms.indexOf('*') !== -1 ? 'stu' : 'edu');
+  rbF = 'open'; openRole({ stu:'refsStu', edu:'refsEdu', exam:'refsExam' }[k]);
+};
+async function refreshCounts(){ try { const r = await api({ action:'home' }); if (r.ok){ D.refs = r.refs; updBell(); } } catch(e){} }
+
+async function openMyStu(){
+  const box = $('msTabs'); box.innerHTML = '';
+  const c = refUnread();
+  MS_TABS.forEach(t => { const b = el('button', msSec === t[0] ? 'on' : ''); b.innerHTML = MSI[t[0]]; b.appendChild(el('span', '', t[1])); b.dataset.k = t[0];
+    if (t[0] === 'track' && c.mine) b.appendChild(el('span', 'bdg', c.mine));
+    b.onclick = () => { msSec = t[0]; openMyStu(); }; box.appendChild(b); });
+  $('msForm').classList.toggle('hidden', msSec === 'track'); $('msTrack').classList.toggle('hidden', msSec !== 'track');
+  const tgt = msSec === 'track' ? $('mtList') : $('msForm');
+  if (!MS){ tgt.innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'myStu' }, tgt.id); if (!r || !r.ok) return; MS = r; }
+  msSec === 'track' ? renderTrack() : renderRefForm(msSec);
+}
+function renderRefForm(k){
+  const f = $('msForm'); f.innerHTML = '';
+  f.appendChild(el('h2', '', MS_TABS.find(t => t[0] === k)[1]));
+  if (!MS.students.length){ f.appendChild(el('small', '', 'لا يوجد طلاب في حلقتك.')); return; }
+  const F = {};
+  if (k === 'exam'){
+    f.appendChild(lab('الطلاب المرشحون', true));
+    const all = el('label', 'chk'); const ca = el('input'); ca.type = 'checkbox'; all.appendChild(ca); all.appendChild(document.createTextNode(' تحديد الكل')); f.appendChild(all);
+    const lst = el('div', 'stlist'); MS.students.forEach(s => { const l = el('label'); const c = el('input'); c.type = 'checkbox'; c.value = s.sid; l.appendChild(c); l.appendChild(el('span', '', s.name)); if (MS.students.some(x => x.hid !== s.hid)) l.appendChild(el('small', '', s.hname)); lst.appendChild(l); });
+    ca.onchange = () => lst.querySelectorAll('input').forEach(c => c.checked = ca.checked);
+    f.appendChild(lst); F.sids = () => [...lst.querySelectorAll('input:checked')].map(c => c.value);
+    f.appendChild(lab('المرحلية', true)); const st = el('select'); fillSel2(st, MS.marhala, '— اختر المرحلية —'); f.appendChild(st); F.stage = () => st.value;
+    f.appendChild(lab('اتجاه الحفظ')); const dir = selBox(['من الناس', 'من الفاتحة']); f.appendChild(dir); F.dir = dir.get;
+    f.appendChild(lab('جاهزية الطالب في رأي المعلم', true)); const rd = selBox(['ممتاز', 'جيد جداً', 'جيد']); f.appendChild(rd); F.ready = rd.get;
+    f.appendChild(lab('عدد مرات مراجعة المقدار كاملاً')); const rv = el('input'); rv.type = 'number'; rv.min = 0; rv.max = 99; rv.inputMode = 'numeric'; f.appendChild(rv); F.reviews = () => rv.value;
+    f.appendChild(lab('هل اختُبر في هذه المرحلية من قبل؟')); const pv = selBox(['لا', 'نعم']); pv.set('لا'); f.appendChild(pv); F.prev = pv.get;
+    const pi = el('input'); pi.placeholder = 'تاريخ الاختبار السابق ونتيجته'; pi.maxLength = 200; pi.className = 'hidden'; pi.style.marginTop = '8px'; f.appendChild(pi); F.prevInfo = () => pi.value.trim();
+    pv.onpick = () => pi.classList.toggle('hidden', pv.get() !== 'نعم');
+    f.appendChild(lab('الأيام المناسبة للاختبار')); const dy = selBox(['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'], true); f.appendChild(dy); F.days = dy.get;
+    f.appendChild(lab('الأوقات المناسبة')); const tm = el('input'); tm.placeholder = 'مثال: بعد العصر'; tm.maxLength = 200; f.appendChild(tm); F.times = () => tm.value.trim();
+    f.appendChild(lab('ملاحظات')); const nt = el('textarea', 'rftxt'); nt.maxLength = 800; f.appendChild(nt); F.notes = () => nt.value.trim();
+    f.appendChild(el('div', 'rfauto', 'يُرفق تلقائياً: آخر ما حفظه الطالب ومتوسط درجات المراجعة في آخر 30 يوماً.'));
+  } else {
+    f.appendChild(lab('الطالب', true)); const ss = el('select'); fillSel2(ss, MS.students.map(s => [s.sid, s.name + (MS.students.some(x => x.hid !== s.hid) ? ' — ' + s.hname : '')]), '— اختر الطالب —'); f.appendChild(ss); F.sids = () => ss.value ? [ss.value] : [];
+    f.appendChild(lab('سبب الإحالة (يمكن اختيار أكثر من سبب)', true)); const rs = selBox(MS.reasons[k], true); f.appendChild(rs); F.reasons = rs.get;
+    f.appendChild(lab(k === 'stu' ? 'وصف الملاحظة' : 'وصف الحالة', true)); const dt = el('textarea', 'rftxt'); dt.maxLength = 1500; f.appendChild(dt); F.details = () => dt.value.trim();
+    if (k === 'stu'){ f.appendChild(lab('عدد مرات تكرار الملاحظة')); const rp = selBox(['مرة', 'مرتان', 'ثلاث فأكثر']); f.appendChild(rp); F.repeat = rp.get; }
+    f.appendChild(lab('ما اتخذه المعلم قبل الإحالة')); const pr = selBox(RF_PRIOR[k], true); f.appendChild(pr); F.prior = pr.get;
+    if (k === 'stu'){
+      f.appendChild(lab('الإجراء المقترح')); const sg = selBox(['استدعاء ولي الأمر', 'مقابلة الطالب', 'نقله لحلقة أخرى', 'إيقاف مؤقت', 'يُترك لشؤون الطلاب'], true); f.appendChild(sg); F.suggest = sg.get;
+      f.appendChild(lab('درجة الأهمية')); const ur = selBox(['عادية', 'عاجلة'], false, 'urg'); ur.set('عادية'); f.appendChild(ur); F.urgent = ur.get;
+      f.appendChild(el('div', 'rfauto', 'يُرفق تلقائياً: الحضور والتأخر والغياب في آخر 30 يوماً من سجل الحضور.'));
+    } else {
+      f.appendChild(lab('المقترح')); const sg = el('textarea', 'rftxt'); sg.maxLength = 500; f.appendChild(sg); F.suggest = () => sg.value.trim();
+      f.appendChild(el('div', 'rfauto', 'يُرفق تلقائياً: آخر ما حفظه الطالب، ومتوسط درجاته في آخر 30 يوماً، وخطته ونسبة إنجازها.'));
+    }
+  }
+  const btn = el('button', 'btn', k === 'exam' ? 'إرسال الترشيح' : 'إرسال الإحالة'); f.appendChild(btn); const m = el('div'); m.id = 'msMsg'; f.appendChild(m);
+  btn.onclick = async () => {
+    const data = {}; Object.keys(F).forEach(x => { if (x !== 'sids') data[x] = F[x](); });
+    const sids = F.sids();
+    if (!sids.length) return msg('msMsg', k === 'exam' ? 'اختر طالباً واحداً على الأقل.' : 'اختر الطالب.', 'err');
+    if (k === 'exam'){ if (!data.stage) return msg('msMsg', 'اختر المرحلية.', 'err'); if (!data.ready) return msg('msMsg', 'حدد جاهزية الطالب.', 'err'); }
+    else { if (!data.reasons.length) return msg('msMsg', 'اختر سبب الإحالة.', 'err'); if (data.details.length < 5) return msg('msMsg', 'اكتب وصف الحالة.', 'err'); }
+    btn.disabled = true; msg('msMsg', 'جاري الإرسال...', 'info');
+    const r = await cpCall({ action:'refCreate', kind:k, sids:sids, data:data }, 'msMsg'); btn.disabled = false;
+    if (!r || !r.ok) return;
+    toast(r.msg); MS = null; await openMyStu(); msg('msMsg', '✓ ' + r.msg + ' — تابع الرد من «متابعة الإحالات».', 'ok');
+  };
+}
+const fillSel2 = (sel, opts, blank) => { sel.innerHTML = ''; if (blank){ const o = el('option', '', blank); o.value = ''; sel.appendChild(o); } opts.forEach(x => { const a = Array.isArray(x) ? x : [x, x]; const o = el('option', '', a[1]); o.value = a[0]; sel.appendChild(o); }); };
+/* سطر إحالة في القوائم */
+function refRow(x, side){
+  const w = el('div', 'strow'), top = el('div', 'top');
+  const unread = side === 't' ? !x.tseen : !x.hseen;
+  if (unread) top.appendChild(el('span', 'newdot'));
+  top.appendChild(el('b', '', x.sname)); w.appendChild(top);
+  const pl = el('div', 'rfpills'); top.appendChild = n => pl.appendChild(n);
+  if (side === 't') top.appendChild(el('span', 'pill p-none', x.kind === 'exam' ? 'ترشيح مرحلية' : 'إحالة ' + x.type));
+  if (x.urgent) top.appendChild(el('span', 'pill p-red', 'عاجلة'));
+  top.appendChild(el('span', 'pill ' + (RF_ST_CLS[x.status] || 'p-none'), x.status));
+  if (x.result) top.appendChild(el('span', 'pill ' + (x.result === 'اجتاز' ? 'p-ok' : 'p-red'), x.result + (x.score ? ' ' + x.score : '')));
+  w.appendChild(pl);
+  const m = el('div', 'meta');
+  [['رقم الإحالة', x.id], ['التاريخ', x.date], ['الحلقة', x.hname], side === 'h' ? ['المعلم', x.tname] : null, [x.kind === 'exam' ? 'الترشيح' : 'السبب', x.summary], x.examDate ? ['موعد الاختبار', x.examDate] : null]
+    .forEach(p => { if (p && p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } });
+  w.appendChild(m);
+  const last = (x.thread || []).filter(e => e.side !== side).slice(-1)[0];
+  if (last && last.text){ const lr = el('small', '', (side === 't' ? 'آخر رد: ' : 'آخر تعقيب: ') + last.text.slice(0, 90) + (last.text.length > 90 ? '…' : '')); lr.style.display = 'block'; lr.style.marginTop = '6px'; w.appendChild(lr); }
+  const ac = el('div', 'stact'), b = el('button', '', side === 't' ? 'عرض التفاصيل والردود' : 'فتح والرد'); b.onclick = () => openRf(x, side); ac.appendChild(b); w.appendChild(ac);
+  return w;
+}
+function chipsSum(boxId, list, cur, set){
+  const sum = $(boxId); sum.innerHTML = '';
+  const n = { open:list.filter(x => x.status !== 'مغلقة').length, new:list.filter(x => x.status === 'جديدة').length, closed:list.filter(x => x.status === 'مغلقة').length, all:list.length };
+  [['open', 'المفتوحة'], ['new', 'الجديدة'], ['closed', 'المغلقة'], ['all', 'الكل']].forEach(c => { const b = el('button', cur === c[0] ? 'on' : '', c[1] + ' (' + n[c[0]] + ')'); b.onclick = () => set(c[0]); sum.appendChild(b); });
+}
+const stFilter = (x, f) => f === 'all' || (f === 'open' ? x.status !== 'مغلقة' : f === 'new' ? x.status === 'جديدة' : x.status === 'مغلقة');
+function renderTrack(){
+  chipsSum('mtSum', MS.refs, mtF, v => { mtF = v; renderTrack(); });
+  const box = $('mtList'); box.innerHTML = '';
+  const list = MS.refs.filter(x => stFilter(x, mtF));
+  if (!list.length) return box.appendChild(el('small', '', MS.refs.length ? 'لا توجد إحالات في هذا التصنيف.' : 'لم ترسل أي إحالة أو ترشيح بعد.'));
+  list.forEach(x => box.appendChild(refRow(x, 't')));
+}
+/* صندوق الجهة المختصة */
+async function openRefs(k){
+  rbKind = k;
+  $('rbTitle').textContent = { stu:'إحالات شؤون الطلاب', edu:'الإحالات التعليمية', exam:'ترشيحات الاختبارات المرحلية' }[k];
+  $('rbSub').textContent = { stu:'إحالات المعلمين للطلاب في السلوك والانضباط، مع الرد عليها ومتابعتها وإغلاقها.', edu:'إحالات المعلمين في مستوى الحفظ والتلاوة والخطط.', exam:'ترشيحات المعلمين للاختبارات المرحلية: تحديد الموعد والمختبِر ورصد النتيجة.' }[k];
+  $('rbList').innerHTML = '<div class="msg info">جاري التحميل...</div>';
+  const r = await cpCall({ action:'refs', kind:k }, 'rbList'); if (!r || !r.ok) return;
+  RB = r.refs; renderRefs();
+}
+function renderRefs(){
+  chipsSum('rbSum', RB, rbF, v => { rbF = v; renderRefs(); });
+  const q = normAr($('rbQ').value), box = $('rbList'); box.innerHTML = '';
+  const list = RB.filter(x => stFilter(x, rbF) && (!q || normAr(x.sname + ' ' + x.tname + ' ' + x.hname + ' ' + x.summary).indexOf(q) !== -1));
+  if (!list.length) return box.appendChild(el('small', '', RB.length ? 'لا توجد نتائج.' : 'لا توجد إحالات بعد.'));
+  list.forEach(x => box.appendChild(refRow(x, 'h')));
+}
+$('rbQ').oninput = () => RB && renderRefs();
+/* نافذة التفاصيل */
+function kvRow(g, k, v){ if (v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length)) return; g.appendChild(el('span', '', k)); g.appendChild(el('b', '', Array.isArray(v) ? v.join('، ') : String(v))); }
+function openRf(x, side){
+  rfCur = x; rfMode = side; msg('rfMsg', '', '');
+  $('rfTitle').textContent = (x.kind === 'exam' ? 'ترشيح مرحلية' : 'إحالة ' + x.type) + ' • ' + x.id;
+  const b = $('rfBody'); b.innerHTML = '';
+  const g = el('div', 'kv'); kvRow(g, 'الطالب', x.sname + ' (' + x.sid + ')'); kvRow(g, 'الحلقة', x.hname); kvRow(g, 'المعلم', x.tname); kvRow(g, 'التاريخ', x.date);
+  kvRow(g, 'الحالة', x.status); if (x.urgent) kvRow(g, 'الأهمية', 'عاجلة'); b.appendChild(g);
+  b.appendChild(el('div', 'rfsec', x.kind === 'exam' ? 'بيانات الترشيح' : 'بيانات الإحالة'));
+  const g2 = el('div', 'kv'); Object.keys(RF_LBL).forEach(k => kvRow(g2, RF_LBL[k], x.data[k])); b.appendChild(g2);
+  if (x.auto){ b.appendChild(el('div', 'rfsec', 'بيانات مرفقة تلقائياً')); const a = el('div', 'rfauto', x.auto); a.style.whiteSpace = 'pre-line'; a.style.marginTop = '6px'; b.appendChild(a); }
+  if (x.kind === 'exam' && (x.examDate || x.examiner || x.result)){ b.appendChild(el('div', 'rfsec', 'الاختبار')); const g3 = el('div', 'kv'); kvRow(g3, 'الموعد', x.examDate); kvRow(g3, 'المختبِر', x.examiner); kvRow(g3, 'الدرجة', x.score ? x.score + ' من 100' : ''); kvRow(g3, 'النتيجة', x.result); b.appendChild(g3); }
+  b.appendChild(el('div', 'rfsec', 'الردود والمتابعة'));
+  const th = el('div', 'thread');
+  if (!x.thread.length) th.appendChild(el('small', '', 'لا توجد ردود بعد.'));
+  x.thread.forEach(e => { const bb = el('div', 'bub ' + e.side), w = el('div', 'who'); w.appendChild(el('b', '', e.by)); w.appendChild(el('span', '', e.side === 'h' ? (x.kind === 'stu' ? 'شؤون الطلاب' : 'الشؤون التعليمية') : 'المعلم')); w.appendChild(el('span', '', (e.at || '').slice(0, 16))); bb.appendChild(w);
+    if (e.text) bb.appendChild(el('p', '', e.text));
+    const ch = el('div', 'chg'); if (e.status) ch.appendChild(el('span', 'pill ' + (RF_ST_CLS[e.status] || 'p-none'), 'الحالة: ' + e.status));
+    if (e.examDate) ch.appendChild(el('span', 'pill p-none', 'الموعد: ' + e.examDate)); if (e.examiner) ch.appendChild(el('span', 'pill p-none', 'المختبِر: ' + e.examiner));
+    if (e.score) ch.appendChild(el('span', 'pill p-none', 'الدرجة: ' + e.score)); if (e.result) ch.appendChild(el('span', 'pill ' + (e.result === 'اجتاز' ? 'p-ok' : 'p-red'), e.result));
+    if (ch.children.length) bb.appendChild(ch); th.appendChild(bb); });
+  b.appendChild(th);
+  // نموذج الرد
+  const rp = $('rfReply'); rp.innerHTML = ''; const R = {};
+  rp.appendChild(lab(side === 'h' ? 'الرد / الإجراء المتخذ' : 'تعقيب على الإحالة'));
+  const tx = el('textarea', 'rftxt'); tx.maxLength = 1500; rp.appendChild(tx); R.text = () => tx.value.trim();
+  if (side === 'h'){
+    if (x.kind === 'exam'){
+      const g4 = el('div', 'edgrid');
+      const fld = (t, inp, full) => { const d = el('div', full ? 'full' : ''); d.appendChild(lab(t)); d.appendChild(inp); g4.appendChild(d); return inp; };
+      const dt = el('input'); dt.type = 'date'; dt.value = x.examDate; fld('موعد الاختبار', dt);
+      const ex = el('input'); ex.maxLength = 60; ex.value = x.examiner; fld('المختبِر', ex);
+      const sc = el('input'); sc.type = 'number'; sc.min = 0; sc.max = 100; sc.inputMode = 'numeric'; sc.value = x.score; fld('الدرجة (من 100)', sc);
+      const rs = el('select'); fillSel2(rs, ['اجتاز', 'يعيد الاختبار'], '— النتيجة —'); rs.value = x.result; fld('النتيجة', rs);
+      rp.appendChild(g4); R.exam = () => ({ date:dt.value, examiner:ex.value.trim(), score:sc.value.trim(), result:rs.value });
+    }
+    rp.appendChild(lab('الحالة')); const st = selBox(['قيد المعالجة', 'مغلقة']); st.set(x.status === 'جديدة' ? '' : x.status); rp.appendChild(st); R.status = st.get;
+  }
+  const btn = el('button', 'btn', side === 'h' ? 'إرسال الرد' : 'إرسال التعقيب'); rp.appendChild(btn);
+  btn.onclick = async () => {
+    const q = { action:'refReply', id:x.id, text:R.text() }; if (side === 'h'){ q.status = R.status(); if (R.exam) q.exam = R.exam(); } else q.asTeacher = true;
+    if (side === 't' && !q.text) return msg('rfMsg', 'اكتب التعقيب.', 'err');
+    btn.disabled = true; msg('rfMsg', 'جاري الإرسال...', 'info');
+    const r = await cpCall(q, 'rfMsg'); btn.disabled = false; if (!r || !r.ok) return;
+    toast(r.msg);
+    if (side === 'h'){ const i = RB.findIndex(y => y.id === x.id); if (i !== -1) RB[i] = r.ref; renderRefs(); }
+    else { const i = MS.refs.findIndex(y => y.id === x.id); if (i !== -1) MS.refs[i] = r.ref; renderTrack(); }
+    openRf(r.ref, side); refreshCounts();
+  };
+  $('rfSheet').classList.remove('hidden');
+  if (side === 't' ? !x.tseen : !x.hseen){
+    x[side === 't' ? 'tseen' : 'hseen'] = true; api({ action:'refSeen', id:x.id }).then(() => { refreshCounts().then(() => { if (role === 'myStu') openMyStu(); }); }).catch(() => {});
+    side === 't' ? renderTrack() : renderRefs();
+  }
+}
+$('rfClose').onclick = () => $('rfSheet').classList.add('hidden');
 
 /* ---------- المنافس: تبويبات داخل الصفحة ---------- */
 let CP = null, cpP = 'all', cpSec = 'bank';
