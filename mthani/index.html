@@ -1875,7 +1875,7 @@ async function loadHome(){
   let r;
   try { r = await api({ action:'home' }); } catch(e){ if (e.message !== 'expired') showLogin('تعذّر الاتصال بالخادم. ' + e.message); return; }
   if (!r.ok) return showLogin(r.msg);
-  if (!r.portal){ store.del('hq_token'); portal = ''; store.del('hq_portal'); return showLogin(); }   // جلسة قديمة قبل البوابات: يختار بوابته
+  if (r.portal === ''){ store.del('hq_token'); portal = ''; store.del('hq_portal'); return showLogin(); }   // جلسة قديمة قبل البوابات: يختار بوابته
   D = r; MS = null; RB = null; updBell();
   if (r.org) $('orgName').textContent = r.org;
   fillSurahs();
