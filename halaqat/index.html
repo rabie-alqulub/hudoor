@@ -715,6 +715,26 @@
       <div class="card" id="heList"></div>
     </div>
 
+    <!-- ملف الموظف (التقرير الشامل) -->
+    <div id="pStfFile" class="hidden">
+      <div class="card" id="efFind">
+        <h2>ملف الموظف</h2>
+        <small>تقرير شامل لكل موظف يجمع: بياناته، وحضوره من البصمة، وأداءه في حلقاته، ودوراته التدريبية.</small>
+        <input id="efQ" placeholder="ابحث باسم الموظف أو رقمه الوظيفي" style="margin-top:8px">
+        <div class="sfres" id="efRes"></div>
+      </div>
+      <div id="efFile" class="hidden">
+        <div class="card sfhead" id="efHead"></div>
+        <div class="card">
+          <div class="stchips" id="efPer"></div>
+          <div class="dsh-top"><button class="mini" id="efPrev">السابق</button><span class="lbl" id="efLbl"></span><button class="mini" id="efNext">التالي</button></div>
+          <div class="edgrid hidden" id="efCustom"><div><label for="efFrom">من تاريخ</label><input type="date" id="efFrom"></div><div><label for="efTo">إلى تاريخ</label><input type="date" id="efTo"></div></div>
+          <div class="cptabs sftabs" id="efTabs"></div>
+        </div>
+        <div class="card" id="efBody"></div>
+      </div>
+    </div>
+
     <!-- الدورات التدريبية -->
     <div id="pCourses" class="hidden">
       <div class="card">
@@ -1609,7 +1629,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1636,6 +1656,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.students') !== -1) TABS.push(['repStu', 'تقارير شؤون الطلاب']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.edu') !== -1) TABS.push(['repEdu', 'التقارير التعليمية']);
+  if (r.roles.indexOf('admin') === -1 && ['reports.staffAtt', 'reports.teachers', 'staff.courses'].some(k => P.indexOf(k) !== -1)) TABS.push(['staffFile', 'ملف الموظف']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('staff.courses') !== -1) TABS.push(['courses', 'الدورات التدريبية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.staffAtt') !== -1) TABS.push(['staffAtt', 'تقرير حضور الموظفين']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.teachers') !== -1) TABS.push(['tchPerf', 'أداء المعلمين']);
@@ -1658,7 +1679,7 @@ async function loadHome(){
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
-  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['tchPerf', 'أداء المعلمين'], ['courses', 'الدورات التدريبية']] },
+  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير الحضور'], ['staffFile', 'ملف الموظف (التقرير الشامل)'], ['tchPerf', 'أداء المعلمين'], ['courses', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['tvCfg', 'شاشة العرض']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
@@ -1706,6 +1727,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pStfFile').classList.toggle('hidden', r !== 'staffFile');
+  if (r === 'staffFile') openStfFile(sfNid);
   $('pCourses').classList.toggle('hidden', r !== 'courses');
   if (r === 'courses') openCourses();
   $('pSAtt').classList.toggle('hidden', r !== 'staffAtt');
@@ -1781,6 +1804,7 @@ function renderWelcome(){
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
     repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
+    staffFile:['ملف الموظف', 'تقرير شامل: البيانات والحضور والأداء والدورات', ''],
     courses:['الدورات التدريبية', 'دورات الموظفين ومتدربوها وشهاداتهم', ''],
     staffAtt:['تقرير حضور الموظفين', 'الحضور والتأخير والغياب من البصمة', ''],
     tchPerf:['أداء المعلمين', 'مؤشرات المعلمين وترتيبهم', ''],
@@ -2219,6 +2243,7 @@ function renderStaff(){
     if (s.st === 'محذوف') btn('good', 'restore', 'استعادة', () => staffOp(s, 'restore'));
     else {
       btn('', 'edit', 'تعديل', () => openEdit(s));
+      { const fb = el('button', '', 'الملف'); fb.onclick = () => { sfNid = s.nid; openRole('staffFile'); }; ac.insertBefore(fb, ac.firstChild); }
       if (!s.admin){
         if (s.st === 'موقوف') btn('good', 'restore', 'رفع الإيقاف', () => staffOp(s, 'restore'));
         else btn('warn', 'pause', 'إيقاف الحساب', () => confirmOp('إيقاف حساب ' + s.name, 'لن يستطيع الدخول على مثاني حتى ترفع الإيقاف، ويخرج فوراً إن كان داخلاً. بياناته وحلقاته تبقى كما هي.', 'إيقاف الحساب', () => staffOp(s, 'suspend')));
@@ -2425,6 +2450,102 @@ $('hlSave').onclick = async () => {
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
 };
+
+/* ---------- ملف الموظف (التقرير الشامل) ---------- */
+let EF = null, EFL = null, sfNid = null, efP = 'month', efDate = null, efSec = 'info', efSeq = 0;
+const EF_TABS = [['info', 'البيانات'], ['att', 'الحضور والانصراف'], ['perf', 'الأداء في الحلقات'], ['courses', 'الدورات التدريبية']];
+async function openStfFile(nid){
+  sfNid = null;
+  if (!nid){ $('efFile').classList.add('hidden'); $('efFind').classList.remove('hidden');
+    if (!EFL){ $('efRes').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'staffFile' }, 'efRes'); if (!r || !r.ok) return; EFL = r.list; }
+    efList(); return; }
+  EF = { info:{ nid:nid } }; $('efFind').classList.add('hidden'); $('efFile').classList.remove('hidden'); efPerUI(); loadEf();
+}
+function efList(){
+  const q = normAr($('efQ').value.trim()), box = $('efRes'); box.innerHTML = '';
+  const list = EFL.filter(x => !q || normAr(x.name).indexOf(q) !== -1 || String(x.emp).indexOf(q) !== -1);
+  if (!list.length) return box.appendChild(el('small', '', 'لا توجد نتائج.'));
+  list.forEach(x => { const b = el('button'); b.appendChild(el('b', '', x.name)); b.appendChild(el('small', '', x.title + ' • ' + x.emp)); b.onclick = () => openStfFile(x.nid); box.appendChild(b); });
+}
+$('efQ').oninput = () => EFL && efList();
+function efPerUI(){
+  const per = $('efPer'); per.innerHTML = '';
+  DS_PER.forEach(p => { const b = el('button', efP === p[0] ? 'on' : '', p[1]); b.onclick = () => { efP = p[0]; efDate = null; efPerUI(); loadEf(); }; per.appendChild(b); });
+  $('efCustom').classList.toggle('hidden', efP !== 'custom'); ['efPrev', 'efNext'].forEach(id => $(id).classList.toggle('hidden', efP === 'term' || efP === 'custom'));
+  if (efP === 'custom' && !$('efFrom').value){ $('efFrom').value = addDays(D.today, -30); $('efTo').value = D.today; }
+}
+async function loadEf(){
+  const my = ++efSeq, rg = perRange(efP, efDate, 'efFrom', 'efTo', (EF && EF.term) || (DS && DS.term));
+  $('efLbl').textContent = rgLabel(rg); $('efNext').disabled = rg[1] >= D.today;
+  $('efBody').innerHTML = '<div class="msg info">جاري تحميل الملف...</div>';
+  let r; try { r = await api({ action:'staffFile', nid:EF.info.nid, from:rg[0], to:rg[1] }); } catch(e){ if (e.message !== 'expired') msg('efBody', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (my !== efSeq) return; if (!r.ok) return msg('efBody', needSrv(r), 'err');
+  EF = r; renderEf();
+}
+$('efPrev').onclick = () => { efDate = perShift(efP, efDate, -1); loadEf(); }; $('efNext').onclick = () => { efDate = perShift(efP, efDate, 1); loadEf(); };
+['efFrom', 'efTo'].forEach(id => $(id).onchange = loadEf);
+function renderEf(){
+  const I = EF.info, h = $('efHead'); h.innerHTML = '';
+  const top = el('div', 'stact'); top.style.marginTop = '0'; const back = el('button', '', '→ موظف آخر'); back.onclick = () => openStfFile(null); top.appendChild(back); h.appendChild(top);
+  const me = el('div', 'me'), who = el('div'); me.style.marginTop = '10px'; who.appendChild(el('b', '', I.name)); who.appendChild(el('small', '', [I.title, 'الرقم الوظيفي ' + I.emp, I.halaqat.length ? I.halaqat.join('، ') : ''].filter(Boolean).join(' • ')));
+  me.appendChild(el('div', 'avatar', I.name.charAt(0))); me.appendChild(who); if (I.st) me.appendChild(el('span', 'pill p-red', I.st)); h.appendChild(me);
+  const st = el('div', 'cfstats'); st.style.gridTemplateColumns = 'repeat(4,1fr)';
+  const A = EF.att, Pf = EF.perf, done = (EF.courses || []).filter(c => c.me && c.me.status === 'أتمّ الدورة');
+  [[A && A.pct != null ? A.pct + '%' : '—', 'نسبة الحضور'], [A ? A.late : '—', 'مرات التأخير'], [Pf && Pf.score != null ? Pf.score : '—', 'مؤشر الأداء'], [done.reduce((a, c) => a + c.hours, 0), 'ساعات التدريب']].forEach(x => { const d = el('div'); d.appendChild(el('b', '', x[0])); d.appendChild(el('span', '', x[1])); st.appendChild(d); });
+  h.appendChild(st);
+  const ac = el('div', 'stact'), pb = el('button', '', 'طباعة / PDF'), xb = el('button', '', 'تصدير Excel'); pb.onclick = efPrint; xb.onclick = efXls; ac.appendChild(pb); ac.appendChild(xb); h.appendChild(ac);
+  const tabs = EF_TABS.filter(t => t[0] === 'info' || (t[0] === 'att' && EF.att !== undefined) || (t[0] === 'perf' && I.halaqat.length && EF.perf !== undefined) || (t[0] === 'courses' && EF.courses));
+  if (!tabs.some(t => t[0] === efSec)) efSec = 'info';
+  const tb = $('efTabs'); tb.innerHTML = ''; tabs.forEach(t => { const b = el('button', efSec === t[0] ? 'on' : '', t[1]); b.onclick = () => { efSec = t[0]; renderEf(); }; tb.appendChild(b); });
+  const body = $('efBody'); body.innerHTML = ''; efSection(efSec, body);
+}
+function efSection(k, b){
+  const I = EF.info, H = t => b.appendChild(el('div', 'rfsec', t));
+  if (k === 'info'){
+    H('البيانات الوظيفية'); b.appendChild(kvBox([['الاسم', I.name], ['الرقم الوظيفي', I.emp], ['رقم الهوية', I.nid], ['الجنسية', I.nat], ['الجوال', I.phone], ['الصفة', I.title], ['المهمة', I.task && I.task !== I.sifa ? I.task : ''], ['الفترة', I.shift], ['تاريخ المباشرة', I.start]]));
+    H('في مثاني'); b.appendChild(kvBox([['الحلقات', I.halaqat.join('، ') || (I.title === 'معلم' ? 'لم تُسند' : '—')], ['حالة الحساب', I.st || 'نشط'], ['آخر دخول', I.last || '—']]));
+    if (EF.perms && EF.perms.length){ H('الصلاحيات'); b.appendChild(el('div', '', EF.perms.length + ' صلاحية: ' + EF.perms.join('، '))); }
+    return;
+  }
+  if (k === 'att'){
+    const A = EF.att; if (!A){ b.appendChild(el('small', '', EF.attErr || 'لا توجد بيانات حضور.')); return; }
+    const tl = el('div', 'tiles'); [[A.present, 'حضور', 't-ok'], [A.late, 'تأخير', 't-late'], [A.absent, 'غياب', 't-abs'], [A.leave, 'إجازة', 't-nav']].forEach(x => tl.appendChild(tile(x[0], x[1], x[2]))); b.appendChild(tl);
+    b.appendChild(kvBox([['أيام الدوام المقررة', A.required], ['نسبة الحضور', A.pct == null ? '—' : A.pct + '%'], ['دقائق التأخير', A.lateMin + (EF.grace ? ' (بعد سماح ' + EF.grace + ' دقيقة)' : '')], ['الخروج المبكر', A.early + ' مرة • ' + A.earlyMin + ' دقيقة'], ['ساعات العمل', A.hours], ['لم يسجّل الانصراف', A.noOut]]));
+    if (A.days && A.days.length){ const w = el('div', 'dtw'), t = el('table', 'dtbl'); t.innerHTML = '<thead><tr><th>التاريخ</th><th>الحالة</th><th>الحضور</th><th>الانصراف</th><th>التأخير</th><th>الساعات</th></tr></thead>'; const tb = el('tbody');
+      A.days.forEach(d => { const tr = el('tr'); tr.appendChild(el('td', '', fmtD(d.date, { weekday:'short', day:'numeric', month:'short' }))); tr.appendChild(el('td', d.status === 'غائب' ? 'lv-r' : d.late ? 'lv-y' : d.in ? 'lv-g' : '', d.status)); [d.in || '—', d.out || (d.in ? 'لم يسجّل' : '—'), d.late || '', d.hours || ''].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); });
+      t.appendChild(tb); w.appendChild(t); b.appendChild(w); }
+    return;
+  }
+  if (k === 'perf'){
+    const T = EF.perf; if (!T){ b.appendChild(el('small', '', 'لا توجد بيانات أداء في هذه الفترة.')); return; }
+    b.appendChild(el('div', 'slabel ' + lvSc(T.score).replace('lv-', 'c-').replace('c-g', 'c-ok').replace('c-y', 'c-late').replace('c-r', 'c-abs'), 'مؤشر الأداء: ' + (T.score == null ? '—' : T.score + ' من 100')));
+    b.appendChild(kvBox([['الحلقات', T.halaqat.join('، ')], ['الطلاب', T.students], ['الاعتماد', T.approved + ' من ' + T.need + (T.apprPct != null ? ' (' + T.apprPct + '%)' : '')], ['تغطية التسميع', T.cover == null ? '—' : T.cover + '%'], ['التسميع', T.recs + ' مرة'],
+      ['الحفظ / المراجعة', T.hifz + ' / ' + T.mur + ' آية'], ['حضور الطلاب', T.att == null ? '—' : T.att + '%'], ['متوسط الدرجات', T.avg == null ? '—' : T.avg + ' من ' + D.maxScore], ['إنجاز الخطط', T.plan == null ? '—' : T.plan + '%'], ['الإحالات', T.refs], ['ترشيحات المرحلية', T.exams + (T.passed ? ' • اجتاز ' + T.passed : '')], ['منقطعون في حلقته', T.excluded]]));
+    if (T.days && T.days.length){ const w = el('div', 'dtw'), t = el('table', 'dtbl'); t.innerHTML = '<thead><tr><th>التاريخ</th><th>الاعتماد</th><th>الوقت</th><th>الحاضرون</th><th>التسميع</th></tr></thead>'; const tb = el('tbody');
+      T.days.forEach(d => { const tr = el('tr'); tr.appendChild(el('td', '', fmtD(d.date, { weekday:'short', day:'numeric', month:'short' }))); tr.appendChild(el('td', d.approved >= d.of ? 'lv-g' : 'lv-r', d.approved >= d.of ? '✓' : '✗')); [d.at || '—', d.present, d.recs].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); });
+      t.appendChild(tb); w.appendChild(t); b.appendChild(w); }
+    return;
+  }
+  if (k === 'courses'){
+    const L = EF.courses || []; if (!L.length){ b.appendChild(el('small', '', 'لم يُسجَّل في أي دورة بعد.')); return; }
+    L.forEach(c => { const w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', c.title)); g.appendChild(el('small', '', [c.provider, c.from && c.from + (c.to && c.to !== c.from ? ' – ' + c.to : ''), c.hours ? c.hours + ' ساعة' : '', c.mode].filter(Boolean).join(' • ')));
+      if (c.me && c.me.cert){ const a = el('a', '', 'الشهادة'); if (/^https?:/.test(c.me.cert)){ a.href = c.me.cert; a.target = '_blank'; } else a.textContent = 'الشهادة: ' + c.me.cert; g.appendChild(a); }
+      w.appendChild(g); w.appendChild(el('span', 'pill ' + (c.me && c.me.status === 'أتمّ الدورة' ? 'p-ok' : c.me && /لم|اعتذر/.test(c.me.status) ? 'p-red' : 'p-late'), c.me ? c.me.status : '')); b.appendChild(w); });
+  }
+}
+function efPrint(){
+  const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'ملف الموظف: ' + EF.info.name)); l.appendChild(el('div', '', EF.info.title + ' • الرقم الوظيفي ' + EF.info.emp + ' • ' + $('efLbl').textContent)); hd.appendChild(l); hd.appendChild(el('div', '', EF.org)); p.appendChild(hd);
+  EF_TABS.forEach(t => { if (t[0] === 'perf' && !EF.perf) return; if (t[0] === 'att' && EF.att === undefined) return; if (t[0] === 'courses' && !EF.courses) return; p.appendChild(el('h3', '', t[1])); const d = el('div'); efSection(t[0], d); p.appendChild(d); });
+  setTimeout(() => window.print(), 50);
+}
+function efXls(){
+  const I = EF.info, t = 'ملف الموظف: ' + I.name + ' — ' + $('efLbl').textContent, sheets = [['البيانات', [[t], ['البند', 'القيمة'], ['الاسم', I.name], ['الرقم الوظيفي', I.emp], ['الهوية', I.nid], ['الجوال', I.phone], ['الصفة', I.title], ['الفترة', I.shift], ['المباشرة', I.start], ['الحلقات', I.halaqat.join('، ')]]]];
+  const A = EF.att; if (A) sheets.push(['الحضور', [[t], ['التاريخ', 'الحالة', 'الحضور', 'الانصراف', 'التأخير (د)', 'الخروج المبكر (د)', 'الساعات']].concat((A.days || []).map(d => [d.date, d.status, d.in || '', d.out || '', d.late || '', d.early || '', d.hours || '']))]);
+  const T = EF.perf; if (T) sheets.push(['الأداء', [[t], ['المؤشر', 'القيمة'], ['مؤشر الأداء', T.score], ['الاعتماد %', T.apprPct], ['تغطية التسميع %', T.cover], ['التسميع', T.recs], ['حفظ (آية)', T.hifz], ['مراجعة (آية)', T.mur], ['حضور الطلاب %', T.att], ['متوسط الدرجة', T.avg], ['إنجاز الخطط %', T.plan]].map(r => r.map(v => v == null ? '' : v))]);
+  if (EF.courses && EF.courses.length) sheets.push(['الدورات', [[t], ['الدورة', 'الجهة', 'من', 'إلى', 'الساعات', 'الحالة', 'الشهادة']].concat(EF.courses.map(c => [c.title, c.provider, c.from, c.to, c.hours, c.me ? c.me.status : '', c.me ? c.me.cert : '']))]);
+  const a = el('a'); a.href = URL.createObjectURL(xlsxBlob(sheets)); a.download = 'ملف-' + I.name.replace(/\s+/g, '-') + '.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel');
+}
 
 /* ---------- الدورات التدريبية ---------- */
 let CR = null, crF = '', crCur = null, trSel = {};
