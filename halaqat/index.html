@@ -702,6 +702,27 @@
       <div class="card" id="heList"></div>
     </div>
 
+    <!-- شاشة العرض العامة (تلفزيون الجامع) -->
+    <div id="pTv" class="hidden">
+      <div class="card">
+        <h2>شاشة العرض</h2>
+        <small>شاشة تحفيزية تُعرض على تلفزيون الجامع للجميع: فرسان الحلقات، والأعلى حفظاً، والحضور الكامل، وتنافس الحلقات، وأبطال المنافس. لا تعرض غياباً ولا درجات ولا أرقام جوال.</small>
+        <label>رابط الشاشة</label>
+        <div class="cfph"><input id="tvLink" readonly dir="ltr" style="font-size:13px"></div>
+        <div class="stact"><button id="tvOpen" class="good">فتح الشاشة</button><button id="tvCopy">نسخ الرابط</button><button id="tvNew" class="danger">رابط جديد</button></div>
+        <small>افتح الرابط في متصفح التلفزيون أو الجهاز المتصل به، ثم اضغط «ملء الشاشة» (يظهر عند تحريك الفأرة). تتحدث البيانات تلقائياً كل 5 دقائق. «رابط جديد» يوقف الرابط القديم.</small>
+        <div id="tvMsg"></div>
+      </div>
+      <div class="card">
+        <h2>محتوى الشاشة</h2>
+        <label>الأقسام المعروضة</label>
+        <div class="rfsel" id="tvParts"></div>
+        <label for="tvSec">مدة كل شريحة (ثوانٍ)</label><input id="tvSec" type="number" min="6" max="60" inputmode="numeric">
+        <label for="tvNews">إعلان يظهر في الشريط السفلي (اختياري)</label><textarea id="tvNews" class="rftxt" maxlength="400" placeholder="مثال: حفل تكريم الحفاظ يوم الخميس بعد صلاة العصر"></textarea>
+        <button class="btn" id="tvSave">حفظ</button><div id="tvMsg2"></div>
+      </div>
+    </div>
+
     <!-- تقارير الطلاب (شؤون الطلاب / الشؤون التعليمية / طالب باسمه) -->
     <div id="pRep" class="hidden">
       <div class="card">
@@ -1501,7 +1522,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1546,9 +1567,9 @@ async function loadHome(){
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
-  { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض']] },
+  { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['tvCfg', 'شاشة العرض']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['dash', 'شاشة عرض المجمع'], ['soon', 'تقرير المجمع']] },
@@ -1595,6 +1616,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pTv').classList.toggle('hidden', r !== 'tvCfg');
+  if (r === 'tvCfg') openTv();
   $('pRep').classList.toggle('hidden', !REP_KIND[r]);
   if (REP_KIND[r]) openRep(REP_KIND[r]);
   $('pDash').classList.toggle('hidden', r !== 'dash');
@@ -2302,6 +2325,29 @@ $('hlSave').onclick = async () => {
     $('hlSheet').classList.add('hidden'); toast(r.msg); openHalEdit();
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
+};
+
+/* ---------- شاشة العرض العامة ---------- */
+const TV_URL = new URL('tv.html', location.href.split('?')[0].replace(/[^/]*$/, '')).href;
+const TV_PARTS_L = [['stars', 'فرسان الحلقات'], ['hifz', 'الأعلى حفظاً'], ['att', 'الحضور الكامل'], ['halaqat', 'تنافس الحلقات'], ['points', 'أبطال المنافس']];
+let TV = null, tvSel = null;
+async function openTv(){
+  const r = await cpCall({ action:'tvCfg' }, 'tvMsg'); if (!r || !r.ok) return; tvFill(r);
+}
+function tvFill(r){
+  TV = r; $('tvLink').value = TV_URL + '?k=' + r.key; $('tvSec').value = r.sec; $('tvNews').value = r.news || '';
+  if (!tvSel){ tvSel = selBox(TV_PARTS_L.map(x => x[1]), true); $('tvParts').appendChild(tvSel); }
+  tvSel.set(TV_PARTS_L.filter(x => r.parts.indexOf(x[0]) !== -1).map(x => x[1]));
+}
+$('tvOpen').onclick = () => window.open($('tvLink').value, '_blank');
+$('tvCopy').onclick = async () => { try { await navigator.clipboard.writeText($('tvLink').value); toast('نُسخ رابط شاشة العرض'); } catch(e){ $('tvLink').select(); document.execCommand('copy'); toast('نُسخ الرابط'); } };
+$('tvNew').onclick = async () => { if (!confirm('إنشاء رابط جديد؟ سيتوقف الرابط القديم على أي شاشة مفتوح عليها.')) return; const r = await cpCall({ action:'tvCfgSave', cfg:{ newKey:true } }, 'tvMsg'); if (r && r.ok){ tvFill(r); msg('tvMsg', '✓ ' + r.msg, 'ok'); } };
+$('tvSave').onclick = async () => {
+  const parts = TV_PARTS_L.filter(x => tvSel.get().indexOf(x[1]) !== -1).map(x => x[0]), sec = +$('tvSec').value;
+  if (!parts.length) return msg('tvMsg2', 'اختر قسماً واحداً على الأقل.', 'err');
+  if (!(sec >= 6 && sec <= 60)) return msg('tvMsg2', 'مدة الشريحة من 6 إلى 60 ثانية.', 'err');
+  $('tvSave').disabled = true; const r = await cpCall({ action:'tvCfgSave', cfg:{ parts:parts, sec:sec, news:$('tvNews').value.trim() } }, 'tvMsg2'); $('tvSave').disabled = false;
+  if (r && r.ok){ tvFill(r); msg('tvMsg2', '✓ ' + r.msg + ' — تظهر على الشاشة خلال 5 دقائق.', 'ok'); }
 };
 
 /* ---------- تقارير الطلاب ---------- */
