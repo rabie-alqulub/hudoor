@@ -702,6 +702,20 @@
       <div class="card" id="heList"></div>
     </div>
 
+    <!-- تقارير الطلاب (شؤون الطلاب / الشؤون التعليمية / طالب باسمه) -->
+    <div id="pRep" class="hidden">
+      <div class="card">
+        <h2 id="rpTitle"></h2>
+        <small id="rpSub"></small>
+        <div class="stchips" id="rpPer"></div>
+        <div class="dsh-top"><button class="mini" id="rpPrev">السابق</button><span class="lbl" id="rpLbl"></span><button class="mini" id="rpNext">التالي</button></div>
+        <div class="edgrid hidden" id="rpCustom"><div><label for="rpFrom">من تاريخ</label><input type="date" id="rpFrom"></div><div><label for="rpTo">إلى تاريخ</label><input type="date" id="rpTo"></div></div>
+        <div class="dsh-f" style="grid-template-columns:1fr 2fr"><select id="rpHal"></select><div class="gsr" style="margin:0"><input id="rpQ" autocomplete="off" placeholder="اكتب اسم الطالب لتقريره"><div class="gsbox hidden" id="rpBox"></div></div></div>
+        <div class="stact"><button id="rpAllBtn" class="hidden">← كل طلاب الحلقة</button><button id="rpPdf">طباعة / PDF</button><button id="rpXls">تصدير Excel</button></div>
+      </div>
+      <div class="card" id="rpBody"></div>
+    </div>
+
     <!-- شاشة عرض المجمع -->
     <div id="pDash" class="hidden">
       <div class="card">
@@ -711,7 +725,7 @@
         <div class="edgrid hidden" id="dsCustom"><div><label for="dsFrom">من تاريخ</label><input type="date" id="dsFrom"></div><div><label for="dsTo">إلى تاريخ</label><input type="date" id="dsTo"></div></div>
         <div class="hidden" id="dsTerm"></div>
         <div class="dsh-f"><select id="dsHal"></select><select id="dsStage"></select><select id="dsSt"><option value="نشط">الطلاب النشطون</option><option value="منقطع">المنقطعون</option><option value="موقوف">الموقوفون</option><option value="الكل">الكل</option></select></div>
-        <div class="stact"><button id="dsXls">تصدير Excel</button><button id="dsPdf">تصدير PDF</button><button id="dsRef">تحديث</button></div>
+        <div class="stact"><button id="dsOne">تقرير طالب باسمه</button><button id="dsXls">تصدير Excel</button><button id="dsPdf">تصدير PDF</button><button id="dsRef">تحديث</button></div>
         <div id="dsMsg"></div>
       </div>
       <div class="card"><div class="kpis" id="dsKpi"></div></div>
@@ -1487,7 +1501,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1512,6 +1526,8 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.students') !== -1) TABS.push(['refsStu', 'إحالات شؤون الطلاب']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.edu') !== -1){ TABS.push(['refsEdu', 'الإحالات التعليمية']); TABS.push(['refsExam', 'ترشيحات المرحلية']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.students') !== -1) TABS.push(['repStu', 'تقارير شؤون الطلاب']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.edu') !== -1) TABS.push(['repEdu', 'التقارير التعليمية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1) TABS.push(['msgs', 'رسائل أولياء الأمور']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
@@ -1530,10 +1546,10 @@ async function loadHome(){
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'التقييم', ic:'teach', r:'teach' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['stuFile', 'ملف الطالب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['soon', 'شاشة عرض آداء الطلاب']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['soon', 'تقرير الحضور'], ['soon', 'التقرير الشامل للموظفين'], ['soon', 'شاشة عرض آداء المعلمين'], ['soon', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['soon', 'شاشات العرض'], ['soon', 'بيانات طلاب الحلقات']] },
-  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
+  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['refsExam', 'ترشيحات الاختبارات المرحلية'], ['soon', 'ترشيح الطلاب لاختبارات الجمعية'], ['soon', 'شاشة عرض متابعة الخطط'], ['soon', 'اختبار طالب قبل الترشيح'], ['soon', 'الطلاب المتعثرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['soon', 'رسائل الطلاب'], ['soon', 'رسائل الموظفين'], ['soon', 'تقرير الرسائل'], ['soon', 'أرشيف الرسائل'], ['soon', 'إحصائيات الرسائل'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['soon', 'تقرير المعلمين'], ['dash', 'شاشة عرض المجمع'], ['soon', 'تقرير المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['soon', 'الإعلانات'], ['soon', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['soon', 'الشؤون التعليمية']] }
@@ -1579,6 +1595,8 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
+  $('pRep').classList.toggle('hidden', !REP_KIND[r]);
+  if (REP_KIND[r]) openRep(REP_KIND[r]);
   $('pDash').classList.toggle('hidden', r !== 'dash');
   if (r === 'dash') openDash();
   $('pMoveMany').classList.toggle('hidden', r !== 'moveMany');
@@ -1643,6 +1661,7 @@ function renderWelcome(){
     refsEdu:['الإحالات التعليمية', 'إحالات مستوى الحفظ والخطط', ''], refsExam:['ترشيحات المرحلية', 'مواعيد الاختبارات المرحلية ونتائجها', 'gold'],
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
+    repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
     dash:['شاشة عرض المجمع', 'لوحة المجمع اليومية وتقاريرها الشاملة', 'gold'],
     absent:['الطلاب المنقطعون', 'المستبعدون لتجاوز حد الغياب وتفعيلهم', ''],
     stuFile:['ملف الطالب', 'بيانات الطالب وحفظه وحضوره وسجله كاملاً', ''],
@@ -2283,6 +2302,135 @@ $('hlSave').onclick = async () => {
     $('hlSheet').classList.add('hidden'); toast(r.msg); openHalEdit();
   } catch(e){ if (e.message !== 'expired') msg('hlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('hlSave').disabled = false; if (!hlForce) $('hlSave').textContent = 'حفظ التعديلات'; }
+};
+
+/* ---------- تقارير الطلاب ---------- */
+const REP_KIND = { repStu:'stu', repEdu:'edu', repAll:'all' };
+let RP = null, rpK = 'stu', rpP = 'day', rpDate = null, rpSid = '', rpSeq = 0, rpNames = null;
+const RP_T = { stu:['تقارير شؤون الطلاب', 'الحضور والتأخر والغياب والاستئذان والإحالات والاستبعاد لأي طالب أو حلقة. مناسب للعرض على ولي الأمر.'],
+  edu:['التقارير التعليمية', 'الحفظ والمراجعة والدرجات والخطط والاختبارات المرحلية لأي طالب أو حلقة.'], all:['تقرير طالب', 'تقرير شامل لطالب باسمه: الحضور والحفظ والدرجات والخطة والإحالات.'] };
+function rpRange(){
+  const t = D.today, d = rpDate || t;
+  if (rpP === 'day') return [d, d];
+  if (rpP === 'week'){ const s = addDays(d, -ud(d).getUTCDay()), e = addDays(s, 6); return [s, e > t ? t : e]; }
+  if (rpP === 'month'){ const s = d.slice(0, 8) + '01', n = ud(s); n.setUTCMonth(n.getUTCMonth() + 1); const e = addDays(iso(n), -1); return [s, e > t ? t : e]; }
+  if (rpP === 'term'){ const tr = (RP && RP.term) || (DS && DS.term) || {}; return [tr.from || addDays(t, -90), tr.to && tr.to < t ? tr.to : t]; }
+  return [$('rpFrom').value || addDays(t, -30), $('rpTo').value || t];
+}
+function openRep(k, sid){
+  if (k !== rpK){ rpK = k; rpSid = ''; RP = null; rpNames = null; $('rpQ').value = ''; }
+  if (sid){ rpSid = sid; if (rpP === 'day'){ rpP = 'month'; rpDate = null; } }
+  $('rpTitle').textContent = RP_T[k][0]; $('rpSub').textContent = RP_T[k][1];
+  const per = $('rpPer'); per.innerHTML = '';
+  DS_PER.forEach(p => { const b = el('button', rpP === p[0] ? 'on' : '', p[1]); b.onclick = () => { rpP = p[0]; rpDate = null; openRep(rpK); }; per.appendChild(b); });
+  $('rpCustom').classList.toggle('hidden', rpP !== 'custom');
+  ['rpPrev', 'rpNext'].forEach(id => $(id).classList.toggle('hidden', rpP === 'term' || rpP === 'custom'));
+  if (rpP === 'custom' && !$('rpFrom').value){ $('rpFrom').value = addDays(D.today, -30); $('rpTo').value = D.today; }
+  loadRep();
+}
+function rpShift(dir){
+  const d = rpDate || D.today;
+  if (rpP === 'day'){ let x = addDays(d, dir); for (let i = 0; i < 7 && !isStudy(x); i++) x = addDays(x, dir); rpDate = x; }
+  else if (rpP === 'week') rpDate = addDays(d, 7 * dir);
+  else if (rpP === 'month'){ const n = ud(d.slice(0, 8) + '01'); n.setUTCMonth(n.getUTCMonth() + dir); rpDate = iso(n); }
+  if (rpDate > D.today) rpDate = D.today; loadRep();
+}
+async function loadRep(){
+  const my = ++rpSeq, rg = rpRange();
+  $('rpLbl').textContent = rg[0] === rg[1] ? fmtD(rg[0], { weekday:'long', day:'numeric', month:'long', year:'numeric' }) : fmtD(rg[0], { day:'numeric', month:'short' }) + ' – ' + fmtD(rg[1], { day:'numeric', month:'short', year:'numeric' });
+  $('rpNext').disabled = rg[1] >= D.today; $('rpAllBtn').classList.toggle('hidden', !rpSid);
+  $('rpBody').innerHTML = '<div class="msg info">جاري تحميل التقرير...</div>';
+  let r; try { r = await api({ action:'stuRep', kind:rpK, from:rg[0], to:rg[1], hid:$('rpHal').value, sid:rpSid }); } catch(e){ if (e.message !== 'expired') msg('rpBody', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (my !== rpSeq) return;
+  if (!r.ok) return msg('rpBody', needSrv(r), 'err');
+  RP = r;
+  if (!$('rpHal').children.length) fillSel('rpHal', r.halaqat.map(h => [h.hid, h.name]), rpK === 'all' ? 'كل الحلقات' : 'كل حلقات المجمع');
+  if (r.list) rpNames = r.list.map(x => ({ sid:x.sid, name:x.name, hname:x.hname }));
+  if (!rpNames && !r.list){ api({ action:'stuRep', kind:rpK, from:rg[1], to:rg[1] }).then(x => { if (x.ok) rpNames = x.list.map(y => ({ sid:y.sid, name:y.name, hname:y.hname })); }).catch(() => {}); }
+  r.student ? rpOne() : rpList();
+}
+const RP_COLS = { stu:[['name', 'الطالب'], ['hname', 'الحلقة'], ['days', 'أيام مسجلة'], ['present', 'حاضر'], ['late', 'متأخر'], ['absent', 'غائب'], ['excused', 'مستأذن'], ['att', 'الحضور %'], ['refs', 'إحالات']],
+  edu:[['name', 'الطالب'], ['hname', 'الحلقة'], ['recs', 'تسميع'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['til', 'تلاوة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %'], ['refs', 'إحالات وترشيحات']] };
+RP_COLS.all = RP_COLS.stu.slice(0, 2).concat([['att', 'الحضور %'], ['absent', 'غائب'], ['excused', 'مستأذن'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %']]);
+let rpSort = ['name', 1];
+function rpCell(c, x){ const v = x[c]; if (v == null) return ['—']; if (c === 'att') return [v + '%', lvAtt(v)]; if (c === 'avg') return [v, lvAvg(v)]; if (c === 'plan') return [v + '%', lvPl(v)]; if (c === 'absent') return [v, v ? 'lv-r' : '']; return [v]; }
+function rpList(){
+  const b = $('rpBody'); b.innerHTML = ''; const cols = RP_COLS[rpK];
+  b.appendChild(el('h2', '', 'طلاب ' + ($('rpHal').value ? $('rpHal').selectedOptions[0].textContent : 'المجمع') + ' (' + RP.list.length + ')'));
+  b.appendChild(el('small', '', 'اضغط اسم الطالب لعرض تقريره المفصل.'));
+  const w = el('div', 'dtw'), t = el('table', 'dtbl'), tr = el('tr');
+  cols.forEach(c => { const th = el('th', rpSort[0] === c[0] ? 's' + (rpSort[1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { rpSort = [c[0], rpSort[0] === c[0] ? -rpSort[1] : (c[0] === 'name' || c[0] === 'hname' ? 1 : -1)]; rpList(); }; tr.appendChild(th); });
+  const th = el('thead'); th.appendChild(tr); t.appendChild(th); const tb = el('tbody');
+  sortBy(RP.list, rpSort[0], rpSort[1]).forEach(x => { const r = el('tr'); cols.forEach((c, i) => { const v = i === 0 ? [x.name + (x.st ? ' (' + x.st + ')' : '')] : rpCell(c[0], x), td = el('td', (i === 0 ? 'nm ' : '') + (v[1] || ''), v[0]); if (i === 0) td.onclick = () => { rpSid = x.sid; $('rpQ').value = x.name; loadRep(); }; r.appendChild(td); }); tb.appendChild(r); });
+  t.appendChild(tb); w.appendChild(t); b.appendChild(w);
+}
+function rpOne(){
+  const b = $('rpBody'), X = RP, s = X.student; b.innerHTML = '';
+  const me = el('div', 'me'), who = el('div'); who.appendChild(el('b', '', s.name)); who.appendChild(el('small', '', [s.hname, s.teacher && 'المعلم: ' + s.teacher, s.stage].filter(Boolean).join(' • ')));
+  me.appendChild(el('div', 'avatar', s.name.charAt(0))); me.appendChild(who); if (s.st) me.appendChild(el('span', 'pill p-red', s.st)); b.appendChild(me);
+  b.appendChild(kvBox([['الفترة', $('rpLbl').textContent], ['ولي الأمر', s.pname], ['جوال ولي الأمر', s.pphone]]));
+  const H = t => b.appendChild(el('div', 'rfsec', t));
+  if (rpK !== 'edu'){
+    H('الحضور');
+    const o = X.att, n = o.present + o.late + o.absent + o.excused, pc = v => n ? Math.round(v / n * 100) + '%' : '—';
+    const tl = el('div', 'tiles'); [['حاضر', 'present', 't-ok'], ['متأخر', 'late', 't-late'], ['غائب', 'absent', 't-abs'], ['مستأذن', 'excused', 't-nav']].forEach(x => { const t = tile(o[x[1]], x[0], x[2]); t.appendChild(el('small', '', pc(o[x[1]]))); tl.appendChild(t); }); b.appendChild(tl);
+    b.appendChild(el('div', 'slabel c-ok', 'نسبة الحضور: ' + (n ? Math.round((o.present + o.late) / n * 100) + '%' : '—') + ' من ' + n + ' يوم مسجل'));
+    if (X.days.length){ const w = el('div', 'dtw'), t = el('table', 'dtbl'); t.innerHTML = '<thead><tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th></tr></thead>'; const tb = el('tbody');
+      X.days.forEach(d => { const r = el('tr'); r.appendChild(el('td', '', d.date)); r.appendChild(el('td', '', fmtD(d.date, { weekday:'long' }))); const c = el('td'); c.appendChild(el('span', pillCls(d.status), d.status)); r.appendChild(c); tb.appendChild(r); }); t.appendChild(tb); w.appendChild(t); b.appendChild(w); }
+    else b.appendChild(el('small', '', 'لا يوجد حضور مسجل في هذه الفترة.'));
+    if (X.events && X.events.length){ H('الاستبعاد والتنبيهات والنقل'); X.events.forEach(e => { const w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', e.event)); g.appendChild(el('small', '', e.at.slice(0, 16) + (e.details ? ' • ' + e.details : ''))); w.appendChild(g); b.appendChild(w); }); }
+    if (X.msgs && X.msgs.length){ H('الرسائل لولي الأمر'); const c = {}; X.msgs.forEach(m => c[m.kind] = (c[m.kind] || 0) + 1); b.appendChild(el('div', '', Object.keys(c).map(k => k + ': ' + c[k]).join(' • '))); }
+  }
+  if (rpK !== 'stu'){
+    H('الحفظ والمراجعة');
+    const ty = {}, sc = []; X.records.forEach(r => { ty[r.type] = (ty[r.type] || 0) + r.ayat; if (r.score != null) sc.push(r.score); });
+    const tl = el('div', 'tiles'); D.types.forEach((t, i) => tl.appendChild(tile(ty[t] || 0, t + ' (آية)', ['t-ok', 't-late', 't-nav', ''][i]))); b.appendChild(tl);
+    if (sc.length){ const a = Math.round(sc.reduce((m, x) => m + x, 0) / sc.length * 10) / 10; b.appendChild(el('div', 'slabel ' + (PILL[scoreLabel(a)] || '').replace('p-', 'c-'), 'متوسط الدرجات: ' + a + ' من ' + D.maxScore + ' • ' + scoreLabel(a) + (X.stars ? ' • فارس الحلقة ' + X.stars + ' مرة' : ''))); }
+    const pb = el('div'); b.appendChild(pb); plansBlock({ plans:X.plans }, pb);
+    if (X.records.length){ const w = el('div', 'dtw'), t = el('table', 'dtbl'); t.innerHTML = '<thead><tr><th>التاريخ</th><th>النوع</th><th>من</th><th>إلى</th><th>آيات</th><th>الدرجة</th><th>ملاحظة</th></tr></thead>'; const tb = el('tbody');
+      X.records.forEach(r => { const tr = el('tr'); [r.date, r.type, r.from, r.to, r.ayat].forEach(v => tr.appendChild(el('td', '', v))); const c = el('td'); c.appendChild(el('span', pillCls(r.grade), scoreTxt(r))); tr.appendChild(c); tr.appendChild(el('td', '', r.note || '')); tb.appendChild(tr); }); t.appendChild(tb); w.appendChild(t); b.appendChild(w); }
+    else b.appendChild(el('small', '', 'لا يوجد تسميع في هذه الفترة.'));
+    if (X.exams && X.exams.length){ H('الاختبارات المرحلية'); X.exams.forEach(x => { const w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', x.data.stage || 'مرحلية')); g.appendChild(el('small', '', 'رُشّح ' + x.date + (x.examDate ? ' • الموعد ' + x.examDate : '') + (x.examiner ? ' • ' + x.examiner : ''))); w.appendChild(g); w.appendChild(el('span', 'pill ' + (x.result === 'اجتاز' ? 'p-ok' : x.result ? 'p-red' : (RF_ST_CLS[x.status] || 'p-none')), x.result ? x.result + (x.score ? ' ' + x.score : '') : x.status)); b.appendChild(w); }); }
+  }
+  const refs = X.refs.filter(x => rpK === 'all' || x.kind !== 'exam');
+  if (refs.length){ H(rpK === 'stu' ? 'إحالات شؤون الطلاب' : 'الإحالات'); refs.forEach(x => { const w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', (x.kind === 'exam' ? 'ترشيح ' : 'إحالة ') + x.type + ' • ' + x.summary)); const last = (x.thread || []).filter(e => e.side === 'h').slice(-1)[0];
+    g.appendChild(el('small', '', x.date + ' • ' + x.tname + (last && last.text ? ' • الرد: ' + last.text : ''))); w.appendChild(g); w.appendChild(el('span', 'pill ' + (RF_ST_CLS[x.status] || 'p-none'), x.status)); b.appendChild(w); }); }
+  const ac = el('div', 'stact'), fb = el('button', '', 'ملف الطالب'); fb.onclick = () => goFile(s.sid); ac.appendChild(fb); b.appendChild(ac);
+}
+$('rpPrev').onclick = () => rpShift(-1); $('rpNext').onclick = () => rpShift(1);
+['rpFrom', 'rpTo'].forEach(id => $(id).onchange = loadRep);
+$('rpHal').onchange = () => { rpSid = ''; $('rpQ').value = ''; loadRep(); };
+$('rpAllBtn').onclick = () => { rpSid = ''; $('rpQ').value = ''; loadRep(); };
+$('rpQ').oninput = () => {
+  const q = normAr($('rpQ').value.trim()), box = $('rpBox'); box.innerHTML = '';
+  if (!q || !rpNames){ box.classList.add('hidden'); return; }
+  const hits = rpNames.filter(x => normAr(x.name).indexOf(q) !== -1).slice(0, 10);
+  if (!hits.length) box.appendChild(el('div', 'ge', 'لا يوجد طالب بهذا الاسم.'));
+  hits.forEach(x => { const b = el('button'); b.appendChild(gsMark(x.name, q)); b.appendChild(el('small', '', x.hname)); b.onmousedown = e => e.preventDefault(); b.onclick = () => { rpSid = x.sid; $('rpQ').value = x.name; box.classList.add('hidden'); loadRep(); }; box.appendChild(b); });
+  box.classList.remove('hidden');
+};
+$('rpQ').onblur = () => setTimeout(() => $('rpBox').classList.add('hidden'), 150);
+$('dsOne').onclick = () => openRole('repAll');
+$('rpPdf').onclick = () => {
+  if (!RP) return;
+  const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', RP_T[rpK][0] + (RP.student ? ': ' + RP.student.name : ''))); l.appendChild(el('div', '', $('rpLbl').textContent + (RP.student ? ' • ' + RP.student.hname : $('rpHal').value ? ' • ' + $('rpHal').selectedOptions[0].textContent : '')));
+  hd.appendChild(l); hd.appendChild(el('div', '', RP.org)); p.appendChild(hd);
+  const c = $('rpBody').cloneNode(true); c.querySelectorAll('.stact,button').forEach(x => x.remove()); c.removeAttribute('id'); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); p.appendChild(c);
+  setTimeout(() => window.print(), 50);
+};
+$('rpXls').onclick = () => {
+  if (!RP) return;
+  const t = RP_T[rpK][0] + (RP.student ? ': ' + RP.student.name : '') + ' — ' + $('rpLbl').textContent, sheets = [];
+  if (RP.list){ const cols = RP_COLS[rpK]; sheets.push(['الطلاب', [[t], ['رقم الطالب'].concat(cols.map(c => c[1]))].concat(sortBy(RP.list, 'hname', 1).map(x => [Number(x.sid) || x.sid].concat(cols.map(c => x[c[0]] == null ? '' : x[c[0]]))))]); }
+  else {
+    if (RP.days) sheets.push(['الحضور', [[t], ['التاريخ', 'اليوم', 'الحالة']].concat(RP.days.map(d => [d.date, fmtD(d.date, { weekday:'long' }), d.status]))]);
+    if (RP.records) sheets.push(['التسميع', [[t], ['التاريخ', 'النوع', 'من', 'إلى', 'الآيات', 'الدرجة', 'التقدير', 'ملاحظة']].concat(RP.records.map(r => [r.date, r.type, r.from, r.to, r.ayat, r.score == null ? '' : r.score, r.grade, r.note || '']))]);
+    if (RP.refs.length) sheets.push(['الإحالات', [[t], ['التاريخ', 'النوع', 'الملخص', 'الحالة', 'المعلم']].concat(RP.refs.map(x => [x.date, x.type, x.summary, x.status, x.tname]))]);
+  }
+  if (!sheets.length) return toast('لا توجد بيانات للتصدير');
+  const a = el('a'); a.href = URL.createObjectURL(xlsxBlob(sheets)); a.download = (RP.student ? 'تقرير-' + RP.student.name : RP_T[rpK][0]).replace(/\s+/g, '-') + '-' + RP.from + (RP.to !== RP.from ? '_' + RP.to : '') + '.xlsx';
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel');
 };
 
 /* ---------- شاشة عرض المجمع ---------- */
