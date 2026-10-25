@@ -572,6 +572,12 @@
   .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .stepper button{flex:none;width:32px;height:32px;padding:0;border-radius:9px;background:var(--light);color:var(--navy);font-size:19px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center}
   .stepper button:active{transform:scale(.94)} @media (prefers-color-scheme: dark){ .stepper button{color:#C9DCEA} }
+  .cdbar{display:flex;gap:8px;align-items:stretch;margin-top:10px} .cdbar input{flex:1;min-width:0;margin:0}
+  #cdAdd{flex:none;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border:0;border-radius:12px;background:var(--navy);color:#fff;font:inherit;font-size:14px;font-weight:700;white-space:nowrap;cursor:pointer;box-shadow:0 3px 10px rgba(59,95,120,.25)}
+  #cdAdd span{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.2);font-size:17px;line-height:1}
+  #cdAdd.hidden{display:none}
+  @media (max-width:600px){ .cdbar{flex-direction:column} #cdAdd{justify-content:center;padding:12px 16px} }
+  @media (max-width:600px){ #pAssoc .card > .stact{display:grid;grid-template-columns:1fr 1fr;gap:8px} #pAssoc .card > .stact button{margin:0;padding:10px 8px} }
   .bellwrap{position:relative} .bellpop{position:absolute;top:calc(100% + 8px);left:0;width:min(340px,calc(100vw - 24px));background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.2);padding:8px;z-index:30;text-align:right}
   .bellpop b.t{display:block;padding:8px 10px 6px;font-size:15px;color:var(--navy)} .bellpop button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 10px;border-radius:12px;background:none;color:var(--text);font-size:14px;text-align:right}
   .bellpop button:hover{background:var(--light)} .bellpop button i{margin-inline-start:auto;font-style:normal;min-width:24px;padding:2px 8px;border-radius:999px;background:var(--red);color:#fff;font-size:12px;font-weight:700;text-align:center} .bellpop small{display:block;padding:12px 10px;color:var(--muted)}
@@ -908,7 +914,7 @@
       <div class="card">
         <h2 id="cdTitle">الطلاب المرشحون</h2>
         <div class="stchips" id="cdSum"></div>
-        <div class="dsh-f" style="grid-template-columns:1fr auto"><input id="cdQ" placeholder="ابحث باسم الطالب أو الحلقة أو المعلم"><button class="good hidden" id="cdAdd">+ طالب للاختبار</button></div>
+        <div class="cdbar"><input id="cdQ" placeholder="ابحث باسم الطالب أو الحلقة أو المعلم"><button class="hidden" id="cdAdd" type="button"><span>+</span>إضافة طالب للاختبار القبلي</button></div>
       </div>
       <div class="card" id="cdBox"></div>
     </div>
