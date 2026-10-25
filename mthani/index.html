@@ -2905,7 +2905,7 @@ const AS_TABS = { preTest:[['wait', 'بانتظار الاختبار الداخ�
 /* تبويب «الاختبارات»: شاشة واحدة بقسمين — المرشحون للاختبار القبلي، ثم المرشحون لاختبار الجمعية ومجموعاتهم */
 async function openExams(){
   asMode = 'assocNom'; if (AS_TABS.assocNom.every(t => t[0] !== asT)) asT = 'nom';
-  $('asTitle').textContent = 'المرشحون لاختبار الجمعية'; $('asSub').textContent = 'بعد اجتياز الاختبار القبلي وترشيحه ينتقل الطالب إلى هنا: حدّد موعد اختباره، ثم أرسله ضمن مجموعة لمشرف الجمعية.';
+  $('asTitle').textContent = 'الطلاب المرشحون لاختبار الجمعية'; $('asSub').textContent = 'بعد اجتياز الاختبار القبلي وترشيحه ينتقل الطالب إلى هنا: حدّد موعد اختباره، ثم أرسله ضمن مجموعة لمشرف الجمعية.';
   const pc = $('pCands'), pa = $('pAssoc'); if (pc.nextElementSibling !== pa) pa.parentNode.insertBefore(pc, pa);
   $('cdBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; $('asBox').innerHTML = '';
   const r = await cpCall({ action:'assoc' }, 'cdBox'); if (r && r.ok){ AX = r; renderCands(); renderAssoc(); }
@@ -3400,7 +3400,7 @@ $('cdAdd').onclick = () => { asMode = 'preTest'; asSheet('add', null); };
 async function cdApprove(x){
   if (!confirm('الموافقة على ترشيح ' + x.name + ' لاختبار الجمعية (' + x.level + ')؟')) return;
   const r = x.a && x.a.status === AX.st.pass ? await cpCall({ action:'assocSave', op:'nom', id:x.a.id, data:{} }, 'cdBox') : await cpCall({ action:'assocSave', op:'fromRef', data:{ refId:x.ref.id } }, 'cdBox');
-  if (r && r.ok){ AX = r; toast('رُشّح ' + x.name + ' لاختبار الجمعية — حدّد موعد اختباره من «المرشحون لاختبار الجمعية»'); renderCands(); if (role === 'exams') renderAssoc(); $('ptSheet').classList.add('hidden'); }
+  if (r && r.ok){ AX = r; toast('رُشّح ' + x.name + ' لاختبار الجمعية — حدّد موعد اختباره من «الطلاب المرشحون لاختبار الجمعية»'); renderCands(); if (role === 'exams') renderAssoc(); $('ptSheet').classList.add('hidden'); }
 }
 /* نموذج الاختبار قبل الترشيح: أسئلة متساوية الدرجة، والخصم: خطأ حفظ = درجة، تنبيه = نصف، خطأ تجويد = نصف */
 const PT_W = { h:1, t:0.5, j:0.5 };
