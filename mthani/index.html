@@ -648,6 +648,150 @@
   table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
   th,td{padding:7px 4px;text-align:center;border-bottom:1px solid var(--line)}
   th{color:var(--muted);font-weight:500} td:first-child,th:first-child{text-align:right}
+  /* ===================== الواجهة الزجاجية (g2) ===================== */
+  .g2only{display:none!important}
+  body.g2 .g2only:not(.hidden){display:block!important}
+  body.g2 .appbar .gsr + .grow{display:none}
+  body.g2{--gl:rgba(255,255,255,.56);--gl2:rgba(255,255,255,.78);--glb:rgba(255,255,255,.7);--gls:0 10px 32px rgba(31,53,70,.10);--blur:blur(18px) saturate(150%);background:#EEF0EC}
+  body.g2::before{content:'';position:fixed;inset:-8%;z-index:-1;pointer-events:none;background:
+    radial-gradient(38% 34% at 88% 8%,rgba(208,142,44,.34),transparent 70%),
+    radial-gradient(42% 40% at 6% 30%,rgba(59,95,120,.32),transparent 70%),
+    radial-gradient(46% 42% at 62% 98%,rgba(243,217,174,.75),transparent 70%),
+    radial-gradient(30% 30% at 30% 70%,rgba(46,139,122,.12),transparent 70%),
+    linear-gradient(160deg,#F8F4EB 0%,#EDF1F3 55%,#F3EEE4 100%)}
+  @media (prefers-color-scheme: dark){
+    body.g2{--gl:rgba(22,32,41,.58);--gl2:rgba(26,38,48,.86);--glb:rgba(255,255,255,.09);--gls:0 12px 34px rgba(0,0,0,.35);background:#0D141A}
+    body.g2::before{background:radial-gradient(38% 34% at 88% 8%,rgba(208,142,44,.22),transparent 70%),radial-gradient(42% 40% at 6% 30%,rgba(59,95,120,.42),transparent 70%),radial-gradient(46% 42% at 62% 98%,rgba(120,90,40,.25),transparent 70%),linear-gradient(160deg,#0E161D,#121C24)}
+  }
+  body.g2 .card,body.g2 .stat,body.g2 .action,body.g2 .orgcard,body.g2 .stucards .stu,body.g2 .pcard,body.g2 .hadith{background:var(--gl);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glb);box-shadow:var(--gls)}
+  body.g2 .card{border-radius:26px;padding:20px 22px}
+  body.g2 .card .card,body.g2 .hal,body.g2 .kpi{background:rgba(255,255,255,.42);border:1px solid var(--glb)}
+  @media (prefers-color-scheme: dark){ body.g2 .card .card,body.g2 .hal,body.g2 .kpi{background:rgba(255,255,255,.04)} }
+  body.g2 input,body.g2 select,body.g2 textarea{background:rgba(255,255,255,.62);border-color:rgba(31,53,70,.12);border-radius:14px}
+  @media (prefers-color-scheme: dark){ body.g2 input,body.g2 select,body.g2 textarea{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)} }
+  body.g2 .btn{border-radius:16px;box-shadow:0 8px 18px rgba(31,53,70,.18)} body.g2 .btn.soft{box-shadow:none;background:rgba(59,95,120,.1)}
+  body.g2 .btn.gold{background:linear-gradient(135deg,#E0A140,#B87A1F)} body.g2 .btn:not(.gold):not(.soft){background:linear-gradient(135deg,#46708C,#1F3546)}
+  body.g2 h2{font-size:19px;letter-spacing:-.2px}
+  body.g2 .tabs,body.g2 .seg{background:rgba(31,53,70,.07);border-radius:16px}
+  body.g2 .chips button{background:rgba(255,255,255,.55);border:1px solid var(--glb)}
+  body.g2 .chips button.on{background:var(--goldlight);border-color:var(--gold)}
+  body.g2 .sheet{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);background:rgba(10,18,24,.4)}
+  body.g2 .sheet .panel{background:var(--gl2);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%);border:1px solid var(--glb)}
+  body.g2 .dtbl th{background:rgba(59,95,120,.08)} body.g2 .dtbl tr:hover td{background:rgba(208,142,44,.07)}
+  body.g2 .bellpop,body.g2 .gsbox{background:var(--gl2);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--glb);border-radius:20px}
+  /* الشريط العلوي العائم */
+  body.g2 .appbar{top:10px;margin:10px auto 0;width:calc(100% - 20px);max-width:1520px;border-radius:24px;background:linear-gradient(135deg,rgba(59,95,120,.86),rgba(31,53,70,.88));-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,.16);border-bottom:2px solid var(--gold);box-shadow:0 14px 34px rgba(31,53,70,.28);z-index:25}
+  body.g2 .appbar .iconbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.12);border-radius:16px}
+  body.g2 .appbar .iconbtn:hover{background:rgba(255,255,255,.22)}
+  body.g2 .appbar .gsr{flex:0 1 420px;margin:0 auto}
+  body.g2 .appbar .gsr input{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:999px;padding:10px 42px 10px 14px;font-size:15px}
+  body.g2 .appbar .gsr input::placeholder{color:rgba(255,255,255,.7)} body.g2 .appbar .gsr .gic{color:#F3D9AE}
+  body.g2 .appbar .gsr .gsbox{color:var(--text)}
+  body.g2 .gsr input{border-radius:999px;background:var(--gl);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glb)}
+  @media (max-width:440px){ body.g2 .appbar{width:calc(100% - 12px);top:6px;margin-top:6px;padding:8px;gap:4px} body.g2 .appbar .iconbtn{min-width:40px;padding:6px 3px;font-size:10.5px} }
+  @media (min-width:860px){
+    body.g2 .appbar{width:calc(100% - 56px);top:14px;margin-top:14px;padding:10px 18px}
+    body.g2.in .shell{grid-template-columns:104px minmax(0,1fr);gap:24px;padding-top:22px}
+    body.g2 nav.groups{top:104px;max-height:calc(100vh - 124px)!important;width:104px;padding:12px 8px!important;gap:4px;border-radius:30px;background:var(--gl);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--glb);box-shadow:var(--gls);scrollbar-width:none}
+    body.g2 nav.groups::-webkit-scrollbar{display:none}
+    body.g2 #navRail{display:none!important}
+    body.g2 nav.groups .navlogo{background:none;border:0;padding:4px 0 10px;margin:0 0 4px;border-bottom:1px solid rgba(31,53,70,.1);border-radius:0}
+    body.g2 nav.groups .navlogo img{width:62px;height:62px;padding:3px;border-width:2px}
+    body.g2 nav.groups .navlogo b,body.g2 nav.groups .navlogo small{display:none}
+    body.g2 nav.groups .ngroup{background:none;border:0;border-radius:20px;overflow:visible}
+    body.g2 nav.groups .ghead{border:0;background:none;white-space:normal;width:100%;flex-direction:column;gap:4px;padding:6px 2px;font-size:11.5px;line-height:1.35;text-align:center;border-radius:20px;color:var(--muted);transition:background .2s,color .2s}
+    body.g2 nav.groups .ghead:hover{background:rgba(255,255,255,.55);color:var(--text)}
+    body.g2 nav.groups .ghead .ic{width:42px;height:42px;border-radius:16px;background:rgba(255,255,255,.7);box-shadow:0 4px 12px rgba(31,53,70,.08);transition:transform .2s}
+    body.g2 nav.groups .ghead:hover .ic{transform:translateY(-2px)}
+    body.g2 nav.groups .ghead .ic svg{width:22px;height:22px}
+    body.g2 nav.groups .ghead .chev{display:none}
+    body.g2 nav.groups .ngroup.cur .ghead{color:var(--navy);font-weight:700}
+    body.g2 nav.groups .ngroup.cur .ghead .ic{background:linear-gradient(135deg,#46708C,#1F3546);color:#fff;box-shadow:0 8px 18px rgba(31,53,70,.3),0 0 0 2px var(--gold)}
+    body.g2 nav.groups .ngroup.fly .ghead .ic{box-shadow:0 0 0 2px var(--gold)}
+    body.g2 nav.groups .gitems{display:none!important}
+    body.g2 nav.groups .ghead .nbdg{position:absolute;margin:0;transform:translate(-18px,-4px)}
+    body.g2 nav.groups .ghead{position:relative}
+  }
+  @media (prefers-color-scheme: dark){ body.g2 nav.groups .ghead .ic{background:rgba(255,255,255,.06)} body.g2 nav.groups .ngroup.cur .ghead{color:#E8B867} }
+  #g2fly{position:fixed;z-index:40;width:290px;max-height:calc(100vh - 40px);overflow:auto;padding:12px;border-radius:22px;background:var(--gl2);-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);border:1px solid var(--glb);box-shadow:0 18px 44px rgba(31,53,70,.22);animation:g2fly .22s cubic-bezier(.2,.7,.2,1)}
+  #g2fly .ft{display:flex;align-items:center;gap:8px;padding:4px 8px 8px;font-weight:700;color:var(--navy);border-bottom:1px solid rgba(31,53,70,.1);margin-bottom:4px}
+  @media (prefers-color-scheme: dark){ #g2fly .ft{color:#E8B867} }
+  #g2fly .gitems{display:block!important;padding:0}
+  #g2fly .gitems button{border-radius:14px} #g2fly .gitems button:hover{background:rgba(59,95,120,.08);color:var(--text)}
+  #g2fly .gitems button.on{background:linear-gradient(135deg,#46708C,#1F3546);color:#fff}
+  @keyframes g2fly{from{opacity:0;transform:translateX(10px) scale(.98)}}
+  @media (max-width:859px){
+    body.g2 nav.groups{background:var(--gl2);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);border-radius:28px 0 0 28px}
+    body.g2 nav.groups .ngroup{background:rgba(255,255,255,.5);border:1px solid var(--glb);border-radius:18px}
+    body.g2 nav:not(.groups) > button{background:var(--gl);border:1px solid var(--glb)}
+    body.g2 .card{padding:16px;border-radius:22px}
+    body.g2 .wkhead h2{flex-basis:100%;font-size:17px}
+  }
+  /* الترحيب */
+  body.g2 .welcome{background:none;box-shadow:none;color:var(--text);text-align:right;padding:18px 6px 10px;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"lg gr" "lg h" "lg r" "lg w" "hs hs";column-gap:18px;align-items:center;overflow:visible}
+  body.g2 .welcome .sky{display:none}
+  body.g2 .welcome .wlogo{grid-area:lg;width:96px;height:96px;margin:0;align-self:center}
+  body.g2 .welcome .greet{grid-area:gr;justify-content:flex-start;color:var(--gold2);font-weight:700;font-size:15px}
+  body.g2 .welcome h2{grid-area:h;color:var(--navy3);font-size:34px;margin:2px 0;letter-spacing:-.5px}
+  body.g2 .welcome .role{grid-area:r;color:var(--navy);margin:0}
+  body.g2 .welcome .when{grid-area:w;color:var(--muted);opacity:1}
+  body.g2 .welcome .hals{grid-area:hs;justify-content:flex-start} body.g2 .welcome .hals span{background:var(--gl);border:1px solid var(--glb);color:var(--text)}
+  @media (prefers-color-scheme: dark){ body.g2 .welcome h2{color:#fff} body.g2 .welcome .role{color:#C9DCEA} }
+  @media (min-width:860px){ body.g2 .welcome h2{font-size:40px} body.g2 .welcome .wlogo{width:116px;height:116px} }
+  @media (max-width:520px){ body.g2 .welcome{grid-template-columns:auto 1fr;column-gap:12px} body.g2 .welcome .wlogo{width:72px;height:72px} body.g2 .welcome h2{font-size:26px} body.g2 .welcome .when{font-size:12px} }
+  body.g2 .stats{gap:14px;margin-bottom:16px}
+  body.g2 .stat{border-radius:24px;padding:16px 16px 14px;text-align:right;display:grid;grid-template-columns:1fr auto;grid-template-areas:"b ic" "s s";align-items:center;row-gap:4px;transition:transform .2s,box-shadow .2s}
+  body.g2 .stat svg{grid-area:ic;width:40px;height:40px;padding:9px;border-radius:14px;background:var(--goldlight);color:var(--gold2)}
+  body.g2 .stat b{grid-area:b;font-size:32px;margin:0;color:var(--navy3);line-height:1}
+  body.g2 .stat span{grid-area:s;font-size:13px}
+  body.g2 .stat:first-child{background:linear-gradient(140deg,#4A7591 0%,#2C4A60 55%,#1F3546 100%);border-color:rgba(255,255,255,.2);box-shadow:0 16px 34px rgba(31,53,70,.32);position:relative;overflow:hidden}
+  body.g2 .stat:first-child::after{content:'';position:absolute;left:-30px;bottom:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(208,142,44,.45),transparent 70%)}
+  body.g2 .stat:first-child b{color:#fff} body.g2 .stat:first-child span{color:#F3D9AE} body.g2 .stat:first-child svg{background:rgba(255,255,255,.14);color:#F3D9AE}
+  @media (prefers-color-scheme: dark){ body.g2 .stat b{color:#fff} body.g2 .stat svg{background:rgba(208,142,44,.15)} }
+  @media (max-width:560px){ body.g2 .stats{grid-template-columns:1fr 1fr;gap:10px} body.g2 .stat b{font-size:26px} body.g2 .stat svg{width:34px;height:34px;padding:7px} }
+  body.g2 .stat:hover,body.g2 .action:hover{transform:translateY(-3px);box-shadow:0 18px 36px rgba(31,53,70,.16)}
+  body.g2 .action{border-radius:24px;transition:transform .2s,box-shadow .2s}
+  body.g2 .action .ic{border-radius:16px;background:rgba(59,95,120,.1)} body.g2 .action.gold .ic{background:var(--goldlight)}
+  body.g2 .wsec{font-size:16px;margin:20px 4px 10px} body.g2 .wsec::after{background:linear-gradient(90deg,transparent,rgba(31,53,70,.18))}
+  body.g2 .hadith{border-radius:24px;background:linear-gradient(135deg,rgba(251,241,225,.75),rgba(255,255,255,.5))}
+  @media (prefers-color-scheme: dark){ body.g2 .hadith{background:rgba(46,38,24,.6)} }
+  /* مخطط الأسبوع */
+  .wkhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap} .wkhead h2{margin:0;flex:1}
+  .wklg{display:flex;gap:14px;font-size:12.5px;color:var(--muted)} .wklg i{display:inline-block;width:10px;height:10px;border-radius:4px;margin-inline-end:5px;vertical-align:-1px}
+  .wksum{display:flex;gap:22px;margin:12px 0 2px;flex-wrap:wrap} .wksum b{display:block;font-size:24px;color:var(--navy3);line-height:1.1} .wksum span{font-size:12px;color:var(--muted)}
+  @media (prefers-color-scheme: dark){ .wksum b{color:#fff} }
+  @media (max-width:520px){ .wksum{display:grid;grid-template-columns:repeat(4,1fr);gap:6px} .wksum b{font-size:19px} .wksum span{font-size:11px;line-height:1.3;display:block} }
+  .wkchart{width:100%;height:220px;display:block;margin-top:6px;overflow:visible}
+  .wkchart .gl{stroke:rgba(31,53,70,.08)} .wkchart text{font-family:Tajawal,sans-serif;fill:var(--muted);font-size:12px}
+  .wkchart .v{fill:var(--text);font-size:11.5px;font-weight:700}
+  .wkchart rect.p{fill:url(#wkN)} .wkchart rect.r{fill:url(#wkG)} .wkchart rect{transition:opacity .2s} .wkchart g.d:hover rect{opacity:.8}
+  .wkchart .today text.x{fill:var(--gold2);font-weight:700}
+  body.g2 .wkchart rect{animation:g2bar .7s cubic-bezier(.2,.7,.2,1) backwards;transform-origin:bottom;transform-box:fill-box}
+  @keyframes g2bar{from{transform:scaleY(0)}}
+  /* التقارير */
+  body.g2 .kpis{gap:12px}
+  body.g2 .kpi{border-radius:20px;padding:14px 12px;text-align:right;transition:transform .2s}
+  body.g2 .kpi:hover{transform:translateY(-2px)}
+  body.g2 .kpi b{font-size:28px} body.g2 #dsKpi .kpi:first-child{background:linear-gradient(140deg,#4A7591,#1F3546);border-color:transparent;box-shadow:0 14px 30px rgba(31,53,70,.28)}
+  body.g2 #dsKpi .kpi:first-child b{color:#fff} body.g2 #dsKpi .kpi:first-child span{color:#F3D9AE}
+  body.g2 .chart{height:190px;gap:6px;border-bottom:1px solid rgba(31,53,70,.12);background:repeating-linear-gradient(to top,transparent 0,transparent 37px,rgba(31,53,70,.06) 37px,rgba(31,53,70,.06) 38px)}
+  body.g2 .chart div{border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,#5C87A3,#2C4A60);animation:g2bar .7s cubic-bezier(.2,.7,.2,1) backwards;transform-origin:bottom}
+  body.g2 .chart div.mid{background:linear-gradient(180deg,#E9B25A,#B87A1F)} body.g2 .chart div.lo{background:linear-gradient(180deg,#E07B6F,#B3261E)}
+  .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:640px){ .rings{grid-template-columns:1fr 1fr 1fr;gap:6px} }
+  .ring{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+  .ring svg{width:min(150px,100%);height:auto} .ring .t{font-size:13px;color:var(--muted);font-weight:700}
+  .ring .bg{stroke:rgba(31,53,70,.1)} .ring .fg{transition:stroke-dashoffset 1s cubic-bezier(.2,.7,.2,1)}
+  .ring text{font-family:Tajawal,sans-serif;font-weight:700;fill:var(--text)}
+  /* حركة الدخول */
+  @keyframes g2up{from{opacity:0;transform:translateY(14px)}}
+  body.g2 main .card,body.g2 .stat,body.g2 .action,body.g2 .welcome,body.g2 .kpi{animation:g2up .5s cubic-bezier(.2,.7,.2,1) backwards}
+  body.g2 .stat:nth-child(2),body.g2 .action:nth-child(2),body.g2 .kpi:nth-child(2){animation-delay:.05s}
+  body.g2 .stat:nth-child(3),body.g2 .action:nth-child(3),body.g2 .kpi:nth-child(3){animation-delay:.1s}
+  body.g2 .stat:nth-child(4),body.g2 .action:nth-child(4),body.g2 .kpi:nth-child(4){animation-delay:.15s}
+  body.g2 .action:nth-child(n+5),body.g2 .kpi:nth-child(n+5){animation-delay:.2s}
+  body.g2 main .card:nth-of-type(2){animation-delay:.06s} body.g2 main .card:nth-of-type(3){animation-delay:.12s}
+  @media (prefers-reduced-motion: reduce){ body.g2 *{animation:none!important;transition:none!important} }
 </style>
 </head>
 <body>
@@ -734,6 +878,7 @@
       </div>
       <div id="zmCards"></div>
       <div class="stats" id="stats"></div>
+      <div class="card g2only hidden" id="weekCard"><div class="wkhead"><h2>الحضور والتسميع — آخر 7 أيام دراسية</h2><div class="wklg"><span><i style="background:#3B5F78"></i>الحاضرون</span><span><i style="background:#D08E2C"></i>مرات التسميع</span></div></div><div class="wksum" id="weekSum"></div><div id="weekChart"></div></div>
       <div class="wsec hidden" id="annHead">الإعلانات</div>
       <div id="annWelcome"></div>
       <div class="wsec">الوصول السريع</div>
@@ -1118,6 +1263,7 @@
         <div id="dsMsg"></div>
       </div>
       <div class="card"><div class="kpis" id="dsKpi"></div></div>
+      <div class="card g2only"><h2>مؤشرات الأداء</h2><div class="rings" id="dsRings"></div></div>
       <div class="card" id="dsChartC"><h2 id="dsChartT">الحضور والتسميع</h2><div id="dsChart"></div></div>
       <div class="card"><h2>الحلقات</h2><div class="dtw"><table class="dtbl" id="dsHalT"></table></div></div>
       <div class="card"><div class="duo"><div><h2>الأفضل</h2><div id="dsBest"></div></div><div><h2>يحتاجون متابعة</h2><div id="dsWeak"></div></div></div></div>
@@ -2257,6 +2403,7 @@ function renderWelcome(){
   const box = $('stats'); box.innerHTML = ''; box.classList.toggle('hidden', !st);
   if (st) [['users', st.students, 'طلابي'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
     .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', x[2])); box.appendChild(d); });
+  renderWeek();
   const ac = $('actions'); ac.innerHTML = '';
   const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['بناء الخطط التعليمية', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['تقرير الحلقات', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''],
     myStu:['طلاب الحلقة', 'إحالة الطلاب وترشيحهم للمرحلية ومتابعة الردود', 'gold'], refsStu:['إحالات شؤون الطلاب', 'استقبال إحالات المعلمين والرد عليها', ''],
@@ -2290,6 +2437,80 @@ function renderWelcome(){
   acts.filter(t => DESC[t[0]]).forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]] || ICONS[{ preT:'exam', assocT:'exam', exams:'exam', trxR:'exam', trxS:'exam', dash:'report', trxIn:'exam', trxMemo:'exam', cands:'exam', exGrp:'exam', ann:'chat', assocNom:'exam', trx:'exam' }[t[0]]] || ''; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
 }
 
+/* ---------- الواجهة الزجاجية (معاينة): ?ui=2 لتفعيلها و ?ui=1 للعودة ---------- */
+const UI2 = (() => { let q = null; try { q = new URLSearchParams(location.search).get('ui'); } catch(e){} if (q === '1' || q === '2') store.set('hq_ui', q); return (q || store.get('hq_ui')) === '2'; })();
+document.body.classList.toggle('g2', UI2);
+const g2Desk = () => UI2 && innerWidth >= 860;
+function g2Place(){   // البحث داخل الشريط العلوي على الكمبيوتر
+  if (!UI2) return; const g = $('gsWrap'), bar = $('appbar'), home = $('vHome');
+  if (g2Desk()){ if (g.parentNode !== bar) bar.insertBefore(g, bar.querySelector('.grow')); }
+  else if (g.parentNode !== home) home.insertBefore(g, home.firstChild);
+}
+let g2Box = null, g2W = null;
+function g2Close(){ const f = $('g2fly'); if (g2Box && g2W) g2W.appendChild(g2Box); if (g2W) g2W.classList.remove('fly'); g2Box = g2W = null; if (f) f.remove(); }
+function g2Open(w){
+  g2Close(); const box = w.querySelector('.gitems'); if (!box) return;
+  const f = el('div'); f.id = 'g2fly'; const t = el('div', 'ft'); t.textContent = w.querySelector('.ghead span:not(.ic)').textContent; f.appendChild(t);
+  g2Box = box; g2W = w; w.classList.add('fly'); f.appendChild(box); document.body.appendChild(f);
+  // يُعاد الصندوق لمكانه قبل تنفيذ أمر الخيار ليبقى تمييز الخيار المفتوح صحيحاً
+  f.addEventListener('click', e => { if (e.target.closest('.gitems button')) g2Close(); }, true);
+  const r = w.querySelector('.ghead').getBoundingClientRect(), nr = $('nav').getBoundingClientRect();
+  f.style.right = (innerWidth - nr.left + 12) + 'px';
+  f.style.top = Math.max(12, Math.min(r.top - 8, innerHeight - f.offsetHeight - 16)) + 'px';
+}
+if (UI2){
+  $('nav').addEventListener('click', e => {
+    if (!g2Desk()) return; const h = e.target.closest('.ghead'); if (!h) return; const w = h.closest('.ngroup');
+    if (w.classList.contains('direct')){ g2Close(); return; }
+    e.stopPropagation(); if (g2W === w) g2Close(); else g2Open(w);
+  }, true);
+  document.addEventListener('click', e => { if (g2W && !e.target.closest('#g2fly') && !e.target.closest('#nav')) g2Close(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') g2Close(); });
+  let g2rt; addEventListener('resize', () => { g2Close(); g2Place(); clearTimeout(g2rt); g2rt = setTimeout(() => { if (D && !$('weekCard').classList.contains('hidden')) renderWeek(); }, 200); });
+  $('nav').addEventListener('scroll', g2Close, { passive:true });
+  g2Place();
+}
+/* مخطط آخر 7 أيام دراسية في الشاشة الرئيسية */
+function renderWeek(){
+  const c = $('weekCard'), W = (D && D.week) || [];
+  c.classList.toggle('hidden', !UI2 || !W.length || !D.stats); if (c.classList.contains('hidden')) return;
+  const sum = (k) => W.reduce((a, x) => a + (x[k] || 0), 0), pres = sum('present'), abs = sum('absent');
+  $('weekSum').innerHTML = '';
+  [[pres, 'حضور خلال الأسبوع'], [pres + abs ? Math.round(pres * 100 / (pres + abs)) + '%' : '—', 'نسبة الحضور'], [sum('recs'), 'مرات التسميع'], [sum('ayat'), 'آيات مسمّعة']]
+    .forEach(x => { const d = el('div'); d.appendChild(el('b', '', x[0])); d.appendChild(el('span', '', x[1])); $('weekSum').appendChild(d); });
+  const Wd = Math.max(300, $('weekChart').clientWidth || 700), H = 220, nar = Wd < 560, top = 22, bot = nar ? 40 : 30, ch = H - top - bot, mx = Math.max(1, ...W.map(x => Math.max(x.present, x.recs)));
+  const step = Math.pow(10, Math.floor(Math.log10(mx))), nice = Math.ceil(mx / step) * step || 1, slot = Wd / W.length, bw = Math.min(26, slot / 3.6);
+  let s = '<svg class="wkchart" viewBox="0 0 ' + Wd + ' ' + H + '" role="img" aria-label="الحضور والتسميع آخر 7 أيام"><defs>' +
+    '<linearGradient id="wkN" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5C87A3"/><stop offset="1" stop-color="#2C4A60"/></linearGradient>' +
+    '<linearGradient id="wkG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EDB862"/><stop offset="1" stop-color="#C0821F"/></linearGradient></defs>';
+  for (let i = 0; i <= 4; i++){ const y = top + ch - ch * i / 4; s += '<line class="gl" x1="0" x2="' + Wd + '" y1="' + y + '" y2="' + y + '"/>'; }
+  W.forEach((x, i) => {
+    const cx = Wd - slot * (i + .5), hp = ch * x.present / nice, hr = ch * x.recs / nice, dn = fmtD(x.d, { weekday:nar ? 'short' : 'long' }) + ' ' + fmtD(x.d, { day:'numeric' });
+    s += '<g class="d' + (x.d === D.today ? ' today' : '') + '"><title>' + fmtD(x.d, { weekday:'long', day:'numeric', month:'long' }) + ': حاضرون ' + x.present + ' • غائبون ' + x.absent + ' • تسميع ' + x.recs + ' • آيات ' + x.ayat + '</title>' +
+      '<rect class="p" x="' + (cx + 2) + '" y="' + (top + ch - hp) + '" width="' + bw + '" height="' + Math.max(hp, 2) + '" rx="6" style="animation-delay:' + i * .05 + 's"/>' +
+      '<rect class="r" x="' + (cx - bw - 2) + '" y="' + (top + ch - hr) + '" width="' + bw + '" height="' + Math.max(hr, 2) + '" rx="6" style="animation-delay:' + (i * .05 + .03) + 's"/>' +
+      (x.present ? '<text class="v" text-anchor="middle" x="' + (cx + 2 + bw / 2) + '" y="' + (top + ch - hp - 6) + '">' + x.present + '</text>' : '') +
+      (x.recs ? '<text class="v" text-anchor="middle" x="' + (cx - 2 - bw / 2) + '" y="' + (top + ch - hr - 6) + '">' + x.recs + '</text>' : '') +
+      (nar ? '<text class="x" text-anchor="middle" x="' + cx + '" y="' + (H - 22) + '" font-size="10.5">' + fmtD(x.d, { weekday:'long' }) + '</text><text class="x" text-anchor="middle" x="' + cx + '" y="' + (H - 6) + '">' + fmtD(x.d, { day:'numeric', month:'numeric' }) + '</text>'
+        : '<text class="x" text-anchor="middle" x="' + cx + '" y="' + (H - 8) + '">' + dn + '</text>') + '</g>';
+  });
+  $('weekChart').innerHTML = s + '</svg>';
+}
+/* حلقات المؤشرات في شاشة عرض المجمع */
+function ringSvg(p, label, val, col){
+  const r = 52, C = 2 * Math.PI * r, v = p == null ? 0 : Math.max(0, Math.min(100, p));
+  return '<div class="ring"><svg viewBox="0 0 130 130"><circle class="bg" cx="65" cy="65" r="' + r + '" fill="none" stroke-width="12"/>' +
+    '<circle class="fg" cx="65" cy="65" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C + '" data-o="' + (C * (1 - v / 100)) + '" transform="rotate(-90 65 65)"/>' +
+    '<text x="65" y="72" text-anchor="middle" font-size="24">' + val + '</text></svg><span class="t">' + label + '</span></div>';
+}
+function renderRings(K){
+  if (!UI2) return; const b = $('dsRings'), lv = (p, a, c) => p == null ? '#9AA5AE' : p >= a ? '#2E7D5B' : p >= c ? '#D08E2C' : '#B3261E';
+  const att = K.att, ap = K.apprNeed ? Math.round(K.approvals * 100 / K.apprNeed) : null, av = K.avg == null ? null : Math.round(K.avg * 100 / D.maxScore);
+  b.innerHTML = ringSvg(att, 'نسبة الحضور', att == null ? '—' : att + '%', lv(att, 90, 75)) +
+    ringSvg(av, 'متوسط الدرجات', K.avg == null ? '—' : K.avg + '/' + D.maxScore, lv(av, 80, 65)) +
+    ringSvg(ap, 'اعتماد الحلقات', K.approvals + '/' + K.apprNeed, lv(ap, 100, 70));
+  requestAnimationFrame(() => requestAnimationFrame(() => b.querySelectorAll('.fg').forEach(c => c.style.strokeDashoffset = c.dataset.o)));
+}
 /* ---------- تغيير الرمز السري ---------- */
 function openPin(){ ['cpOld','cpNew','cpNew2'].forEach(id => $(id).value = ''); msg('cpMsg', '', ''); $('pinSheet').classList.remove('hidden'); $('cpOld').focus(); }
 $('btnPin').onclick = openPin; $('btnPin2').onclick = openPin;
@@ -4237,7 +4458,7 @@ function renderDash(){
     else { const c = el('div', 'chart'); sr.forEach(x => { const b = el('div', x.att < 75 ? 'lo' : x.att < 90 ? 'mid' : ''); b.style.height = Math.max(3, x.att) + '%'; b.title = x.d + ': حضور ' + x.att + '% • تسميع ' + x.recs; c.appendChild(b); }); ch.appendChild(c);
       const xl = el('div', 'chart-x'); xl.appendChild(el('span', '', fmtD(sr[0].d, { day:'numeric', month:'short' }))); xl.appendChild(el('span', '', fmtD(sr[sr.length - 1].d, { day:'numeric', month:'short' }))); ch.appendChild(xl); }
   }
-  dsHalTable(); dsRanks(); dsStuTable();
+  dsHalTable(); dsRanks(); dsStuTable(); renderRings(K);
 }
 const DS_HCOLS = [['name', 'الحلقة'], ['teacher', 'المعلم'], ['students', 'الطلاب'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['recs', 'تسميع'], ['avg', 'متوسط الدرجة'], ['appr', 'الاعتماد']];
 const DS_SCOLS = [['name', 'الطالب'], ['hname', 'الحلقة'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %'], ['stars', 'فارس الحلقة'], ['points', 'النقاط'], ['refs', 'إحالات']];
