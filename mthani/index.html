@@ -1988,7 +1988,7 @@ const ADMIN_NAV = [
 ];
 function navLogo(){
   const lg = el('div', 'navlogo'), im = el('img'); im.src = '../logo.jpg'; im.alt = 'شعار مجمع ربيع القلوب';
-  lg.appendChild(im); lg.appendChild(el('b', '', (D && D.orgShort) || 'مجمع ربيع القلوب')); lg.appendChild(el('small', '', 'لتحفيظ القرآن الكريم بجامع علي الشبلان'));
+  lg.appendChild(im); lg.appendChild(el('b', '', 'مجمع حلقات ربيع القلوب القرآني')); lg.appendChild(el('small', '', 'بجامع علي الشبلان - أبها'));
   return lg;
 }
 function buildAdminNav(n){
@@ -2143,7 +2143,7 @@ function roleText(){
 }
 function renderWelcome(){
   renderAnnFor('annWelcome'); zmCards();
-  if (D.org) $('orgCardName').textContent = D.org.split(' بجامع')[0];
+  $('orgCardName').textContent = 'مجمع حلقات ربيع القلوب القرآني';
   const hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', hourCycle:'h23' }).format(new Date());
   const morning = hr >= 4 && hr < 12;
   $('sky').innerHTML = morning ? SUN : MOON;
