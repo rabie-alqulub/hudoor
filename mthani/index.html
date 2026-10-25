@@ -26,14 +26,14 @@
   .logo img{height:50px;width:auto}
   header h1{margin:0;font-size:20px;font-weight:700}
   header p{margin:6px 0 0;font-size:13px;color:#F3D9AE}
-  main{max-width:520px;margin:-28px auto 0;padding:0 14px 40px;width:100%}
+  main{max-width:640px;margin:-28px auto 0;padding:0 14px 40px;width:100%}
   .hero{background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;padding:26px 16px 48px;text-align:center;border-bottom:4px solid var(--gold)}
   .hero .mark{width:76px;height:76px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}
   .hero h1{margin:10px 0 0;font-size:24px}
   .hero h1 span{color:#F3D9AE}
   .hero p{margin:6px 0 0;font-size:13px;color:#F3D9AE}
   .hero .org{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:12px;opacity:.9}
-  .hero .org img{width:26px;height:26px;border-radius:50%;background:#fff;padding:2px}
+  .hero .org img{display:none}
   .appbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);border-bottom:3px solid var(--gold);color:#fff}
   .brand{display:flex;align-items:center;gap:10px;background:none;color:#fff;padding:0;text-align:right}
   .brand .mark{width:42px;height:42px}
@@ -53,7 +53,7 @@
   @media (max-width:520px){ nav{gap:6px} nav:not(.groups) > button{padding:9px 11px;font-size:14px;gap:6px;border-radius:12px} nav svg{width:18px;height:18px} }
   @media (max-width:430px){ nav:not(.groups) > button{padding:9px 13px} nav:not(.groups) > button svg{display:none} }
   @media (min-width:860px){
-    .shell{display:grid;grid-template-columns:280px minmax(0,980px);gap:24px;padding:20px;justify-content:center;max-width:1340px}
+    .shell{display:grid;grid-template-columns:270px minmax(0,1fr);gap:24px;padding:20px 28px;max-width:1520px}
     body:not(.in) .shell{display:block;padding:0}
     nav{flex-direction:column;position:sticky;top:90px;align-self:start;padding:0 0 0 6px;margin:0;max-width:none;max-height:calc(100vh - 110px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--navy) transparent}
     nav::-webkit-scrollbar{display:block;width:8px} nav::-webkit-scrollbar-thumb{background:var(--navy);border-radius:8px} nav::-webkit-scrollbar-track{background:var(--light);border-radius:8px}
@@ -63,7 +63,12 @@
     nav button{width:100%;padding:14px 16px}
     body.in main{margin:0;padding:0 0 40px;max-width:none}
   }
-  .welcome{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;border-radius:22px;padding:22px 20px;margin-bottom:12px;box-shadow:0 8px 24px rgba(31,53,70,.25)}
+  .welcome{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;border-radius:22px;padding:24px 20px 22px;margin-bottom:12px;box-shadow:0 8px 24px rgba(31,53,70,.25);text-align:center}
+  .welcome .wlogo{display:block;width:96px;height:96px;margin:0 auto 10px;border-radius:50%;background:#fff;padding:5px;border:3px solid var(--gold);object-fit:contain;box-shadow:0 8px 20px rgba(0,0,0,.25);position:relative}
+  .welcome .greet{justify-content:center} .welcome .hals{justify-content:center} .welcome .role{color:#F3D9AE;font-weight:700;font-size:14px}
+  @media (min-width:860px){ .welcome .wlogo{width:112px;height:112px} .welcome h2{font-size:27px} }
+  .wsec{display:flex;align-items:center;gap:8px;margin:16px 2px 8px;font-size:15px;color:var(--navy);font-weight:700} .wsec::after{content:'';flex:1;height:1px;background:var(--line)}
+  @media (prefers-color-scheme: dark){ .wsec{color:#C9DCEA} }
   .welcome .sky{position:absolute;left:-10px;top:-10px;width:130px;height:130px;opacity:.9}
   .welcome .greet{font-size:14px;color:#F3D9AE;display:flex;align-items:center;gap:6px}
   .welcome h2{color:#fff;font-size:24px;margin:6px 0 4px}
@@ -75,6 +80,7 @@
   .stat svg{width:22px;height:22px;color:var(--gold)}
   .stat b{display:block;font-size:22px;margin-top:2px} .stat span{font-size:12px;color:var(--muted)}
   .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  @media (min-width:860px){ .actions{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))} .actions.one{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))} .action{padding:14px 14px;gap:6px} .action .ic{width:40px;height:40px} .action .ic svg{width:22px;height:22px} .action b{font-size:15.5px} }
   .actions.one{grid-template-columns:1fr}
   .action{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:18px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);color:var(--text);text-align:right;box-shadow:0 4px 14px rgba(30,42,51,.06)}
   .action .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--light);color:var(--navy)}
@@ -358,7 +364,7 @@
   .portal:hover{transform:translateY(-2px)} .portal{transition:transform .15s}
   .pc-admin{background:linear-gradient(135deg,#3B5F78,#1F3546)} .pc-stu{background:linear-gradient(135deg,#2E8B7A,#1D5E52)} .pc-edu{background:linear-gradient(135deg,#D08E2C,#9C6514)}
   .pc-teach{background:linear-gradient(135deg,#4F7A3A,#30521F)} .pc-parent{background:linear-gradient(135deg,#7B5BA6,#523A75)} .pc-student{background:linear-gradient(135deg,#C9583E,#8E3523)}
-  .ptag{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;color:#fff;margin-bottom:6px} .ptag svg{width:22px;height:22px} .ptag b{flex:1} .ptag .link{color:#fff;text-decoration:underline;margin:0;padding:0}
+  .ptag{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;color:#fff;margin-bottom:6px} .ptag svg{width:22px;height:22px} .ptag #ptagIc{flex:none;display:flex} .ptag b{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .ptag .link{flex:none;width:auto;color:#fff;text-decoration:underline;margin:0;padding:0}
   .lrow{display:flex;justify-content:space-between}
   .tempbox{margin-top:10px;padding:14px;border-radius:14px;background:var(--goldlight);border:2px dashed var(--gold);text-align:center} .tempbox b{display:block;font-size:30px;letter-spacing:6px;color:var(--gold2);margin:6px 0}
   .robar{background:var(--goldlight);color:var(--gold2);border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;margin-bottom:10px}
@@ -559,7 +565,12 @@
   .seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--light);padding:4px;border-radius:12px;margin-top:8px}
   .seg button{padding:10px;border-radius:9px;background:none;color:var(--muted);font-size:15px;font-weight:700}
   .seg button.on{background:var(--navy);color:#fff}
-  .pair{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+  @media (min-width:860px){ .seg{display:inline-flex!important;width:auto} .seg button{padding:9px 24px;white-space:nowrap} .tabs{display:inline-flex} .tabs button{flex:none;padding:9px 22px;white-space:nowrap} }
+  .bellwrap{position:relative} .bellpop{position:absolute;top:calc(100% + 8px);left:0;width:min(340px,calc(100vw - 24px));background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.2);padding:8px;z-index:30;text-align:right}
+  .bellpop b.t{display:block;padding:8px 10px 6px;font-size:15px;color:var(--navy)} .bellpop button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 10px;border-radius:12px;background:none;color:var(--text);font-size:14px;text-align:right}
+  .bellpop button:hover{background:var(--light)} .bellpop button i{margin-inline-start:auto;font-style:normal;min-width:24px;padding:2px 8px;border-radius:999px;background:var(--red);color:#fff;font-size:12px;font-weight:700;text-align:center} .bellpop small{display:block;padding:12px 10px;color:var(--muted)}
+  @media (prefers-color-scheme: dark){ .bellpop b.t{color:#C9DCEA} }
+  @media (max-width:600px){ .bellpop{position:fixed;top:72px;left:12px;right:12px;width:auto} }  .pair{display:grid;grid-template-columns:2fr 1fr;gap:8px}
   .types{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--light);padding:4px;border-radius:12px;margin-top:8px}
   .types button{padding:10px 4px;border-radius:9px;background:none;color:var(--muted);font-size:15px;font-weight:700}
   .types button.on{background:var(--navy);color:#fff}
@@ -614,7 +625,8 @@
 <header class="appbar hidden" id="appbar">
   <button class="brand" id="brandHome" aria-label="الرئيسية"><img class="mark" src="mthani-192.png" alt="مثاني"><span><b>مثاني</b><small>لحلقات تحفيظ القرآن</small></span></button>
   <span class="grow"></span>
-  <button class="iconbtn hidden" style="display:none" id="btnBell" aria-label="الإحالات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>الإحالات<span class="bdg hidden" id="bellN"></span></button>
+  <button class="iconbtn" id="btnHome" aria-label="الشاشة الرئيسية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>الرئيسية</button>
+  <div class="bellwrap"><button class="iconbtn" id="btnBell" aria-label="التنبيهات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>التنبيهات<span class="bdg hidden" id="bellN"></span></button><div class="bellpop hidden" id="bellPop"></div></div>
   <button class="iconbtn menubtn" id="btnMenu" aria-label="القائمة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>القائمة</button>
   <button class="iconbtn" style="display:none" id="btnPin" aria-label="تغيير الرمز السري"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/></svg>الرمز</button>
   <button class="iconbtn" id="btnLogout" aria-label="تسجيل الخروج"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>خروج</button>
@@ -675,19 +687,21 @@
     </div>
     <!-- الترحيب -->
     <div id="pWelcome" class="hidden">
-      <div id="annWelcome"></div>
-      <div id="zmCards"></div>
       <div class="notice hidden" id="pinNotice">أنت تستخدم الرمز الأولي. غيّره لحماية حسابك.<button id="btnPin2">تغيير الآن</button></div>
-      <div class="orgcard"><img src="../logo.jpg" alt="شعار مجمع ربيع القلوب"><div><b id="orgCardName">مجمع حلقات ربيع القلوب القرآني</b><small>بجامع علي الشبلان - أبها</small></div></div>
       <div class="welcome">
         <svg class="sky" id="sky" viewBox="0 0 120 120"></svg>
+        <img class="wlogo" src="../logo.jpg" alt="شعار مجمع ربيع القلوب">
         <div class="greet" id="greet"></div>
         <h2 id="hello"></h2>
         <div class="role" id="roleLine"></div>
         <div class="when" id="when"></div>
         <div class="hals" id="myHals"></div>
       </div>
+      <div id="zmCards"></div>
       <div class="stats" id="stats"></div>
+      <div class="wsec hidden" id="annHead">الإعلانات</div>
+      <div id="annWelcome"></div>
+      <div class="wsec">الوصول السريع</div>
       <div class="actions" id="actions"></div>
       <div class="hadith">«خيركم من تعلّم القرآن وعلّمه»<small>رواه البخاري</small></div>
     </div>
@@ -1993,7 +2007,7 @@ async function loadHome(){
   else n.appendChild(navLogo());
   if (!admin) TABS.forEach(x => { const b = el('button'); b.dataset.r = x[0]; b.innerHTML = ICONS[x[0]]; b.appendChild(el('span', '', x[1])); b.onclick = () => openRole(x[0]); n.appendChild(b); });
   show('vHome');
-  openRole(admin ? 'dash' : 'welcome'); updBell();
+  openRole('welcome'); updBell(); clearInterval(window._bellT); window._bellT = setInterval(refreshCounts, 120000);
   if (r.ro && !$('roBar')){ const b = el('div', 'robar', 'حساب المشرف العام: للاطلاع فقط، ولا يمكن التعديل.'); b.id = 'roBar'; $('vHome').insertBefore(b, $('vHome').firstChild); }   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
 }
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
@@ -2004,7 +2018,7 @@ const ADMIN_NAV = [
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['planF', 'شاشة عرض متابعة الخطط']] },
   { t:'الاختبارات', ic:'exam', items:[['cands', 'الطلاب المرشحون'], ['assocNom', 'ترشيح طالب لاختبار الجمعية'], ['exGrp', 'المختبرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
-  { t:'المعاملات', ic:'exam', items:[['trxIn', 'المعاملات الواردة'], ['trxMemo', 'التعاميم والمذكرات']] },
+  { t:'المعاملات', ic:'exam', items:[['trxIn', 'المعاملات الواردة'], ['trxMemo', 'المعاملات الصادرة']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['zoomCfg', 'ربط الحلقات عن بعد'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
 ];
@@ -2168,7 +2182,7 @@ function roleText(){
 }
 function renderWelcome(){
   renderAnnFor('annWelcome'); zmCards();
-  $('orgCardName').textContent = 'مجمع حلقات ربيع القلوب القرآني';
+  $('annHead').classList.toggle('hidden', !(D.ann || []).length);
   const hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', hourCycle:'h23' }).format(new Date());
   const morning = hr >= 4 && hr < 12;
   $('sky').innerHTML = morning ? SUN : MOON;
@@ -2206,10 +2220,12 @@ function renderWelcome(){
     absent:['الطلاب المنقطعون', 'المستبعدون لتجاوز حد الغياب وتفعيلهم', ''],
     stuFile:['ملف الطالب', 'بيانات الطالب وحفظه وحضوره وسجله كاملاً', ''],
     msgs:['رسائل أولياء الأمور', 'رسالة خاصة أو عامة عبر برق', ''],
+    trxIn:['المعاملات الواردة', 'طلبات الموظفين ومعاملاتهم', ''], trxMemo:['المعاملات الصادرة', 'إضافة معاملة جديدة وأرشيف الصادرة', ''],
+    exGrp:['المختبرون', 'مجموعات اختبار الجمعية ومشرفوها', 'gold'], assocNom:['ترشيح طالب لاختبار الجمعية', 'المرشحون ومواعيد اختبارهم ونتائجهم', 'gold'],
     halaqaNew:['إضافة حلقة', 'إضافة حلقة جديدة', ''], halaqaEdit:['تعديل حلقة', 'تعديل الحلقات وعدد طلابها', ''] };
-  const acts = document.body.classList.contains('admin') ? [['teach'], ['report'], ['plans'], ['settings']] : TABS;
+  const acts = document.body.classList.contains('admin') ? [['dash'], ['teach'], ['report'], ['plans'], ['trxIn'], ['trxMemo'], ['cands'], ['exGrp'], ['ann'], ['settings']] : TABS;
   ac.classList.toggle('one', acts.length === 1);
-  acts.filter(t => DESC[t[0]]).forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]]; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
+  acts.filter(t => DESC[t[0]]).forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]] || ICONS[{ dash:'report', trxIn:'exam', trxMemo:'exam', cands:'exam', exGrp:'exam', ann:'chat', assocNom:'exam', trx:'exam' }[t[0]]] || ''; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
 }
 
 /* ---------- تغيير الرمز السري ---------- */
@@ -3124,11 +3140,11 @@ function renderMsgArc(){
 
 /* ---------- المعاملات الإدارية ---------- */
 let TX = null, txMode = 'trx', txT = '', txF = '', txCur = null;
-const TX_TABS = { trx:[['new', 'معاملة جديدة'], ['mine', 'معاملاتي'], ['memos', 'التعاميم الواردة']], trxIn:[['inbox', 'الواردة']], trxMemo:[['memoNew', 'تعميم أو مذكرة جديدة'], ['sent', 'الصادرة']] };
+const TX_TABS = { trx:[['new', 'معاملة جديدة'], ['mine', 'معاملاتي'], ['memos', 'التعاميم الواردة']], trxIn:[['inbox', 'الواردة']], trxMemo:[['memoNew', 'إضافة معاملة جديدة'], ['sent', 'الصادرة']] };
 const TX_CLS = { 'جديدة':'p-late', 'قيد المراجعة':'p-none', 'معادة للاستكمال':'p-red', 'معتمدة':'p-ok', 'مرفوضة':'p-red', 'منجزة':'p-ok' };
 async function openTrx(mode){
   if (mode !== txMode){ txMode = mode; txT = ''; txF = ''; } if (!txT) txT = TX_TABS[mode][mode === 'trx' ? 1 : 0][0];
-  $('txTitle').textContent = { trx:'المعاملات', trxIn:'المعاملات الواردة', trxMemo:'التعاميم والمذكرات' }[mode];
+  $('txTitle').textContent = { trx:'المعاملات', trxIn:'المعاملات الواردة', trxMemo:'المعاملات الصادرة' }[mode];
   $('txBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'trxList' }, 'txBox'); if (r && r.ok){ TX = r; renderTrx(); }
 }
 function renderTrx(){
@@ -3160,7 +3176,7 @@ function txForm(box){
   if (memo){
     f.appendChild(lab('المستلمون', true)); const to = selBox(['كل الموظفين', 'بحسب الصفة', 'موظفون محددون']); f.appendChild(to);
     const tw = el('div'); f.appendChild(tw); let tb = null, nb = null;
-    to.onpick = () => { tw.innerHTML = ''; tb = nb = null; if (to.get() === 'بحسب الصفة'){ tb = selBox(TX.titles, true); tw.appendChild(tb); } if (to.get() === 'موظفون محددون'){ const q = el('input'); q.placeholder = 'ابحث بالاسم'; tw.appendChild(q); const lst = el('div', 'stlist'); tw.appendChild(lst); const sel = new Set();
+    to.onpick = () => { tw.innerHTML = ''; tb = nb = null; if (to.get() === 'بحسب الصفة'){ tb = selBox(TX.titles.filter(x => x && x !== D.title && x !== (D.me || {}).title), true); tw.appendChild(tb); } if (to.get() === 'موظفون محددون'){ const q = el('input'); q.placeholder = 'ابحث بالاسم'; tw.appendChild(q); const lst = el('div', 'stlist'); tw.appendChild(lst); const sel = new Set();
       const draw = () => { lst.innerHTML = ''; TX.staff.filter(p => !q.value.trim() || normAr(p.name).indexOf(normAr(q.value)) !== -1).forEach(p => { const l = el('label'), c = el('input'); c.type = 'checkbox'; c.checked = sel.has(p.nid); c.onchange = () => c.checked ? sel.add(p.nid) : sel.delete(p.nid); l.appendChild(c); l.appendChild(el('span', '', p.name)); l.appendChild(el('small', '', p.title)); lst.appendChild(l); }); };
       q.oninput = draw; draw(); nb = { get:() => [...sel] }; } };
     F.to = () => ({ toAll:to.get() === 'كل الموظفين' ? 'الكل' : '', titles:tb ? tb.get() : [], nids:nb ? nb.get() : [] });
@@ -4745,25 +4761,38 @@ function selBox(opts, multi, cls){
 }
 const lab = (t, req) => el('label', '', t + (req ? ' *' : ''));
 function refUnread(){ const c = (D && D.refs) || {}; return { mine:c.mine || 0, stu:c.stu || 0, edu:c.edu || 0, exam:c.exam || 0 }; }
+function bellItems(){
+  const c = refUnread(), t = (D && D.trxN) || {}, out = [], has = r => TABS.some(x => x[0] === r) || document.body.classList.contains('admin');
+  const add = (n, label, go) => { if (n) out.push([n, label, go]); };
+  add(c.mine, 'ردود على إحالاتك وترشيحاتك', () => { msSec = 'track'; openRole('myStu'); });
+  add(c.stu, 'إحالات شؤون الطلاب الجديدة', () => { rbF = 'open'; openRole('refsStu'); });
+  add(c.edu, 'إحالات تعليمية جديدة', () => { rbF = 'open'; openRole('refsEdu'); });
+  add(c.exam, 'ترشيحات جديدة من المعلمين', () => { if (has('cands')) openRole('cands'); else { rbF = 'open'; openRole('refsExam'); } });
+  add(t.inbox, 'معاملات واردة جديدة', () => { txMode = 'trxIn'; txT = 'inbox'; openRole('trxIn'); });
+  add(t.mine, 'ردود على معاملاتك', () => { txMode = 'trx'; txT = 'mine'; openRole('trx'); });
+  add(t.memos, 'تعاميم ومذكرات لم تطّلع عليها', () => { txMode = 'trx'; txT = 'memos'; openRole('trx'); });
+  add((D && D.ann || []).filter(a => !a.read).length, 'إعلانات جديدة', () => { openRole('welcome'); setTimeout(() => { const a = $('annWelcome'); if (a) a.scrollIntoView({ behavior:'smooth', block:'center' }); }, 100); });
+  return out;
+}
 function updBell(){
-  const P = (D && D.perms) || [], adm = P.indexOf('*') !== -1, c = refUnread();
-  const isT = D && D.roles && D.roles.indexOf('teacher') !== -1;
-  const show = isT || adm || P.indexOf('refs.students') !== -1 || P.indexOf('refs.edu') !== -1;
-  $('btnBell').classList.toggle('hidden', !show);
-  const bm = { myStu:c.mine, refsStu:c.stu, refsEdu:c.edu, refsExam:c.exam, cands:c.exam };
+  const c = refUnread();
+  const bm = { myStu:c.mine, refsStu:c.stu, refsEdu:c.edu, refsExam:c.exam, cands:c.exam, trxIn:((D && D.trxN) || {}).inbox || 0, trx:(((D && D.trxN) || {}).mine || 0) + (((D && D.trxN) || {}).memos || 0) };
   document.querySelectorAll('#nav button[data-r]').forEach(b => { const k = b.dataset.r; let x = b.querySelector('.nbdg'); const v = bm[k] || 0;
     if (!(k in bm)) return; if (!v){ if (x) x.remove(); return; } if (!x){ x = el('span', 'nbdg'); b.appendChild(x); } x.textContent = v; });
   document.querySelectorAll('#nav .ngroup').forEach(w => { const h = w.querySelector('.ghead'); if (!h) return; let x = h.querySelector('.nbdg'); const v = [...w.querySelectorAll('.gitems .nbdg')].reduce((a, y) => a + (+y.textContent || 0), 0);
     if (!v){ if (x) x.remove(); return; } if (!x){ x = el('span', 'nbdg'); h.insertBefore(x, h.querySelector('.chev')); } x.textContent = v; });
-  const n = c.mine + c.stu + c.edu + c.exam; $('bellN').textContent = n; $('bellN').classList.toggle('hidden', !n);
+  const n = bellItems().reduce((a, x) => a + x[0], 0); $('bellN').textContent = n > 99 ? '99+' : n; $('bellN').classList.toggle('hidden', !n);
+  if (!$('bellPop').classList.contains('hidden')) bellDraw();
 }
-$('btnBell').onclick = () => {
-  const c = refUnread(), isT = D.roles.indexOf('teacher') !== -1;
-  if (c.mine || (isT && !c.stu && !c.edu && !c.exam)){ msSec = 'track'; return openRole('myStu'); }
-  const k = c.stu ? 'stu' : c.edu ? 'edu' : c.exam ? 'exam' : (D.perms.indexOf('refs.students') !== -1 || D.perms.indexOf('*') !== -1 ? 'stu' : 'edu');
-  rbF = 'open'; openRole({ stu:'refsStu', edu:'refsEdu', exam:'refsExam' }[k]);
-};
-async function refreshCounts(){ try { const r = await api({ action:'home' }); if (r.ok){ D.refs = r.refs; updBell(); } } catch(e){} }
+function bellDraw(){
+  const p = $('bellPop'), L = bellItems(); p.innerHTML = ''; p.appendChild(el('b', 't', 'التنبيهات'));
+  if (!L.length) p.appendChild(el('small', '', 'لا توجد تنبيهات جديدة ✓'));
+  L.forEach(x => { const b = el('button'); b.appendChild(el('span', '', x[1])); b.appendChild(el('i', '', x[0])); b.onclick = () => { p.classList.add('hidden'); closeMenu(); x[2](); window.scrollTo(0, 0); setTimeout(refreshCounts, 2500); }; p.appendChild(b); });
+}
+$('btnBell').onclick = e => { e.stopPropagation(); const p = $('bellPop'); if (!p.classList.contains('hidden')) return p.classList.add('hidden'); bellDraw(); p.classList.remove('hidden'); refreshCounts(); };
+document.addEventListener('click', e => { const p = $('bellPop'); if (p && !p.classList.contains('hidden') && !p.contains(e.target)) p.classList.add('hidden'); });
+$('btnHome').onclick = () => { if (D){ show('vHome'); closeMenu(); openRole('welcome'); window.scrollTo(0, 0); } };
+async function refreshCounts(){ try { if (!D || !store.get('hq_token')) return; const r = await api({ action:'home' }); if (r.ok){ D.refs = r.refs; D.trxN = r.trxN; D.ann = r.ann; updBell(); } } catch(e){} }
 
 async function openMyStu(){
   const box = $('msTabs'); box.innerHTML = '';
