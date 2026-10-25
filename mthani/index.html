@@ -1701,6 +1701,7 @@
   </section>
 
   <div id="loading" class="card"><div class="msg info">جاري التحميل...</div></div>
+  <div class="robar hidden" id="peekBar" style="display:flex;align-items:center;gap:8px"><span class="grow" style="flex:1" id="peekTxt"></span><button class="mini" id="peekChg">تغيير</button></div>
 </main>
 </div>
 
@@ -1814,6 +1815,14 @@
 </div>
 
 <!-- تغيير الرمز السري -->
+<div class="sheet hidden" id="peekSheet">
+  <div class="panel">
+    <div class="head"><h2 id="pkT">معاينة البوابة</h2><button class="iconbtn" id="pkClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
+    <small id="pkSub"></small>
+    <input id="pkQ" placeholder="ابحث بالاسم" style="margin-top:10px">
+    <div class="gsbox" id="pkList" style="position:static;display:block;max-height:55vh;margin-top:8px;box-shadow:none"></div>
+  </div>
+</div>
 <div class="sheet hidden" id="pinSheet">
   <div class="panel">
     <div class="head"><h2>تغيير الرمز السري</h2><button class="iconbtn" id="cpClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
@@ -2132,7 +2141,7 @@ $('btnF4').onclick = async () => {
 };
 $('btnCheck').onclick = async () => {
   const nid = digits($('nid').value);
-  if (portal === 'parent' ? !/^0?5\d{8}$/.test(nid) : nid.length < 9) return msg('loginMsg', portal === 'parent' ? 'أدخل رقم الجوال كاملاً (05xxxxxxxx).' : 'أدخل رقم الهوية أو الإقامة كاملاً.', 'err');
+  if (portal === 'parent' ? !/^0?5\d{8}$/.test(nid) && !/^[12]\d{9}$/.test(nid) : nid.length < 9) return msg('loginMsg', portal === 'parent' ? 'أدخل رقم الجوال كاملاً (05xxxxxxxx).' : 'أدخل رقم الهوية أو الإقامة كاملاً.', 'err');
   $('btnCheck').disabled = true; msg('loginMsg', '', '');
   try {
     const r = await api({ action:'check', nid, portal });
@@ -2168,8 +2177,30 @@ $('btnSetPin').onclick = () => {
 };
 $('btnLogout').onclick = async () => {
   try { await api({ action:'logout' }); } catch(e){}
-  store.del('hq_token'); D = null; document.body.classList.remove('ro'); portal = ''; store.del('hq_portal'); showLogin('تم تسجيل الخروج.');
+  store.del('hq_token'); D = null; document.body.classList.remove('ro'); $('peekBar').classList.add('hidden'); portal = ''; store.del('hq_portal'); showLogin('تم تسجيل الخروج.');
 };
+
+/* ---------- معاينة المدير لبوابتي أولياء الأمور والطلاب ---------- */
+let PK = null, pkMust = false;
+async function peekOpen(pt, must){
+  pkMust = !!must; $('pkT').textContent = pt === 'parent' ? 'اختر ولي الأمر لمعاينة بوابته' : 'اختر الطالب لمعاينة بوابته';
+  $('pkSub').textContent = 'تدخل بوابته للاطلاع فقط، ولا يُسجَّل أي تعديل.'; $('pkClose').textContent = pkMust ? 'خروج' : '✕';
+  $('pkQ').value = ''; $('pkList').innerHTML = '<div class="ge">جاري التحميل...</div>'; $('peekSheet').classList.remove('hidden');
+  let r; try { r = await api({ action:'peekList' }); } catch(e){ return; } if (!r.ok){ $('pkList').innerHTML = ''; $('pkList').appendChild(el('div', 'ge', r.msg)); return; }
+  PK = r; peekDraw(); $('pkQ').focus();
+}
+function peekDraw(){
+  const q = normAr($('pkQ').value.trim()), box = $('pkList'); box.innerHTML = '';
+  const L = PK.list.filter(x => !q || normAr(x.name + ' ' + x.sub).indexOf(q) !== -1).slice(0, 80);
+  if (!L.length) box.appendChild(el('div', 'ge', 'لا توجد نتائج.'));
+  L.forEach(x => { const b = el('button', x.k === PK.cur ? 'on' : ''); b.appendChild(el('span', '', x.name)); b.appendChild(el('small', '', x.sub));
+    b.onclick = async () => { b.disabled = true; const r = await api({ action:'peekSet', k:x.k }).catch(() => null); if (r && r.ok){ $('peekSheet').classList.add('hidden'); loadHome(); } else { b.disabled = false; toast((r && r.msg) || 'تعذّر الاختيار'); } };
+    box.appendChild(b); });
+}
+$('pkQ').oninput = () => PK && peekDraw();
+$('pkClose').onclick = () => { $('peekSheet').classList.add('hidden'); if (pkMust) $('btnLogout').onclick(); };
+$('peekChg').onclick = () => peekOpen(D && D.portal);
+document.querySelector('main').insertBefore($('peekBar'), document.querySelector('main').firstChild);
 
 /* ---------- الرئيسية ---------- */
 const ROLE_NAME = { admin:'إدارة المجمع', teacher:'معلم', parent:'ولي أمر' };
@@ -2200,6 +2231,8 @@ async function loadHome(){
   let r;
   try { r = await api({ action:'home' }); } catch(e){ if (e.message !== 'expired') showLogin('تعذّر الاتصال بالخادم. ' + e.message); return; }
   if (!r.ok) return showLogin(r.msg);
+  if (r.peekPick){ D = null; return peekOpen(r.portal, true); }
+  $('peekBar').classList.toggle('hidden', !r.peek); if (r.peek) $('peekTxt').textContent = 'معاينة المدير (' + r.peek + ') لبوابة ' + (r.portal === 'parent' ? 'ولي الأمر' : 'الطالب') + ': ' + r.name + ' — للاطلاع فقط';
   if (r.portal === ''){ store.del('hq_token'); portal = ''; store.del('hq_portal'); return showLogin(); }   // جلسة قديمة قبل البوابات: يختار بوابته
   D = r; MS = null; RB = null; updBell();
   if (r.org) $('orgName').textContent = r.org;
@@ -2247,7 +2280,7 @@ async function loadHome(){
   if (admin) buildAdminNav(n); else buildAdminNav(n, userNav(TABS));
   show('vHome');
   openRole('welcome'); updBell(); clearInterval(window._bellT); window._bellT = setInterval(refreshCounts, 120000);
-  if (r.ro && !$('roBar')){ const b = el('div', 'robar', 'حساب المشرف العام: للاطلاع فقط، ولا يمكن التعديل.'); b.id = 'roBar'; $('vHome').insertBefore(b, $('vHome').firstChild); }   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
+  if (r.ro && !r.peek && !$('roBar')){ const b = el('div', 'robar', 'حساب المشرف العام: للاطلاع فقط، ولا يمكن التعديل.'); b.id = 'roBar'; $('vHome').insertBefore(b, $('vHome').firstChild); }   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
 }
 /* قائمة بقية المستخدمين بنفس أسلوب المدير: الاختبارات والمعاملات مجموعتان، والباقي تبويبات مباشرة */
 function userNav(T){
@@ -2441,7 +2474,7 @@ function renderWelcome(){
   $('when').textContent = fmtD(D.today, { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + ' م • ' +
     ud(D.today).toLocaleDateString('ar-SA-u-ca-islamic-umalqura', { timeZone:'UTC', day:'numeric', month:'long', year:'numeric' });
   fill('myHals', []);
-  $('pinNotice').classList.toggle('hidden', store.get('hq_must') !== '1');
+  $('pinNotice').classList.toggle('hidden', store.get('hq_must') !== '1' || !!D.peek);
   const st = D.stats;
   const box = $('stats'); box.innerHTML = ''; box.classList.toggle('hidden', !st);
   if (st) [['users', st.students, 'طلابي'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
