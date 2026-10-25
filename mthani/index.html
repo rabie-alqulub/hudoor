@@ -2851,7 +2851,7 @@ $('hlSave').onclick = async () => {
 
 /* ---------- اختبارات الجمعية: الاختبار الداخلي والترشيح ---------- */
 let AX = null, asT = 'wait', asMode = 'preTest', asAct = null, asDate = '';
-const AS_TABS = { preTest:[['wait', 'بانتظار الاختبار الداخلي'], ['pass', 'اجتازوا الداخلي'], ['fail', 'لم يجتازوا']], assocNom:[['nom', 'المرشحون للجمعية'], ['batch', 'دفعات الاختبار'], ['ok', 'اجتازوا الجمعية'], ['no', 'لم يجتازوا الجمعية']] };
+const AS_TABS = { preTest:[['wait', 'بانتظار الاختبار الداخلي'], ['pass', 'اجتازوا الداخلي'], ['fail', 'لم يجتازوا']], assocNom:[['nom', 'المرشحون للجمعية'], ['batch', 'المختبرون'], ['ok', 'اجتازوا الجمعية'], ['no', 'لم يجتازوا الجمعية']] };
 async function openAssoc(mode){
   if (mode !== asMode){ asMode = mode; asT = AS_TABS[mode][0][0]; }
   $('asTitle').textContent = mode === 'preTest' ? 'اختبار طالب قبل الترشيح' : 'ترشيح طالب لاختبار الجمعية';
@@ -2881,8 +2881,10 @@ function renderAssoc(){
     const ac = el('div', 'stact'), b = (t, cls, fn) => { const y = el('button', cls, t); y.onclick = fn; ac.appendChild(y); };
     if (asT === 'wait') b('تسجيل الاختبار الداخلي', 'good', () => asSheet('pre', x));
     if (asT === 'pass' && asMode === 'assocNom' && AX.canNom) b('ترشيح للجمعية', 'good', () => asSheet('nom', x));
-    if (asT === 'nom') b('تسجيل نتيجة الجمعية', 'good', () => asSheet('result', x));
-    if (asT === 'nom' && AX.canNom) b('إلغاء الترشيح', 'danger', () => asSheet('cancel', x));
+    const sent = asT === 'nom' && (AX.batches || []).some(y => y.date === x.examDate && y.status !== AX.exSt.draft);
+    if (sent) w.appendChild(el('div', 'meta', 'ضمن ' + exbName((AX.batches || []).find(y => y.date === x.examDate)) + ' المرسلة لمشرف الجمعية — النتيجة يسجّلها المشرف.'));
+    if (asT === 'nom' && !sent) b('تسجيل نتيجة الجمعية', 'good', () => asSheet('result', x));
+    if (asT === 'nom' && AX.canNom && !sent) b('إلغاء الترشيح', 'danger', () => asSheet('cancel', x));
     if (asT === 'fail') b('إعادة الاختبار الداخلي', '', () => asDo('retry', x.id, {}));
     b('الملف', '', () => goFile(x.sid)); if (asT === 'wait' || asT === 'fail') b('حذف', 'danger', () => { if (confirm('حذف ' + x.sname + ' من القائمة؟')) asDo('del', x.id, {}); });
     w.appendChild(ac); box.appendChild(w); });
@@ -2926,13 +2928,17 @@ function asSheet(op, x){
     $('asShT').textContent = 'الاختبار الداخلي: ' + x.sname + ' — ' + x.level;
     F.score = inp('الدرجة (من 100) *', 'number', '', { min:0, max:100 }); F.date = inp('تاريخ الاختبار', 'date', D.today); F.examiner = inp('المختبِر', 'text', ''); F.notes = inp('ملاحظات', 'textarea', '');
     b.appendChild(el('small', '', 'درجة الاجتياز: ' + AX.pass + ' (تُعدّل من الإعدادات ← الشؤون التعليمية).'));
+  } else if (op === 'exbBack'){
+    $('asShT').textContent = 'إرجاع نتائج ' + exbName(x) + ' للمشرف';
+    b.appendChild(el('div', 'msg info', 'تعود المجموعة مفتوحة للمشرف ' + x.sup + ' ليراجع النتائج ويعدّلها بنفسه ثم يعيد اعتمادها. تعديل النتائج من صلاحياته وحده.'));
+    F.reason = inp('سبب الإرجاع * (يظهر للمشرف)', 'textarea', ''); F.date = () => x.date;
   } else if (op === 'sup'){
     $('asShT').textContent = x ? 'تعديل بيانات المشرف' : 'إضافة مشرف من الجمعية'; if (x) F.id = () => x.id;
     F.name = inp('الاسم الكامل *', 'text', x ? x.name : ''); F.nid = inp('رقم الهوية * (يدخل به نموذج الاختبار)', 'text', x ? x.nid : '', { inputMode:'numeric', maxLength:10, dir:'ltr' });
     F.phone = inp('الجوال *', 'tel', x ? x.phone : '', { dir:'ltr', placeholder:'05xxxxxxxx' }); F.org = inp('الجهة', 'text', x ? x.org : 'جمعية تذكرة لتحفيظ القرآن الكريم بعسير');
   } else if (op === 'cancel'){
     $('asShT').textContent = 'إلغاء ترشيح: ' + x.sname + ' — ' + x.level;
-    b.appendChild(el('div', 'msg err', 'يُلغى ترشيح الطالب نهائياً ويخرج من قوائم الترشيح والدفعات، ويُغلق طلب المعلم ويصله إشعار بالسبب.'));
+    b.appendChild(el('div', 'msg err', 'يُلغى ترشيح الطالب نهائياً ويخرج من قوائم الترشيح والمختبرين، ويُغلق طلب المعلم ويصله إشعار بالسبب.'));
     F.reason = inp('سبب الإلغاء *', 'textarea', '');
   } else if (op === 'nom'){
     $('asShT').textContent = 'ترشيح للجمعية: ' + x.sname; F.examDate = inp('موعد اختبار الجمعية (إن عُرف)', 'date', ''); F.notes = inp('ملاحظات', 'textarea', '');
@@ -2953,6 +2959,7 @@ $('asShSave').onclick = async () => {
   if (asAct.op === 'pre' && !(d.score !== '' && +d.score >= 0 && +d.score <= 100)) return msg('asShMsg', 'اكتب الدرجة من 0 إلى 100.', 'err');
   if (asAct.op === 'result' && !d.result) return msg('asShMsg', 'اختر النتيجة.', 'err');
   if (asAct.op === 'cancel' && !d.reason) return msg('asShMsg', 'اكتب سبب الإلغاء.', 'err');
+  if (asAct.op === 'exbBack'){ if (!d.reason) return msg('asShMsg', 'اكتب سبب الإرجاع.', 'err'); $('asShSave').disabled = true; await exbDo('exbReturn', d, 'asShMsg'); $('asShSave').disabled = false; return; }
   if (asAct.op === 'sup'){ $('asShSave').disabled = true; await exbDo('supSave', d, 'asShMsg'); $('asShSave').disabled = false; return; }
   $('asShSave').disabled = true; const r = await asDo(asAct.op, asAct.x ? asAct.x.id : '', d, 'asShMsg'); $('asShSave').disabled = false;
   if (r && r.ok && asAct.op === 'nomMany'){ asT = 'nom'; asDate = r.examDate || ''; renderAssoc(); }
@@ -2971,21 +2978,21 @@ $('asPdf').onclick = () => { if (!AX) return; const list = asSorted(asList()), p
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>الحلقة</th><th>المرحلية</th><th>تاريخ الاختبار</th></tr></thead>'; const tb = el('tbody');
   list.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.hname, x.level, x.examDate].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
   setTimeout(() => window.print(), 50); };
-/* ---------- دفعات اختبار الجمعية: تجميع المرشحين حسب يوم الاختبار، ومشرفو الجمعية، واعتماد الدفعة ---------- */
+/* ---------- مجموعات اختبار الجمعية: تجميع المرشحين حسب يوم الاختبار، ومشرفو الجمعية، واعتماد المجموعة ---------- */
 const exbIn = x => [AX.st.nom, AX.st.ok, AX.st.no].indexOf(x.status) !== -1 && x.examDate;
 function exbDates(){ const ds = new Set(AX.list.filter(exbIn).map(x => x.examDate));
   const t = D.today; return [...ds].sort((a, b) => (a < t) - (b < t) || (a < t ? b.localeCompare(a) : a.localeCompare(b))); }
 const ordAr = n => { const u = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة', 'العاشرة'], h = ['الحادية', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة'],
   t = ['', '', 'العشرون', 'الثلاثون', 'الأربعون', 'الخمسون', 'الستون', 'السبعون', 'الثمانون', 'التسعون']; n = +n || 0;
   if (n < 1 || n > 99) return 'رقم ' + n; if (n <= 10) return u[n - 1]; if (n < 20) return h[n - 11] + ' عشرة'; return n % 10 ? h[n % 10 - 1] + ' و' + t[Math.floor(n / 10)] : t[n / 10]; };
-const exbName = b => b && b.no ? 'الدفعة ' + ordAr(b.no) : 'دفعة (مسودة)';
+const exbName = b => b && b.no ? 'المجموعة رقم ' + b.no : 'مجموعة (مسودة)';
 const exbUrl = () => new URL('exam.html', location.href).href;
 const wDay = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('ar-SA', { weekday:'long' }); } catch(e){ return ''; } };
 function exbText(b, n){ return 'السلام عليكم ورحمة الله وبركاته\nفضيلة الشيخ ' + String(b.sup).replace(/^(فضيلة\s+)?(الشيخ|الأستاذ)\s+/, '') + ' حفظه الله\n\nنفيدكم باعتماد ' + exbName(b) + ' لاختبار المرحليات لطلاب ' + ((D && D.org) || 'مجمع حلقات ربيع القلوب القرآني') + ' يوم ' + wDay(b.date) + ' ' + b.date + '، وعددهم ' + n + ' طالب.\n\nرابط نموذج الاختبار:\n' + exbUrl() +
-  '\n\nالدخول برقم هويتكم فقط، والرابط نفسه لكل الدفعات.\n\nيظهر لكم طلاب الدفعات المرسلة لكم فقط، ونموذج الاختبار معبأ بنطاق كل مرحلية. وبعد تسجيل النتائج اضغطوا «اعتماد النتائج»، ثم يمكنكم طباعة التقرير أو تنزيله Excel لاعتماده لدى الجمعية.\n\nجزاكم الله خيراً'; }
+  '\n\nالدخول برقم هويتكم فقط، والرابط نفسه لكل المجموعات.\n\nيظهر لكم طلاب المجموعات المرسلة لكم فقط، ونموذج الاختبار معبأ بنطاق كل مرحلية. وبعد تسجيل النتائج اضغطوا «اعتماد النتائج»، ثم يمكنكم طباعة التقرير أو تنزيله Excel لاعتماده لدى الجمعية.\n\nجزاكم الله خيراً'; }
 function supCard(box){
   const c = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', 'مشرفو الجمعية (' + AX.sups.length + ')')); c.appendChild(tp);
-  if (!AX.sups.length) c.appendChild(el('small', '', 'أضف مشرفي الجمعية مرة واحدة، ثم اختر المختبِر عند اعتماد كل دفعة. يدخل المشرف نموذج الاختبار برقم هويته، ولا يرى إلا الدفعات المرسلة له.'));
+  if (!AX.sups.length) c.appendChild(el('small', '', 'أضف مشرفي الجمعية مرة واحدة، ثم اختر المختبِر عند اعتماد كل مجموعة. يدخل المشرف نموذج الاختبار برقم هويته، ولا يرى إلا المجموعات المرسلة له.'));
   AX.sups.forEach(s => { const r = el('div', 'meta'); r.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;border-top:1px solid var(--line);padding-top:8px;margin-top:8px';
     r.appendChild(el('b', '', s.name)); [['الهوية', s.nid], ['الجوال', s.phone], ['الجهة', s.org]].forEach(p => { if (p[1]){ const x = el('span', '', p[0] + ': '); x.appendChild(el('i', '', p[1])); r.appendChild(x); } });
     const e = el('button', 'mini', 'تعديل'); e.onclick = () => asSheet('sup', s); const dl = el('button', 'mini', 'حذف'); dl.style.color = 'var(--red)';
@@ -2996,8 +3003,8 @@ function supCard(box){
 function renderBatches(){
   const box = $('asBox'); box.innerHTML = ''; const ds = exbDates(); if (AX.canNom) supCard(box);
   const nod = AX.list.filter(x => x.status === AX.st.nom && !x.examDate).length;
-  if (nod) box.appendChild(el('div', 'msg info', nod + ' طالب مرشح بلا موعد اختبار — حدد موعدهم من «المرشحون للجمعية» ليظهروا هنا في دفعة يومهم.'));
-  if (!ds.length) return box.appendChild(el('small', '', 'لا توجد دفعات بعد. حدّد موعد الاختبار للمرشحين فتتجمع هنا حسب اليوم.'));
+  if (nod) box.appendChild(el('div', 'msg info', nod + ' طالب مرشح بلا موعد اختبار — حدد موعدهم من «المرشحون للجمعية» ليظهروا هنا في مجموعة يومهم.'));
+  if (!ds.length) return box.appendChild(el('small', '', 'لا توجد مجموعات بعد. حدّد موعد الاختبار للمرشحين فتتجمع هنا حسب اليوم.'));
   ds.forEach(d => { const L = AX.list.filter(x => exbIn(x) && x.examDate === d).sort((a, b) => AX.levels.indexOf(a.level) - AX.levels.indexOf(b.level) || a.sname.localeCompare(b.sname, 'ar'));
     const bt = (AX.batches || []).find(b => b.date === d), stt = bt ? bt.status : AX.exSt.draft, rec = L.filter(x => x.status !== AX.st.nom).length, okN = L.filter(x => x.status === AX.st.ok).length, mid = 'exbM' + d;
     const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', exbName(stt === AX.exSt.draft ? null : bt) + ' — ' + wDay(d) + ' ' + d)); w.appendChild(tp);
@@ -3010,20 +3017,22 @@ function renderBatches(){
     const ac = el('div', 'stact'), b = (tx, cls, fn) => { const y = el('button', cls, tx); y.onclick = fn; ac.appendChild(y); return y; };
     const ed = el('div'); ed.style.marginTop = '10px'; ed.appendChild(lab('مشرف الجمعية المختبِر', true)); const sp = el('select'); fillSel2(sp, AX.sups.map(s => [s.id, s.name + (s.org ? ' — ' + s.org : '')]), AX.sups.length ? '— اختر المشرف —' : '— أضف مشرفاً أولاً —'); if (bt) sp.value = bt.supId || ''; ed.appendChild(sp);
     const approve = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر' + (AX.sups.length ? '.' : ' (أضفه من «مشرفو الجمعية» أعلى الصفحة).'), 'err'); exbDo('exbApprove', { date:d, supId:sp.value }, mid); };
-    if (AX.canNom && stt === AX.exSt.draft){ w.appendChild(ed); b('اعتماد الدفعة وإرسالها للمشرف', 'good', approve); }
-    if (stt === AX.exSt.done) w.appendChild(el('div', 'msg ok', '✓ اعتمد المشرف نتائج هذه الدفعة، وهي مغلقة للاطلاع فقط.'));
-    if (bt && stt !== AX.exSt.draft){ const kv = el('div', 'meta'); [['المختبِر', bt.sup + ' • ' + bt.phone], ['اعتمد الدفعة', bt.by + ' ' + (bt.approved || '').slice(0, 16)], ['اعتمد المشرف النتائج', (bt.done || '').slice(0, 16)]].forEach(p => { if (p[1].trim()){ const s0 = el('span', '', p[0] + ': '); s0.appendChild(el('i', '', p[1])); kv.appendChild(s0); } }); w.appendChild(kv);
-      if (AX.canNom && stt === AX.exSt.ok){ const lk = el('div', 'msg info'); lk.style.fontSize = '13px'; lk.textContent = 'يدخل المشرف من رابط المشرفين برقم هويته، وتظهر له هذه الدفعة.'; w.appendChild(lk);
+    if (AX.canNom && stt === AX.exSt.draft){ w.appendChild(ed); b('اعتماد المجموعة وإرسالها للمشرف', 'good', approve); }
+    if (stt === AX.exSt.done) w.appendChild(el('div', 'msg ok', '✓ اعتمد المشرف نتائج هذه المجموعة، وهي مغلقة للاطلاع فقط.'));
+    if (bt && bt.back && stt === AX.exSt.ok) w.appendChild(el('div', 'msg err', 'أُعيدت النتائج للمشرف ليراجعها (' + bt.back.by + ' • ' + String(bt.back.at).slice(0, 16) + '): ' + bt.back.reason));
+    if (bt && stt !== AX.exSt.draft){ const kv = el('div', 'meta'); [['المختبِر', bt.sup + ' • ' + bt.phone], ['اعتمد المجموعة', bt.by + ' ' + (bt.approved || '').slice(0, 16)], ['اعتمد المشرف النتائج', (bt.done || '').slice(0, 16)]].forEach(p => { if (p[1].trim()){ const s0 = el('span', '', p[0] + ': '); s0.appendChild(el('i', '', p[1])); kv.appendChild(s0); } }); w.appendChild(kv);
+      if (AX.canNom && stt === AX.exSt.ok){ const lk = el('div', 'msg info'); lk.style.fontSize = '13px'; lk.textContent = 'يدخل المشرف من رابط المشرفين برقم هويته، وتظهر له هذه المجموعة.'; w.appendChild(lk);
         b('إرسال للمشرف عبر واتساب', 'good', () => window.open('https://wa.me/966' + String(bt.phone).replace(/^0/, '') + '?text=' + encodeURIComponent(exbText(bt, L.length)), '_blank'));
         b('نسخ الرسالة', '', async () => { try { await navigator.clipboard.writeText(exbText(bt, L.length)); toast('نُسخت الرسالة مع الرابط'); } catch(e){ prompt('انسخ الرسالة:', exbText(bt, L.length)); } }); } }
-    b('طباعة كشف الدفعة', '', () => exbPrint(d, L, bt));
+    b('طباعة كشف المجموعة', '', () => exbPrint(d, L, bt));
+    if (bt && stt === AX.exSt.done && D.roles.indexOf('admin') !== -1) b('إرجاع النتائج للمشرف', '', () => asSheet('exbBack', bt));
     if (AX.canNom && bt && stt === AX.exSt.ok){ const chg = b('تغيير المشرف', '', () => { w.insertBefore(ed, ac); chg.classList.add('hidden'); const sv = el('button', 'good', 'حفظ المشرف'); sv.onclick = approve; ac.insertBefore(sv, ac.firstChild); });
-      b('سحب الدفعة من المشرف', 'danger', () => { if (confirm('سحب الدفعة من المشرف وإرجاعها مسودة؟ (النتائج المسجلة تبقى كما هي)')) exbDo('exbRevoke', { date:d }, mid); }); }
+      b('سحب المجموعة من المشرف', 'danger', () => { if (confirm('سحب المجموعة من المشرف وإرجاعها مسودة؟ (النتائج المسجلة تبقى كما هي)')) exbDo('exbRevoke', { date:d }, mid); }); }
     w.appendChild(ac); const m = el('div'); m.id = mid; w.appendChild(m); box.appendChild(w); });
 }
 async function exbDo(op, data, mid){ const r = await cpCall({ action:'assocSave', op:op, data:data }, mid); if (r && r.ok){ AX = r; toast(r.msg); $('asSheet').classList.add('hidden'); renderAssoc(); } return r; }
 function exbPrint(d, L, bt){ const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
-  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'كشف ' + (bt && bt.no ? exbName(bt) : 'دفعة') + ' — اختبار المرحليات')); l.appendChild(el('div', '', wDay(d) + ' ' + d + ' • عدد الطلاب: ' + L.length + (bt && bt.sup ? ' • المختبِر: ' + bt.sup : '') + (bt && bt.done ? ' • اعتمد المشرف النتائج: ' + bt.done.slice(0, 16) : ''))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'كشف ' + (bt && bt.no ? exbName(bt) : 'مجموعة') + ' — اختبار المرحليات')); l.appendChild(el('div', '', wDay(d) + ' ' + d + ' • عدد الطلاب: ' + L.length + (bt && bt.sup ? ' • المختبِر: ' + bt.sup : '') + (bt && bt.done ? ' • اعتمد المشرف النتائج: ' + bt.done.slice(0, 16) : ''))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>المرحلية</th><th>الحلقة</th><th>الدرجة</th><th>النتيجة</th></tr></thead>'; const tb = el('tbody');
   L.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.level, x.hname, x.status === AX.st.nom ? '' : x.score, x.status === AX.st.nom ? '' : x.result].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
   setTimeout(() => window.print(), 50); }

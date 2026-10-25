@@ -69,7 +69,7 @@
 <main>
   <div class="card" id="cLogin">
     <h2>دخول مشرف الجمعية</h2>
-    <small class="note">ادخل برقم هويتك المسجل لدى المجمع، فتظهر لك الدفعات المرسلة إليك.</small>
+    <small class="note">ادخل برقم هويتك المسجل لدى المجمع، فتظهر لك المجموعات المرسلة إليك.</small>
     <label for="nid">رقم الهوية</label>
     <input id="nid" inputmode="numeric" maxlength="10" autocomplete="username" placeholder="1xxxxxxxxx" dir="ltr" style="text-align:center;letter-spacing:2px;font-size:20px">
     <button class="main" id="go">دخول</button>
@@ -77,14 +77,14 @@
   </div>
   <div id="home" class="hidden">
     <div class="card">
-      <div class="shd"><h2 id="hName" style="margin:0">دفعاتي</h2><button id="out">خروج</button></div>
+      <div class="shd"><h2 id="hName" style="margin:0">المختبرون</h2><button id="out">خروج</button></div>
       <small class="note" id="hSub"></small>
       <div id="bList"></div>
     </div>
   </div>
   <div id="app" class="hidden">
     <div class="card">
-      <div class="shd"><h2 id="bTitle" style="margin:0">دفعة الاختبار</h2><button id="back">→ دفعاتي</button></div>
+      <div class="shd"><h2 id="bTitle" style="margin:0">مجموعة الاختبار</h2><button id="back">→ المختبرون</button></div>
       <div class="kv" id="bKv"></div>
       <div class="bar"><i id="bBar" style="width:0"></i></div>
       <div class="row"><button class="main hidden" id="fin" style="margin-top:0">✓ اعتماد النتائج</button></div>
@@ -118,7 +118,7 @@ const dayName = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString
 const ordAr = n => { const u = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة', 'العاشرة'], h = ['الحادية', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة'],
   t = ['', '', 'العشرون', 'الثلاثون', 'الأربعون', 'الخمسون', 'الستون', 'السبعون', 'الثمانون', 'التسعون']; n = +n || 0;
   if (n < 1 || n > 99) return 'رقم ' + n; if (n <= 10) return u[n - 1]; if (n < 20) return h[n - 11] + ' عشرة'; return n % 10 ? h[n % 10 - 1] + ' و' + t[Math.floor(n / 10)] : t[n / 10]; };
-const bName = no => 'الدفعة ' + ordAr(no);
+const bName = no => 'المجموعة رقم ' + no;
 const toAr = s => String(s || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
 let X = null, H = null, NID = '', BID = '', F = 'all';
 
@@ -139,19 +139,19 @@ async function open1(nid, silent){
 }
 function renderHome(){
   if (H.org) $('hOrg').textContent = H.org; show('home');
-  $('hName').textContent = 'مرحباً ' + H.sup; $('hSub').textContent = (H.supOrg ? H.supOrg + ' • ' : '') + 'الدفعات المرسلة إليك: ' + H.batches.length + '. الدفعة التي تعتمد نتائجها تبقى مرجعاً للاطلاع فقط.';
+  $('hName').textContent = 'مرحباً ' + H.sup; $('hSub').textContent = (H.supOrg ? H.supOrg + ' • ' : '') + 'المجموعات المرسلة إليك: ' + H.batches.length + '. المجموعة التي تعتمد نتائجها تبقى مرجعاً للاطلاع فقط.';
   const box = $('bList'); box.innerHTML = '';
   H.batches.forEach(b => { const w = el('div', 'st'), nm = el('div', 'nm'); nm.appendChild(el('b', '', bName(b.no))); nm.appendChild(el('small', '', dayName(b.date) + ' ' + b.date + ' • ' + b.n + ' طالب')); w.appendChild(nm);
-    const fin = !!b.final; w.appendChild(el('span', 'pill ' + (fin ? 'p-ok' : b.rec ? 'p-lv' : ''), fin ? 'معتمدة ✓' : b.rec ? 'سُجّل ' + b.rec + ' من ' + b.n : 'لم تبدأ'));
+    const fin = !!b.final; w.appendChild(el('span', 'pill ' + (fin ? 'p-ok' : b.back ? 'p-no' : b.rec ? 'p-lv' : ''), fin ? 'معتمدة ✓' : b.back ? 'أُعيدت إليك للمراجعة' : b.rec ? 'سُجّل ' + b.rec + ' من ' + b.n : 'لم تبدأ'));
     if (fin) w.appendChild(el('span', 'pill p-ok', 'اجتاز ' + b.ok + ' من ' + b.n));
-    const o = el('button', fin ? '' : 'gold', fin ? 'عرض التقرير' : 'فتح الدفعة'); o.onclick = () => openB(b.id); w.appendChild(o); box.appendChild(w); });
+    const o = el('button', fin ? '' : 'gold', fin ? 'عرض التقرير' : 'فتح المجموعة'); o.onclick = () => openB(b.id); w.appendChild(o); box.appendChild(w); });
 }
 async function openB(id){ BID = id; try { const r = await call({ action:'exOpen' }); if (!r.ok){ BID = ''; return alert(r.msg); } X = r; F = 'all'; $('q').value = ''; show('app'); msg('bMsg', '', ''); render(); window.scrollTo(0, 0); } catch(e){ BID = ''; alert('تعذّر الاتصال.'); } }
 $('back').onclick = async () => { BID = ''; try { const r = await call({ action:'exOpen' }); if (r.ok) H = r; } catch(e){} renderHome(); };
 $('go').onclick = () => open1($('nid').value);
 $('nid').onkeydown = e => { if (e.key === 'Enter') open1($('nid').value); };
 $('out').onclick = () => { ss.del(); location.reload(); };
-$('fin').onclick = async () => { if (!confirm('اعتماد نتائج ' + bName(X.no) + '؟ بعد الاعتماد تُغلق الدفعة ولا يمكن تعديل أي نتيجة، وتبقى لك مرجعاً للاطلاع.')) return;
+$('fin').onclick = async () => { if (!confirm('اعتماد نتائج ' + bName(X.no) + '؟ بعد الاعتماد تُغلق المجموعة ولا يمكن تعديل أي نتيجة، وتبقى لك مرجعاً للاطلاع.')) return;
   $('fin').disabled = true; try { const r = await call({ action:'exSave', final:1 }); if (!r.ok) return msg('bMsg', r.msg, 'err'); X = r; render(); msg('bMsg', r.msg, 'ok'); }
   catch(e){ msg('bMsg', 'تعذّر الاتصال، حاول مجدداً.', 'err'); } finally { $('fin').disabled = false; } };
 const done = s => s.status === X.st.ok || s.status === X.st.no;
@@ -162,7 +162,8 @@ function render(){
   const kv = $('bKv'); kv.innerHTML = ''; [['المختبِر', X.sup + (X.supOrg ? ' — ' + X.supOrg : '')], ['عدد الطلاب', n], ['سُجّلت نتائجهم', d + ' من ' + n], ['اجتازوا', ok]].concat(X.final ? [['اعتماد النتائج', X.final.slice(0, 16)]] : []).forEach(p => { const b = el('div'); b.appendChild(el('small', '', p[0])); b.appendChild(el('b', '', p[1])); kv.appendChild(b); });
   $('bBar').style.width = (n ? Math.round(d * 100 / n) : 0) + '%';
   $('fin').classList.toggle('hidden', !(X.canEdit && n && d === n));
-  msg('bMsg', X.final ? '✓ اعتمدتَ نتائج هذه الدفعة، وهي الآن مرجع للاطلاع فقط. التقرير جاهز للطباعة والتنزيل.' : d === n && n ? 'سُجّلت نتائج جميع الطلاب. راجعها ثم اضغط «اعتماد النتائج» لإنهاء الدفعة.' : '', X.final ? 'ok' : 'info');
+  if (X.back && !X.final){ msg('bMsg', 'أعاد ' + X.back.by + ' النتائج إليك للمراجعة: ' + X.back.reason + ' — عدّل ما يلزم ثم اضغط «اعتماد النتائج» مرة أخرى.', 'err'); $('fin').classList.toggle('hidden', !(X.canEdit && n && d === n)); } else
+  msg('bMsg', X.final ? '✓ اعتمدتَ نتائج هذه المجموعة، وهي الآن مرجع للاطلاع فقط. التقرير جاهز للطباعة والتنزيل.' : d === n && n ? 'سُجّلت نتائج جميع الطلاب. راجعها ثم اضغط «اعتماد النتائج» لإنهاء المجموعة.' : '', X.final ? 'ok' : 'info');
   const fl = $('flt'); fl.innerHTML = '';
   [['all', 'الكل', n], ['wait', 'لم يُختبر', n - d], ['ok', 'اجتاز', ok], ['no', 'لم يجتز', d - ok]].forEach(f => { const b = el('button', F === f[0] ? 'on' : '', f[1] + ' (' + f[2] + ')'); b.onclick = () => { F = f[0]; render(); }; fl.appendChild(b); });
   const q = $('q').value.trim(), box = $('list'); box.innerHTML = '';
