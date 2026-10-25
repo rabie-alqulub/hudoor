@@ -2975,13 +2975,17 @@ $('asPdf').onclick = () => { if (!AX) return; const list = asSorted(asList()), p
 const exbIn = x => [AX.st.nom, AX.st.ok, AX.st.no].indexOf(x.status) !== -1 && x.examDate;
 function exbDates(){ const ds = new Set(AX.list.filter(exbIn).map(x => x.examDate));
   const t = D.today; return [...ds].sort((a, b) => (a < t) - (b < t) || (a < t ? b.localeCompare(a) : a.localeCompare(b))); }
+const ordAr = n => { const u = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة', 'العاشرة'], h = ['الحادية', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة'],
+  t = ['', '', 'العشرون', 'الثلاثون', 'الأربعون', 'الخمسون', 'الستون', 'السبعون', 'الثمانون', 'التسعون']; n = +n || 0;
+  if (n < 1 || n > 99) return 'رقم ' + n; if (n <= 10) return u[n - 1]; if (n < 20) return h[n - 11] + ' عشرة'; return n % 10 ? h[n % 10 - 1] + ' و' + t[Math.floor(n / 10)] : t[n / 10]; };
+const exbName = b => b && b.no ? 'الدفعة ' + ordAr(b.no) : 'دفعة (مسودة)';
 const exbUrl = () => new URL('exam.html', location.href).href;
 const wDay = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('ar-SA', { weekday:'long' }); } catch(e){ return ''; } };
-function exbText(b, n){ return 'السلام عليكم ورحمة الله وبركاته\nفضيلة الشيخ ' + String(b.sup).replace(/^(فضيلة\s+)?(الشيخ|الأستاذ)\s+/, '') + ' حفظه الله\n\nنفيدكم باعتماد دفعة اختبار المرحليات لطلاب ' + ((D && D.org) || 'مجمع حلقات ربيع القلوب القرآني') + ' يوم ' + wDay(b.date) + ' ' + b.date + '، وعددهم ' + n + ' طالب.\n\nرابط نموذج الاختبار:\n' + exbUrl() +
-  '\n\nالدخول برقم هويتكم والرقم السري لهذه الدفعة: ' + b.pin + '\n\nيظهر لكم طلاب الدفعة فقط، ونموذج الاختبار معبأ بنطاق كل مرحلية. وبعد تسجيل النتائج اضغطوا «اعتماد النتائج»، ثم يمكنكم طباعة التقرير أو تنزيله Excel لاعتماده لدى الجمعية.\n\nجزاكم الله خيراً'; }
+function exbText(b, n){ return 'السلام عليكم ورحمة الله وبركاته\nفضيلة الشيخ ' + String(b.sup).replace(/^(فضيلة\s+)?(الشيخ|الأستاذ)\s+/, '') + ' حفظه الله\n\nنفيدكم باعتماد ' + exbName(b) + ' لاختبار المرحليات لطلاب ' + ((D && D.org) || 'مجمع حلقات ربيع القلوب القرآني') + ' يوم ' + wDay(b.date) + ' ' + b.date + '، وعددهم ' + n + ' طالب.\n\nرابط نموذج الاختبار:\n' + exbUrl() +
+  '\n\nالدخول برقم هويتكم فقط، والرابط نفسه لكل الدفعات.\n\nيظهر لكم طلاب الدفعات المرسلة لكم فقط، ونموذج الاختبار معبأ بنطاق كل مرحلية. وبعد تسجيل النتائج اضغطوا «اعتماد النتائج»، ثم يمكنكم طباعة التقرير أو تنزيله Excel لاعتماده لدى الجمعية.\n\nجزاكم الله خيراً'; }
 function supCard(box){
   const c = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', 'مشرفو الجمعية (' + AX.sups.length + ')')); c.appendChild(tp);
-  if (!AX.sups.length) c.appendChild(el('small', '', 'أضف مشرفي الجمعية مرة واحدة، ثم اختر المختبِر عند اعتماد كل دفعة. يدخل المشرف نموذج الاختبار برقم هويته ورقم سري يُولَّد لكل دفعة.'));
+  if (!AX.sups.length) c.appendChild(el('small', '', 'أضف مشرفي الجمعية مرة واحدة، ثم اختر المختبِر عند اعتماد كل دفعة. يدخل المشرف نموذج الاختبار برقم هويته، ولا يرى إلا الدفعات المرسلة له.'));
   AX.sups.forEach(s => { const r = el('div', 'meta'); r.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;border-top:1px solid var(--line);padding-top:8px;margin-top:8px';
     r.appendChild(el('b', '', s.name)); [['الهوية', s.nid], ['الجوال', s.phone], ['الجهة', s.org]].forEach(p => { if (p[1]){ const x = el('span', '', p[0] + ': '); x.appendChild(el('i', '', p[1])); r.appendChild(x); } });
     const e = el('button', 'mini', 'تعديل'); e.onclick = () => asSheet('sup', s); const dl = el('button', 'mini', 'حذف'); dl.style.color = 'var(--red)';
@@ -2996,7 +3000,7 @@ function renderBatches(){
   if (!ds.length) return box.appendChild(el('small', '', 'لا توجد دفعات بعد. حدّد موعد الاختبار للمرشحين فتتجمع هنا حسب اليوم.'));
   ds.forEach(d => { const L = AX.list.filter(x => exbIn(x) && x.examDate === d).sort((a, b) => AX.levels.indexOf(a.level) - AX.levels.indexOf(b.level) || a.sname.localeCompare(b.sname, 'ar'));
     const bt = (AX.batches || []).find(b => b.date === d), stt = bt ? bt.status : AX.exSt.draft, rec = L.filter(x => x.status !== AX.st.nom).length, okN = L.filter(x => x.status === AX.st.ok).length, mid = 'exbM' + d;
-    const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', 'دفعة ' + wDay(d) + ' ' + d)); w.appendChild(tp);
+    const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', exbName(stt === AX.exSt.draft ? null : bt) + ' — ' + wDay(d) + ' ' + d)); w.appendChild(tp);
     const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (stt === AX.exSt.done ? 'p-ok' : stt === AX.exSt.ok ? 'p-late' : 'p-none'), stt)); pl.appendChild(el('span', 'pill p-none', L.length + ' طالب'));
     if (rec) pl.appendChild(el('span', 'pill p-ok', 'النتائج: ' + rec + ' من ' + L.length + ' • اجتاز ' + okN)); w.appendChild(pl);
     const lv = {}; L.forEach(x => lv[x.level] = (lv[x.level] || 0) + 1); w.appendChild(el('div', 'meta', Object.keys(lv).map(k => k.replace('المرحلية ', '') + ' × ' + lv[k]).join(' • ')));
@@ -3007,20 +3011,19 @@ function renderBatches(){
     const ed = el('div'); ed.style.marginTop = '10px'; ed.appendChild(lab('مشرف الجمعية المختبِر', true)); const sp = el('select'); fillSel2(sp, AX.sups.map(s => [s.id, s.name + (s.org ? ' — ' + s.org : '')]), AX.sups.length ? '— اختر المشرف —' : '— أضف مشرفاً أولاً —'); if (bt) sp.value = bt.supId || ''; ed.appendChild(sp);
     const approve = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر' + (AX.sups.length ? '.' : ' (أضفه من «مشرفو الجمعية» أعلى الصفحة).'), 'err'); exbDo('exbApprove', { date:d, supId:sp.value }, mid); };
     if (AX.canNom && stt === AX.exSt.draft){ w.appendChild(ed); b('اعتماد الدفعة وإرسالها للمشرف', 'good', approve); }
+    if (stt === AX.exSt.done) w.appendChild(el('div', 'msg ok', '✓ اعتمد المشرف نتائج هذه الدفعة، وهي مغلقة للاطلاع فقط.'));
     if (bt && stt !== AX.exSt.draft){ const kv = el('div', 'meta'); [['المختبِر', bt.sup + ' • ' + bt.phone], ['اعتمد الدفعة', bt.by + ' ' + (bt.approved || '').slice(0, 16)], ['اعتمد المشرف النتائج', (bt.done || '').slice(0, 16)]].forEach(p => { if (p[1].trim()){ const s0 = el('span', '', p[0] + ': '); s0.appendChild(el('i', '', p[1])); kv.appendChild(s0); } }); w.appendChild(kv);
-      if (AX.canNom && bt.pin && stt === AX.exSt.ok){ const lk = el('div', 'msg info'); lk.style.fontSize = '13px'; lk.textContent = 'يدخل المشرف برقم هويته والرقم السري: ' + bt.pin; w.appendChild(lk);
+      if (AX.canNom && stt === AX.exSt.ok){ const lk = el('div', 'msg info'); lk.style.fontSize = '13px'; lk.textContent = 'يدخل المشرف من رابط المشرفين برقم هويته، وتظهر له هذه الدفعة.'; w.appendChild(lk);
         b('إرسال للمشرف عبر واتساب', 'good', () => window.open('https://wa.me/966' + String(bt.phone).replace(/^0/, '') + '?text=' + encodeURIComponent(exbText(bt, L.length)), '_blank'));
-        b('نسخ الرسالة', '', async () => { try { await navigator.clipboard.writeText(exbText(bt, L.length)); toast('نُسخت الرسالة مع الرابط والرقم السري'); } catch(e){ prompt('انسخ الرسالة:', exbText(bt, L.length)); } });
-        b('رقم سري جديد', '', () => { if (confirm('توليد رقم سري جديد لهذه الدفعة؟ سيتوقف الرقم القديم، وأرسل الجديد للمشرف.')) exbDo('exbNewPin', { date:d }, mid); }); } }
+        b('نسخ الرسالة', '', async () => { try { await navigator.clipboard.writeText(exbText(bt, L.length)); toast('نُسخت الرسالة مع الرابط'); } catch(e){ prompt('انسخ الرسالة:', exbText(bt, L.length)); } }); } }
     b('طباعة كشف الدفعة', '', () => exbPrint(d, L, bt));
-    if (AX.canNom && bt && stt === AX.exSt.done) b('إعادة فتح الدفعة للمشرف', '', () => { if (confirm('إعادة فتح الدفعة ليعدّل المشرف النتائج؟ (يعيد اعتمادها بعد التعديل)')) exbDo('exbReopen', { date:d }, mid); });
     if (AX.canNom && bt && stt === AX.exSt.ok){ const chg = b('تغيير المشرف', '', () => { w.insertBefore(ed, ac); chg.classList.add('hidden'); const sv = el('button', 'good', 'حفظ المشرف'); sv.onclick = approve; ac.insertBefore(sv, ac.firstChild); });
-      b('إيقاف دخول المشرف', 'danger', () => { if (confirm('إيقاف دخول المشرف وإرجاع الدفعة مسودة؟ (النتائج المسجلة تبقى كما هي)')) exbDo('exbRevoke', { date:d }, mid); }); }
+      b('سحب الدفعة من المشرف', 'danger', () => { if (confirm('سحب الدفعة من المشرف وإرجاعها مسودة؟ (النتائج المسجلة تبقى كما هي)')) exbDo('exbRevoke', { date:d }, mid); }); }
     w.appendChild(ac); const m = el('div'); m.id = mid; w.appendChild(m); box.appendChild(w); });
 }
 async function exbDo(op, data, mid){ const r = await cpCall({ action:'assocSave', op:op, data:data }, mid); if (r && r.ok){ AX = r; toast(r.msg); $('asSheet').classList.add('hidden'); renderAssoc(); } return r; }
 function exbPrint(d, L, bt){ const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
-  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'كشف دفعة اختبار المرحليات')); l.appendChild(el('div', '', wDay(d) + ' ' + d + ' • عدد الطلاب: ' + L.length + (bt && bt.sup ? ' • المختبِر: ' + bt.sup : '') + (bt && bt.done ? ' • اعتمد المشرف النتائج: ' + bt.done.slice(0, 16) : ''))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'كشف ' + (bt && bt.no ? exbName(bt) : 'دفعة') + ' — اختبار المرحليات')); l.appendChild(el('div', '', wDay(d) + ' ' + d + ' • عدد الطلاب: ' + L.length + (bt && bt.sup ? ' • المختبِر: ' + bt.sup : '') + (bt && bt.done ? ' • اعتمد المشرف النتائج: ' + bt.done.slice(0, 16) : ''))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>المرحلية</th><th>الحلقة</th><th>الدرجة</th><th>النتيجة</th></tr></thead>'; const tb = el('tbody');
   L.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.level, x.hname, x.status === AX.st.nom ? '' : x.score, x.status === AX.st.nom ? '' : x.result].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
   setTimeout(() => window.print(), 50); }

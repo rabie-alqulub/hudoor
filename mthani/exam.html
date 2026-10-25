@@ -69,21 +69,26 @@
 <main>
   <div class="card" id="cLogin">
     <h2>دخول مشرف الجمعية</h2>
-    <small class="note">ادخل برقم هويتك والرقم السري المرسل لك مع الدفعة. يتغير الرقم السري مع كل دفعة.</small>
+    <small class="note">ادخل برقم هويتك المسجل لدى المجمع، فتظهر لك الدفعات المرسلة إليك.</small>
     <label for="nid">رقم الهوية</label>
     <input id="nid" inputmode="numeric" maxlength="10" autocomplete="username" placeholder="1xxxxxxxxx" dir="ltr" style="text-align:center;letter-spacing:2px;font-size:20px">
-    <label for="pin">الرقم السري للدفعة</label>
-    <input id="pin" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••" dir="ltr" style="text-align:center;letter-spacing:6px;font-size:22px">
     <button class="main" id="go">دخول</button>
     <div id="lMsg"></div>
   </div>
+  <div id="home" class="hidden">
+    <div class="card">
+      <div class="shd"><h2 id="hName" style="margin:0">دفعاتي</h2><button id="out">خروج</button></div>
+      <small class="note" id="hSub"></small>
+      <div id="bList"></div>
+    </div>
+  </div>
   <div id="app" class="hidden">
     <div class="card">
-      <h2 id="bTitle">دفعة الاختبار</h2>
+      <div class="shd"><h2 id="bTitle" style="margin:0">دفعة الاختبار</h2><button id="back">→ دفعاتي</button></div>
       <div class="kv" id="bKv"></div>
       <div class="bar"><i id="bBar" style="width:0"></i></div>
       <div class="row"><button class="main hidden" id="fin" style="margin-top:0">✓ اعتماد النتائج</button></div>
-      <div class="row"><button class="gold" id="rPrint">طباعة تقرير النتائج / PDF</button><button id="rXls">تنزيل Excel</button><button id="out">خروج</button></div>
+      <div class="row"><button class="gold" id="rPrint">طباعة تقرير النتائج / PDF</button><button id="rXls">تنزيل Excel</button></div>
       <div id="bMsg"></div>
     </div>
     <div class="card">
@@ -110,39 +115,54 @@ const MR_RANGE = { 'الأولى':[114,67], 'الثانية':[66,52], 'الثا�
 const mrRange = lv => MR_RANGE[String(lv || '').replace(/^المرحلية\s*/, '').trim()] || null;
 const msg = (id, t, c) => { const b = $(id); b.innerHTML = ''; if (t) b.appendChild(el('div', 'msg ' + (c || 'info'), t)); };
 const dayName = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('ar-SA', { weekday:'long' }); } catch(e){ return ''; } };
+const ordAr = n => { const u = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة', 'العاشرة'], h = ['الحادية', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة'],
+  t = ['', '', 'العشرون', 'الثلاثون', 'الأربعون', 'الخمسون', 'الستون', 'السبعون', 'الثمانون', 'التسعون']; n = +n || 0;
+  if (n < 1 || n > 99) return 'رقم ' + n; if (n <= 10) return u[n - 1]; if (n < 20) return h[n - 11] + ' عشرة'; return n % 10 ? h[n % 10 - 1] + ' و' + t[Math.floor(n / 10)] : t[n / 10]; };
+const bName = no => 'الدفعة ' + ordAr(no);
 const toAr = s => String(s || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
-let X = null, PIN = '', NID = '', F = 'all';
+let X = null, H = null, NID = '', BID = '', F = 'all';
 
 async function call(data){
-  const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(Object.assign({ nid:NID, pin:PIN }, data)) });
+  const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(Object.assign({ nid:NID }, BID ? { bid:BID } : {}, data)) });
   return r.json();
 }
-async function open1(nid, pin, silent){
-  NID = toAr(nid).replace(/\D/g, ''); PIN = toAr(pin).replace(/\D/g, '');
+const show = id => ['cLogin', 'home', 'app'].forEach(k => $(k).classList.toggle('hidden', k !== id));
+async function open1(nid, silent){
+  NID = toAr(nid).replace(/\D/g, ''); BID = '';
   if (NID.length !== 10){ if (!silent) msg('lMsg', 'رقم الهوية 10 أرقام.', 'err'); return; }
-  if (PIN.length !== 6){ if (!silent) msg('lMsg', 'الرقم السري 6 أرقام.', 'err'); return; }
   $('go').disabled = true; if (!silent) msg('lMsg', 'جاري التحقق...', 'info');
   try { const r = await call({ action:'exOpen' });
     if (!r.ok){ ss.del(); msg('lMsg', r.msg || 'تعذّر الدخول.', 'err'); return; }
-    ss.set({ n:NID, p:PIN }); X = r; $('cLogin').classList.add('hidden'); $('app').classList.remove('hidden'); render();
+    ss.set({ n:NID }); H = r; msg('lMsg', '', ''); renderHome();
   } catch(e){ msg('lMsg', 'تعذّر الاتصال. تأكد من الإنترنت وحاول مجدداً.', 'err'); }
   finally { $('go').disabled = false; }
 }
-$('go').onclick = () => open1($('nid').value, $('pin').value);
-$('pin').onkeydown = e => { if (e.key === 'Enter') open1($('nid').value, $('pin').value); };
+function renderHome(){
+  if (H.org) $('hOrg').textContent = H.org; show('home');
+  $('hName').textContent = 'مرحباً ' + H.sup; $('hSub').textContent = (H.supOrg ? H.supOrg + ' • ' : '') + 'الدفعات المرسلة إليك: ' + H.batches.length + '. الدفعة التي تعتمد نتائجها تبقى مرجعاً للاطلاع فقط.';
+  const box = $('bList'); box.innerHTML = '';
+  H.batches.forEach(b => { const w = el('div', 'st'), nm = el('div', 'nm'); nm.appendChild(el('b', '', bName(b.no))); nm.appendChild(el('small', '', dayName(b.date) + ' ' + b.date + ' • ' + b.n + ' طالب')); w.appendChild(nm);
+    const fin = !!b.final; w.appendChild(el('span', 'pill ' + (fin ? 'p-ok' : b.rec ? 'p-lv' : ''), fin ? 'معتمدة ✓' : b.rec ? 'سُجّل ' + b.rec + ' من ' + b.n : 'لم تبدأ'));
+    if (fin) w.appendChild(el('span', 'pill p-ok', 'اجتاز ' + b.ok + ' من ' + b.n));
+    const o = el('button', fin ? '' : 'gold', fin ? 'عرض التقرير' : 'فتح الدفعة'); o.onclick = () => openB(b.id); w.appendChild(o); box.appendChild(w); });
+}
+async function openB(id){ BID = id; try { const r = await call({ action:'exOpen' }); if (!r.ok){ BID = ''; return alert(r.msg); } X = r; F = 'all'; $('q').value = ''; show('app'); msg('bMsg', '', ''); render(); window.scrollTo(0, 0); } catch(e){ BID = ''; alert('تعذّر الاتصال.'); } }
+$('back').onclick = async () => { BID = ''; try { const r = await call({ action:'exOpen' }); if (r.ok) H = r; } catch(e){} renderHome(); };
+$('go').onclick = () => open1($('nid').value);
+$('nid').onkeydown = e => { if (e.key === 'Enter') open1($('nid').value); };
 $('out').onclick = () => { ss.del(); location.reload(); };
-$('fin').onclick = async () => { if (!confirm('اعتماد نتائج الدفعة؟ بعد الاعتماد لا يمكن تعديل النتائج إلا بطلب من المجمع.')) return;
+$('fin').onclick = async () => { if (!confirm('اعتماد نتائج ' + bName(X.no) + '؟ بعد الاعتماد تُغلق الدفعة ولا يمكن تعديل أي نتيجة، وتبقى لك مرجعاً للاطلاع.')) return;
   $('fin').disabled = true; try { const r = await call({ action:'exSave', final:1 }); if (!r.ok) return msg('bMsg', r.msg, 'err'); X = r; render(); msg('bMsg', r.msg, 'ok'); }
   catch(e){ msg('bMsg', 'تعذّر الاتصال، حاول مجدداً.', 'err'); } finally { $('fin').disabled = false; } };
 const done = s => s.status === X.st.ok || s.status === X.st.no;
 function render(){
   if (X.org) $('hOrg').textContent = X.org;
-  $('bTitle').textContent = 'دفعة اختبار المرحليات — ' + dayName(X.date) + ' ' + X.date;
+  $('bTitle').textContent = bName(X.no) + ' — ' + dayName(X.date) + ' ' + X.date;
   const n = X.list.length, d = X.list.filter(done).length, ok = X.list.filter(s => s.status === X.st.ok).length;
   const kv = $('bKv'); kv.innerHTML = ''; [['المختبِر', X.sup + (X.supOrg ? ' — ' + X.supOrg : '')], ['عدد الطلاب', n], ['سُجّلت نتائجهم', d + ' من ' + n], ['اجتازوا', ok]].concat(X.final ? [['اعتماد النتائج', X.final.slice(0, 16)]] : []).forEach(p => { const b = el('div'); b.appendChild(el('small', '', p[0])); b.appendChild(el('b', '', p[1])); kv.appendChild(b); });
   $('bBar').style.width = (n ? Math.round(d * 100 / n) : 0) + '%';
   $('fin').classList.toggle('hidden', !(X.canEdit && n && d === n));
-  msg('bMsg', X.final ? '✓ اعتمدتَ نتائج هذه الدفعة. التقرير جاهز للطباعة والتنزيل.' : !X.canEdit ? 'انتهت مدة تسجيل النتائج لهذه الدفعة، والتقرير متاح للاطلاع.' : d === n && n ? 'سُجّلت نتائج جميع الطلاب. راجعها ثم اضغط «اعتماد النتائج» لإنهاء الدفعة.' : '', X.final ? 'ok' : 'info');
+  msg('bMsg', X.final ? '✓ اعتمدتَ نتائج هذه الدفعة، وهي الآن مرجع للاطلاع فقط. التقرير جاهز للطباعة والتنزيل.' : d === n && n ? 'سُجّلت نتائج جميع الطلاب. راجعها ثم اضغط «اعتماد النتائج» لإنهاء الدفعة.' : '', X.final ? 'ok' : 'info');
   const fl = $('flt'); fl.innerHTML = '';
   [['all', 'الكل', n], ['wait', 'لم يُختبر', n - d], ['ok', 'اجتاز', ok], ['no', 'لم يجتز', d - ok]].forEach(f => { const b = el('button', F === f[0] ? 'on' : '', f[1] + ' (' + f[2] + ')'); b.onclick = () => { F = f[0]; render(); }; fl.appendChild(b); });
   const q = $('q').value.trim(), box = $('list'); box.innerHTML = '';
@@ -211,7 +231,7 @@ function form(s){
 $('shX').onclick = () => $('sh').classList.add('hidden');
 const repRows = () => X.list.map((s, i) => [i + 1, s.name, s.nid, s.level, s.hname, done(s) ? Number(s.score) : '', done(s) ? s.result : 'لم يُختبر']);
 $('rPrint').onclick = () => { const p = $('print'); p.innerHTML = '';
-  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'تقرير نتائج اختبار المرحليات')); l.appendChild(el('div', '', 'تاريخ الاختبار: ' + dayName(X.date) + ' ' + X.date + ' • المختبِر: ' + X.sup + (X.supOrg ? ' (' + X.supOrg + ')' : ''))); hd.appendChild(l); hd.appendChild(el('div', '', X.org)); p.appendChild(hd);
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'تقرير نتائج ' + bName(X.no) + ' — اختبار المرحليات')); l.appendChild(el('div', '', 'تاريخ الاختبار: ' + dayName(X.date) + ' ' + X.date + ' • المختبِر: ' + X.sup + (X.supOrg ? ' (' + X.supOrg + ')' : ''))); hd.appendChild(l); hd.appendChild(el('div', '', X.org)); p.appendChild(hd);
   const n = X.list.length, ok = X.list.filter(s => s.status === X.st.ok).length, d = X.list.filter(done).length;
   p.appendChild(el('p', '', 'عدد الطلاب: ' + n + ' • اجتازوا: ' + ok + ' • لم يجتازوا: ' + (d - ok) + (n - d ? ' • لم يُختبروا: ' + (n - d) : '')));
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>المرحلية</th><th>الحلقة</th><th>الدرجة</th><th>النتيجة</th></tr></thead>'; const tb = el('tbody');
@@ -219,8 +239,8 @@ $('rPrint').onclick = () => { const p = $('print'); p.innerHTML = '';
   if (!X.final) p.appendChild(el('p', '', '⚠ مسودة: لم يعتمد المختبِر النتائج بعد.'));
   const sg = el('div', 'sig'); sg.appendChild(el('div', '', 'المختبِر: ' + X.sup + (X.final ? ' • اعتمد النتائج في ' + X.final.slice(0, 16) : ''))); sg.appendChild(el('div', '', 'التوقيع: ....................')); p.appendChild(sg);
   setTimeout(() => window.print(), 50); };
-$('rXls').onclick = () => { const rows = [['نتائج اختبار المرحليات — ' + X.date + ' — المختبِر ' + X.sup + (X.final ? ' — اعتُمدت ' + X.final.slice(0, 16) : ' — مسودة')], ['م', 'اسم الطالب', 'رقم الهوية', 'المرحلية', 'الحلقة', 'الدرجة', 'النتيجة']].concat(repRows());
-  const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['النتائج', rows]])); a.download = 'نتائج-المرحليات-' + X.date + '.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); };
+$('rXls').onclick = () => { const rows = [['نتائج ' + bName(X.no) + ' — اختبار المرحليات — ' + X.date + ' — المختبِر ' + X.sup + (X.final ? ' — اعتُمدت ' + X.final.slice(0, 16) : ' — مسودة')], ['م', 'اسم الطالب', 'رقم الهوية', 'المرحلية', 'الحلقة', 'الدرجة', 'النتيجة']].concat(repRows());
+  const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['النتائج', rows]])); a.download = 'نتائج-' + bName(X.no).replace(/\s+/g, '-') + '-' + X.date + '.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); };
 function xlsxBlob(sheets){
   const esc = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const col = i => { let s = ''; i++; while (i){ const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
@@ -252,7 +272,7 @@ function xlsxBlob(sheets){
   const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length), ...u32(cs), ...u32(off), ...u16(0)]);
   return new Blob([...parts, ...cen, end], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 }
-{ const p0 = ss.get(); if (p0 && p0.n) open1(p0.n, p0.p, true); }
+{ const p0 = ss.get(); if (p0 && p0.n) open1(p0.n, true); }
 </script>
 </body>
 </html>
