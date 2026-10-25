@@ -2882,8 +2882,7 @@ function renderAssoc(){
     if (asT === 'wait') b('تسجيل الاختبار الداخلي', 'good', () => asSheet('pre', x));
     if (asT === 'pass' && asMode === 'assocNom' && AX.canNom) b('ترشيح للجمعية', 'good', () => asSheet('nom', x));
     const sent = asT === 'nom' && (AX.batches || []).some(y => y.date === x.examDate && y.status !== AX.exSt.draft);
-    if (sent) w.appendChild(el('div', 'meta', 'ضمن ' + exbName((AX.batches || []).find(y => y.date === x.examDate)) + ' المرسلة لمشرف الجمعية — النتيجة يسجّلها المشرف.'));
-    if (asT === 'nom' && !sent) b('تسجيل نتيجة الجمعية', 'good', () => asSheet('result', x));
+    w.appendChild(el('div', 'meta', asT !== 'nom' ? '' : sent ? 'ضمن ' + exbName((AX.batches || []).find(y => y.date === x.examDate)) + ' المرسلة لمشرف الجمعية — النتيجة يسجّلها المشرف.' : 'النتيجة يسجّلها مشرف الجمعية بعد إرسال مجموعته من خانة «المختبرون».'));
     if (asT === 'nom' && AX.canNom && !sent) b('إلغاء الترشيح', 'danger', () => asSheet('cancel', x));
     if (asT === 'fail') b('إعادة الاختبار الداخلي', '', () => asDo('retry', x.id, {}));
     b('الملف', '', () => goFile(x.sid)); if (asT === 'wait' || asT === 'fail') b('حذف', 'danger', () => { if (confirm('حذف ' + x.sname + ' من القائمة؟')) asDo('del', x.id, {}); });
