@@ -384,8 +384,16 @@
   .nbdg{background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;line-height:18px;margin-inline-start:auto;text-align:center}
   .welcome .role{font-size:14px;color:#F3D9AE;margin:-2px 0 6px;font-weight:700}
   #pTeach.ro .att button{pointer-events:none} #pTeach.ro .trow,#pTeach.ro #btnAllPresent,#pTeach.ro #btnApprove{display:none!important}
-  .navlogo{display:flex;align-items:center;gap:10px;padding:2px 6px 10px} .navlogo img{width:46px;height:46px;border-radius:50%;background:#fff;padding:3px;border:2px solid var(--gold);object-fit:contain} .navlogo b{font-size:14px;color:var(--navy)}
+  .navlogo{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px 14px;margin-bottom:6px;background:var(--card);border:1px solid var(--line);border-radius:18px;text-align:center}
+  .navlogo img{width:92px;height:92px;border-radius:50%;background:#fff;padding:5px;border:3px solid var(--gold);object-fit:contain;box-shadow:0 6px 16px rgba(0,0,0,.12)}
+  .navlogo b{font-size:15px;color:var(--navy);line-height:1.4} .navlogo small{font-size:11.5px;color:var(--muted);line-height:1.5}
   @media (prefers-color-scheme: dark){ .navlogo b{color:var(--text)} }
+  @media (max-width:859px){ nav:not(.groups) .navlogo{display:none} }
+  .orgcard{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin-bottom:12px;box-shadow:0 4px 14px rgba(30,42,51,.06)}
+  .orgcard img{width:78px;height:78px;flex:none;border-radius:50%;background:#fff;padding:4px;border:3px solid var(--gold);object-fit:contain}
+  .orgcard b{display:block;font-size:17px;color:var(--navy);line-height:1.4} .orgcard small{font-size:12.5px;color:var(--muted);line-height:1.6}
+  @media (prefers-color-scheme: dark){ .orgcard b{color:var(--text)} }
+  @media (min-width:860px){ .orgcard img{width:96px;height:96px} .orgcard b{font-size:19px} }
   #btnBell .bdg{position:absolute;top:2px;left:4px;background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;line-height:18px}
   .cptabs .bdg{background:var(--red);color:#fff;border-radius:99px;font-size:12px;padding:0 7px;min-width:20px}
   @media (max-width:560px){ .cptabs{grid-template-columns:1fr 1fr} .cptabs button{font-size:14px;min-height:54px} }
@@ -666,6 +674,7 @@
       <div id="annWelcome"></div>
       <div id="zmCards"></div>
       <div class="notice hidden" id="pinNotice">أنت تستخدم الرمز الأولي. غيّره لحماية حسابك.<button id="btnPin2">تغيير الآن</button></div>
+      <div class="orgcard"><img src="../logo.jpg" alt="شعار مجمع ربيع القلوب"><div><b id="orgCardName">مجمع حلقات ربيع القلوب القرآني</b><small>بجامع علي الشبلان - أبها</small></div></div>
       <div class="welcome">
         <svg class="sky" id="sky" viewBox="0 0 120 120"></svg>
         <div class="greet" id="greet"></div>
@@ -1959,7 +1968,8 @@ async function loadHome(){
   document.body.classList.toggle('admin', admin);
   n.classList.toggle('groups', admin);
   if (admin) buildAdminNav(n);
-  else TABS.forEach(x => { const b = el('button'); b.dataset.r = x[0]; b.innerHTML = ICONS[x[0]]; b.appendChild(el('span', '', x[1])); b.onclick = () => openRole(x[0]); n.appendChild(b); });
+  else n.appendChild(navLogo());
+  if (!admin) TABS.forEach(x => { const b = el('button'); b.dataset.r = x[0]; b.innerHTML = ICONS[x[0]]; b.appendChild(el('span', '', x[1])); b.onclick = () => openRole(x[0]); n.appendChild(b); });
   show('vHome');
   openRole(admin ? 'dash' : 'welcome'); updBell();
   if (r.ro && !$('roBar')){ const b = el('div', 'robar', 'حساب المشرف العام: للاطلاع فقط، ولا يمكن التعديل.'); b.id = 'roBar'; $('vHome').insertBefore(b, $('vHome').firstChild); }   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
@@ -1976,8 +1986,13 @@ const ADMIN_NAV = [
   { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['zoomCfg', 'ربط الحلقات عن بعد'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
 ];
+function navLogo(){
+  const lg = el('div', 'navlogo'), im = el('img'); im.src = '../logo.jpg'; im.alt = 'شعار مجمع ربيع القلوب';
+  lg.appendChild(im); lg.appendChild(el('b', '', (D && D.orgShort) || 'مجمع ربيع القلوب')); lg.appendChild(el('small', '', 'لتحفيظ القرآن الكريم بجامع علي الشبلان'));
+  return lg;
+}
 function buildAdminNav(n){
-  const lg = el('div', 'navlogo'), im = el('img'); im.src = '../logo.jpg'; im.alt = ''; lg.appendChild(im); lg.appendChild(el('b', '', (D && D.orgShort) || 'مجمع ربيع القلوب')); n.appendChild(lg);
+  n.appendChild(navLogo());
   ADMIN_NAV.forEach((g, gi) => {
     const w = el('div', 'ngroup'); w.dataset.g = gi;
     if (g.r){   // تبويب مباشر بلا خيارات (التقييم)
@@ -2128,6 +2143,7 @@ function roleText(){
 }
 function renderWelcome(){
   renderAnnFor('annWelcome'); zmCards();
+  if (D.org) $('orgCardName').textContent = D.org.split(' بجامع')[0];
   const hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', hourCycle:'h23' }).format(new Date());
   const morning = hr >= 4 && hr < 12;
   $('sky').innerHTML = morning ? SUN : MOON;
