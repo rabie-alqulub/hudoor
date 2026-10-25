@@ -3001,7 +3001,10 @@ function supCard(box){
   const m = el('div'); m.id = 'exbSupM'; c.appendChild(m); box.appendChild(c);
 }
 function renderBatches(){
-  const box = $('asBox'); box.innerHTML = ''; const ds = exbDates(); if (AX.canNom) supCard(box);
+  const box = $('asBox'); box.innerHTML = ''; const ds = exbDates();
+  if (!Array.isArray(AX.sups) || !AX.exSt){ AX.sups = AX.sups || []; AX.batches = AX.batches || []; AX.exSt = AX.exSt || { draft:'مسودة', ok:'أُرسلت للمشرف', done:'اعتمد المشرف النتائج' };
+    box.appendChild(el('div', 'msg err', 'الخادم ما زال على النسخة القديمة، لذلك لا تظهر خانة مشرفي الجمعية. الصق ملف Code.gs الأخير في مشروع مثاني، ثم: نشر ← إدارة عمليات النشر ← ✏️ ← الإصدار: «إصدار جديد» ← نشر.')); return; }
+  if (AX.canNom) supCard(box);
   const nod = AX.list.filter(x => x.status === AX.st.nom && !x.examDate).length;
   if (nod) box.appendChild(el('div', 'msg info', nod + ' طالب مرشح بلا موعد اختبار — حدد موعدهم من «المرشحون للجمعية» ليظهروا هنا في مجموعة يومهم.'));
   if (!ds.length) return box.appendChild(el('small', '', 'لا توجد مجموعات بعد. حدّد موعد الاختبار للمرشحين فتتجمع هنا حسب اليوم.'));
