@@ -3245,21 +3245,40 @@ function ptForm(x, a){
   const g = el('div', 'edgrid'), fld = (l, i) => { const d = el('div'); d.appendChild(lab(l)); d.appendChild(i); g.appendChild(d); return i; };
   const dt = fld('تاريخ الاختبار', el('input')); dt.type = 'date'; dt.value = D.today; const ex = fld('المختبِر', el('input')); ex.value = D.name || '';
   const nq = fld('عدد الأسئلة', el('select')); [3, 4, 5, 6, 8, 10].forEach(n => { const o = el('option', '', n + ' أسئلة'); o.value = n; nq.appendChild(o); }); nq.value = 5; B0.appendChild(g);
-  B0.appendChild(el('small', '', 'لكل سؤال درجة متساوية من 100. الخصم: خطأ حفظ = درجة • تنبيه أو تردد = نصف درجة • خطأ تجويد = نصف درجة.'));
+  // نطاق المرحلية وتوليد مواضع الأسئلة تلقائياً (يُحفظ آخر نطاق لكل مرحلية على هذا الجهاز)
+  const sOpt = () => { const q = el('select'); const o0 = el('option', '', '— السورة —'); o0.value = ''; q.appendChild(o0); D.surah.forEach((nm, k) => { const o = el('option', '', (k + 1) + '. ' + nm); o.value = k + 1; q.appendChild(o); }); return q; };
+  const rg = el('div', 'edgrid'), fdv = (l, i) => { const d = el('div'); d.appendChild(lab(l)); d.appendChild(i); rg.appendChild(d); return i; };
+  const rF = fdv('نطاق المرحلية: من سورة', sOpt()), rT = fdv('إلى سورة', sOpt()); B0.appendChild(rg);
+  const gen = el('button', 'btn soft', '🎲 توليد الأسئلة تلقائياً'); gen.type = 'button'; B0.appendChild(gen);
+  let saved = null; try { saved = JSON.parse(localStorage.getItem('pt_rng_' + x.level) || 'null'); } catch(e){}
+  if (saved){ rF.value = saved[0]; rT.value = saved[1]; }
+  B0.appendChild(el('small', '', 'حدد النطاق ثم اضغط التوليد؛ يختار النظام المواضع عشوائياً وموزعة على النطاق كله، ويمكنك تعديل أي سؤال. لكل سؤال درجة متساوية من 100. الخصم: خطأ حفظ = درجة • تنبيه أو تردد = نصف درجة • خطأ تجويد = نصف درجة.'));
   const t = el('table', 'pttbl'); B0.appendChild(t); const tot = el('div', 'pttot'); B0.appendChild(tot);
   const nt = el('textarea', 'rftxt'); nt.placeholder = 'ملاحظات المختبِر'; B0.appendChild(lab('ملاحظات')); B0.appendChild(nt);
   const save = el('button', 'btn', 'حفظ نتيجة الاختبار'); B0.appendChild(save); const after = el('div'); B0.appendChild(after);
   let rows = [];
+  const absTo = n => { for (let k = 0; k < 114; k++){ if (n <= D.ayat[k]) return [k + 1, n]; n -= D.ayat[k]; } return [114, D.ayat[113]]; };
   const calc = () => { const n = rows.length, Q = 100 / n; let sum = 0; rows.forEach(r => { const v = k => Math.max(0, +r[k].value || 0); r.sc = Math.max(0, Q - v('h') * PT_W.h - v('t') * PT_W.t - v('j') * PT_W.j); r.out.textContent = (Math.round(r.sc * 2) / 2).toString(); sum += r.sc; });
     sum = Math.round(sum * 2) / 2; const ok = sum >= AX.pass; tot.className = 'pttot ' + (ok ? 'ok' : 'no'); tot.innerHTML = ''; tot.appendChild(el('span', '', 'المجموع (درجة الاجتياز ' + AX.pass + ')')); tot.appendChild(el('b', '', sum + ' / 100')); return sum; };
-  const draw = () => { const n = +nq.value, old = rows.map(r => ({ p:r.p.value, h:r.h.value, t:r.t.value, j:r.j.value })); rows = [];
-    t.innerHTML = '<thead><tr><th>الموضع (السورة والآية)</th><th>أخطاء الحفظ</th><th>تنبيهات</th><th>أخطاء التجويد</th><th>الدرجة من ' + (Math.round(1000 / n) / 10) + '</th></tr></thead>'; const tb = el('tbody');
+  const generate = () => { const s1 = +rF.value, s2 = +rT.value; if (!s1 || !s2) return msg('ptMsg', 'اختر نطاق المرحلية: من سورة وإلى سورة.', 'err');
+    const lo = Math.min(s1, s2), hi = Math.max(s1, s2), A = absAyah(lo, 1), Z = absAyah(hi, D.ayat[hi - 1]), seg = (Z - A + 1) / rows.length;
+    try { localStorage.setItem('pt_rng_' + x.level, JSON.stringify([rF.value, rT.value])); } catch(e){}
+    rows.forEach((r, k) => { const pos = Math.min(Z, Math.floor(A + seg * k + Math.random() * seg)), sa = absTo(pos); r.s.value = sa[0]; r.a.max = D.ayat[sa[0] - 1]; r.a.value = sa[1]; });
+    msg('ptMsg', '', ''); gen.textContent = '🎲 توليد مرة أخرى'; };
+  gen.onclick = generate;
+  const draw = () => { const n = +nq.value, old = rows.map(r => ({ s:r.s.value, a:r.a.value, h:r.h.value, t:r.t.value, j:r.j.value })); rows = [];
+    t.innerHTML = '<thead><tr><th>السورة</th><th>الآية</th><th>أخطاء الحفظ</th><th>تنبيهات</th><th>أخطاء التجويد</th><th>الدرجة من ' + (Math.round(1000 / n) / 10) + '</th></tr></thead>'; const tb = el('tbody');
     for (let i = 0; i < n; i++){ const tr = el('tr'), r = {}; const mk = (k, num) => { const td = el('td'), inp = el('input'); if (num){ inp.type = 'number'; inp.min = 0; inp.inputMode = 'numeric'; } inp.value = old[i] ? old[i][k] : ''; inp.oninput = calc; td.appendChild(inp); tr.appendChild(td); r[k] = inp; };
-      mk('p'); mk('h', 1); mk('t', 1); mk('j', 1); r.out = el('td', '', ''); tr.appendChild(r.out); tb.appendChild(tr); rows.push(r); }
+      const tdS = el('td'); r.s = sOpt(); r.s.style.minWidth = '150px'; if (old[i]) r.s.value = old[i].s; tdS.appendChild(r.s); tr.appendChild(tdS);
+      const tdA = el('td'); r.a = el('input'); r.a.type = 'number'; r.a.min = 1; r.a.inputMode = 'numeric'; r.a.style.width = '70px'; if (old[i]) r.a.value = old[i].a; if (r.s.value) r.a.max = D.ayat[r.s.value - 1]; tdA.appendChild(r.a); tr.appendChild(tdA);
+      r.s.onchange = () => { r.a.max = r.s.value ? D.ayat[r.s.value - 1] : ''; if (r.s.value && +r.a.value > +r.a.max) r.a.value = r.a.max; if (r.s.value && !r.a.value) r.a.value = 1; };
+      r.a.oninput = () => { if (r.s.value && +r.a.value > D.ayat[r.s.value - 1]) r.a.value = D.ayat[r.s.value - 1]; if (r.a.value !== '' && +r.a.value < 1) r.a.value = 1; };
+      r.p = { get value(){ return r.s.value ? D.surah[r.s.value - 1] + ' ' + (+r.a.value || 1) : ''; } };
+      mk('h', 1); mk('t', 1); mk('j', 1); r.out = el('td', '', ''); tr.appendChild(r.out); tb.appendChild(tr); rows.push(r); }
     t.appendChild(tb); calc(); };
-  nq.onchange = draw; draw();
-  save.onclick = async () => { const score = calc(), sheet = { n:rows.length, w:PT_W, q:rows.map(r => ({ p:r.p.value.trim(), h:+r.h.value || 0, t:+r.t.value || 0, j:+r.j.value || 0, s:Math.round(r.sc * 2) / 2 })) };
-    if (!rows.some(r => r.p.value.trim())) return msg('ptMsg', 'اكتب موضع سؤال واحد على الأقل.', 'err');
+  nq.onchange = () => { draw(); if (rF.value && rT.value) generate(); }; draw(); if (saved) generate();
+  save.onclick = async () => { const score = calc(), sheet = { n:rows.length, w:PT_W, range: rF.value && rT.value ? D.surah[rF.value - 1] + ' — ' + D.surah[rT.value - 1] : '', q:rows.map(r => ({ p:r.p.value, h:+r.h.value || 0, t:+r.t.value || 0, j:+r.j.value || 0, s:Math.round(r.sc * 2) / 2 })) };
+    if (!rows.some(r => r.p.value)) return msg('ptMsg', 'حدد موضع سؤال واحد على الأقل، أو اضغط «توليد الأسئلة تلقائياً».', 'err');
     save.disabled = true; const r = await cpCall({ action:'assocSave', op:'pre', id:a.id, data:{ score:score, date:dt.value, examiner:ex.value.trim(), notes:nt.value.trim(), sheet:sheet } }, 'ptMsg'); save.disabled = false; if (!r || !r.ok) return;
     AX = r; renderCands(); msg('ptMsg', r.msg, score >= AX.pass ? 'ok' : 'err'); save.classList.add('hidden'); after.innerHTML = '';
     if (score >= AX.pass){ const y = el('button', 'btn gold', 'الموافقة على الترشيح لاختبار الجمعية'); y.onclick = () => { const it = cdItems().find(z => z.a && z.a.id === a.id); if (it) cdApprove(it); }; after.appendChild(y); } };
@@ -3267,7 +3286,7 @@ function ptForm(x, a){
 }
 function ptView(x){
   const a = x.a, d = a.preData || {}; msg('ptMsg', '', ''); $('ptT').textContent = 'نموذج الاختبار: ' + x.name + ' — ' + x.level; const B0 = $('ptBody'); B0.innerHTML = '';
-  const g = el('div', 'kv'); kvRow(g, 'التاريخ', a.preDate); kvRow(g, 'المختبِر', a.preExaminer); kvRow(g, 'الدرجة', a.preScore + ' من 100'); kvRow(g, 'النتيجة', a.status); kvRow(g, 'ملاحظات', a.preNotes); B0.appendChild(g);
+  const g = el('div', 'kv'); kvRow(g, 'التاريخ', a.preDate); kvRow(g, 'المختبِر', a.preExaminer); kvRow(g, 'الدرجة', a.preScore + ' من 100'); kvRow(g, 'النتيجة', a.status); kvRow(g, 'نطاق المرحلية', d.range); kvRow(g, 'ملاحظات', a.preNotes); B0.appendChild(g);
   const t = el('table', 'pttbl'); t.innerHTML = '<thead><tr><th>الموضع</th><th>حفظ</th><th>تنبيهات</th><th>تجويد</th><th>الدرجة</th></tr></thead>'; const tb = el('tbody');
   (d.q || []).forEach(q => { const tr = el('tr'); [q.p, q.h, q.t, q.j, q.s].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); B0.appendChild(t);
   $('ptSheet').classList.remove('hidden');
