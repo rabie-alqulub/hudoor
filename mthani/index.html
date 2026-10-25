@@ -3234,6 +3234,10 @@ async function cdApprove(x){
 }
 /* نموذج الاختبار قبل الترشيح: أسئلة متساوية الدرجة، والخصم: خطأ حفظ = درجة، تنبيه = نصف، خطأ تجويد = نصف */
 const PT_W = { h:1, t:0.5, j:0.5 };
+/* نطاقات المرحليات المعتمدة بجمعية تذكرة (عسير): [من سورة، إلى سورة] بترتيب الجدول الرسمي */
+const MR_RANGE = { 'الأولى':[114,67], 'الثانية':[66,52], 'الثالثة':[51,42], 'الرابعة':[41,36], 'الخامسة':[35,29], 'السادسة':[28,24], 'السابعة':[23,19], 'الثامنة':[18,15],
+  'التاسعة':[14,11], 'العاشرة':[10,8], 'الحادية عشرة':[7,7], 'الثانية عشرة':[6,5], 'الثالثة عشرة':[4,4], 'الرابعة عشرة':[3,3], 'الخامسة عشرة':[2,2] };
+const mrRange = lv => MR_RANGE[String(lv || '').replace(/^المرحلية\s*/, '').trim()] || null;
 async function ptStart(x){
   let aid = x.a && x.a.id;
   if (x.a && x.a.status === AX.st.fail){ const r0 = await cpCall({ action:'assocSave', op:'retry', id:x.a.id, data:{} }, 'cdBox'); if (!r0 || !r0.ok) return; AX = r0; }
@@ -3250,10 +3254,11 @@ function ptForm(x, a){
   const rg = el('div', 'edgrid'), fdv = (l, i) => { const d = el('div'); d.appendChild(lab(l)); d.appendChild(i); rg.appendChild(d); return i; };
   const rF = fdv('نطاق المرحلية: من سورة', sOpt()), rT = fdv('إلى سورة', sOpt()); B0.appendChild(rg);
   const gen = el('button', 'btn soft', '🎲 توليد الأسئلة تلقائياً'); gen.type = 'button'; B0.appendChild(gen);
-  let saved = null; try { saved = JSON.parse(localStorage.getItem('pt_rng_' + x.level) || 'null'); } catch(e){}
+  let saved = mrRange(x.level); if (!saved) try { saved = JSON.parse(localStorage.getItem('pt_rng_' + x.level) || 'null'); } catch(e){}
   if (saved){ rF.value = saved[0]; rT.value = saved[1]; }
+  if (mrRange(x.level)) B0.appendChild(el('small', '', '✓ النطاق معبأ تلقائياً وفق جدول المرحليات المعتمد بجمعية تذكرة: من سورة ' + D.surah[saved[0] - 1] + ' إلى سورة ' + D.surah[saved[1] - 1] + '.'));
   B0.appendChild(el('small', '', 'حدد النطاق ثم اضغط التوليد؛ يختار النظام المواضع عشوائياً وموزعة على النطاق كله، ويمكنك تعديل أي سؤال. لكل سؤال درجة متساوية من 100. الخصم: خطأ حفظ = درجة • تنبيه أو تردد = نصف درجة • خطأ تجويد = نصف درجة.'));
-  const t = el('table', 'pttbl'); B0.appendChild(t); const tot = el('div', 'pttot'); B0.appendChild(tot);
+  const t = el('table', 'pttbl'), tw = el('div'); tw.style.overflowX = 'auto'; tw.appendChild(t); B0.appendChild(tw); const tot = el('div', 'pttot'); B0.appendChild(tot);
   const nt = el('textarea', 'rftxt'); nt.placeholder = 'ملاحظات المختبِر'; B0.appendChild(lab('ملاحظات')); B0.appendChild(nt);
   const save = el('button', 'btn', 'حفظ نتيجة الاختبار'); B0.appendChild(save); const after = el('div'); B0.appendChild(after);
   let rows = [];
@@ -3262,14 +3267,14 @@ function ptForm(x, a){
     sum = Math.round(sum * 2) / 2; const ok = sum >= AX.pass; tot.className = 'pttot ' + (ok ? 'ok' : 'no'); tot.innerHTML = ''; tot.appendChild(el('span', '', 'المجموع (درجة الاجتياز ' + AX.pass + ')')); tot.appendChild(el('b', '', sum + ' / 100')); return sum; };
   const generate = () => { const s1 = +rF.value, s2 = +rT.value; if (!s1 || !s2) return msg('ptMsg', 'اختر نطاق المرحلية: من سورة وإلى سورة.', 'err');
     const lo = Math.min(s1, s2), hi = Math.max(s1, s2), A = absAyah(lo, 1), Z = absAyah(hi, D.ayat[hi - 1]), seg = (Z - A + 1) / rows.length;
-    try { localStorage.setItem('pt_rng_' + x.level, JSON.stringify([rF.value, rT.value])); } catch(e){}
+    if (!mrRange(x.level)) try { localStorage.setItem('pt_rng_' + x.level, JSON.stringify([rF.value, rT.value])); } catch(e){}
     rows.forEach((r, k) => { const pos = Math.min(Z, Math.floor(A + seg * k + Math.random() * seg)), sa = absTo(pos); r.s.value = sa[0]; r.a.max = D.ayat[sa[0] - 1]; r.a.value = sa[1]; });
     msg('ptMsg', '', ''); gen.textContent = '🎲 توليد مرة أخرى'; };
   gen.onclick = generate;
   const draw = () => { const n = +nq.value, old = rows.map(r => ({ s:r.s.value, a:r.a.value, h:r.h.value, t:r.t.value, j:r.j.value })); rows = [];
     t.innerHTML = '<thead><tr><th>السورة</th><th>الآية</th><th>أخطاء الحفظ</th><th>تنبيهات</th><th>أخطاء التجويد</th><th>الدرجة من ' + (Math.round(1000 / n) / 10) + '</th></tr></thead>'; const tb = el('tbody');
     for (let i = 0; i < n; i++){ const tr = el('tr'), r = {}; const mk = (k, num) => { const td = el('td'), inp = el('input'); if (num){ inp.type = 'number'; inp.min = 0; inp.inputMode = 'numeric'; } inp.value = old[i] ? old[i][k] : ''; inp.oninput = calc; td.appendChild(inp); tr.appendChild(td); r[k] = inp; };
-      const tdS = el('td'); r.s = sOpt(); r.s.style.minWidth = '150px'; if (old[i]) r.s.value = old[i].s; tdS.appendChild(r.s); tr.appendChild(tdS);
+      const tdS = el('td'); r.s = sOpt(); r.s.style.minWidth = '130px'; if (old[i]) r.s.value = old[i].s; tdS.appendChild(r.s); tr.appendChild(tdS);
       const tdA = el('td'); r.a = el('input'); r.a.type = 'number'; r.a.min = 1; r.a.inputMode = 'numeric'; r.a.style.width = '70px'; if (old[i]) r.a.value = old[i].a; if (r.s.value) r.a.max = D.ayat[r.s.value - 1]; tdA.appendChild(r.a); tr.appendChild(tdA);
       r.s.onchange = () => { r.a.max = r.s.value ? D.ayat[r.s.value - 1] : ''; if (r.s.value && +r.a.value > +r.a.max) r.a.value = r.a.max; if (r.s.value && !r.a.value) r.a.value = 1; };
       r.a.oninput = () => { if (r.s.value && +r.a.value > D.ayat[r.s.value - 1]) r.a.value = D.ayat[r.s.value - 1]; if (r.a.value !== '' && +r.a.value < 1) r.a.value = 1; };
