@@ -2971,7 +2971,7 @@ function exbDates(){ const ds = new Set(AX.list.filter(exbIn).map(x => x.examDat
   const t = D.today; return [...ds].sort((a, b) => (a < t) - (b < t) || (a < t ? b.localeCompare(a) : a.localeCompare(b))); }
 const exbUrl = b => new URL('exam.html?k=' + b.key, location.href).href;
 const wDay = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('ar-SA', { weekday:'long' }); } catch(e){ return ''; } };
-function exbText(b, n){ return 'السلام عليكم ورحمة الله وبركاته\nفضيلة الشيخ ' + b.sup + ' حفظه الله\n\nنفيدكم باعتماد دفعة اختبار المرحليات لطلاب ' + ((D && D.org) || 'مجمع حلقات ربيع القلوب القرآني') + ' يوم ' + wDay(b.date) + ' ' + b.date + '، وعددهم ' + n + ' طالب.\n\nرابط تسجيل النتائج:\n' + exbUrl(b) + '\n\nرمز الدخول: ' + b.pin +
+function exbText(b, n){ return 'السلام عليكم ورحمة الله وبركاته\nفضيلة الشيخ ' + String(b.sup).replace(/^(فضيلة\s+)?(الشيخ|الأستاذ)\s+/, '') + ' حفظه الله\n\nنفيدكم باعتماد دفعة اختبار المرحليات لطلاب ' + ((D && D.org) || 'مجمع حلقات ربيع القلوب القرآني') + ' يوم ' + wDay(b.date) + ' ' + b.date + '، وعددهم ' + n + ' طالب.\n\nرابط تسجيل النتائج:\n' + exbUrl(b) + '\n\nرمز الدخول: ' + b.pin +
   '\n\nيظهر في الرابط طلاب الدفعة فقط، ونموذج الاختبار معبأ بنطاق كل مرحلية. وبعد التسجيل يمكنكم طباعة تقرير النتائج أو تنزيله Excel لاعتماده لدى الجمعية.\n\nجزاكم الله خيراً'; }
 function renderBatches(){
   const box = $('asBox'); box.innerHTML = ''; const ds = exbDates(), sups = [...new Map((AX.batches || []).filter(b => b.sup).map(b => [b.sup, b.phone])).entries()];
