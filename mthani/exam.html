@@ -104,7 +104,7 @@
   </div>
 </main>
 <div class="sheet hidden" id="sh"><div class="card">
-  <div class="shd"><h2 id="shT" style="margin:0">اختبار الطالب</h2><button id="shX">إغلاق</button></div>
+  <div class="shd"><h2 id="shT" style="margin:0">اختبار الطالب</h2><button id="shX" aria-label="إغلاق" style="width:40px;height:40px;border-radius:50%;padding:0;font-size:18px">✕</button></div>
   <div id="shB"></div>
 </div></div>
 <div id="print"></div>
@@ -139,6 +139,7 @@ async function open1(nid, silent){
   try { const r = await call({ action:'exOpen' });
     if (!r.ok){ ss.del(); msg('lMsg', r.msg || 'تعذّر الدخول.', 'err'); return; }
     ss.set({ n:NID }); H = r; msg('lMsg', '', ''); renderHome();
+    const g = +new URLSearchParams(location.search).get('g'); if (g && !window._gDone){ window._gDone = 1; const b = H.batches.find(x => x.no === g); if (b) openB(b.id); }
   } catch(e){ msg('lMsg', 'تعذّر الاتصال. تأكد من الإنترنت وحاول مجدداً.', 'err'); }
   finally { $('go').disabled = false; }
 }
