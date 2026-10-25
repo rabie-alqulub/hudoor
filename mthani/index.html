@@ -369,6 +369,18 @@
   #navRail i{position:absolute;left:0;right:0;border-radius:8px;background:var(--navy);min-height:36px;cursor:grab}
   #navRail::before{content:'';position:absolute;inset:0 -10px}
   @media (prefers-color-scheme: dark){ #navRail{background:rgba(255,255,255,.12)} #navRail i{background:#8FB3CC} }
+  .zmbar button{width:auto;margin:0}
+  .zmbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px} .zmbar .grow{flex:1}
+  .zmgo{background:#5B4A6B;color:#fff;border:2px solid #fff;outline:2px solid #5B4A6B;border-radius:6px;padding:9px 22px;font-weight:700}
+  .zmgo.end{background:var(--red);outline-color:var(--red)}
+  .zmstage{background:#111;border-radius:16px;margin-bottom:12px;min-height:360px;position:relative;overflow:hidden} .zmstage .zmph{color:#ccc;text-align:center;padding:40px 16px;font-size:14px}
+  .zmlink{margin-top:8px;font-size:13px}
+  .zmcard{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#5B4A6B,#3A2E46);color:#fff;border-radius:18px;padding:14px 16px;margin-bottom:12px}
+  .zmcard b{font-size:16px;display:block} .zmcard small{color:#E8DDF2} .zmcard .grow{flex:1} .zmcard button{background:#fff;color:#3A2E46;border-radius:12px;padding:10px 14px;font-weight:700}
+  .zmcard .lv{display:inline-block;background:#E53935;color:#fff;border-radius:99px;font-size:11px;padding:1px 8px;margin-inline-start:6px;animation:zmp 1.4s infinite}
+  @keyframes zmp{50%{opacity:.45}}
+  @media (min-width:1100px){ body.zmon .shell{grid-template-columns:260px minmax(0,1200px);max-width:1520px} body.zmon #pTeach{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+    body.zmon #pTeach > .card:first-child{grid-column:1/-1} body.zmon #zmStage{position:sticky;top:90px;grid-column:1;grid-row:2 / span 3} body.zmon #stuList,body.zmon #apprCard{grid-column:2} }
   .nbdg{background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;line-height:18px;margin-inline-start:auto;text-align:center}
   .welcome .role{font-size:14px;color:#F3D9AE;margin:-2px 0 6px;font-weight:700}
   #pTeach.ro .att button{pointer-events:none} #pTeach.ro .trow,#pTeach.ro #btnAllPresent,#pTeach.ro #btnApprove{display:none!important}
@@ -652,6 +664,7 @@
     <!-- الترحيب -->
     <div id="pWelcome" class="hidden">
       <div id="annWelcome"></div>
+      <div id="zmCards"></div>
       <div class="notice hidden" id="pinNotice">أنت تستخدم الرمز الأولي. غيّره لحماية حسابك.<button id="btnPin2">تغيير الآن</button></div>
       <div class="welcome">
         <svg class="sky" id="sky" viewBox="0 0 120 120"></svg>
@@ -671,10 +684,13 @@
       <div class="card">
         <div class="chips" id="halChips"></div>
         <div class="msg info hidden" id="roNote">عرض فقط: التقييم يسجّله معلم الحلقة.</div>
+        <div class="zmbar hidden" id="zmBar"><button class="zmgo" id="zmGo">بدء الحلقة عن بعد</button><button class="link" id="zmCopy">نسخ الرابط</button><span class="grow"></span><span class="pill p-red hidden" id="zmLiveP">● مباشر</span></div>
+        <div id="zmMsg"></div>
         <div class="pnav"><button id="dPrev">السابق</button><b id="dLabel"></b><button id="dNext">التالي</button></div>
         <div class="tiles" id="attTiles"></div>
         <div class="bar"><span class="muted" id="saveState"></span><button class="mini" id="btnAllPresent">الكل حاضر</button></div>
       </div>
+      <div class="zmstage hidden" id="zmStage"></div>
       <div class="card" id="stuList"></div>
       <div class="card" id="apprCard">
         <div id="apprState" class="muted" style="font-size:14px"></div>
@@ -746,6 +762,7 @@
         <small>لا يمكن تسكين طالب في الحلقة بعد اكتمال هذا العدد.</small>
         <label for="hnT">معلم الحلقة</label><select id="hnT"></select>
         <label for="hnNotes">ملاحظات</label><input id="hnNotes" maxlength="200" placeholder="مثال: المكان أو الفترة">
+        <label class="chk" style="margin-top:12px"><input type="checkbox" id="hnRemote"> حلقة عن بعد (Zoom)</label>
         <button class="btn" id="hnSave">إضافة الحلقة</button>
         <div id="hnMsg"></div>
       </div>
@@ -819,6 +836,30 @@
         <div class="stchips" id="txSum"></div>
       </div>
       <div class="card" id="txBox"></div>
+    </div>
+
+    <!-- ربط Zoom -->
+    <div id="pZoomCfg" class="hidden">
+      <div class="card">
+        <h2>ربط Zoom للحلقات عن بعد</h2>
+        <div class="rfsec">1) تطبيق إنشاء الاجتماعات (Server-to-Server OAuth)</div>
+        <label for="zcAcc">Account ID</label><input id="zcAcc" dir="ltr" autocomplete="off">
+        <label for="zcCid">Client ID</label><input id="zcCid" dir="ltr" autocomplete="off">
+        <label for="zcSec">Client Secret</label><input id="zcSec" dir="ltr" type="password" autocomplete="off">
+        <div class="rfsec">2) تطبيق فتح الحلقة داخل مثاني (General App ← Meeting SDK)</div>
+        <label for="zcSdk">Client ID</label><input id="zcSdk" dir="ltr" autocomplete="off">
+        <label for="zcSdkSec">Client Secret</label><input id="zcSdkSec" dir="ltr" type="password" autocomplete="off">
+        <small>المفاتيح السرية لا تُعرض بعد حفظها، واتركها فارغة للإبقاء على المحفوظ.</small>
+        <div class="stact"><button class="good" id="zcSave">حفظ واختبار الاتصال</button><button id="zcCreate">إنشاء روابط الحلقات عن بعد</button></div>
+        <div id="zcMsg"></div>
+      </div>
+      <div class="card" id="zcList"></div>
+    </div>
+
+    <!-- دخول الحلقة عن بعد (للطالب وولي الأمر) -->
+    <div id="pZoom" class="hidden">
+      <div class="card"><div class="zmbar"><b id="zmTitle"></b><span class="grow"></span><button class="mini" id="zmLeave">خروج من الحلقة</button></div><div id="zmMsg2"></div></div>
+      <div class="zmstage" id="zmStage2"></div>
     </div>
 
     <!-- الإعدادات: تعديل البيانات -->
@@ -1670,6 +1711,8 @@
     <label for="hlT">معلم الحلقة</label><select id="hlT"></select>
     <label for="hlNotes">ملاحظات</label><input id="hlNotes" maxlength="200">
     <label class="chk" style="margin-top:12px"><input type="checkbox" id="hlOn"> الحلقة نشطة</label>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" id="hlRemote"> حلقة عن بعد (Zoom)</label>
+    <div class="zmlink hidden" id="hlZm"></div>
     <button class="btn" id="hlSave">حفظ التعديلات</button>
     <div id="hlMsg"></div>
   </div>
@@ -1865,7 +1908,7 @@ const ICONS = {
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
-ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.ann = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; ICONS.preTest = ICONS.exam || ICONS.book; ICONS.assocNom = ICONS.exam || ICONS.book; ICONS.strug = ICONS.book; ICONS.planF = ICONS.plans; ICONS.msgArc = ICONS.chat; ICONS.eduCfg = ICONS.settings; ICONS.trx = ICONS.exam; ICONS.trxIn = ICONS.exam; ICONS.trxMemo = ICONS.exam; ICONS.mine = ICONS.report; ICONS.shop = ICONS.trophy; ICONS.me = ICONS.settings; ICONS.arc = ICONS.settings; ICONS.accs = ICONS.settings; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgsStu = ICONS.chat; ICONS.msgsStaff = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
+ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.ann = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; ICONS.preTest = ICONS.exam || ICONS.book; ICONS.assocNom = ICONS.exam || ICONS.book; ICONS.strug = ICONS.book; ICONS.planF = ICONS.plans; ICONS.msgArc = ICONS.chat; ICONS.eduCfg = ICONS.settings; ICONS.zoomCfg = ICONS.settings; ICONS.trx = ICONS.exam; ICONS.trxIn = ICONS.exam; ICONS.trxMemo = ICONS.exam; ICONS.mine = ICONS.report; ICONS.shop = ICONS.trophy; ICONS.me = ICONS.settings; ICONS.arc = ICONS.settings; ICONS.accs = ICONS.settings; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgsStu = ICONS.chat; ICONS.msgsStaff = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
 ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
@@ -1935,7 +1978,7 @@ const ADMIN_NAV = [
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'المعاملات', ic:'exam', items:[['trxIn', 'المعاملات الواردة'], ['trxMemo', 'التعاميم والمذكرات']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع']] },
-  { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
+  { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['zoomCfg', 'ربط Zoom (الحلقات عن بعد)'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
 ];
 function buildAdminNav(n){
   const lg = el('div', 'navlogo'), im = el('img'); im.src = '../logo.jpg'; im.alt = ''; lg.appendChild(im); lg.appendChild(el('b', '', (D && D.orgShort) || 'مجمع ربيع القلوب')); n.appendChild(lg);
@@ -2006,6 +2049,8 @@ function openRole(r, title, group){
   if (r === 'msgArc') openMsgArc();
   $('pTrx').classList.toggle('hidden', ['trx', 'trxIn', 'trxMemo'].indexOf(r) === -1);
   if (['trx', 'trxIn', 'trxMemo'].indexOf(r) !== -1) openTrx(r);
+  $('pZoomCfg').classList.toggle('hidden', r !== 'zoomCfg'); if (r === 'zoomCfg') openZoomCfg();
+  $('pZoom').classList.toggle('hidden', r !== 'zoom'); if (r !== 'zoom' && r !== 'teach') zmStop();
   $('pMe').classList.toggle('hidden', r !== 'me');
   if (r === 'me') openMe();
   $('pArc').classList.toggle('hidden', r !== 'arc');
@@ -2086,7 +2131,7 @@ function roleText(){
   return '';
 }
 function renderWelcome(){
-  renderAnnFor('annWelcome');
+  renderAnnFor('annWelcome'); zmCards();
   const hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', hourCycle:'h23' }).format(new Date());
   const morning = hr >= 4 && hr < 12;
   $('sky').innerHTML = morning ? SUN : MOON;
@@ -2169,7 +2214,7 @@ async function loadAtt(){
   let r;
   try { r = await api({ action:'attendance', hid:hal, date:day }); } catch(e){ if (e.message !== 'expired') msg('stuList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (!r.ok) return msg('stuList', r.msg, 'err');
-  teachRO = !!r.ro; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !teachRO);
+  teachRO = !!r.ro; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !teachRO); zmTeachBar();
   studs = r.students; exStuds = r.excluded || []; approval = r.approval; renderStuds(); renderAppr();
   if (!r.studyDay) $('saveState').textContent = 'تنبيه: هذا اليوم ليس من أيام الدراسة.';
 }
@@ -2706,7 +2751,7 @@ async function openHalNew(){
   fillSel('hnT', [], 'جاري التحميل...'); if (await loadHal('hnMsg')) teacherOpts('hnT');
 }
 $('hnSave').onclick = async () => {
-  const h = { name:$('hnName').value.trim(), tnid:$('hnT').value, notes:$('hnNotes').value.trim(), cap:$('hnCap').value.trim() };
+  const h = { name:$('hnName').value.trim(), tnid:$('hnT').value, notes:$('hnNotes').value.trim(), cap:$('hnCap').value.trim(), remote:$('hnRemote').checked };
   if (h.name.length < 3) return msg('hnMsg', 'اكتب اسم الحلقة.', 'err');
   if (!(+h.cap >= 1 && +h.cap <= 200)) return msg('hnMsg', 'اكتب عدد الطلاب المسموح في الحلقة (من 1 إلى 200).', 'err');
   $('hnSave').disabled = true; msg('hnMsg', 'جاري الإضافة...', 'info');
@@ -2733,7 +2778,7 @@ function renderHalEdit(){
   if (!list.length) return box.appendChild(el('small', '', HL.halaqat.length ? 'لا توجد نتائج.' : 'لا توجد حلقات بعد.'));
   list.forEach(h => {
     const w = el('div', 'strow' + (h.active ? '' : ' off')), top = el('div', 'top');
-    top.appendChild(el('b', '', h.name)); top.appendChild(el('span', 'pill ' + (h.cap && h.students >= h.cap ? 'p-red' : 'p-none'), h.cap ? h.students + ' / ' + h.cap + ' طالب' + (h.students >= h.cap ? ' • مكتملة' : '') : h.students + ' طالب • بلا حد'));
+    top.appendChild(el('b', '', h.name + (h.remote ? ' 🖥️' : ''))); top.appendChild(el('span', 'pill ' + (h.cap && h.students >= h.cap ? 'p-red' : 'p-none'), h.cap ? h.students + ' / ' + h.cap + ' طالب' + (h.students >= h.cap ? ' • مكتملة' : '') : h.students + ' طالب • بلا حد'));
     if (!h.active) top.appendChild(el('span', 'pill p-red', 'موقوفة'));
     w.appendChild(top);
     const m = el('div', 'meta'); [['رقم الحلقة', h.hid], ['المعلم', h.teacher || (h.tnid ? h.tnid : 'لم تُسند')], ['ملاحظات', h.notes]].forEach(x => { if (x[1]){ const d = el('span', '', x[0] + ': '); d.appendChild(el('i', '', x[1])); m.appendChild(d); } });
@@ -2747,13 +2792,14 @@ function openHl(h){
   hlCur = h; hlForce = false; msg('hlMsg', '', ''); $('hlSave').textContent = 'حفظ التعديلات';
   $('hlNo').textContent = 'رقم الحلقة: ' + h.hid + ' • ' + h.students + ' طالب';
   $('hlCap').value = h.cap || ''; $('hlCapN').textContent = 'في الحلقة الآن ' + h.students + ' طالب، فلا يقل الحد عن ' + Math.max(h.students, 1) + '.';
-  $('hlName').value = h.name; $('hlNotes').value = h.notes || ''; teacherOpts('hlT'); $('hlT').value = h.tnid || ''; $('hlOn').checked = h.active;
+  $('hlName').value = h.name; $('hlNotes').value = h.notes || ''; teacherOpts('hlT'); $('hlT').value = h.tnid || ''; $('hlOn').checked = h.active; $('hlRemote').checked = !!h.remote;
+  const zl = $('hlZm'); zl.innerHTML = ''; zl.classList.toggle('hidden', !h.zmUrl); if (h.zmUrl){ zl.appendChild(el('span', '', 'رابط الحلقة: ')); zl.appendChild(zmCopyBtn(h.zmUrl)); }
   $('hlSheet').classList.remove('hidden');
 }
 $('hlOn').onchange = () => { hlForce = false; msg('hlMsg', '', ''); };
 $('hlClose').onclick = () => $('hlSheet').classList.add('hidden');
 $('hlSave').onclick = async () => {
-  const h = { hid:hlCur.hid, name:$('hlName').value.trim(), tnid:$('hlT').value, notes:$('hlNotes').value.trim(), on:$('hlOn').checked, force:hlForce, cap:$('hlCap').value.trim() };
+  const h = { hid:hlCur.hid, name:$('hlName').value.trim(), tnid:$('hlT').value, notes:$('hlNotes').value.trim(), on:$('hlOn').checked, force:hlForce, cap:$('hlCap').value.trim(), remote:$('hlRemote').checked };
   if (h.name.length < 3) return msg('hlMsg', 'اكتب اسم الحلقة.', 'err');
   if (!(+h.cap >= 1 && +h.cap <= 200)) return msg('hlMsg', 'اكتب عدد الطلاب المسموح في الحلقة (من 1 إلى 200).', 'err');
   if (+h.cap < hlCur.students) return msg('hlMsg', 'في الحلقة الآن ' + hlCur.students + ' طالب، فلا يمكن أن يكون الحد أقل من ذلك. انقل بعض الطلاب أولاً.', 'err');
@@ -3042,6 +3088,81 @@ function txPrint(x){
   const sg = el('div'); sg.style.cssText = 'display:flex;justify-content:space-between;margin-top:30px'; sg.appendChild(el('div', '', 'توقيع مقدم الطلب: ............')); sg.appendChild(el('div', '', 'اعتماد مدير المجمع: ............')); p.appendChild(sg);
   setTimeout(() => window.print(), 50);
 }
+
+/* ---------- الحلقات عن بعد (Zoom داخل مثاني) ---------- */
+const ZM_VER = '5.1.4';
+let zmClient = null, zmLoad = null, zmCur = null, zmPoll = null;
+function zmCopyBtn(url){ const b = el('button', 'link', 'نسخ الرابط'); b.type = 'button'; b.onclick = () => { try { navigator.clipboard.writeText(url); toast('نُسخ رابط الحلقة'); } catch(e){ prompt('انسخ الرابط', url); } }; return b; }
+function zmScript(src){ return new Promise((ok, no) => { const x = document.createElement('script'); x.src = src; x.onload = ok; x.onerror = no; document.head.appendChild(x); }); }
+function zmSdk(){
+  if (window.ZoomMtgEmbedded) return Promise.resolve();
+  if (!zmLoad){ const v = 'https://source.zoom.us/' + ZM_VER + '/lib/vendor/';
+    zmLoad = ['react.min.js', 'react-dom.min.js', 'redux.min.js', 'redux-thunk.min.js', 'lodash.min.js'].reduce((p, f) => p.then(() => zmScript(v + f)), Promise.resolve())
+      .then(() => zmScript('https://source.zoom.us/zoom-meeting-embedded-' + ZM_VER + '.min.js')).catch(e => { zmLoad = null; throw e; }); }
+  return zmLoad;
+}
+/* يفتح الحلقة داخل الصفحة. إن تعذّر (مفاتيح غير مضافة أو متصفح لا يدعم) يُفتح رابط Zoom مباشرة */
+async function zmOpen(hid, stage, msgBox){
+  const S0 = $(stage); S0.classList.remove('hidden'); S0.innerHTML = '<div class="zmph">جاري فتح الحلقة...</div>';
+  const r = await cpCall({ action:'zmJoin', hid:hid }, msgBox); if (!r || !r.ok){ S0.classList.add('hidden'); return null; }
+  zmCur = { hid:hid, stage:stage, url:r.url, host:r.host };
+  const fallback = why => { S0.innerHTML = ''; const p = el('div', 'zmph'); p.appendChild(el('div', '', why)); const a = el('a', 'btn', 'فتح الحلقة في Zoom'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.style.marginTop = '10px'; p.appendChild(a); S0.appendChild(p); };
+  if (!r.signature) return fallback('لم تُضف مفاتيح فتح Zoom داخل مثاني بعد.'), r;
+  try {
+    await zmSdk(); S0.innerHTML = ''; const root = el('div'); root.id = 'zmRoot_' + stage; S0.appendChild(root);
+    zmClient = ZoomMtgEmbedded.createClient();
+    const w = Math.max(280, S0.clientWidth - 8);
+    await zmClient.init({ zoomAppRoot:root, language:'en-US', patchJsMedia:true, customize:{ video:{ isResizable:true, viewSizes:{ default:{ width:w, height:Math.round(w * 0.62) } } } } });
+    await zmClient.join({ sdkKey:r.sdkKey, signature:r.signature, meetingNumber:r.mn, password:r.pwd, userName:r.userName, zak:r.zak || '' });
+    if (r.host){ await cpCall({ action:'zmLive', hid:hid, on:1 }, null); }
+  } catch(e){ fallback('تعذّر فتح الحلقة داخل الصفحة على هذا الجهاز.'); }
+  return r;
+}
+async function zmStop(end){
+  const cur = zmCur; zmCur = null; document.body.classList.remove('zmon');
+  try { if (zmClient) zmClient.leaveMeeting && await zmClient.leaveMeeting(); } catch(e){}
+  try { if (window.ZoomMtgEmbedded && ZoomMtgEmbedded.destroyClient) ZoomMtgEmbedded.destroyClient(); } catch(e){}
+  zmClient = null; ['zmStage', 'zmStage2'].forEach(id => { const x = $(id); if (x){ x.innerHTML = ''; } }); $('zmStage').classList.add('hidden');
+  if (end && cur && cur.host) await cpCall({ action:'zmLive', hid:cur.hid, on:0 }, null);
+  zmTeachBar();
+}
+function zmTeachBar(){
+  const h = (D && D.halaqat || []).find(x => x.hid === hal), on = h && h.remote && !h.ro;
+  $('zmBar').classList.toggle('hidden', !(h && h.remote)); if (!h) return;
+  const rm = (D.remote || []).find(x => x.hid === hal) || {}, live = zmCur && zmCur.hid === hal;
+  $('zmGo').classList.toggle('hidden', !on); $('zmGo').textContent = live ? 'إنهاء الحلقة عن بعد' : 'بدء الحلقة عن بعد'; $('zmGo').classList.toggle('end', !!live);
+  $('zmLiveP').classList.toggle('hidden', !(live || rm.live)); $('zmCopy').classList.toggle('hidden', !rm.url);
+}
+$('zmGo').onclick = async () => {
+  if (zmCur && zmCur.hid === hal){ if (!confirm('إنهاء الحلقة عن بعد؟')) return; await zmStop(true); return; }
+  document.body.classList.add('zmon'); $('zmGo').disabled = true; const r = await zmOpen(hal, 'zmStage', 'zmMsg'); $('zmGo').disabled = false;
+  if (!r) document.body.classList.remove('zmon'); zmTeachBar();
+};
+$('zmCopy').onclick = () => { const rm = (D.remote || []).find(x => x.hid === hal); if (rm && rm.url) zmCopyBtn(rm.url).onclick(); };
+/* بطاقة الحلقة عن بعد للطالب وولي الأمر */
+function zmCards(){
+  const box = $('zmCards'); if (!box) return; box.innerHTML = '';
+  (D.remote || []).filter(x => !x.host).forEach(x => { const c = el('div', 'zmcard'), g = el('div', 'grow'), b = el('b', '', 'حلقة ' + x.name.replace(/^حلقة\s+/, '') + ' عن بعد');
+    if (x.live){ const l = el('span', 'lv', 'مباشر الآن'); b.appendChild(l); } g.appendChild(b); g.appendChild(el('small', '', x.live ? 'بدأت الحلقة الساعة ' + x.live : 'لم تبدأ الحلقة بعد، وستظهر هنا عند بدئها')); c.appendChild(g);
+    const go = el('button', '', x.live ? 'ادخل الحلقة' : 'دخول'); go.disabled = !x.ready; go.onclick = () => zmEnter(x); c.appendChild(go); box.appendChild(c); });
+  clearInterval(zmPoll); if ((D.remote || []).some(x => !x.host)) zmPoll = setInterval(async () => { if (role !== 'welcome') return; try { const r = await api({ action:'zmState' }); if (r.ok){ D.remote = r.remote; zmCards(); } } catch(e){} }, 45000);
+}
+async function zmEnter(x){ openRole('zoom'); $('zmTitle').textContent = 'حلقة ' + x.name.replace(/^حلقة\s+/, '') + ' عن بعد'; await zmOpen(x.hid, 'zmStage2', 'zmMsg2'); }
+$('zmLeave').onclick = async () => { await zmStop(false); openRole('welcome'); };
+/* إعدادات ربط Zoom */
+let ZC = null;
+async function openZoomCfg(){ const r = await cpCall({ action:'zmCfg' }, 'zcMsg'); if (r && r.ok){ ZC = r; fillZc(); } }
+function fillZc(){
+  $('zcAcc').value = ZC.acc || ''; $('zcCid').value = ZC.cid || ''; $('zcSdk').value = ZC.sdk || ''; $('zcSec').value = ''; $('zcSdkSec').value = '';
+  $('zcSec').placeholder = ZC.hasSec ? '•••••• محفوظ' : ''; $('zcSdkSec').placeholder = ZC.hasSdkSec ? '•••••• محفوظ' : '';
+  const L = $('zcList'); L.innerHTML = ''; L.appendChild(el('h2', '', 'الحلقات عن بعد'));
+  const rm = ZC.halaqat.filter(h => h.remote); if (!rm.length) L.appendChild(el('small', '', 'لا توجد حلقات عن بعد. فعّل «حلقة عن بعد» من تعديل الحلقة.'));
+  rm.forEach(h => { const w = el('div', 'strow'), t = el('div', 'top'); t.appendChild(el('b', '', h.name)); t.appendChild(el('span', 'pill ' + (h.url ? 'p-ok' : 'p-late'), h.url ? 'الرابط جاهز' : 'لم يُنشأ الرابط')); w.appendChild(t);
+    if (h.url){ const m = el('div', 'meta'); m.appendChild(el('span', '', 'رقم الاجتماع: ' + h.id + ' ')); m.appendChild(zmCopyBtn(h.url)); w.appendChild(m); } L.appendChild(w); });
+}
+async function zcSave(create){ const cfg = { acc:$('zcAcc').value.trim(), cid:$('zcCid').value.trim(), sec:$('zcSec').value.trim(), sdk:$('zcSdk').value.trim(), sdkSec:$('zcSdkSec').value.trim() };
+  const r = await cpCall({ action:'zmCfgSave', cfg:cfg, test:1, create:create ? 1 : 0 }, 'zcMsg'); if (r && r.ok){ ZC = r; fillZc(); msg('zcMsg', r.msg, 'ok'); } }
+$('zcSave').onclick = () => zcSave(false); $('zcCreate').onclick = () => zcSave(true);
 
 /* ---------- الإعدادات: تعديل البيانات ---------- */
 function openMe(){
