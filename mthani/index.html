@@ -5014,13 +5014,8 @@ function renderRefForm(k){
     ca.onchange = () => lst.querySelectorAll('input').forEach(c => c.checked = ca.checked);
     f.appendChild(lst); F.sids = () => [...lst.querySelectorAll('input:checked')].map(c => c.value);
     F.stages = () => { const o = {}; F.sids().forEach(k => o[k] = stv[k] || ''); return o; };
-    f.appendChild(lab('اتجاه الحفظ')); const dir = selBox(['من الناس', 'من الفاتحة']); f.appendChild(dir); F.dir = dir.get;
     f.appendChild(lab('جاهزية الطالب في رأي المعلم', true)); const rd = selBox(['ممتاز', 'جيد جداً', 'جيد']); f.appendChild(rd); F.ready = rd.get;
     f.appendChild(lab('عدد مرات مراجعة المقدار كاملاً')); const rv = el('input'); rv.type = 'number'; rv.min = 0; rv.max = 99; rv.inputMode = 'numeric'; f.appendChild(rv); F.reviews = () => rv.value;
-    f.appendChild(lab('هل اختُبر في هذه المرحلية من قبل؟')); const pv = selBox(['لا', 'نعم']); pv.set('لا'); f.appendChild(pv); F.prev = pv.get;
-    const pi = el('input'); pi.placeholder = 'تاريخ الاختبار السابق ونتيجته'; pi.maxLength = 200; pi.className = 'hidden'; pi.style.marginTop = '8px'; f.appendChild(pi); F.prevInfo = () => pi.value.trim();
-    pv.onpick = () => pi.classList.toggle('hidden', pv.get() !== 'نعم');
-    f.appendChild(lab('الأيام المناسبة للاختبار')); const dy = selBox(['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'], true); f.appendChild(dy); F.days = dy.get;
     f.appendChild(lab('الأوقات المناسبة')); const tm = el('input'); tm.placeholder = 'مثال: بعد العصر'; tm.maxLength = 200; f.appendChild(tm); F.times = () => tm.value.trim();
     f.appendChild(lab('ملاحظات')); const nt = el('textarea', 'rftxt'); nt.maxLength = 800; f.appendChild(nt); F.notes = () => nt.value.trim();
     f.appendChild(el('div', 'rfauto', 'يُرفق تلقائياً: آخر ما حفظه الطالب ومتوسط درجات المراجعة في آخر 30 يوماً.'));
