@@ -1971,8 +1971,8 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && ['ann.manage', 'refs.students', 'reports.students', 'refs.edu', 'reports.edu'].some(k => P.indexOf(k) !== -1)) TABS.push(['ann', 'الإعلانات']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1){ TABS.push(['msgs', 'رسائل أولياء الأمور']); TABS.push(['msgsStaff', 'رسائل الموظفين']); TABS.push(['msgArc', 'أرشيف الرسائل']); }
-  if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['cands', 'الطلاب المرشحون']); TABS.push(['assocNom', 'ترشيح طالب لاختبار الجمعية']); TABS.push(['planF', 'متابعة الخطط']); }
-  else if (r.roles.indexOf('admin') === -1 && P.indexOf('assoc.nominate') !== -1){ TABS.push(['cands', 'الطلاب المرشحون']); TABS.push(['assocNom', 'ترشيح طالب لاختبار الجمعية']); }
+  if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['cands', 'الطلاب المرشحون']); TABS.push(['assocNom', 'ترشيح طالب لاختبار الجمعية']); TABS.push(['exGrp', 'المختبرون']); TABS.push(['planF', 'متابعة الخطط']); }
+  else if (r.roles.indexOf('admin') === -1 && P.indexOf('assoc.nominate') !== -1){ TABS.push(['cands', 'الطلاب المرشحون']); TABS.push(['assocNom', 'ترشيح طالب لاختبار الجمعية']); TABS.push(['exGrp', 'المختبرون']); }
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
   if (r.roles.indexOf('admin') !== -1 || P.indexOf('halaqat.reports_all') !== -1) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
@@ -2002,7 +2002,7 @@ const ADMIN_NAV = [
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير الحضور'], ['staffFile', 'ملف الموظف (التقرير الشامل)'], ['tchPerf', 'أداء المعلمين'], ['courses', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['tvCfg', 'شاشة العرض']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['planF', 'شاشة عرض متابعة الخطط']] },
-  { t:'الاختبارات', ic:'exam', items:[['cands', 'الطلاب المرشحون'], ['assocNom', 'ترشيح طالب لاختبار الجمعية']] },
+  { t:'الاختبارات', ic:'exam', items:[['cands', 'الطلاب المرشحون'], ['assocNom', 'ترشيح طالب لاختبار الجمعية'], ['exGrp', 'المختبرون']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'المعاملات', ic:'exam', items:[['trxIn', 'المعاملات الواردة'], ['trxMemo', 'التعاميم والمذكرات']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع']] },
@@ -2072,8 +2072,9 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
-  $('pAssoc').classList.toggle('hidden', r !== 'preTest' && r !== 'assocNom');
-  if (r === 'preTest' || r === 'assocNom') openAssoc(r);
+  $('pAssoc').classList.toggle('hidden', r !== 'preTest' && r !== 'assocNom' && r !== 'exGrp');
+  if (r === 'exGrp'){ asMode = 'assocNom'; asT = 'batch'; openAssoc('assocNom'); }
+  else if (r === 'preTest' || r === 'assocNom'){ if (r === 'assocNom' && asT === 'batch') asT = 'nom'; openAssoc(r); }
   $('pStrug').classList.toggle('hidden', r !== 'strug');
   if (r === 'strug') openStrug();
   $('pPlanF').classList.toggle('hidden', r !== 'planF');
