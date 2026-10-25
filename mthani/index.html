@@ -648,6 +648,48 @@
   table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
   th,td{padding:7px 4px;text-align:center;border-bottom:1px solid var(--line)}
   th{color:var(--muted);font-weight:500} td:first-child,th:first-child{text-align:right}
+  /* ===================== رسوم التقارير ===================== */
+  .chgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px;margin-bottom:12px}
+  .chgrid > .card{margin:0}
+  .chcard h3{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:16px;color:var(--navy)} .chcard h3 small{margin-inline-start:auto;font-weight:400;font-size:12px}
+  @media (prefers-color-scheme: dark){ .chcard h3{color:#C9DCEA} }
+  .chseg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+  .chseg button{padding:7px 13px;border-radius:999px;background:var(--light);color:var(--muted);font-size:13px;font-weight:700;border:1px solid transparent}
+  .chseg button.on{background:var(--navy);color:#fff;box-shadow:0 4px 10px rgba(59,95,120,.25)}
+  .chbars{display:flex;flex-direction:column;gap:7px}
+  .chb{display:grid;grid-template-columns:minmax(90px,30%) 1fr auto;align-items:center;gap:10px;font-size:13.5px}
+  .chb.click{cursor:pointer;border-radius:10px} .chb.click:hover{background:rgba(59,95,120,.06)}
+  .chb .l{min-width:0} .chb .l b{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .chb .l small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+  .chb .tr{height:14px;border-radius:99px;background:rgba(59,95,120,.08);overflow:hidden;display:flex;position:relative}
+  .chb .tr s{position:absolute;top:0;bottom:0;width:3px;margin-right:-1.5px;background:var(--text);opacity:.55;border-radius:2px}
+  .chb .tr i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#2C4A60,#5C87A3);transform-origin:right;animation:chgrow .7s cubic-bezier(.2,.7,.2,1) backwards}
+  .chb .tr.stk i{border-radius:0} .chb .tr.stk i:first-child{border-radius:0 99px 99px 0} .chb .tr.stk i:last-child{border-radius:99px 0 0 99px} .chb .tr.stk i:only-child{border-radius:99px}
+  .chb > b{font-size:13px;min-width:42px;text-align:left;white-space:nowrap}
+  .chb .tr i.g{background:linear-gradient(90deg,#1F6B48,#3E9A6E)} .chb .tr i.y{background:linear-gradient(90deg,#B87A1F,#E9B25A)} .chb .tr i.r{background:linear-gradient(90deg,#9A1F18,#D9574D)} .chb .tr i.n{background:#C9CED3}
+  @keyframes chgrow{from{transform:scaleX(0)}}
+  @media (max-width:520px){ .chb{grid-template-columns:minmax(80px,34%) 1fr auto;gap:7px;font-size:12.5px} }
+  .chleg{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 10px;font-size:12.5px;color:var(--muted)} .chleg span{display:inline-flex;align-items:center;gap:5px} .chleg i{width:10px;height:10px;border-radius:4px;display:inline-block}
+  .chdonut{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
+  .chdonut svg{width:150px;height:150px;flex:none} .chdonut svg text{font-family:Tajawal,sans-serif;fill:var(--text);font-weight:700}
+  .chdonut svg circle.s{transition:stroke-dasharray .9s cubic-bezier(.2,.7,.2,1)}
+  .chdonut ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;min-width:150px;flex:1}
+  .chdonut li{display:flex;align-items:center;gap:8px;font-size:13.5px} .chdonut li i{width:12px;height:12px;border-radius:4px;flex:none} .chdonut li b{margin-inline-start:auto} .chdonut li small{display:inline;color:var(--muted);margin-inline-start:4px}
+  .chempty{padding:18px;text-align:center;color:var(--muted);font-size:14px}
+  .chline{position:relative;height:190px;margin:6px 0 0 34px}
+  .chline svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .chline .gy{position:absolute;left:-34px;right:0;border-top:1px dashed rgba(31,53,70,.12);font-size:10.5px;color:var(--muted)} .chline .gy span{position:absolute;left:0;top:-8px;width:28px;text-align:left}
+  .chline .dot{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#fff;border:2.5px solid var(--navy);cursor:default}
+  .chline .dot:hover{transform:scale(1.4)}
+  .chlx{display:flex;justify-content:space-between;margin:6px 0 0 34px;font-size:11px;color:var(--muted)}
+  .chcal{display:flex;flex-wrap:wrap;gap:4px;direction:rtl}
+  .chcal i{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-style:normal;color:#fff;font-weight:700;cursor:default}
+  .chkv{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:12px}
+  .chkv div{padding:10px 12px;border-radius:14px;background:var(--light)} .chkv b{display:block;font-size:22px;color:var(--navy);line-height:1.2} .chkv span{font-size:12px;color:var(--muted)}
+  @media (prefers-color-scheme: dark){ .chkv b{color:#9CC1DC} }
+  .chmore{margin-top:10px;background:none;color:var(--navy);font-weight:700;font-size:13px;padding:6px 0}
+  body.g2 .chseg button{background:rgba(255,255,255,.55);border-color:var(--glb)} body.g2 .chseg button.on{background:linear-gradient(135deg,#46708C,#1F3546);color:#fff}
+  body.g2 .chkv div{background:rgba(255,255,255,.45);border:1px solid var(--glb);border-radius:18px}
+  @media print{ #dsPrint *{animation:none!important;transition:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact} #dsPrint .chgrid{grid-template-columns:1fr 1fr} #dsPrint .chb .tr{border:1px solid #ccc} }
   /* ===================== الواجهة الزجاجية (g2) ===================== */
   .g2only{display:none!important}
   body.g2 .g2only:not(.hidden){display:block!important}
@@ -1023,8 +1065,8 @@
         <div class="stact"><button id="pfXls">تصدير Excel</button></div>
       </div>
       <div class="card"><div class="kpis" id="pfKpi"></div><div class="pfgrid" id="pfTypes"></div></div>
-      <div class="card"><h2>الحلقات</h2><div class="dtw"><table class="dtbl" id="pfHalT"></table></div></div>
-      <div class="card"><h2>الطلاب</h2><div class="stchips" id="pfSum"></div><div class="dtw"><table class="dtbl" id="pfTbl"></table></div></div>
+      <div class="chgrid"><div class="card chcard"><h3>إنجاز الحلقات<small>الخط الرأسي = المتوقع حتى اليوم</small></h3><div id="pfHalT"></div></div><div class="card chcard"><h3>حالة الخطط</h3><div id="pfDon"></div></div></div>
+      <div class="card chcard"><h3>الطلاب<small>مرتبون من الأكثر تأخراً • اضغط الاسم لملف الطالب</small></h3><div class="stchips" id="pfSum"></div><div id="pfTbl" style="margin-top:10px"></div></div>
       <div class="card" id="pfNo"></div>
     </div>
 
@@ -1182,7 +1224,7 @@
         <div class="card" id="crBox"></div>
       </div>
       <div id="crSumBox" class="hidden">
-        <div class="card"><input id="crQ" placeholder="ابحث باسم الموظف"><div class="dtw"><table class="dtbl" id="crTbl"></table></div><div class="stact"><button id="crXls">تصدير Excel</button></div></div>
+        <div class="card"><input id="crQ" placeholder="ابحث باسم الموظف"><div id="crTbl" style="margin-top:12px"></div><div class="stact"><button id="crXls">تصدير Excel</button></div></div>
       </div>
     </div>
 
@@ -1198,7 +1240,7 @@
         <div class="stact"><button id="saAllBtn" class="hidden">← كل الموظفين</button><button id="saXls">تصدير Excel</button><button id="saPdf">تصدير PDF</button></div>
       </div>
       <div class="card"><div class="kpis" id="saKpi"></div></div>
-      <div class="card"><h2 id="saTblT">الموظفون</h2><div class="dtw"><table class="dtbl" id="saTbl"></table></div></div>
+      <div class="card chcard"><h3 id="saTblT">الموظفون</h3><div id="saTbl"></div></div>
     </div>
 
     <!-- أداء المعلمين -->
@@ -1213,7 +1255,7 @@
       </div>
       <div class="card"><div class="kpis" id="tcKpi"></div></div>
       <div class="card" id="tcRank"></div>
-      <div class="card"><h2 id="tcTblT">تفاصيل المؤشرات</h2><div class="dtw"><table class="dtbl" id="tcTbl"></table></div></div>
+      <div class="card chcard"><h3 id="tcTblT">تفاصيل المؤشرات</h3><div id="tcTbl"></div></div>
     </div>
 
     <!-- شاشة العرض العامة (تلفزيون الجامع) -->
@@ -1265,9 +1307,10 @@
       <div class="card"><div class="kpis" id="dsKpi"></div></div>
       <div class="card g2only"><h2>مؤشرات الأداء</h2><div class="rings" id="dsRings"></div></div>
       <div class="card" id="dsChartC"><h2 id="dsChartT">الحضور والتسميع</h2><div id="dsChart"></div></div>
-      <div class="card"><h2>الحلقات</h2><div class="dtw"><table class="dtbl" id="dsHalT"></table></div></div>
+      <div class="chgrid" id="dsDon"></div>
+      <div class="card chcard" id="dsHalT"></div>
       <div class="card"><div class="duo"><div><h2>الأفضل</h2><div id="dsBest"></div></div><div><h2>يحتاجون متابعة</h2><div id="dsWeak"></div></div></div></div>
-      <div class="card"><h2>تقرير الطلاب الشامل</h2><input id="dsQ" placeholder="ابحث باسم الطالب"><div class="dtw"><table class="dtbl" id="dsStuT"></table></div></div>
+      <div class="card chcard"><h3>تقرير الطلاب الشامل</h3><div id="dsStuS"></div><input id="dsQ" placeholder="ابحث باسم الطالب" style="margin-bottom:12px"><div id="dsStuT"></div></div>
     </div>
 
     <!-- نقل الطلاب بين الحلقات -->
@@ -3468,18 +3511,16 @@ function renderPlanF(){
     c.appendChild(pbar(pct, ep)); const st = el('div', 'rfpills'); st.style.marginTop = '8px';
     ['متقدم', 'على المسار', 'متأخر', 'متأخر جداً'].forEach(s0 => { const n = L.filter(x => x.state === s0).length; if (n) st.appendChild(el('span', 'pill ' + (s0 === 'متأخر جداً' ? 'p-red' : s0 === 'متأخر' ? 'p-late' : 'p-ok'), s0 + ' ' + n)); }); c.appendChild(st); tw.appendChild(c); });
   const hm = {}; live.forEach(x => { const h = hm[x.hname] = hm[x.hname] || { name:x.hname, teacher:x.teacher, n:0, t:0, d:0, e:0, late:0 }; h.n++; h.t += pg(x, 'target'); h.d += pg(x, 'done'); h.e += pg(x, 'expect'); if (/متأخر/.test(x.state)) h.late++; });
-  const ht = $('pfHalT'); ht.innerHTML = '<thead><tr><th>الحلقة</th><th>المعلم</th><th>الخطط</th><th>المستهدف</th><th>المنجز</th><th>الإنجاز</th><th>المتوقع</th><th>متأخرة</th></tr></thead>'; const hb = el('tbody');
-  Object.values(hm).sort((a, b) => (b.t ? b.d / b.t : 0) - (a.t ? a.d / a.t : 0)).forEach(h => { const tr = el('tr'), p = h.t ? Math.round(h.d / h.t * 100) : 0, e = h.t ? Math.round(h.e / h.t * 100) : 0;
-    [[h.name, 'nm'], [h.teacher], [h.n], [fmtPg(h.t)], [fmtPg(h.d)], [p + '%', lvPl(p)], [e + '%'], [h.late || '—', h.late ? 'lv-r' : '']].forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); hb.appendChild(tr); });
-  ht.appendChild(hb);
+  const pcl = (p, e) => p >= e - 10 ? 'g' : p >= e - 25 ? 'y' : 'r';
+  const ht = $('pfHalT'); ht.innerHTML = ''; ht.appendChild(chBars(Object.values(hm).map(h => { const p = h.t ? Math.round(h.d / h.t * 100) : 0, e = h.t ? Math.round(h.e / h.t * 100) : 0;
+    return { label:h.name, sub:h.teacher + ' • ' + h.n + ' خطة' + (h.late ? ' • متأخرة ' + h.late : ''), value:p, mark:e, text:p + '%', cls:pcl(p, e), title:h.name + ': المنجز ' + fmtPg(h.d) + ' من ' + fmtPg(h.t) + ' (' + p + '%) • المتوقع ' + e + '%' }; }).sort((a, b) => b.value - a.value), { max:100, empty:'لا توجد خطط.' }));
+  const dn0 = $('pfDon'); dn0.innerHTML = ''; const stc = { 'متقدم':CHC.teal, 'على المسار':CHC.ok, 'مكتملة':CHC.navy, 'متأخر':CHC.gold, 'متأخر جداً':CHC.abs, 'لم تبدأ':CHC.none, 'خطة قديمة (تحتاج تحديث)':CHC.purple };
+  dn0.appendChild(chDonut(PF_ST.map(x => [x, base.filter(y => y.state === x).length, stc[x]]).filter(x => x[1]), base.length, 'خطة'));
   const sm = $('pfSum'); sm.innerHTML = ''; [['', 'الكل']].concat(PF_ST.map(x => [x, x])).forEach(x => { const n = base.filter(y => !x[0] || y.state === x[0]).length; if (x[0] && !n) return; const b = el('button', pfS === x[0] ? 'on' : '', x[1] + ' (' + n + ')'); b.onclick = () => { pfS = x[0]; renderPlanF(); }; sm.appendChild(b); });
-  const t = $('pfTbl'); t.innerHTML = '<thead><tr><th>الطالب</th><th>الحلقة</th><th>النوع</th><th>يومياً</th><th>الهدف</th><th>المنجز</th><th>الإنجاز</th><th>المتوقع</th><th>الحالة</th><th>المتبقي</th></tr></thead>'; const tb = el('tbody');
-  sortBy(base.filter(x => !pfS || x.state === pfS), 'gap', 1).forEach(x => { const tr = el('tr'), nm = el('td', 'nm', x.name); nm.onclick = () => goFile(x.sid); tr.appendChild(nm);
-    if (x.legacy){ [[x.hname], [x.type], [x.daily + ' آية'], ['—'], ['—'], [x.pct == null ? '—' : x.pct + '%'], ['—'], [x.state, PF_CLS[x.state]], ['—']].forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tb.appendChild(tr); return; }
-    const pc = el('td', lvPl(x.pct), (x.pct || 0) + '%');
-    [[x.hname], [x.type], [fmtAmt(x.unit, x.daily)], [fmtAmt(x.unit, x.target) + ' / ' + fmtDays(x.days)], [fmtAmt(x.unit, x.done)]].forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tr.appendChild(pc);
-    [[(x.exp || 0) + '%'], [x.state, PF_CLS[x.state]], [fmtDays(x.left)]].forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tb.appendChild(tr); });
-  t.appendChild(tb);
+  const t = $('pfTbl'); t.innerHTML = '';
+  t.appendChild(chTop(sortBy(base.filter(x => !pfS || x.state === pfS), 'gap', 1).map(x => x.legacy ? { label:x.name, sub:x.hname + ' • ' + x.type + ' • ' + x.state, value:x.pct, text:x.pct == null ? '—' : x.pct + '%', cls:'y', onclick:() => goFile(x.sid) }
+    : { label:x.name, sub:x.hname + ' • ' + x.type + ' • ' + x.state + ' • متبقٍ ' + fmtDays(x.left), value:x.pct || 0, mark:x.exp || 0, text:(x.pct || 0) + '%', cls:lvC(PF_CLS[x.state]) || 'n', onclick:() => goFile(x.sid),
+      title:x.name + ' — ' + x.type + ': يومياً ' + fmtAmt(x.unit, x.daily) + ' • الهدف ' + fmtAmt(x.unit, x.target) + ' • المنجز ' + fmtAmt(x.unit, x.done) + ' (' + (x.pct || 0) + '%) • المتوقع ' + (x.exp || 0) + '% • ' + x.state }), 15, { max:100, empty:'لا توجد خطط.' }));
   const no = $('pfNo'); no.innerHTML = ''; no.appendChild(el('h2', '', 'طلاب بلا خطة (' + PF.noPlan.length + ')')); if (PF.noPlan.length) no.appendChild(el('small', '', PF.noPlan.map(x => x.name + ' (' + x.hname + ')').join('، ')));
 }
 $('pfHal').onchange = openPlanF; $('pfType').onchange = () => PF && renderPlanF(); $('pfQ').oninput = () => PF && renderPlanF();
@@ -3502,10 +3543,12 @@ function renderMsgArc(){
     const k = el('div', 'kpis'); k.style.marginTop = '8px'; const kp = (v, l, c) => { const d = el('div', 'kpi ' + (c || '')); d.appendChild(el('b', '', v)); d.appendChild(el('span', '', l)); k.appendChild(d); };
     kp(MA.total, 'كل الرسائل'); kp(MA.byStatus['أُرسلت'] || 0, 'أُرسلت', 'g'); kp(MA.byStatus['فشلت'] || 0, 'فشلت', (MA.byStatus['فشلت'] || 0) ? 'r' : ''); kp(MA.byStatus['في الانتظار'] || 0, 'في الانتظار', 'y'); b.appendChild(k);
     const sent = (MA.byStatus['أُرسلت'] || 0), fin = sent + (MA.byStatus['فشلت'] || 0); b.appendChild(el('div', 'slabel c-ok', 'نسبة نجاح الإرسال: ' + (fin ? Math.round(sent / fin * 100) + '%' : '—')));
-    b.appendChild(el('div', 'rfsec', 'حسب النوع')); const t = el('table', 'dtbl'); t.innerHTML = '<thead><tr><th>النوع</th><th>الكل</th><th>أُرسلت</th><th>فشلت</th><th>في الانتظار</th></tr></thead>'; const tb = el('tbody');
-    Object.keys(MA.byKind).sort((x, y) => MA.byKind[y].total - MA.byKind[x].total).forEach(kd => { const o = MA.byKind[kd], tr = el('tr'); [kd, o.total, o.ok, o.fail, o.wait].forEach((v, i) => tr.appendChild(el('td', i === 3 && v ? 'lv-r' : '', v))); tb.appendChild(tr); });
-    t.appendChild(tb); const w = el('div', 'dtw'); w.appendChild(t); b.appendChild(w);
-    if (MA.byDay.length > 1){ b.appendChild(el('div', 'rfsec', 'عدد الرسائل يومياً')); const mx = Math.max(...MA.byDay.map(x => x.n)), c = el('div', 'chart'); MA.byDay.forEach(x => { const d = el('div'); d.style.height = Math.max(3, x.n / mx * 100) + '%'; d.title = x.d + ': ' + x.n; c.appendChild(d); }); b.appendChild(c); }
+    const g = el('div', 'chgrid'); g.style.marginTop = '12px'; b.appendChild(g);
+    const c1 = chCard('حالة الرسائل'); c1.appendChild(chDonut([['أُرسلت', MA.byStatus['أُرسلت'] || 0, CHC.ok], ['فشلت', MA.byStatus['فشلت'] || 0, CHC.abs], ['في الانتظار', MA.byStatus['في الانتظار'] || 0, CHC.gold]], MA.total, 'رسالة')); g.appendChild(c1);
+    const ks = Object.keys(MA.byKind).sort((x, y) => MA.byKind[y].total - MA.byKind[x].total), kc = [CHC.navy, CHC.gold, CHC.teal, CHC.purple, CHC.exc, CHC.ok];
+    const c2 = chCard('حسب نوع الرسالة'); c2.appendChild(chDonut(ks.map((k, i) => [k, MA.byKind[k].total, kc[i % kc.length]]), MA.total, 'رسالة')); g.appendChild(c2);
+    const c3 = chCard('نتيجة الإرسال لكل نوع'); c3.appendChild(chStack(ks.map(k => ({ label:k, parts:{ ok:MA.byKind[k].ok, fail:MA.byKind[k].fail, wait:MA.byKind[k].wait } })), [['ok', 'أُرسلت', CHC.ok], ['fail', 'فشلت', CHC.abs], ['wait', 'في الانتظار', CHC.gold]], { empty:'لا توجد رسائل.' })); b.appendChild(c3);
+    if (MA.byDay.length > 1){ const c4 = chCard('عدد الرسائل يومياً'); c4.style.marginTop = '12px'; c4.appendChild(chLine(MA.byDay.slice().sort((x, y) => x.d.localeCompare(y.d)).map(x => ({ x:fmtD(x.d, { day:'numeric', month:'short' }), y:x.n, title:x.d + ': ' + x.n + ' رسالة' })), { id:'ma' })); b.appendChild(c4); }
     return;
   }
   if (maT === 'arc' && !maCid){
@@ -3978,11 +4021,9 @@ function efSection(k, b){
   }
   if (k === 'att'){
     const A = EF.att; if (!A){ b.appendChild(el('small', '', EF.attErr || 'لا توجد بيانات حضور.')); return; }
-    const tl = el('div', 'tiles'); [[A.present, 'حضور', 't-ok'], [A.late, 'تأخير', 't-late'], [A.absent, 'غياب', 't-abs'], [A.leave, 'إجازة', 't-nav']].forEach(x => tl.appendChild(tile(x[0], x[1], x[2]))); b.appendChild(tl);
+    { const g = el('div', 'chgrid'); b.appendChild(g); const c1 = chCard('توزيع أيام الدوام'); c1.appendChild(chDonut([['حضور في الوقت', Math.max(0, A.present - A.late), CHC.ok], ['تأخير', A.late, CHC.late], ['غياب', A.absent, CHC.abs], ['إجازة', A.leave, CHC.exc]], A.pct == null ? '—' : A.pct + '%', 'نسبة الحضور')); g.appendChild(c1);
+      if (A.days && A.days.length){ const c2 = chCard('تقويم الحضور'); c2.appendChild(chCal(A.days.slice().sort((x, y) => x.date.localeCompare(y.date)).map(d => ({ d:d.date, color:d.status === 'غائب' ? CHC.abs : d.late ? CHC.late : d.in ? CHC.ok : /إجازة/.test(d.status) ? CHC.exc : CHC.none, title:d.status + (d.in ? ' • ' + d.in : '') + (d.late ? ' • تأخير ' + d.late + ' د' : '') })), [['', 'حاضر', CHC.ok], ['', 'متأخر', CHC.late], ['', 'غائب', CHC.abs], ['', 'إجازة', CHC.exc]])); g.appendChild(c2); } }
     b.appendChild(kvBox([['أيام الدوام المقررة', A.required], ['نسبة الحضور', A.pct == null ? '—' : A.pct + '%'], ['دقائق التأخير', A.lateMin + (EF.grace ? ' (بعد سماح ' + EF.grace + ' دقيقة)' : '')], ['الخروج المبكر', A.early + ' مرة • ' + A.earlyMin + ' دقيقة'], ['ساعات العمل', A.hours], ['لم يسجّل الانصراف', A.noOut]]));
-    if (A.days && A.days.length){ const w = el('div', 'dtw'), t = el('table', 'dtbl'); t.innerHTML = '<thead><tr><th>التاريخ</th><th>الحالة</th><th>الحضور</th><th>الانصراف</th><th>التأخير</th><th>الساعات</th></tr></thead>'; const tb = el('tbody');
-      A.days.forEach(d => { const tr = el('tr'); tr.appendChild(el('td', '', fmtD(d.date, { weekday:'short', day:'numeric', month:'short' }))); tr.appendChild(el('td', d.status === 'غائب' ? 'lv-r' : d.late ? 'lv-y' : d.in ? 'lv-g' : '', d.status)); [d.in || '—', d.out || (d.in ? 'لم يسجّل' : '—'), d.late || '', d.hours || ''].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); });
-      t.appendChild(tb); w.appendChild(t); b.appendChild(w); }
     return;
   }
   if (k === 'perf'){
@@ -3990,9 +4031,9 @@ function efSection(k, b){
     b.appendChild(el('div', 'slabel ' + lvSc(T.score).replace('lv-', 'c-').replace('c-g', 'c-ok').replace('c-y', 'c-late').replace('c-r', 'c-abs'), 'مؤشر الأداء: ' + (T.score == null ? '—' : T.score + ' من 100')));
     b.appendChild(kvBox([['الحلقات', T.halaqat.join('، ')], ['الطلاب', T.students], ['الاعتماد', T.approved + ' من ' + T.need + (T.apprPct != null ? ' (' + T.apprPct + '%)' : '')], ['تغطية التسميع', T.cover == null ? '—' : T.cover + '%'], ['التسميع', T.recs + ' مرة'],
       ['الحفظ / المراجعة', T.hifz + ' / ' + T.mur + ' آية'], ['حضور الطلاب', T.att == null ? '—' : T.att + '%'], ['متوسط الدرجات', T.avg == null ? '—' : T.avg + ' من ' + D.maxScore], ['إنجاز الخطط', T.plan == null ? '—' : T.plan + '%'], ['الإحالات', T.refs], ['ترشيحات المرحلية', T.exams + (T.passed ? ' • اجتاز ' + T.passed : '')], ['منقطعون في حلقته', T.excluded]]));
-    if (T.days && T.days.length){ const w = el('div', 'dtw'), t = el('table', 'dtbl'); t.innerHTML = '<thead><tr><th>التاريخ</th><th>الاعتماد</th><th>الوقت</th><th>الحاضرون</th><th>التسميع</th></tr></thead>'; const tb = el('tbody');
-      T.days.forEach(d => { const tr = el('tr'); tr.appendChild(el('td', '', fmtD(d.date, { weekday:'short', day:'numeric', month:'short' }))); tr.appendChild(el('td', d.approved >= d.of ? 'lv-g' : 'lv-r', d.approved >= d.of ? '✓' : '✗')); [d.at || '—', d.present, d.recs].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); });
-      t.appendChild(tb); w.appendChild(t); b.appendChild(w); }
+    if (T.days && T.days.length){ const Ds = T.days.slice().sort((x, y) => x.date.localeCompare(y.date)), g = el('div', 'chgrid'); b.appendChild(g);
+      const c1 = chCard('تقويم الاعتماد'); c1.appendChild(chCal(Ds.map(d => ({ d:d.date, color:d.approved >= d.of ? CHC.ok : d.approved ? CHC.late : CHC.abs, title:(d.approved >= d.of ? 'معتمد' : 'لم يُعتمد') + (d.at ? ' • ' + d.at : '') + ' • حاضرون ' + d.present + ' • تسميع ' + d.recs })), [['', 'معتمد', CHC.ok], ['', 'جزئي', CHC.late], ['', 'لم يُعتمد', CHC.abs]])); g.appendChild(c1);
+      const c2 = chCard('التسميع يومياً'); c2.appendChild(chLine(Ds.map(d => ({ x:fmtD(d.date, { day:'numeric', month:'short' }), y:d.recs, title:fmtD(d.date, { weekday:'long', day:'numeric', month:'short' }) + ': تسميع ' + d.recs + ' • حاضرون ' + d.present })), { id:'ef', color:CHC.gold })); g.appendChild(c2); }
     return;
   }
   if (k === 'courses'){
@@ -4065,8 +4106,11 @@ $('trSave').onclick = async () => {
   if (r && r.ok){ CR = r; toast(r.msg); $('trSheet').classList.add('hidden'); renderCourses(); renderCrSum(); }
 };
 function renderCrSum(){
-  const t = $('crTbl'), q = normAr($('crQ').value); t.innerHTML = '<thead><tr><th>الموظف</th><th>الصفة</th><th>الدورات المسجل فيها</th><th>الدورات المكتملة</th><th>ساعات التدريب</th></tr></thead>';
-  const tb = el('tbody'); sortBy(CR.summary.filter(x => !q || normAr(x.name).indexOf(q) !== -1), 'hours', -1).forEach(x => { const tr = el('tr'); [x.name, x.title, x.enrolled, x.done, x.hours].forEach((v, i) => tr.appendChild(el('td', i === 4 && v ? 'lv-g' : '', v))); tb.appendChild(tr); }); t.appendChild(tb);
+  const t = $('crTbl'), q = normAr($('crQ').value), L = CR.summary.filter(x => !q || normAr(x.name).indexOf(q) !== -1); t.innerHTML = '';
+  const g = el('div', 'chgrid'); t.appendChild(g); const sm = k => CR.summary.reduce((a, x) => a + (x[k] || 0), 0);
+  const c1 = chCard('حالة التسجيل'); c1.appendChild(chDonut([['أكملوا', sm('done'), CHC.ok], ['لم يكملوا بعد', Math.max(0, sm('enrolled') - sm('done')), CHC.gold]], sm('enrolled'), 'تسجيل')); g.appendChild(c1);
+  const c2 = chCard('ساعات التدريب لكل موظف'); c2.appendChild(chTop(sortBy(L, 'hours', -1).map(x => ({ label:x.name, sub:x.title + ' • مسجل ' + x.enrolled + ' • أكمل ' + x.done, value:x.hours, text:x.hours + ' ساعة', cls:x.hours ? 'g' : '' })), 15, { empty:'لا يوجد موظفون.' })); g.appendChild(c2);
+  const c3 = chCard('الدورات لكل موظف'); c3.appendChild(chStack(sortBy(L, 'enrolled', -1).slice(0, 15).map(x => ({ label:x.name, sub:x.title, parts:{ done:x.done, rest:Math.max(0, x.enrolled - x.done) } })), [['done', 'مكتملة', CHC.ok], ['rest', 'غير مكتملة', CHC.gold]], { empty:'لا يوجد موظفون.' })); t.appendChild(c3);
 }
 $('crQ').oninput = () => CR && renderCrSum();
 $('crXls').onclick = () => {
@@ -4102,25 +4146,32 @@ function renderSAtt(){
   const sum = f => L.reduce((a, x) => a + (x[f] || 0), 0), req = sum('required'), pr = sum('present'), ab = sum('absent');
   if (day){ const due = L.filter(x => x.required).length; kp(due, 'عليهم دوام اليوم'); kp(pr, 'حضروا', 'g'); kp(sum('late'), 'متأخرون', sum('late') ? 'y' : ''); kp(L.filter(x => x.required && !x.present && !x.leave).length, day && SA.to === D.today ? 'لم يحضروا بعد' : 'غائبون', 'r'); }
   else { kp(L.length, 'الموظفون'); const pc = pr + ab ? Math.round(pr / (pr + ab) * 100) : null; kp(pc == null ? null : pc + '%', 'نسبة الحضور', pc == null ? '' : pc >= 90 ? 'g' : pc >= 75 ? 'y' : 'r'); kp(sum('late'), 'مرات التأخير', 'y', sum('lateMin') + ' دقيقة'); kp(ab, 'أيام الغياب', ab ? 'r' : '', 'إجازات معتمدة: ' + sum('leave')); }
-  const t = $('saTbl'); t.innerHTML = '';
+  const t = $('saTbl'); t.innerHTML = ''; const SC = { 'حاضر':CHC.ok, 'متأخر':CHC.late, 'غائب':CHC.abs, 'إجازة':CHC.exc, 'لم يحضر بعد':CHC.none };
+  const stCol = v => /غائب|لم يحضر/.test(v || '') ? CHC.abs : /متأخر/.test(v || '') ? CHC.late : /حاضر/.test(v || '') ? CHC.ok : /إجازة|استئذان/.test(v || '') ? CHC.exc : CHC.none;
   if (saOne && L[0]){
-    const E = L[0]; $('saTblT').textContent = E.name + ' • ' + E.title + (E.shift ? ' • ' + E.shift : '');
-    t.innerHTML = '<thead><tr><th>التاريخ</th><th>الحالة</th><th>الحضور</th><th>الانصراف</th><th>التأخير (د)</th><th>الخروج المبكر (د)</th><th>الساعات</th><th>الإثبات</th></tr></thead>';
-    const tb = el('tbody'); (E.days || []).forEach(d => { const tr = el('tr'); tr.appendChild(el('td', '', fmtD(d.date, { weekday:'short', day:'numeric', month:'short' })));
-      tr.appendChild(el('td', d.status === 'غائب' ? 'lv-r' : d.status === 'متأخر' || d.late ? 'lv-y' : d.in ? 'lv-g' : '', d.status));
-      [d.in || '—', d.out || (d.in ? 'لم يسجّل' : '—'), d.late || '', d.early || '', d.hours || '', d.method || ''].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); });
-    if (!(E.days || []).length){ const tr = el('tr'), td = el('td', '', 'لا توجد أيام دوام في هذه الفترة.'); td.colSpan = 8; tr.appendChild(td); tb.appendChild(tr); }
-    t.appendChild(tb); return;
+    const E = L[0], Ds = (E.days || []).slice().sort((a, b) => a.date.localeCompare(b.date)); $('saTblT').textContent = E.name + ' • ' + E.title + (E.shift ? ' • ' + E.shift : '');
+    if (!Ds.length){ t.appendChild(el('div', 'chempty', 'لا توجد أيام دوام في هذه الفترة.')); return; }
+    const g = el('div', 'chgrid'); t.appendChild(g);
+    const c1 = chCard('تقويم الحضور'); c1.appendChild(chCal(Ds.map(d => ({ d:d.date, color:d.late && d.status !== 'غائب' ? CHC.late : stCol(d.status), title:d.status + (d.in ? ' • حضور ' + d.in : '') + (d.out ? ' • انصراف ' + d.out : '') + (d.late ? ' • تأخير ' + d.late + ' د' : '') + (d.hours ? ' • ' + d.hours + ' ساعة' : '') })), [['', 'حاضر', CHC.ok], ['', 'متأخر', CHC.late], ['', 'غائب', CHC.abs], ['', 'إجازة', CHC.exc]])); g.appendChild(c1);
+    const n = k => Ds.filter(d => k(d)).length, c2 = chCard('توزيع الأيام'); c2.appendChild(chDonut([['في الوقت', n(d => d.in && !d.late), CHC.ok], ['متأخر', n(d => d.in && d.late), CHC.late], ['غائب', n(d => d.status === 'غائب'), CHC.abs], ['إجازة', n(d => /إجازة/.test(d.status)), CHC.exc]], Ds.length, 'يوم دوام')); g.appendChild(c2);
+    const c3 = chCard('دقائق التأخير يومياً'); c3.appendChild(chLine(Ds.map(d => ({ x:fmtD(d.date, { day:'numeric', month:'short' }), y:d.in ? (d.late || 0) : null, title:fmtD(d.date, { weekday:'long', day:'numeric', month:'short' }) + ': تأخير ' + (d.late || 0) + ' د', color:d.late ? CHC.late : CHC.ok })), { color:CHC.gold, id:'sl', empty:'لا يوجد حضور مسجل.' })); g.appendChild(c3);
+    const c4 = chCard('ساعات العمل يومياً'); c4.appendChild(chLine(Ds.map(d => ({ x:fmtD(d.date, { day:'numeric', month:'short' }), y:d.hours ? +d.hours : null, title:fmtD(d.date, { weekday:'long', day:'numeric', month:'short' }) + ': ' + (d.hours || 0) + ' ساعة' })), { id:'sh', empty:'لا توجد ساعات مسجلة.' })); g.appendChild(c4);
+    return;
   }
+  const q = normAr($('saQ').value), F = L.filter(x => !q || normAr(x.name).indexOf(q) !== -1);
   $('saTblT').textContent = 'الموظفون (' + L.length + ')';
-  const cols = day ? [['name', 'الموظف'], ['today', 'حالة اليوم'], ['lateMin', 'دقائق التأخير'], ['title', 'الصفة']]
-    : [['name', 'الموظف'], ['title', 'الصفة'], ['required', 'أيام الدوام'], ['present', 'حضور'], ['late', 'تأخير'], ['lateMin', 'دقائق التأخير'], ['early', 'خروج مبكر'], ['absent', 'غياب'], ['leave', 'إجازات'], ['hours', 'ساعات العمل'], ['noOut', 'بلا انصراف'], ['pct', 'الحضور %']];
-  const tr = el('tr'); cols.forEach(c => { const th = el('th', saSort[0] === c[0] ? 's' + (saSort[1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { saSort = [c[0], saSort[0] === c[0] ? -saSort[1] : (c[0] === 'name' || c[0] === 'title' ? 1 : -1)]; renderSAtt(); }; tr.appendChild(th); });
-  const th = el('thead'); th.appendChild(tr); t.appendChild(th); const tb = el('tbody'), q = normAr($('saQ').value);
-  sortBy(L.filter(x => !q || normAr(x.name).indexOf(q) !== -1), saSort[0], saSort[1]).forEach(E => { const r = el('tr'); cols.forEach((c, i) => { const v = E[c[0]];
-    const cls = c[0] === 'pct' ? lvAtt(v) : c[0] === 'absent' && v ? 'lv-r' : c[0] === 'late' && v ? 'lv-y' : c[0] === 'today' ? (/غائب|لم يحضر/.test(v || '') ? 'lv-r' : /متأخر/.test(v || '') ? 'lv-y' : /حاضر/.test(v || '') ? 'lv-g' : '') : '';
-    const td = el('td', (i === 0 ? 'nm ' : '') + cls, v == null || v === '' ? '—' : c[0] === 'pct' ? v + '%' : v); if (i === 0) td.onclick = () => { saOne = E.emp; if (saP === 'day'){ saP = 'month'; saDate = null; openSAtt(); } else loadSAtt(); }; r.appendChild(td); }); tb.appendChild(r); });
-  t.appendChild(tb);
+  const pick = E => { saOne = E.emp; if (saP === 'day'){ saP = 'month'; saDate = null; openSAtt(); } else loadSAtt(); };
+  if (day){
+    const cnt = {}; F.forEach(E => { const k = String(E.today || '—').replace(/\s*\d.*$/, '') || '—'; cnt[k] = (cnt[k] || 0) + 1; });
+    const g = el('div', 'chgrid'); t.appendChild(g); const c1 = chCard('حالة اليوم'); c1.appendChild(chDonut(Object.keys(cnt).map(k => [k, cnt[k], stCol(k)]), F.length, 'موظف')); g.appendChild(c1);
+    const c2 = chCard('الموظفون', 'اضغط الاسم لتقرير الموظف'); c2.appendChild(chBars(sortBy(F, 'lateMin', -1).map(E => ({ label:E.name, sub:E.title, value:E.required ? 1 : 0, color:stCol(E.today), text:(E.today || '—') + (E.lateMin ? ' ' + E.lateMin + 'د' : ''), onclick:() => pick(E) })), { max:1, empty:'لا يوجد موظفون.' })); g.appendChild(c2);
+    return;
+  }
+  const c = el('div'); t.appendChild(c); c.appendChild(el('small', '', 'اضغط اسم الموظف لعرض تقريره اليومي. النسبة = الحضور من أيام الدوام.'));
+  c.appendChild(chStack(sortBy(F, saSort[0] === 'name' ? 'pct' : saSort[0], -1).map(E => ({ label:E.name, sub:E.title + (E.lateMin ? ' • تأخير ' + E.lateMin + ' د' : '') + (E.hours ? ' • ' + E.hours + ' ساعة' : ''), parts:{ ok:Math.max(0, (E.present || 0) - (E.late || 0)), late:E.late || 0, absent:E.absent || 0, leave:E.leave || 0 }, pct:E.pct, onclick:() => pick(E) })),
+    [['ok', 'حضور في الوقت', CHC.ok], ['late', 'تأخير', CHC.late], ['absent', 'غياب', CHC.abs], ['leave', 'إجازة', CHC.exc]], { text:x => x.pct == null ? '—' : x.pct + '%', empty:'لا يوجد موظفون.' }));
+  const dl = {}; F.forEach(E => (E.days || (E.lateDays || []).map(d => ({ date:d, late:1 }))).forEach(d => { if (d.late) dl[d.date] = (dl[d.date] || 0) + 1; }));
+  if (Object.keys(dl).length){ const c2 = chCard('حالات التأخير يومياً'); c2.style.marginTop = '12px'; c2.appendChild(chLine(Object.keys(dl).sort().map(d => ({ x:fmtD(d, { day:'numeric', month:'short' }), y:dl[d], title:fmtD(d, { weekday:'long', day:'numeric', month:'short' }) + ': ' + dl[d] + ' متأخر' })), { color:CHC.gold, id:'sd' })); t.appendChild(c2); }
 }
 $('saPrev').onclick = () => { saDate = perShift(saP, saDate, -1); loadSAtt(); }; $('saNext').onclick = () => { saDate = perShift(saP, saDate, 1); loadSAtt(); };
 ['saFrom', 'saTo', 'saSifa'].forEach(id => $(id).onchange = loadSAtt); $('saQ').oninput = () => SA && renderSAtt();
@@ -4136,7 +4187,9 @@ $('saXls').onclick = () => {
 $('saPdf').onclick = () => {
   if (!SA) return; const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
   const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'تقرير حضور الموظفين' + (saOne && SA.list[0] ? ': ' + SA.list[0].name : ''))); l.appendChild(el('div', '', $('saLbl').textContent)); hd.appendChild(l); hd.appendChild(el('div', '', SA.org)); p.appendChild(hd);
-  [$('saKpi'), $('saTbl').parentNode.parentNode].forEach(n => { const c = n.cloneNode(true); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); c.removeAttribute('id'); p.appendChild(c); });
+  [$('saKpi'), $('saTbl').parentNode].forEach(n => { const c = n.cloneNode(true); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); c.removeAttribute('id'); p.appendChild(c); });
+  if (saOne && SA.list[0]) prTbl(p, 'الحضور اليومي', ['التاريخ', 'الحالة', 'الحضور', 'الانصراف', 'التأخير (د)', 'الخروج المبكر (د)', 'الساعات'], (SA.list[0].days || []).map(d => [d.date, d.status, d.in, d.out, d.late, d.early, d.hours]));
+  else prTbl(p, 'الموظفون', ['الموظف', 'الصفة', 'أيام الدوام', 'حضور', 'تأخير', 'دقائق التأخير', 'غياب', 'إجازات', 'ساعات العمل', 'الحضور %'], sortBy(SA.list, 'name', 1).map(E => [E.name, E.title, E.required, E.present, E.late, E.lateMin, E.absent, E.leave, E.hours, E.pct == null ? '' : E.pct + '%']));
   setTimeout(() => window.print(), 50);
 };
 
@@ -4201,19 +4254,24 @@ function renderTch(){
   // الجدول
   const t = $('tcTbl'); t.innerHTML = '';
   if (tcOne && L[0]){
-    $('tcTblT').textContent = 'أيام الدراسة في الفترة';
-    t.innerHTML = '<thead><tr><th>التاريخ</th><th>الاعتماد</th><th>وقت الاعتماد</th><th>الحاضرون</th><th>الغائبون</th><th>التسميع</th><th>فارس الحلقة</th></tr></thead>';
-    const tb = el('tbody'); (L[0].days || []).forEach(d => { const tr = el('tr'); tr.appendChild(el('td', '', fmtD(d.date, { weekday:'short', day:'numeric', month:'short' })));
-      tr.appendChild(el('td', d.approved >= d.of ? 'lv-g' : 'lv-r', d.approved >= d.of ? '✓ معتمد' : d.approved ? d.approved + '/' + d.of : '✗ لم يُعتمد')); [d.at || '—', d.present, d.absent, d.recs, d.star || '—'].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); });
-    t.appendChild(tb); return;
+    $('tcTblT').textContent = 'أيام الدراسة في الفترة'; const Ds = (L[0].days || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+    if (!Ds.length){ t.appendChild(el('div', 'chempty', 'لا توجد أيام دراسة في هذه الفترة.')); return; }
+    const g = el('div', 'chgrid'); t.appendChild(g);
+    const c1 = chCard('تقويم الاعتماد'); c1.appendChild(chCal(Ds.map(d => ({ d:d.date, color:d.approved >= d.of ? CHC.ok : d.approved ? CHC.late : CHC.abs, title:(d.approved >= d.of ? 'معتمد' : d.approved ? d.approved + '/' + d.of : 'لم يُعتمد') + (d.at ? ' • ' + d.at : '') + (d.star ? ' • فارس الحلقة: ' + d.star : '') })), [['', 'معتمد', CHC.ok], ['', 'جزئي', CHC.late], ['', 'لم يُعتمد', CHC.abs]])); g.appendChild(c1);
+    const c2 = chCard('الحاضرون يومياً'); c2.appendChild(chLine(Ds.map(d => ({ x:fmtD(d.date, { day:'numeric', month:'short' }), y:d.present, title:fmtD(d.date, { weekday:'long', day:'numeric', month:'short' }) + ': حاضرون ' + d.present + ' • غائبون ' + d.absent })), { id:'tp', color:CHC.ok })); g.appendChild(c2);
+    const c3 = chCard('التسميع يومياً'); c3.appendChild(chLine(Ds.map(d => ({ x:fmtD(d.date, { day:'numeric', month:'short' }), y:d.recs, title:fmtD(d.date, { weekday:'long', day:'numeric', month:'short' }) + ': تسميع ' + d.recs })), { id:'tr', color:CHC.gold })); g.appendChild(c3);
+    return;
   }
-  $('tcTblT').textContent = 'تفاصيل المؤشرات';
-  const cols = [['name', 'المعلم'], ['students', 'الطلاب'], ['score', 'الأداء'], ['apprPct', 'الاعتماد %'], ['cover', 'تغطية التسميع %'], ['recs', 'تسميع'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['att', 'حضور الطلاب %'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطط %'], ['refs', 'إحالات'], ['exams', 'ترشيحات'], ['excluded', 'منقطعون']];
-  const tr = el('tr'); cols.forEach(c => { const th = el('th', tcSort[0] === c[0] ? 's' + (tcSort[1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { tcSort = [c[0], tcSort[0] === c[0] ? -tcSort[1] : (c[0] === 'name' ? 1 : -1)]; renderTch(); }; tr.appendChild(th); });
-  const th = el('thead'); th.appendChild(tr); t.appendChild(th); const tb = el('tbody');
-  sortBy(L, tcSort[0], tcSort[1]).forEach(T => { const r = el('tr'); cols.forEach((c, i) => { const v = T[c[0]], cls = c[0] === 'score' ? lvSc(v) : c[0] === 'apprPct' || c[0] === 'att' ? lvAtt(v) : c[0] === 'cover' || c[0] === 'plan' ? lvPl(v) : c[0] === 'avg' ? lvAvg(v) : '';
-    const td = el('td', (i === 0 ? 'nm ' : '') + cls, v == null ? '—' : v); if (i === 0) td.onclick = () => { tcOne = T.tnid; loadTch(); }; r.appendChild(td); }); tb.appendChild(r); });
-  t.appendChild(tb);
+  $('tcTblT').textContent = 'مقارنة المعلمين';
+  const g = el('div', 'chgrid'); t.appendChild(g); const n = f => L.filter(f).length;
+  const c1 = chCard('مستوى الأداء'); c1.appendChild(chDonut([['متميز 85 فأكثر', n(x => x.score != null && x.score >= 85), CHC.ok], ['جيد 65–84', n(x => x.score != null && x.score >= 65 && x.score < 85), CHC.gold], ['يحتاج دعماً', n(x => x.score != null && x.score < 65), CHC.abs], ['بلا بيانات', n(x => x.score == null), CHC.none]], L.length, 'معلم')); g.appendChild(c1);
+  const c2 = chCard('المؤشر', 'اضغط اسم المعلم لتقريره'); g.appendChild(c2);
+  const mets = [['score', 'الأداء'], ['apprPct', 'الاعتماد'], ['cover', 'تغطية التسميع'], ['att', 'حضور الطلاب'], ['avg', 'الدرجات'], ['plan', 'إنجاز الخطط'], ['hifz', 'الحفظ'], ['mur', 'المراجعة'], ['recs', 'التسميع']];
+  const m = mets.some(x => x[0] === tcSort[0]) ? tcSort[0] : 'score'; c2.appendChild(chSeg(mets, m, k => { tcSort = [k, -1]; renderTch(); }));
+  const lv = k => k === 'score' ? lvSc : k === 'apprPct' || k === 'att' ? lvAtt : k === 'cover' || k === 'plan' ? lvPl : k === 'avg' ? lvAvg : () => '';
+  const pc = ['score', 'apprPct', 'cover', 'att', 'plan'].indexOf(m) !== -1;
+  c2.appendChild(chBars(sortBy(L, m, -1).map(T => ({ label:T.name, sub:T.halaqat.join('، ') + ' • ' + T.students + ' طالب', value:T[m], text:T[m] == null ? '—' : T[m] + (pc && m !== 'score' ? '%' : m === 'avg' ? '/' + D.maxScore : ''), cls:lvC(lv(m)(T[m])), onclick:() => { tcOne = T.tnid; loadTch(); } })),
+    { max:pc ? 100 : m === 'avg' ? D.maxScore : null, empty:'لا يوجد معلمون.' }));
 }
 $('tcPrev').onclick = () => { tcDate = perShift(tcP, tcDate, -1); loadTch(); }; $('tcNext').onclick = () => { tcDate = perShift(tcP, tcDate, 1); loadTch(); };
 ['tcFrom', 'tcTo'].forEach(id => $(id).onchange = loadTch);
@@ -4229,7 +4287,9 @@ $('tcXls').onclick = () => {
 $('tcPdf').onclick = () => {
   if (!TC) return; const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
   const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'أداء المعلمين' + (tcOne && TC.teachers[0] ? ': ' + TC.teachers[0].name : ''))); l.appendChild(el('div', '', $('tcLbl').textContent)); hd.appendChild(l); hd.appendChild(el('div', '', TC.org)); p.appendChild(hd);
-  [$('tcKpi'), $('tcRank'), $('tcTbl').parentNode.parentNode].forEach(n => { const c = n.cloneNode(true); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); c.removeAttribute('id'); p.appendChild(c); });
+  [$('tcKpi'), $('tcRank'), $('tcTbl').parentNode].forEach(n => { const c = n.cloneNode(true); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); c.querySelectorAll('.chseg').forEach(x => x.remove()); c.removeAttribute('id'); p.appendChild(c); });
+  if (tcOne && TC.teachers[0]) prTbl(p, 'أيام الدراسة', ['التاريخ', 'الاعتماد', 'وقت الاعتماد', 'الحاضرون', 'الغائبون', 'التسميع', 'فارس الحلقة'], (TC.teachers[0].days || []).map(d => [d.date, d.approved >= d.of ? 'معتمد' : d.approved ? d.approved + '/' + d.of : 'لم يُعتمد', d.at, d.present, d.absent, d.recs, d.star]));
+  else prTbl(p, 'تفاصيل المؤشرات', ['المعلم', 'الطلاب', 'الأداء', 'الاعتماد %', 'تغطية التسميع %', 'تسميع', 'حفظ', 'مراجعة', 'حضور الطلاب %', 'متوسط الدرجة', 'إنجاز الخطط %'], sortBy(TC.teachers, 'score', -1).map(T => [T.name, T.students, T.score, T.apprPct, T.cover, T.recs, T.hifz, T.mur, T.att, T.avg, T.plan]));
   setTimeout(() => window.print(), 50);
 };
 
@@ -4306,15 +4366,34 @@ const RP_COLS = { stu:[['name', 'الطالب'], ['hname', 'الحلقة'], ['da
 RP_COLS.all = RP_COLS.stu.slice(0, 2).concat([['att', 'الحضور %'], ['absent', 'غائب'], ['excused', 'مستأذن'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %']]);
 let rpSort = ['name', 1];
 function rpCell(c, x){ const v = x[c]; if (v == null) return ['—']; if (c === 'att') return [v + '%', lvAtt(v)]; if (c === 'avg') return [v, lvAvg(v)]; if (c === 'plan') return [v + '%', lvPl(v)]; if (c === 'absent') return [v, v ? 'lv-r' : '']; return [v]; }
+let rpM = {};
 function rpList(){
-  const b = $('rpBody'); b.innerHTML = ''; const cols = RP_COLS[rpK];
-  b.appendChild(el('h2', '', 'طلاب ' + ($('rpHal').value ? $('rpHal').selectedOptions[0].textContent : 'المجمع') + ' (' + RP.list.length + ')'));
-  b.appendChild(el('small', '', 'اضغط اسم الطالب لعرض تقريره المفصل.'));
-  const w = el('div', 'dtw'), t = el('table', 'dtbl'), tr = el('tr');
-  cols.forEach(c => { const th = el('th', rpSort[0] === c[0] ? 's' + (rpSort[1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { rpSort = [c[0], rpSort[0] === c[0] ? -rpSort[1] : (c[0] === 'name' || c[0] === 'hname' ? 1 : -1)]; rpList(); }; tr.appendChild(th); });
-  const th = el('thead'); th.appendChild(tr); t.appendChild(th); const tb = el('tbody');
-  sortBy(RP.list, rpSort[0], rpSort[1]).forEach(x => { const r = el('tr'); cols.forEach((c, i) => { const v = i === 0 ? [x.name + (x.st ? ' (' + x.st + ')' : '')] : rpCell(c[0], x), td = el('td', (i === 0 ? 'nm ' : '') + (v[1] || ''), v[0]); if (i === 0) td.onclick = () => { rpSid = x.sid; $('rpQ').value = x.name; loadRep(); }; r.appendChild(td); }); tb.appendChild(r); });
-  t.appendChild(tb); w.appendChild(t); b.appendChild(w);
+  const b = $('rpBody'); b.innerHTML = ''; const L = RP.list, has = k => L.some(x => x[k] != null), sum = k => L.reduce((a, x) => a + (x[k] || 0), 0);
+  b.appendChild(el('h2', '', 'طلاب ' + ($('rpHal').value ? $('rpHal').selectedOptions[0].textContent : 'المجمع') + ' (' + L.length + ')'));
+  const av = (k, d) => { const v = L.filter(x => x[k] != null); return v.length ? Math.round(v.reduce((a, x) => a + x[k], 0) / v.length * (d || 1)) / (d || 1) : null; };
+  const kv = [[L.length, 'الطلاب']];
+  if (has('att')){ const a = av('att'); kv.push([a == null ? null : a + '%', 'متوسط الحضور', lvAtt(a)]); }
+  if (has('absent')) kv.push([sum('absent'), 'حالات الغياب', sum('absent') ? 'lv-r' : '']);
+  if (has('hifz')) kv.push([sum('hifz'), 'آيات الحفظ']); if (has('mur')) kv.push([sum('mur'), 'آيات المراجعة']);
+  if (has('avg')){ const a = av('avg', 10); kv.push([a == null ? null : a + '/' + D.maxScore, 'متوسط الدرجات', lvAvg(a)]); }
+  if (has('plan')){ const a = av('plan'); kv.push([a == null ? null : a + '%', 'إنجاز الخطط', lvPl(a)]); }
+  if (has('refs')) kv.push([sum('refs'), 'الإحالات']);
+  b.appendChild(chKv(kv));
+  const g = el('div', 'chgrid'); b.appendChild(g);
+  if (has('present')){ const c = chCard('توزيع الحضور'); c.appendChild(chDonut(ATT_SEGS.map(x => [x[1], sum(x[0]), x[2]]), sum('days'), 'يوم مسجل')); g.appendChild(c); }
+  else if (has('att')){ const n = f => L.filter(f).length, c = chCard('مستوى حضور الطلاب'); c.appendChild(chDonut([['ممتاز 90% فأكثر', n(x => x.att != null && x.att >= 90), CHC.ok], ['جيد 75–89%', n(x => x.att != null && x.att >= 75 && x.att < 90), CHC.gold], ['يحتاج متابعة', n(x => x.att != null && x.att < 75), CHC.abs], ['لم يُسجَّل', n(x => x.att == null), CHC.none]], L.length, 'طالب')); g.appendChild(c); }
+  if (rpK !== 'stu' && has('hifz')){ const c = chCard('الآيات المسمّعة'); c.appendChild(chDonut([['حفظ', sum('hifz'), CHC.navy], ['مراجعة', sum('mur'), CHC.gold], ['تلاوة', sum('til'), CHC.teal]], sum('hifz') + sum('mur') + sum('til'), 'آية')); g.appendChild(c); }
+  if (rpK !== 'stu' && has('avg')){ const n = f => L.filter(f).length, c = chCard('مستوى الدرجات'); c.appendChild(chDonut([['ممتاز 8 فأكثر', n(x => x.avg != null && x.avg >= 8), CHC.ok], ['جيد 6.5–7.9', n(x => x.avg != null && x.avg >= 6.5 && x.avg < 8), CHC.gold], ['ضعيف', n(x => x.avg != null && x.avg < 6.5), CHC.abs], ['بلا درجات', n(x => x.avg == null), CHC.none]], L.length, 'طالب')); g.appendChild(c); }
+  const mets = RP_COLS[rpK].filter(c => c[0] !== 'name' && c[0] !== 'hname').map(c => [c[0], c[1].replace(' (آية)', '').replace(' %', '')]);
+  if (!rpM[rpK] || !mets.some(m => m[0] === rpM[rpK][0])) rpM[rpK] = [mets.some(m => m[0] === 'att') ? 'att' : mets[0][0], -1];
+  const M = rpM[rpK], c = chCard('الطلاب حسب المؤشر', 'اضغط اسم الطالب لعرض تقريره المفصل'); b.appendChild(c);
+  c.appendChild(chSeg(mets, M[0], m => { rpM[rpK] = [m, M[1]]; rpList(); }));
+  c.appendChild(chSeg([[-1, 'الأعلى'], [1, 'الأدنى']], M[1], d => { rpM[rpK] = [M[0], d]; rpList(); }));
+  const met = x => { const v = x[M[0]]; if (M[0] === 'att') return { value:v, text:v == null ? '—' : v + '%', cls:lvC(lvAtt(v)) }; if (M[0] === 'avg') return { value:v, text:v == null ? '—' : v + '/' + D.maxScore, cls:lvC(lvAvg(v)) };
+    if (M[0] === 'plan') return { value:v, text:v == null ? '—' : v + '%', cls:lvC(lvPl(v)) }; if (M[0] === 'absent') return { value:v, text:v, cls:v ? 'r' : '' }; if (M[0] === 'late') return { value:v, text:v, cls:v ? 'y' : '' }; return { value:v, text:v }; };
+  const mx = M[0] === 'att' || M[0] === 'plan' ? 100 : M[0] === 'avg' ? D.maxScore : null;
+  const items = sortBy(M[1] > 0 ? L.filter(x => x[M[0]] != null) : L, M[0], M[1]).map(x => Object.assign({ label:x.name + (x.st ? ' (' + x.st + ')' : ''), sub:x.hname, onclick:() => { rpSid = x.sid; $('rpQ').value = x.name; loadRep(); } }, met(x)));
+  c.appendChild(chTop(items, 15, { max:mx, empty:'لا يوجد طلاب.' }));
 }
 function rpOne(){
   const b = $('rpBody'), X = RP, s = X.student; b.innerHTML = '';
@@ -4325,22 +4404,21 @@ function rpOne(){
   if (rpK !== 'edu'){
     H('الحضور');
     const o = X.att, n = o.present + o.late + o.absent + o.excused, pc = v => n ? Math.round(v / n * 100) + '%' : '—';
-    const tl = el('div', 'tiles'); [['حاضر', 'present', 't-ok'], ['متأخر', 'late', 't-late'], ['غائب', 'absent', 't-abs'], ['مستأذن', 'excused', 't-nav']].forEach(x => { const t = tile(o[x[1]], x[0], x[2]); t.appendChild(el('small', '', pc(o[x[1]]))); tl.appendChild(t); }); b.appendChild(tl);
+    const g1 = el('div', 'chgrid'); b.appendChild(g1); const c1 = chCard('توزيع الحضور'); c1.appendChild(chDonut(ATT_SEGS.map(x => [x[1], o[x[0]], x[2]]), n ? Math.round((o.present + o.late) / n * 100) + '%' : '—', 'نسبة الحضور')); g1.appendChild(c1);
+    const c2 = chCard('تقويم الحضور'); c2.appendChild(chCal(X.days.slice().sort((p, q) => p.date.localeCompare(q.date)).map(d => ({ d:d.date, color:ST_COL[d.status] || CHC.none, title:d.status })), ATT_SEGS.map(x => [x[0], x[1], x[2]]))); g1.appendChild(c2);
     b.appendChild(el('div', 'slabel c-ok', 'نسبة الحضور: ' + (n ? Math.round((o.present + o.late) / n * 100) + '%' : '—') + ' من ' + n + ' يوم مسجل'));
-    if (X.days.length){ const w = el('div', 'dtw'), t = el('table', 'dtbl'); t.innerHTML = '<thead><tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th></tr></thead>'; const tb = el('tbody');
-      X.days.forEach(d => { const r = el('tr'); r.appendChild(el('td', '', d.date)); r.appendChild(el('td', '', fmtD(d.date, { weekday:'long' }))); const c = el('td'); c.appendChild(el('span', pillCls(d.status), d.status)); r.appendChild(c); tb.appendChild(r); }); t.appendChild(tb); w.appendChild(t); b.appendChild(w); }
-    else b.appendChild(el('small', '', 'لا يوجد حضور مسجل في هذه الفترة.'));
     if (X.events && X.events.length){ H('الاستبعاد والتنبيهات والنقل'); X.events.forEach(e => { const w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', e.event)); g.appendChild(el('small', '', e.at.slice(0, 16) + (e.details ? ' • ' + e.details : ''))); w.appendChild(g); b.appendChild(w); }); }
     if (X.msgs && X.msgs.length){ H('الرسائل لولي الأمر'); const c = {}; X.msgs.forEach(m => c[m.kind] = (c[m.kind] || 0) + 1); b.appendChild(el('div', '', Object.keys(c).map(k => k + ': ' + c[k]).join(' • '))); }
   }
   if (rpK !== 'stu'){
     H('الحفظ والمراجعة');
     const ty = {}, sc = []; X.records.forEach(r => { ty[r.type] = (ty[r.type] || 0) + r.ayat; if (r.score != null) sc.push(r.score); });
-    const tl = el('div', 'tiles'); D.types.forEach((t, i) => tl.appendChild(tile(ty[t] || 0, t + ' (آية)', ['t-ok', 't-late', 't-nav', ''][i]))); b.appendChild(tl);
+    const g2 = el('div', 'chgrid'); b.appendChild(g2); const tc = [CHC.navy, CHC.gold, CHC.teal, CHC.purple]; const c3 = chCard('الآيات حسب النوع'); c3.appendChild(chDonut(D.types.map((t, i) => [t, ty[t] || 0, tc[i % 4]]), null, 'آية')); g2.appendChild(c3);
+    const rs = X.records.filter(r => r.score != null).slice().sort((p, q) => p.date.localeCompare(q.date)), c4 = chCard('تطور الدرجات'); c4.appendChild(chLine(rs.map(r => ({ x:fmtD(r.date, { day:'numeric', month:'short' }), y:r.score, title:fmtD(r.date, { weekday:'long', day:'numeric', month:'short' }) + ' • ' + r.type + ' • ' + r.from + ' – ' + r.to + ': ' + r.score + ' (' + r.grade + ')', color:r.score >= 8 ? CHC.ok : r.score >= 6.5 ? CHC.gold : CHC.abs })), { max:D.maxScore, id:'rs', empty:'لا توجد درجات في هذه الفترة.' })); g2.appendChild(c4);
     if (sc.length){ const a = Math.round(sc.reduce((m, x) => m + x, 0) / sc.length * 10) / 10; b.appendChild(el('div', 'slabel ' + (PILL[scoreLabel(a)] || '').replace('p-', 'c-'), 'متوسط الدرجات: ' + a + ' من ' + D.maxScore + ' • ' + scoreLabel(a) + (X.stars ? ' • فارس الحلقة ' + X.stars + ' مرة' : ''))); }
     const pb = el('div'); b.appendChild(pb); plansBlock({ plans:X.plans }, pb);
-    if (X.records.length){ const w = el('div', 'dtw'), t = el('table', 'dtbl'); t.innerHTML = '<thead><tr><th>التاريخ</th><th>النوع</th><th>من</th><th>إلى</th><th>آيات</th><th>الدرجة</th><th>ملاحظة</th></tr></thead>'; const tb = el('tbody');
-      X.records.forEach(r => { const tr = el('tr'); [r.date, r.type, r.from, r.to, r.ayat].forEach(v => tr.appendChild(el('td', '', v))); const c = el('td'); c.appendChild(el('span', pillCls(r.grade), scoreTxt(r))); tr.appendChild(c); tr.appendChild(el('td', '', r.note || '')); tb.appendChild(tr); }); t.appendChild(tb); w.appendChild(t); b.appendChild(w); }
+    if (X.records.length){ const by = {}; X.records.forEach(r => { const k = r.date; by[k] = by[k] || { label:fmtD(k, { weekday:'short', day:'numeric', month:'short' }), d:k, parts:{} }; by[k].parts[r.type] = (by[k].parts[r.type] || 0) + (r.ayat || 0); });
+      const c5 = chCard('الآيات يوماً بيوم'); c5.appendChild(chStack(Object.values(by).sort((p, q) => q.d.localeCompare(p.d)), D.types.map((t, i) => [t, t, tc[i % 4]]))); b.appendChild(c5); }
     else b.appendChild(el('small', '', 'لا يوجد تسميع في هذه الفترة.'));
     if (X.exams && X.exams.length){ H('الاختبارات المرحلية'); X.exams.forEach(x => { const w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', x.data.stage || 'مرحلية')); g.appendChild(el('small', '', 'رُشّح ' + x.date + (x.examDate ? ' • الموعد ' + x.examDate : '') + (x.examiner ? ' • ' + x.examiner : ''))); w.appendChild(g); w.appendChild(el('span', 'pill ' + (x.result === 'اجتاز' ? 'p-ok' : x.result ? 'p-red' : (RF_ST_CLS[x.status] || 'p-none')), x.result ? x.result + (x.score ? ' ' + x.score : '') : x.status)); b.appendChild(w); }); }
   }
@@ -4368,7 +4446,10 @@ $('rpPdf').onclick = () => {
   const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
   const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', RP_T[rpK][0] + (RP.student ? ': ' + RP.student.name : ''))); l.appendChild(el('div', '', $('rpLbl').textContent + (RP.student ? ' • ' + RP.student.hname : $('rpHal').value ? ' • ' + $('rpHal').selectedOptions[0].textContent : '')));
   hd.appendChild(l); hd.appendChild(el('div', '', RP.org)); p.appendChild(hd);
-  const c = $('rpBody').cloneNode(true); c.querySelectorAll('.stact,button').forEach(x => x.remove()); c.removeAttribute('id'); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); p.appendChild(c);
+  const c = $('rpBody').cloneNode(true); c.querySelectorAll('.stact,button,.chseg').forEach(x => x.remove()); c.removeAttribute('id'); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); p.appendChild(c);
+  if (RP.list){ const cols = RP_COLS[rpK]; prTbl(p, 'تفاصيل الطلاب', cols.map(c => c[1]), sortBy(RP.list, 'hname', 1).map(x => cols.map(c => x[c[0]]))); }
+  else { if (RP.days && RP.days.length && rpK !== 'edu') prTbl(p, 'أيام الحضور', ['التاريخ', 'اليوم', 'الحالة'], RP.days.map(d => [d.date, fmtD(d.date, { weekday:'long' }), d.status]));
+    if (RP.records && RP.records.length && rpK !== 'stu') prTbl(p, 'التسميع', ['التاريخ', 'النوع', 'من', 'إلى', 'الآيات', 'الدرجة', 'ملاحظة'], RP.records.map(r => [r.date, r.type, r.from, r.to, r.ayat, scoreTxt(r), r.note])); }
   setTimeout(() => window.print(), 50);
 };
 $('rpXls').onclick = () => {
@@ -4385,6 +4466,80 @@ $('rpXls').onclick = () => {
   document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel');
 };
 
+/* ---------- مكتبة الرسوم البيانية للتقارير ---------- */
+const CHC = { ok:'#2E7D5B', late:'#D08E2C', abs:'#B3261E', exc:'#7C8FA0', navy:'#3B5F78', gold:'#D08E2C', teal:'#2E8B7A', purple:'#7B5BA6', none:'#C9CED3' };
+const lvC = cls => ({ 'lv-g':'g', 'lv-y':'y', 'lv-r':'r' }[cls] || '');
+function chCard(title, note){ const c = el('div', 'card chcard'), h = el('h3', '', title); if (note) h.appendChild(el('small', '', note)); c.appendChild(h); return c; }
+function chSeg(opts, cur, on){ const s = el('div', 'chseg'); opts.forEach(o => { const b = el('button', o[0] === cur ? 'on' : '', o[1]); b.onclick = () => on(o[0]); s.appendChild(b); }); return s; }
+function chLeg(segs){ const l = el('div', 'chleg'); segs.forEach(s => { const x = el('span'), i = el('i'); i.style.background = s[2]; x.appendChild(i); x.appendChild(document.createTextNode(s[1])); l.appendChild(x); }); return l; }
+/* أعمدة أفقية: items [{ label, sub, value, text, cls ('g'/'y'/'r'), color, onclick, title }] */
+function chBars(items, o){
+  o = o || {}; const w = el('div', 'chbars'); if (!items.length){ w.appendChild(el('div', 'chempty', o.empty || 'لا توجد بيانات.')); return w; }
+  const mx = o.max || Math.max(1, ...items.map(x => x.value || 0));
+  items.forEach((x, i) => {
+    const r = el('div', 'chb' + (x.onclick ? ' click' : '')), l = el('div', 'l'); l.appendChild(el('b', '', x.label)); if (x.sub) l.appendChild(el('small', '', x.sub));
+    const tr = el('div', 'tr'), f = el('i', x.cls || ''); if (x.mark != null){ const m = el('s'); m.style.right = Math.min(100, x.mark * 100 / mx) + '%'; tr.appendChild(m); } f.style.width = (x.value == null ? 0 : Math.max(x.value ? 1.5 : 0, Math.min(100, x.value * 100 / mx))) + '%'; if (x.color) f.style.background = x.color; f.style.animationDelay = Math.min(i * .03, .6) + 's'; tr.appendChild(f);
+    r.appendChild(l); r.appendChild(tr); r.appendChild(el('b', x.cls ? 'lv-' + x.cls : '', x.text != null ? x.text : x.value == null ? '—' : x.value));
+    r.title = x.title || (x.label + ': ' + (x.text != null ? x.text : x.value)); if (x.onclick) r.onclick = x.onclick; w.appendChild(r);
+  });
+  return w;
+}
+/* أعمدة مكدّسة: items [{ label, sub, parts:{k:v}, onclick }], segs [[k, label, color]] */
+function chStack(items, segs, o){
+  o = o || {}; const w = el('div'); w.appendChild(chLeg(segs)); const b = el('div', 'chbars'); w.appendChild(b);
+  if (!items.length){ b.appendChild(el('div', 'chempty', o.empty || 'لا توجد بيانات.')); return w; }
+  const tot = x => segs.reduce((a, s) => a + (x.parts[s[0]] || 0), 0), mx = o.rel ? 0 : Math.max(1, ...items.map(tot));
+  items.forEach((x, i) => {
+    const r = el('div', 'chb' + (x.onclick ? ' click' : '')), l = el('div', 'l'), t = tot(x); l.appendChild(el('b', '', x.label)); if (x.sub) l.appendChild(el('small', '', x.sub));
+    const tr = el('div', 'tr stk'); tr.style.background = 'rgba(59,95,120,.08)';
+    segs.forEach(s => { const v = x.parts[s[0]] || 0; if (!v) return; const f = el('i'); f.style.width = (v * 100 / (o.rel ? t || 1 : mx)) + '%'; f.style.background = s[2]; f.style.animationDelay = Math.min(i * .03, .6) + 's'; f.title = s[1] + ': ' + v; tr.appendChild(f); });
+    r.appendChild(l); r.appendChild(tr); r.appendChild(el('b', '', o.text ? o.text(x, t) : t));
+    r.title = x.label + ' — ' + segs.map(s => s[1] + ': ' + (x.parts[s[0]] || 0)).join(' • '); if (x.onclick) r.onclick = x.onclick; b.appendChild(r);
+  });
+  return w;
+}
+/* دائرة: parts [[label, value, color]] */
+function chDonut(parts, center, sub){
+  const w = el('div', 'chdonut'), tot = parts.reduce((a, p) => a + (p[1] || 0), 0);
+  if (!tot){ w.appendChild(el('div', 'chempty', 'لا توجد بيانات.')); return w; }
+  const r = 54, C = 2 * Math.PI * r; let off = 0, s = '<svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="' + r + '" fill="none" stroke="rgba(59,95,120,.08)" stroke-width="18"/>';
+  parts.forEach(p => { if (!p[1]) return; const len = C * p[1] / tot; s += '<circle class="s" cx="75" cy="75" r="' + r + '" fill="none" stroke="' + p[2] + '" stroke-width="18" stroke-dasharray="0 ' + C + '" data-d="' + Math.max(0, len - (parts.filter(x => x[1]).length > 1 ? 1.5 : 0)) + ' ' + C + '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 75 75)"><title>' + p[0] + ': ' + p[1] + '</title></circle>'; off += len; });
+  s += '<text x="75" y="' + (sub ? 76 : 83) + '" text-anchor="middle" font-size="24">' + (center != null ? center : tot) + '</text>' + (sub ? '<text x="75" y="96" text-anchor="middle" font-size="11" style="font-weight:500;fill:var(--muted)">' + sub + '</text>' : '') + '</svg>';
+  w.innerHTML = s; const ul = el('ul');
+  parts.forEach(p => { const li = el('li'), i = el('i'); i.style.background = p[2]; li.appendChild(i); li.appendChild(el('span', '', p[0])); const b = el('b', '', p[1] || 0); b.appendChild(el('small', '', '(' + Math.round((p[1] || 0) * 100 / tot) + '%)')); li.appendChild(b); ul.appendChild(li); });
+  w.appendChild(ul);
+  requestAnimationFrame(() => requestAnimationFrame(() => w.querySelectorAll('circle.s').forEach(c => c.setAttribute('stroke-dasharray', c.dataset.d))));
+  return w;
+}
+/* خط زمني: pts [{ x:'تسمية', y:رقم أو null, title }] */
+function chLine(pts, o){
+  o = o || {}; const w = el('div'); const P = pts.filter(p => p.y != null);
+  if (!P.length){ w.appendChild(el('div', 'chempty', o.empty || 'لا توجد بيانات.')); return w; }
+  const mx = o.max || Math.max(1, ...P.map(p => p.y)), mn = o.min || 0, box = el('div', 'chline'), n = pts.length, col = o.color || CHC.navy;
+  for (let i = 0; i <= 4; i++){ const v = mn + (mx - mn) * i / 4, g = el('div', 'gy'); g.style.top = (100 - i * 25) + '%'; g.appendChild(el('span', '', Math.round(v * 10) / 10)); box.appendChild(g); }
+  const X = i => n === 1 ? 50 : 100 - i * 100 / (n - 1), Y = v => 100 - (v - mn) * 100 / (mx - mn || 1);
+  const seq = pts.map((p, i) => p.y == null ? null : [X(i), Y(p.y)]).filter(Boolean);
+  const d = seq.map((q, i) => (i ? 'L' : 'M') + q[0] + ' ' + q[1]).join(' ');
+  box.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="chA' + (o.id || '') + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + col + '" stop-opacity=".28"/><stop offset="1" stop-color="' + col + '" stop-opacity="0"/></linearGradient></defs>' +
+    (seq.length > 1 ? '<path d="' + d + ' L' + seq[seq.length - 1][0] + ' 100 L' + seq[0][0] + ' 100 Z" fill="url(#chA' + (o.id || '') + ')"/>' : '') +
+    '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="2.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>');
+  pts.forEach((p, i) => { if (p.y == null) return; const t = el('span', 'dot'); t.style.left = X(i) + '%'; t.style.top = Y(p.y) + '%'; t.style.borderColor = p.color || col; t.title = p.title || (p.x + ': ' + p.y); box.appendChild(t); });
+  w.appendChild(box); const xl = el('div', 'chlx'); const idx = n <= 3 ? pts.map((_, i) => i) : [0, Math.floor((n - 1) / 2), n - 1];
+  idx.forEach(i => xl.appendChild(el('span', '', pts[i].x))); w.appendChild(xl); return w;
+}
+/* تقويم أيام ملوّن: days [{ d:'YYYY-MM-DD', color, title }] */
+function chCal(days, legend){
+  const w = el('div'); if (legend) w.appendChild(chLeg(legend));
+  if (!days.length){ w.appendChild(el('div', 'chempty', 'لا توجد أيام في هذه الفترة.')); return w; }
+  const c = el('div', 'chcal'); days.forEach(x => { const i = el('i', '', ud(x.d).getUTCDate()); i.style.background = x.color; i.title = fmtD(x.d, { weekday:'long', day:'numeric', month:'long' }) + ': ' + x.title; c.appendChild(i); }); w.appendChild(c); return w;
+}
+function chKv(list){ const g = el('div', 'chkv'); list.forEach(x => { const d = el('div'); d.appendChild(el('b', x[2] || '', x[0] == null ? '—' : x[0])); d.appendChild(el('span', '', x[1])); g.appendChild(d); }); return g; }
+/* أعلى/أدنى N مع زر عرض الكل */
+function chTop(items, n, more){ const w = el('div'); let all = false; const draw = () => { w.innerHTML = ''; w.appendChild(chBars(all ? items : items.slice(0, n), more)); if (items.length > n){ const b = el('button', 'chmore', all ? 'عرض أقل' : 'عرض الكل (' + items.length + ')'); b.onclick = () => { all = !all; draw(); }; w.appendChild(b); } }; draw(); return w; }
+/* جدول للطباعة فقط (PDF) */
+function prTbl(p, title, head, rows){ p.appendChild(el('h3', '', title)); const t = el('table'), tr = el('tr'); head.forEach(h => tr.appendChild(el('th', '', h))); t.appendChild(tr); rows.forEach(r => { const x = el('tr'); r.forEach(v => x.appendChild(el('td', '', v == null || v === '' ? '—' : v))); t.appendChild(x); }); p.appendChild(t); }
+const ATT_SEGS = [['present', 'حاضر', CHC.ok], ['late', 'متأخر', CHC.late], ['absent', 'غائب', CHC.abs], ['excused', 'مستأذن', CHC.exc]];
+const ST_COL = { 'حاضر':CHC.ok, 'متأخر':CHC.late, 'غائب':CHC.abs, 'مستأذن':CHC.exc };
 /* ---------- شاشة عرض المجمع ---------- */
 let DS = null, dsP = 'day', dsDate = null, dsSort = { stu:['hifz', -1], hal:['name', 1] }, dsSeq = 0;
 const DS_PER = [['day', 'اليوم'], ['week', 'أسبوعي'], ['month', 'شهري'], ['term', 'فصلي'], ['custom', 'من تاريخ إلى تاريخ']];
@@ -4458,7 +4613,7 @@ function renderDash(){
     else { const c = el('div', 'chart'); sr.forEach(x => { const b = el('div', x.att < 75 ? 'lo' : x.att < 90 ? 'mid' : ''); b.style.height = Math.max(3, x.att) + '%'; b.title = x.d + ': حضور ' + x.att + '% • تسميع ' + x.recs; c.appendChild(b); }); ch.appendChild(c);
       const xl = el('div', 'chart-x'); xl.appendChild(el('span', '', fmtD(sr[0].d, { day:'numeric', month:'short' }))); xl.appendChild(el('span', '', fmtD(sr[sr.length - 1].d, { day:'numeric', month:'short' }))); ch.appendChild(xl); }
   }
-  dsHalTable(); dsRanks(); dsStuTable(); renderRings(K);
+  dsDonuts(); dsHalTable(); dsRanks(); dsStuTable(); renderRings(K);
 }
 const DS_HCOLS = [['name', 'الحلقة'], ['teacher', 'المعلم'], ['students', 'الطلاب'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['recs', 'تسميع'], ['avg', 'متوسط الدرجة'], ['appr', 'الاعتماد']];
 const DS_SCOLS = [['name', 'الطالب'], ['hname', 'الحلقة'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %'], ['stars', 'فارس الحلقة'], ['points', 'النقاط'], ['refs', 'إحالات']];
@@ -4468,13 +4623,34 @@ function dsHead(t, cols, which, redraw){
   const tr = el('tr'); cols.forEach(c => { const th = el('th', dsSort[which][0] === c[0] ? 's' + (dsSort[which][1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { dsSort[which] = [c[0], dsSort[which][0] === c[0] ? -dsSort[which][1] : (c[0] === 'name' || c[0] === 'hname' || c[0] === 'teacher' ? 1 : -1)]; redraw(); }; tr.appendChild(th); });
   const th = el('thead'); th.appendChild(tr); t.appendChild(th);
 }
+let dsHM = 'att', dsSM = 'hifz', dsSD = -1;
+const DS_HM = [['att', 'الحضور %'], ['hifz', 'الحفظ'], ['mur', 'المراجعة'], ['recs', 'التسميع'], ['avg', 'متوسط الدرجات'], ['appr', 'الاعتماد'], ['absent', 'الغياب'], ['late', 'التأخر']];
+function dsMet(m, x, hal){
+  const v = x[m];
+  if (m === 'att') return { value:v, text:v == null ? '—' : v + '%', cls:lvC(lvAtt(v)), max:100 };
+  if (m === 'avg') return { value:v, text:v == null ? '—' : v + '/' + D.maxScore, cls:lvC(lvAvg(v)), max:D.maxScore };
+  if (m === 'plan') return { value:v, text:v == null ? '—' : v + '%', cls:lvC(lvPl(v)), max:100 };
+  if (m === 'appr'){ if (DS.from === DS.to) return { value:x.apprToday ? 100 : 0, text:x.apprToday ? '✓ معتمدة' : '✗ لم تُعتمد', cls:x.apprToday ? 'g' : 'r', max:100 };
+    const p = x.studyDays ? Math.round(x.approved * 100 / x.studyDays) : null; return { value:p, text:x.approved + '/' + x.studyDays, cls:lvC(lvAtt(p)), max:100 }; }
+  if (m === 'absent') return { value:v, text:v, cls:v ? 'r' : '' };
+  if (m === 'late') return { value:v, text:v, cls:v ? 'y' : '' };
+  return { value:v, text:v };
+}
 function dsHalTable(){
-  const t = $('dsHalT'); t.innerHTML = ''; dsHead(t, DS_HCOLS, 'hal', dsHalTable);
-  const tb = el('tbody'), key = dsSort.hal[0] === 'appr' ? 'approved' : dsSort.hal[0];
-  sortBy(DS.halaqat, key, dsSort.hal[1]).forEach(h => { const tr = el('tr');
-    [[h.name], [h.teacher], [h.students + (h.cap ? '/' + h.cap : '')], [h.att == null ? '—' : h.att + '%', lvAtt(h.att)], [h.absent], [h.late], [h.hifz], [h.mur], [h.recs], [h.avg == null ? '—' : h.avg, lvAvg(h.avg)], [hAppr(h), DS.from === DS.to ? (h.apprToday ? 'lv-g' : 'lv-r') : '']]
-      .forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tb.appendChild(tr); });
-  t.appendChild(tb);
+  const c = $('dsHalT'); c.innerHTML = ''; c.appendChild(el('h3', '', 'مقارنة الحلقات')); c.firstChild.appendChild(el('small', '', 'اضغط الحلقة لعرضها وحدها'));
+  c.appendChild(chSeg(DS_HM, dsHM, m => { dsHM = m; dsHalTable(); }));
+  const items = DS.halaqat.map(h => Object.assign({ label:h.name, sub:[h.teacher, h.students + (h.cap ? '/' + h.cap : '') + ' طالب'].filter(Boolean).join(' • '),
+    onclick:() => { $('dsHal').value = h.hid; loadDash(); } }, dsMet(dsHM, h, 1)));
+  const mx = items.reduce((a, x) => Math.max(a, x.max || 0), 0) || null;
+  c.appendChild(chBars(sortBy(items, 'value', -1), { max:mx, empty:'لا توجد حلقات.' }));
+}
+function dsDonuts(){
+  const S = DS.students, b = $('dsDon'); b.innerHTML = '';
+  const n = f => S.filter(f).length;
+  const c1 = chCard('مستوى حضور الطلاب'); c1.appendChild(chDonut([['ممتاز 90% فأكثر', n(x => x.att != null && x.att >= 90), CHC.ok], ['جيد 75–89%', n(x => x.att != null && x.att >= 75 && x.att < 90), CHC.gold], ['يحتاج متابعة', n(x => x.att != null && x.att < 75), CHC.abs], ['لم يُسجَّل حضور', n(x => x.att == null), CHC.none]], S.length, 'طالب'));
+  const c2 = chCard('مستوى الدرجات'); c2.appendChild(chDonut([['ممتاز 8 فأكثر', n(x => x.avg != null && x.avg >= 8), CHC.ok], ['جيد 6.5–7.9', n(x => x.avg != null && x.avg >= 6.5 && x.avg < 8), CHC.gold], ['ضعيف', n(x => x.avg != null && x.avg < 6.5), CHC.abs], ['بلا درجات', n(x => x.avg == null), CHC.none]], S.length, 'طالب'));
+  const K = DS.kpi, c3 = chCard('الحفظ والمراجعة'); c3.appendChild(chDonut([['حفظ', K.hifz, CHC.navy], ['مراجعة', K.mur, CHC.gold], ['تلاوة', S.reduce((a, x) => a + (x.til || 0), 0), CHC.teal]], (K.hifz || 0) + (K.mur || 0), 'آية'));
+  [c1, c2, c3].forEach(x => b.appendChild(x));
 }
 function dsRanks(){
   const S = DS.students, act = S.filter(x => x.days), rk = (box, list, fmt) => { const b = $(box); list.forEach((x, i) => { const r = el('div', 'rank'); r.appendChild(el('i', '', i + 1)); const sp = el('span'); sp.appendChild(el('b', '', x.name)); sp.appendChild(el('small', '', ' • ' + x.hname)); r.appendChild(sp); r.appendChild(el('b', '', fmt(x))); r.onclick = () => goFile(x.sid); b.appendChild(r); }); };
@@ -4488,14 +4664,16 @@ function dsRanks(){
   if (wa.length){ $('dsWeak').appendChild(el('label', '', 'الأقل درجات')); rk('dsWeak', wa, x => x.avg + '/' + D.maxScore); }
   if (!wa.length && !wb.length) $('dsWeak').appendChild(el('small', '', 'لا يوجد من يحتاج متابعة في هذه الفترة. 👍'));
 }
+const DS_SM = [['hifz', 'الحفظ'], ['mur', 'المراجعة'], ['att', 'الحضور %'], ['avg', 'الدرجات'], ['plan', 'إنجاز الخطة'], ['absent', 'الغياب'], ['points', 'النقاط'], ['stars', 'النجوم']];
 function dsStuTable(){
-  const t = $('dsStuT'); t.innerHTML = ''; dsHead(t, DS_SCOLS, 'stu', dsStuTable);
-  const q = normAr($('dsQ').value), list = sortBy(DS.students.filter(x => !q || normAr(x.name).indexOf(q) !== -1), dsSort.stu[0], dsSort.stu[1]), tb = el('tbody');
-  list.forEach(x => { const tr = el('tr'), nm = el('td', 'nm', x.name + (x.st ? ' (' + x.st + ')' : '')); nm.onclick = () => goFile(x.sid); tr.appendChild(nm);
-    [[x.hname], [x.att == null ? '—' : x.att + '%', lvAtt(x.att)], [x.absent, x.absent ? 'lv-r' : ''], [x.late], [x.hifz], [x.mur], [x.avg == null ? '—' : x.avg, lvAvg(x.avg)], [x.plan == null ? '—' : x.plan + '%', lvPl(x.plan)], [x.stars], [x.points], [x.refs]]
-      .forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tb.appendChild(tr); });
-  if (!list.length){ const tr = el('tr'), td = el('td', '', 'لا يوجد طلاب.'); td.colSpan = DS_SCOLS.length; tr.appendChild(td); tb.appendChild(tr); }
-  t.appendChild(tb);
+  const s = $('dsStuS'); s.innerHTML = ''; s.appendChild(chSeg(DS_SM, dsSM, m => { dsSM = m; dsStuTable(); }));
+  s.appendChild(chSeg([[-1, 'الأعلى'], [1, 'الأدنى']], dsSD, d => { dsSD = d; dsStuTable(); }));
+  const q = normAr($('dsQ').value), t = $('dsStuT'); t.innerHTML = '';
+  let list = DS.students.filter(x => !q || normAr(x.name).indexOf(q) !== -1);
+  if (!q && dsSD > 0) list = list.filter(x => x[dsSM] != null);
+  const items = sortBy(list, dsSM, dsSD).map(x => Object.assign({ label:x.name + (x.st ? ' (' + x.st + ')' : ''), sub:x.hname, onclick:() => goFile(x.sid) }, dsMet(dsSM, x)));
+  const mx = items.reduce((a, x) => Math.max(a, x.max || 0), 0) || Math.max(1, ...DS.students.map(x => x[dsSM] || 0));
+  t.appendChild(chTop(items, q ? 50 : 10, { max:mx, empty:'لا يوجد طلاب.' }));
 }
 $('dsPrev').onclick = () => dsShift(-1); $('dsNext').onclick = () => dsShift(1); $('dsRef').onclick = loadDash;
 ['dsHal', 'dsStage', 'dsSt', 'dsFrom', 'dsTo'].forEach(id => $(id).onchange = loadDash);
@@ -4835,7 +5013,9 @@ function sfSection(k, box, print){
     const lh = SF.records.find(r => r.type === 'حفظ'); box.appendChild(kvBox([['آخر حفظ', lh ? lh.from + ' ← ' + lh.to + ' (' + lh.date + ')' : 'لا يوجد']]));
     if (!print) rngChips(box, () => renderSF());
     const from = print ? '0000' : rngFrom(), x = achieve({ attendance:SF.attendance, records:SF.records }, print ? 'all' : sfRng);
-    const ty = el('div', 'tiles'); D.types.forEach((t, i) => ty.appendChild(tile(x.types[t] || 0, t + ' (آية)', ['t-ok', 't-late', 't-nav', ''][i]))); box.appendChild(ty);
+    if (print){ const ty = el('div', 'tiles'); D.types.forEach((t, i) => ty.appendChild(tile(x.types[t] || 0, t + ' (آية)', ['t-ok', 't-late', 't-nav', ''][i]))); box.appendChild(ty); }
+    else { const g = el('div', 'chgrid'), tc = [CHC.navy, CHC.gold, CHC.teal, CHC.purple]; box.appendChild(g); const c1 = chCard('الآيات حسب النوع'); c1.appendChild(chDonut(D.types.map((t, i) => [t, x.types[t] || 0, tc[i % 4]]), null, 'آية')); g.appendChild(c1);
+      const rs = SF.records.filter(r => r.date >= from && r.score != null).slice(0, 60).reverse(), c2 = chCard('تطور الدرجات'); c2.appendChild(chLine(rs.map(r => ({ x:fmtD(r.date, { day:'numeric', month:'short' }), y:r.score, title:fmtD(r.date, { weekday:'long', day:'numeric', month:'short' }) + ' • ' + r.type + ': ' + r.score, color:r.score >= 8 ? CHC.ok : r.score >= 6.5 ? CHC.gold : CHC.abs })), { max:D.maxScore, id:'sf', empty:'لا توجد درجات في هذه الفترة.' })); g.appendChild(c2); }
     if (x.avg != null) box.appendChild(el('div', 'slabel ' + (PILL[scoreLabel(x.avg)] || '').replace('p-', 'c-'), 'متوسط الدرجات: ' + x.avg + ' من ' + D.maxScore + ' • ' + scoreLabel(x.avg)));
     H('سجل التسميع');
     const list = SF.records.filter(r => r.date >= from), lim = print ? 25 : sfMore;
@@ -4849,10 +5029,11 @@ function sfSection(k, box, print){
     const from = print ? '0000' : rngFrom(), list = SF.attendance.filter(a => a.date >= from), c = { 'حاضر':0, 'متأخر':0, 'غائب':0, 'مستأذن':0 };
     list.forEach(a => { if (a.status in c) c[a.status]++; });
     const n = list.length, pc = v => n ? Math.round(v / n * 100) + '%' : '—';
-    const tl = el('div', 'tiles'); [['حاضر', 't-ok'], ['متأخر', 't-late'], ['غائب', 't-abs'], ['مستأذن', 't-nav']].forEach(x => { const t = tile(c[x[0]], x[0], x[1]); t.appendChild(el('small', '', pc(c[x[0]]))); tl.appendChild(t); }); box.appendChild(tl);
+    if (print){ const tl = el('div', 'tiles'); [['حاضر', 't-ok'], ['متأخر', 't-late'], ['غائب', 't-abs'], ['مستأذن', 't-nav']].forEach(x => { const t = tile(c[x[0]], x[0], x[1]); t.appendChild(el('small', '', pc(c[x[0]]))); tl.appendChild(t); }); box.appendChild(tl); }
     box.appendChild(el('div', 'slabel c-ok', 'نسبة الحضور: ' + (n ? Math.round((c['حاضر'] + c['متأخر']) / n * 100) + '%' : '—') + ' من ' + n + ' يوم'));
     if (print){ const ab = list.filter(a => a.status !== 'حاضر').slice(0, 40); if (ab.length){ H('أيام الغياب والتأخر والاستئذان'); box.appendChild(el('div', '', ab.map(a => a.date + ' ' + a.status).join(' • '))); } return; }
-    const dots = el('div', 'dots'); list.slice(0, 120).reverse().forEach(a => { const d = el('div', 'dot ' + a.status, fmtD(a.date, { day:'numeric' })); d.title = a.status + ' • ' + a.date; dots.appendChild(d); }); box.appendChild(dots);
+    { const g = el('div', 'chgrid'); box.appendChild(g); const c1 = chCard('توزيع الحضور'); c1.appendChild(chDonut(ATT_SEGS.map(s => [s[1], c[s[1]], s[2]]), n ? Math.round((c['حاضر'] + c['متأخر']) / n * 100) + '%' : '—', 'نسبة الحضور')); g.appendChild(c1);
+      const c2 = chCard('تقويم الحضور'); c2.appendChild(chCal(list.slice(0, 120).reverse().map(a => ({ d:a.date, color:ST_COL[a.status] || CHC.none, title:a.status })), ATT_SEGS)); g.appendChild(c2); }
     if (!list.length) box.appendChild(el('small', '', 'لا يوجد حضور مسجل في هذه الفترة.'));
     const ab = list.filter(a => a.status !== 'حاضر'); if (ab.length){ H('الغياب والتأخر والاستئذان'); ab.slice(0, 60).forEach(a => { const w = el('div', 'row'); w.appendChild(el('div', 'grow', fmtD(a.date, { weekday:'long', day:'numeric', month:'short' }))); w.appendChild(el('span', pillCls(a.status), a.status)); box.appendChild(w); }); }
     return;
@@ -5434,20 +5615,11 @@ function renderCompete(){
   const sum = el('div', 'cpsum'); sum.appendChild(el('span', '', 'عدد الطلاب: ' + all.length)); sum.appendChild(el('span', '', '• مجموع النقاط: ' + all.reduce((n, x) => n + x.points, 0)));
   if (CP.resetAt) sum.appendChild(el('span', '', '• آخر تصفير: ' + CP.resetAt.slice(0, 10).split('-').reverse().join('/'))); box.appendChild(sum);
   if (!list.length) return box.appendChild(el('small', '', CP.list.length ? 'لا توجد نتائج.' : 'لا توجد نقاط بعد. تُضاف النقاط عند اختيار فارس الحلقة، أو من «إضافة نقاط».'));
-  const tb = el('table', 'cptab'), hd = el('tr');
-  ['#', 'الطالب', 'الحلقة', cpP === 'all' ? 'الرصيد' : 'النقاط'].filter((x, i) => !(i === 2 && hal)).forEach(t => hd.appendChild(el('th', '', t))); tb.appendChild(hd);
   let rank = 0, prev = null;
   all.forEach((x, i) => { if (x.points !== prev){ rank = i + 1; prev = x.points; } x.rank = rank; });
-  list.forEach(x => {
-    const tr = el('tr', x.rank <= 3 && x.points > 0 ? 'top' + x.rank : '');
-    tr.appendChild(el('td', 'rk', x.points > 0 && x.rank === 1 ? '🥇' : x.points > 0 && x.rank === 2 ? '🥈' : x.points > 0 && x.rank === 3 ? '🥉' : x.rank));
-    const n = el('td'); n.appendChild(el('b', '', x.name));
-    n.appendChild(el('small', '', 'فارس ' + x.stars + (x.added ? ' • مضاف ' + x.added : '') + (x.spent ? ' • مصروف ' + x.spent : '') + (x.off ? ' • غير نشط' : ''))); tr.appendChild(n);
-    if (!hal) tr.appendChild(el('td', '', x.hname));
-    const p = el('td', 'pt'), b = el('b'); b.innerHTML = STAR_SVG; b.appendChild(document.createTextNode(x.points)); p.appendChild(b); tr.appendChild(p);
-    tb.appendChild(tr);
-  });
-  box.appendChild(tb);
+  const md = x => x.points > 0 && x.rank <= 3 ? ['🥇', '🥈', '🥉'][x.rank - 1] + ' ' : x.rank + '. ';
+  box.appendChild(chTop(list.map(x => ({ label:md(x) + x.name, sub:(hal ? '' : x.hname + ' • ') + 'فارس ' + x.stars + (x.added ? ' • مضاف ' + x.added : '') + (x.spent ? ' • مصروف ' + x.spent : '') + (x.off ? ' • غير نشط' : ''),
+    value:x.points, text:'⭐ ' + x.points, color:x.points > 0 && x.rank <= 3 ? 'linear-gradient(90deg,#B87A1F,#E9B25A)' : null })), 20, { empty:'لا توجد نتائج.' }));
 }
 $('cpHal').onchange = () => CP && CP.ok && renderCompete();
 $('cpQ').oninput = () => CP && CP.ok && renderCompete();
@@ -6269,6 +6441,10 @@ function renderReport(r){
   const body = $('repBody'); body.innerHTML = '';
   if (!r.dates.length){ msg('repBody', 'ليس يوم دراسة. أيام الدراسة من الأحد إلى الأربعاء.', 'info'); return; }
   body.appendChild(el('h3', '', (r.admin ? 'الحلقات' : 'حلقاتي') + ' (' + r.halaqat.length + ') • ' + students + ' طالب'));
+  { const g = el('div', 'chgrid'); body.appendChild(g); const tc = [CHC.navy, CHC.gold, CHC.teal, CHC.purple];
+    const c1 = chCard('الحضور في الحلقات'); c1.appendChild(chStack(r.halaqat.map(h => ({ label:h.name, sub:h.teacher, parts:{ present:h.sum.present, late:h.sum.late, absent:h.sum.absent, excused:h.sum.excused || 0, un:h.unmarked } })),
+      ATT_SEGS.concat([['un', 'لم يُحضَّر', CHC.none]]), { rel:true, text:(x, t) => { const n = x.parts.present + x.parts.late; const d = t - x.parts.un; return d ? Math.round(n * 100 / d) + '%' : '—'; } })); g.appendChild(c1);
+    const c2 = chCard('أنواع التسميع'); c2.appendChild(chDonut(r.types.map((t, i) => [t, TY[t] || 0, tc[i % 4]]), T.recs || null, T.recs ? 'تسميع' : '')); g.appendChild(c2); }
   r.halaqat.forEach((h, idx) => {
     const w = el('div', 'hal'), top = el('div', 'top'), g = el('div', 'grow');
     g.appendChild(el('b', '', h.name)); g.appendChild(el('small', '', (h.teacher ? 'المعلم: ' + h.teacher + ' • ' : '') + h.count + ' طالب'));
@@ -6277,17 +6453,9 @@ function renderReport(r){
     top.appendChild(g); top.appendChild(ps); w.appendChild(top);
     if (h.unmarked) w.appendChild(el('small', '', 'لم يُحضَّر: ' + h.unmarked + (r.period === 'day' ? ' طالب' : ' (طالب × يوم)')));
     const more = el('button', 'mini', 'تفاصيل الطلاب'); more.style.marginTop = '8px';
-    const tb = el('table', r.halaqat.length === 1 ? '' : 'hidden');
-    const head = ['الطالب', 'حضور', 'غياب'].concat(r.types.map(t => t.replace('مراجعة ', 'م.')), ['المعدل']);
-    const thead = el('thead'), hr = el('tr'); head.forEach(x => hr.appendChild(el('th', '', x))); thead.appendChild(hr); tb.appendChild(thead);
-    const tbody = el('tbody');
-    h.students.slice().sort((a, b) => (b.types['حفظ'] || 0) - (a.types['حفظ'] || 0)).forEach(s => {
-      const tr = el('tr');
-      [s.name, s.present + s.late, s.absent].concat(r.types.map(t => s.types[t] || 0), [s.avg != null ? s.avg : '—']).forEach((v, i) => {
-        const td = el('td', '', v); if (i === 0){ td.style.cursor = 'pointer'; td.style.textDecoration = 'underline'; td.onclick = () => openStudent(s.sid); } tr.appendChild(td); });
-      tbody.appendChild(tr);
-    });
-    tb.appendChild(tbody);
+    const tb = el('div', r.halaqat.length === 1 ? '' : 'hidden'); tb.style.marginTop = '10px'; const tc = [CHC.navy, CHC.gold, CHC.teal, CHC.purple];
+    tb.appendChild(chStack(h.students.slice().sort((a, b) => (b.types['حفظ'] || 0) - (a.types['حفظ'] || 0)).map(s => ({ label:s.name, sub:'حضور ' + (s.present + s.late) + ' • غياب ' + s.absent + (s.avg != null ? ' • المعدل ' + s.avg : ''), parts:s.types, onclick:() => openStudent(s.sid) })),
+      r.types.map((t, i) => [t, t, tc[i % 4]]), { text:(x, t) => t + ' آية', empty:'لا يوجد طلاب.' }));
     const sync = () => more.textContent = tb.classList.contains('hidden') ? 'تفاصيل الطلاب' : 'إخفاء التفاصيل';
     more.onclick = () => { tb.classList.toggle('hidden'); sync(); }; sync();
     w.appendChild(more); w.appendChild(tb); body.appendChild(w);
