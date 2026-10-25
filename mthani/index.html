@@ -577,6 +577,14 @@
   @media (prefers-color-scheme: dark){ .bellpop b.t{color:#C9DCEA} }
   @media (max-width:600px){ .bellpop{position:fixed;top:72px;left:12px;right:12px;width:auto} }  .pair{display:grid;grid-template-columns:2fr 1fr;gap:8px}
   .types{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--light);padding:4px;border-radius:12px;margin-top:8px}
+  .amtrow{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap} .amtrow b{font-size:16px;color:var(--navy)} .amtrow select{width:auto;min-width:96px;margin:0}
+  .goal{margin-top:14px;padding:14px;border-radius:16px;background:var(--goldlight);text-align:center;line-height:1.8} .goal b{display:block;font-size:19px;color:var(--gold2)} .goal small{color:var(--muted)}
+  @media (prefers-color-scheme: dark){ .amtrow b{color:#C9DCEA} }
+  .pfgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:10px}
+  .pftype{border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--card)} .pftype h3{margin:0 0 8px;font-size:16px;color:var(--navy)}
+  .pftype .row2{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:4px} .pftype .row2 b{color:var(--text)}
+  .pbar{position:relative;height:10px;border-radius:10px;background:var(--light);overflow:hidden;margin-top:8px} .pbar i{position:absolute;inset:0 auto 0 0;right:auto;border-radius:10px;background:var(--ok)} .pbar s{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--gold2)}
+  .pbar{direction:ltr}
   .types button{padding:10px 4px;border-radius:9px;background:none;color:var(--muted);font-size:15px;font-weight:700}
   .types button.on{background:var(--navy);color:#fff}
   .types button.done{color:var(--ok)}
@@ -734,6 +742,7 @@
     <div id="pPlans" class="hidden">
       <div class="card">
         <h2>بناء الخطط التعليمية</h2>
+        <div class="msg info" id="plCalInfo" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"></div>
         <div class="chips" id="planHal" style="margin-top:10px"></div>
       </div>
       <div class="card" id="planList"></div>
@@ -841,11 +850,13 @@
     <div id="pPlanF" class="hidden">
       <div class="card">
         <h2>متابعة الخطط</h2>
-        <div class="dsh-f"><select id="pfHal"></select><select id="pfType"></select><input id="pfQ" placeholder="ابحث باسم الطالب"></div>
-        <div class="stchips" id="pfSum"></div>
+        <small id="pfCal"></small>
+        <div class="dsh-f" style="margin-top:8px"><select id="pfHal"></select><select id="pfType"></select><input id="pfQ" placeholder="ابحث باسم الطالب"></div>
         <div class="stact"><button id="pfXls">تصدير Excel</button></div>
       </div>
-      <div class="card"><div class="dtw"><table class="dtbl" id="pfTbl"></table></div></div>
+      <div class="card"><div class="kpis" id="pfKpi"></div><div class="pfgrid" id="pfTypes"></div></div>
+      <div class="card"><h2>الحلقات</h2><div class="dtw"><table class="dtbl" id="pfHalT"></table></div></div>
+      <div class="card"><h2>الطلاب</h2><div class="stchips" id="pfSum"></div><div class="dtw"><table class="dtbl" id="pfTbl"></table></div></div>
       <div class="card" id="pfNo"></div>
     </div>
 
@@ -1556,22 +1567,34 @@
     <div class="head"><h2 id="plName"></h2><button class="iconbtn" id="plClose">إغلاق</button></div>
     <label>نوع الخطة</label>
     <div class="types" id="plType"></div>
-    <label for="plDaily">المقدار اليومي (عدد الآيات)</label>
-    <input id="plDaily" type="number" inputmode="numeric" min="1" max="300">
-    <label>من</label>
+    <label>نوع المقدار اليومي</label>
+    <div class="types" id="plUnit"><button type="button" data-u="سطر">بالأسطر</button><button type="button" data-u="وجه">بالأوجه</button></div>
+    <label>المقدار اليومي</label>
+    <div class="amtrow" id="plAmtL"><span id="plLnW"></span><b>سطر</b></div>
+    <div class="amtrow hidden" id="plAmtP"><b>وجه</b><span id="plPgW"></span><select id="plFr"><option value="0">فقط</option><option value="0.25">وربع</option><option value="0.3333">وثلث</option><option value="0.5">ونصف</option></select></div>
+    <label>اتجاه الحفظ</label>
+    <div class="types" id="plDir"><button type="button" data-d="من الناس">من الناس إلى الفاتحة</button><button type="button" data-d="من الفاتحة">من الفاتحة إلى الناس</button></div>
+    <label>بداية الخطة (من سورة وآية)</label>
     <div class="pair"><select id="plFs"></select><input id="plFa" type="number" inputmode="numeric" min="1" placeholder="آية"></div>
-    <label>إلى</label>
-    <div class="pair"><select id="plTs"></select><input id="plTa" type="number" inputmode="numeric" min="1" placeholder="آية"></div>
-    <div class="count" id="plCount"></div>
-    <div class="pair" style="grid-template-columns:1fr 1fr">
-      <div><label for="plStart">بداية الخطة</label><input id="plStart" type="date"></div>
-      <div><label for="plEnd">نهاية الخطة</label><input id="plEnd" type="date"></div>
-    </div>
+    <div class="goal" id="plGoal"></div>
     <label for="plNotes">ملاحظات (اختياري)</label>
     <input id="plNotes" maxlength="200">
     <button class="btn" id="plSave">حفظ الخطة</button>
     <button class="link" id="plDel">حذف هذه الخطة</button>
     <div id="plMsg"></div>
+  </div>
+</div>
+
+<!-- تقويم أيام الخطط -->
+<div class="sheet hidden" id="pcSheet">
+  <div class="panel">
+    <div class="head"><h2>تقويم أيام الخطط</h2><button class="iconbtn" id="pcClose">إغلاق</button></div>
+    <small>أيام الدوام الفعلي التي يوزَّع عليها المقدار اليومي. يُحسب للخطة الجديدة ما تبقى منها من يوم إدخالها.</small>
+    <div class="edgrid"><div><label for="pcFrom">أول يوم</label><input type="date" id="pcFrom"></div><div><label for="pcTo">آخر يوم</label><input type="date" id="pcTo"></div></div>
+    <label>أيام الدراسة في الأسبوع</label><div id="pcDays"></div>
+    <label for="pcOff">أيام مستثناة (إجازات واختبارات) — تاريخ في كل سطر</label><textarea id="pcOff" class="rftxt" dir="ltr" placeholder="2026-11-22"></textarea>
+    <div class="goal" id="pcCount"></div>
+    <button class="btn" id="pcSave">حفظ التقويم</button><div id="pcMsg"></div>
   </div>
 </div>
 
@@ -2288,7 +2311,6 @@ function lastText(s){
   const h = s.last['حفظ'];
   return h ? 'آخر حفظ: ' + h.to + ' (' + fmtD(h.date, { day:'numeric', month:'short' }) + ')' : (s.level ? 'مقدار الحفظ: ' + s.level : 'لا يوجد تسجيل حفظ بعد');
 }
-function planText(p){ return p.daily + ' آية يومياً' + (p.pct != null ? ' • أنجز ' + p.done + ' من ' + p.total + ' (' + p.pct + '%)' : ''); }
 function renderStuds(){
   attTiles();
   const box = $('stuList'); box.innerHTML = '';
@@ -3098,20 +3120,48 @@ $('sgXls').onclick = () => { if (!SG) return; const rows = [['الطلاب ال�
   const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['المتعثرون', rows]])); a.download = 'الطلاب-المتعثرون.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel'); };
 /* ---------- متابعة الخطط ---------- */
 let PF = null, pfS = '';
-const PF_CLS = { 'متقدم':'lv-g', 'مكتملة':'lv-g', 'على المسار':'lv-g', 'متأخر':'lv-y', 'متأخر جداً':'lv-r', 'بلا مدة':'' };
+const PF_CLS = { 'متقدم':'lv-g', 'مكتملة':'lv-g', 'على المسار':'lv-g', 'متأخر':'lv-y', 'متأخر جداً':'lv-r', 'لم تبدأ':'', 'خطة قديمة (تحتاج تحديث)':'lv-y' };
+const PF_ST = ['متقدم', 'على المسار', 'متأخر', 'متأخر جداً', 'مكتملة', 'لم تبدأ', 'خطة قديمة (تحتاج تحديث)'];
 async function openPlanF(){ $('pfTbl').innerHTML = ''; const r = await cpCall({ action:'planFollow', hid:$('pfHal').value }, 'pfNo'); if (!r || !r.ok) return; PF = r;
   if (!$('pfHal').children.length){ fillSel('pfHal', r.halaqat.map(h => [h.hid, h.name]), 'كل الحلقات'); fillSel('pfType', r.types.map(t => [t, t]), 'كل الأنواع'); } renderPlanF(); }
+const pfPg = x => x.unit === 'سطر' ? x.v / LPP : x.v;   // توحيد المقادير بالأوجه للمجاميع
+const pbar = (pct, exp) => { const b = el('div', 'pbar'), i = el('i'); i.style.width = Math.min(100, pct || 0) + '%'; i.style.background = (pct || 0) >= (exp || 0) - 10 ? 'var(--ok)' : (pct || 0) >= (exp || 0) - 25 ? 'var(--gold)' : 'var(--red)'; b.appendChild(i);
+  if (exp != null){ const m = el('s'); m.style.left = Math.min(100, exp) + '%'; m.title = 'المتوقع حتى اليوم'; b.appendChild(m); } return b; };
 function renderPlanF(){
-  const ty = $('pfType').value, q = normAr($('pfQ').value), base = PF.list.filter(x => (!ty || x.type === ty) && (!q || normAr(x.name).indexOf(q) !== -1));
-  const sum = $('pfSum'); sum.innerHTML = ''; [['', 'الكل'], ['متقدم', 'متقدم'], ['على المسار', 'على المسار'], ['متأخر', 'متأخر'], ['متأخر جداً', 'متأخر جداً'], ['مكتملة', 'مكتملة'], ['بلا مدة', 'بلا مدة']].forEach(x => { const n = base.filter(y => !x[0] || y.state === x[0]).length; if (x[0] && !n) return; const b = el('button', pfS === x[0] ? 'on' : '', x[1] + ' (' + n + ')'); b.onclick = () => { pfS = x[0]; renderPlanF(); }; sum.appendChild(b); });
-  const t = $('pfTbl'); t.innerHTML = '<thead><tr><th>الطالب</th><th>النوع</th><th>الإنجاز</th><th>المتوقع</th><th>الحالة</th><th>الحلقة</th><th>الخطة</th><th>تنتهي</th></tr></thead>'; const tb = el('tbody');
+  const ty = $('pfType').value, q = normAr($('pfQ').value), base = PF.list.filter(x => (!ty || x.type === ty) && (!q || normAr(x.name).indexOf(q) !== -1)), live = base.filter(x => !x.legacy);
+  $('pfCal').textContent = 'أيام الدوام الفعلي في تقويم الخطط: ' + fmtDays(PF.cal.total) + ' • المتبقي: ' + fmtDays(PF.cal.left) + ' • ' + PF.cal.from + ' ← ' + PF.cal.to;
+  const pg = (x, k) => x.unit === 'سطر' ? (x[k] || 0) / LPP : (x[k] || 0), sum = (L, k) => L.reduce((n, x) => n + pg(x, k), 0), avg = L => L.length ? Math.round(L.reduce((n, x) => n + (x.pct || 0), 0) / L.length) : 0;
+  const k = $('pfKpi'); k.innerHTML = ''; const kp = (v, l, c, sm) => { const d = el('div', 'kpi ' + (c || '')); d.appendChild(el('b', '', v)); d.appendChild(el('span', '', l)); if (sm) d.appendChild(el('small', '', sm)); k.appendChild(d); };
+  const sid = new Set(base.map(x => x.sid)), tg = sum(live, 'target'), dn = sum(live, 'done'), ex = sum(live, 'expect'), behind = live.filter(x => /متأخر/.test(x.state)).length;
+  kp(sid.size, 'طالب لهم خطة', '', PF.noPlan.length ? PF.noPlan.length + ' بلا خطة' : 'كل الطلاب لهم خطط');
+  kp(tg ? Math.round(dn / tg * 100) + '%' : '—', 'نسبة الإنجاز', tg && dn / tg * 100 >= (ex / tg * 100) - 10 ? 'g' : 'y', fmtPg(dn) + ' من ' + fmtPg(tg));
+  kp(tg ? Math.round(ex / tg * 100) + '%' : '—', 'المتوقع حتى اليوم', '', fmtPg(ex));
+  kp(behind, 'خطة متأخرة', behind ? 'r' : 'g', live.filter(x => x.state === 'متقدم' || x.state === 'على المسار' || x.state === 'مكتملة').length + ' على المسار أو متقدمة');
+  const tw = $('pfTypes'); tw.innerHTML = '';
+  PF.types.filter(t => !ty || t === ty).forEach(t => { const L = live.filter(x => x.type === t); if (!L.length && !base.some(x => x.type === t)) return; const c = el('div', 'pftype'); c.appendChild(el('h3', '', t));
+    const T = sum(L, 'target'), Dn = sum(L, 'done'), Ex = sum(L, 'expect'), pct = T ? Math.round(Dn / T * 100) : 0, ep = T ? Math.round(Ex / T * 100) : 0;
+    const r2 = (a, b) => { const x = el('div', 'row2'); x.appendChild(el('span', '', a)); x.appendChild(el('b', '', b)); c.appendChild(x); };
+    r2('الخطط', String(L.length)); r2('المستهدف', fmtPg(T)); r2('المنجز', fmtPg(Dn) + ' (' + pct + '%)'); r2('المتوقع حتى اليوم', fmtPg(Ex) + ' (' + ep + '%)'); r2('متوسط إنجاز الطلاب', avg(L) + '%');
+    c.appendChild(pbar(pct, ep)); const st = el('div', 'rfpills'); st.style.marginTop = '8px';
+    ['متقدم', 'على المسار', 'متأخر', 'متأخر جداً'].forEach(s0 => { const n = L.filter(x => x.state === s0).length; if (n) st.appendChild(el('span', 'pill ' + (s0 === 'متأخر جداً' ? 'p-red' : s0 === 'متأخر' ? 'p-late' : 'p-ok'), s0 + ' ' + n)); }); c.appendChild(st); tw.appendChild(c); });
+  const hm = {}; live.forEach(x => { const h = hm[x.hname] = hm[x.hname] || { name:x.hname, teacher:x.teacher, n:0, t:0, d:0, e:0, late:0 }; h.n++; h.t += pg(x, 'target'); h.d += pg(x, 'done'); h.e += pg(x, 'expect'); if (/متأخر/.test(x.state)) h.late++; });
+  const ht = $('pfHalT'); ht.innerHTML = '<thead><tr><th>الحلقة</th><th>المعلم</th><th>الخطط</th><th>المستهدف</th><th>المنجز</th><th>الإنجاز</th><th>المتوقع</th><th>متأخرة</th></tr></thead>'; const hb = el('tbody');
+  Object.values(hm).sort((a, b) => (b.t ? b.d / b.t : 0) - (a.t ? a.d / a.t : 0)).forEach(h => { const tr = el('tr'), p = h.t ? Math.round(h.d / h.t * 100) : 0, e = h.t ? Math.round(h.e / h.t * 100) : 0;
+    [[h.name, 'nm'], [h.teacher], [h.n], [fmtPg(h.t)], [fmtPg(h.d)], [p + '%', lvPl(p)], [e + '%'], [h.late || '—', h.late ? 'lv-r' : '']].forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); hb.appendChild(tr); });
+  ht.appendChild(hb);
+  const sm = $('pfSum'); sm.innerHTML = ''; [['', 'الكل']].concat(PF_ST.map(x => [x, x])).forEach(x => { const n = base.filter(y => !x[0] || y.state === x[0]).length; if (x[0] && !n) return; const b = el('button', pfS === x[0] ? 'on' : '', x[1] + ' (' + n + ')'); b.onclick = () => { pfS = x[0]; renderPlanF(); }; sm.appendChild(b); });
+  const t = $('pfTbl'); t.innerHTML = '<thead><tr><th>الطالب</th><th>الحلقة</th><th>النوع</th><th>يومياً</th><th>الهدف</th><th>المنجز</th><th>الإنجاز</th><th>المتوقع</th><th>الحالة</th><th>المتبقي</th></tr></thead>'; const tb = el('tbody');
   sortBy(base.filter(x => !pfS || x.state === pfS), 'gap', 1).forEach(x => { const tr = el('tr'), nm = el('td', 'nm', x.name); nm.onclick = () => goFile(x.sid); tr.appendChild(nm);
-    [[x.type], [x.pct == null ? '—' : x.pct + '%', lvPl(x.pct)], [x.exp == null ? '—' : x.exp + '%'], [x.state, PF_CLS[x.state]], [x.hname], [x.from + ' ← ' + x.to], [x.end || '—']].forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tb.appendChild(tr); });
+    if (x.legacy){ [[x.hname], [x.type], [x.daily + ' آية'], ['—'], ['—'], [x.pct == null ? '—' : x.pct + '%'], ['—'], [x.state, PF_CLS[x.state]], ['—']].forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tb.appendChild(tr); return; }
+    const pc = el('td', lvPl(x.pct), (x.pct || 0) + '%');
+    [[x.hname], [x.type], [fmtAmt(x.unit, x.daily)], [fmtAmt(x.unit, x.target) + ' / ' + fmtDays(x.days)], [fmtAmt(x.unit, x.done)]].forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tr.appendChild(pc);
+    [[(x.exp || 0) + '%'], [x.state, PF_CLS[x.state]], [fmtDays(x.left)]].forEach(c => tr.appendChild(el('td', c[1] || '', c[0]))); tb.appendChild(tr); });
   t.appendChild(tb);
   const no = $('pfNo'); no.innerHTML = ''; no.appendChild(el('h2', '', 'طلاب بلا خطة (' + PF.noPlan.length + ')')); if (PF.noPlan.length) no.appendChild(el('small', '', PF.noPlan.map(x => x.name + ' (' + x.hname + ')').join('، ')));
 }
 $('pfHal').onchange = openPlanF; $('pfType').onchange = () => PF && renderPlanF(); $('pfQ').oninput = () => PF && renderPlanF();
-$('pfXls').onclick = () => { if (!PF) return; const rows = [['متابعة الخطط — ' + D.today], ['الطالب', 'الحلقة', 'المعلم', 'النوع', 'من', 'إلى', 'البداية', 'النهاية', 'المنجز (آية)', 'الإجمالي (آية)', 'الإنجاز %', 'المتوقع %', 'الحالة']].concat(PF.list.map(x => [x.name, x.hname, x.teacher, x.type, x.from, x.to, x.start, x.end, x.done, x.total, x.pct == null ? '' : x.pct, x.exp == null ? '' : x.exp, x.state]));
+$('pfXls').onclick = () => { if (!PF) return; const rows = [['متابعة الخطط — ' + D.today], ['الطالب', 'الحلقة', 'المعلم', 'النوع', 'الوحدة', 'المقدار اليومي', 'أيام الخطة', 'المنقضي', 'الهدف', 'المنجز', 'المتوقع حتى اليوم', 'الإنجاز %', 'المتوقع %', 'الحالة', 'من', 'إلى']]
+    .concat(PF.list.map(x => [x.name, x.hname, x.teacher, x.type, x.unit || 'آية', x.daily, x.days || '', x.elapsed || '', x.target || '', x.done || '', x.expect || '', x.pct == null ? '' : x.pct, x.exp == null ? '' : x.exp, x.state, x.from, x.to]));
   const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['الخطط', rows], ['بلا خطة', [['طلاب بلا خطة'], ['الطالب', 'الحلقة']].concat(PF.noPlan.map(x => [x.name, x.hname]))]])); a.download = 'متابعة-الخطط.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel'); };
 /* ---------- أرشيف الرسائل وإحصائياتها ---------- */
 let MA = null, maP = 'month', maT = 'stats', maDate = null, maQ = '', maCid = '';
@@ -5576,6 +5626,7 @@ $('peSave').onclick = async () => {
 /* ---------- خطة الطالب ---------- */
 let pl = { hal:null, s:null, type:'حفظ' }, planStuds = [];
 function openPlans(){
+  plCalInfo();
   const list = D.planHalaqat || D.halaqat || [];
   if (!list.length){ msg('planList', 'لا توجد حلقات مسندة إليك.', 'info'); return; }
   if (!pl.hal || !list.some(h => h.hid === pl.hal)) pl.hal = hal && list.some(h => h.hid === hal) ? hal : (list.find(h => h.mine) || list[0]).hid;
@@ -5602,8 +5653,8 @@ function renderPlans(){
     if (!ks.length) w.appendChild(el('div', 'plan none', 'لا توجد خطة'));
     ks.forEach(t => {
       const p = s.plans[t], row = el('div', 'row'), g = el('div', 'grow');
-      g.appendChild(el('b', '', t + ': ' + p.from + ' ← ' + p.to));
-      g.appendChild(el('small', '', planText(p) + (p.end ? ' • حتى ' + fmtD(p.end, { day:'numeric', month:'short' }) : '')));
+      g.appendChild(el('b', '', t + ': من ' + p.from + (p.to ? ' ← ' + p.to : '')));
+      g.appendChild(el('small', '', planText(p)));
       if (p.pct != null){ const bar = el('div', 'bar2'), i = el('i'); i.style.width = p.pct + '%'; bar.appendChild(i); g.appendChild(bar); }
       const e = el('button', 'mini', 'تعديل'); e.onclick = () => openPlan(s, t);
       row.appendChild(g); row.appendChild(e); w.appendChild(row);
@@ -5611,26 +5662,59 @@ function renderPlans(){
     box.appendChild(w);
   });
 }
+/* ---------- الخطة بالأسطر أو الأوجه: الهدف = المقدار اليومي × أيام الدوام المتبقية ---------- */
+const PAGE_START = [1,8,13,24,32,37,45,56,65,69,77,84,91,96,101,109,113,120,127,134,142,149,153,161,171,177,184,189,194,198,204,210,218,223,227,232,238,241,245,253,256,260,264,267,272,277,282,289,290,294,303,309,316,323,331,339,346,355,364,371,377,385,394,402,409,415,426,434,442,447,451,459,467,474,480,488,494,500,505,508,513,517,520,527,531,538,545,553,559,568,573,580,585,588,595,599,607,615,621,628,634,641,648,656,664,669,672,675,679,683,687,693,701,706,711,715,720,727,734,740,746,752,759,765,773,778,783,790,798,808,817,825,834,842,849,858,863,871,880,884,891,900,908,914,921,927,932,936,941,947,955,966,977,985,992,998,1006,1012,1022,1028,1036,1042,1050,1059,1075,1085,1092,1098,1104,1110,1114,1118,1125,1133,1142,1150,1161,1169,1177,1186,1194,1201,1206,1213,1222,1230,1236,1242,1249,1256,1262,1267,1272,1276,1283,1290,1297,1304,1308,1315,1322,1329,1335,1342,1347,1353,1358,1365,1371,1379,1385,1390,1398,1407,1418,1426,1435,1443,1453,1462,1471,1479,1486,1493,1502,1511,1519,1527,1536,1545,1555,1562,1571,1582,1591,1601,1611,1619,1627,1634,1640,1649,1660,1666,1675,1683,1692,1700,1708,1713,1721,1726,1736,1742,1750,1756,1761,1769,1775,1784,1793,1803,1818,1834,1854,1873,1893,1908,1916,1928,1936,1944,1956,1966,1974,1981,1989,1995,2004,2012,2020,2030,2037,2047,2057,2068,2079,2088,2096,2105,2116,2126,2134,2145,2156,2161,2168,2175,2186,2194,2202,2215,2224,2238,2251,2262,2276,2289,2302,2315,2327,2346,2361,2386,2400,2413,2425,2436,2447,2462,2474,2484,2494,2508,2519,2528,2541,2556,2565,2574,2585,2596,2601,2611,2619,2626,2634,2642,2651,2660,2668,2674,2691,2701,2716,2733,2748,2763,2778,2792,2802,2812,2819,2823,2828,2835,2845,2850,2853,2858,2867,2876,2888,2899,2911,2923,2933,2952,2972,2993,3016,3044,3069,3092,3116,3139,3160,3173,3182,3195,3204,3215,3223,3236,3248,3258,3266,3274,3281,3288,3296,3303,3312,3323,3330,3337,3347,3355,3364,3371,3379,3386,3393,3404,3415,3425,3434,3442,3451,3460,3470,3481,3489,3498,3504,3515,3524,3534,3540,3549,3556,3564,3569,3577,3584,3588,3596,3607,3614,3621,3629,3638,3646,3655,3664,3672,3679,3691,3699,3705,3718,3733,3746,3760,3776,3789,3813,3840,3865,3891,3915,3942,3971,3987,3997,4013,4032,4054,4064,4069,4080,4090,4099,4106,4115,4126,4133,4141,4150,4159,4167,4174,4183,4192,4200,4211,4219,4230,4239,4248,4257,4265,4273,4283,4288,4295,4304,4317,4324,4336,4348,4359,4373,4386,4399,4415,4433,4454,4474,4487,4496,4506,4516,4525,4531,4539,4546,4557,4565,4575,4584,4593,4599,4607,4612,4617,4624,4631,4646,4666,4682,4706,4727,4750,4767,4785,4811,4829,4853,4874,4896,4918,4942,4969,4996,5030,5056,5079,5087,5094,5100,5105,5111,5116,5126,5130,5136,5143,5151,5156,5162,5169,5178,5186,5193,5200,5209,5218,5223,5230,5237,5242,5254,5268,5287,5314,5332,5358,5386,5415,5430,5448,5461,5476,5495,5513,5543,5571,5597,5617,5642,5673,5703,5728,5759,5801,5830,5855,5883,5910,5932,5964,5994,6017,6044,6073,6099,6126,6138,6156,6177,6194,6208,6222], LPP = 15;
+function lineAt(a){ if (a > 6236) return 604 * LPP; let lo = 0, hi = 603; while (lo < hi){ const m = (lo + hi + 1) >> 1; if (PAGE_START[m] <= a) lo = m; else hi = m - 1; }
+  const st = PAGE_START[lo], en = lo < 603 ? PAGE_START[lo + 1] : 6237; return lo * LPP + (a - st) / (en - st) * LPP; }
+const linesAbs = (a1, a2) => Math.max(0, lineAt(a2 + 1) - lineAt(a1));
+function planEndC(fs, fa, dir, lines){ const step = dir === 'من الفاتحة' ? 1 : -1; let x = fs, a = fa, left = lines;
+  for (let g = 0; g < 120; g++){ const last = D.ayat[x - 1], seg = linesAbs(absAyah(x, a), absAyah(x, last));
+    if (seg >= left - 1e-6){ let lo = a, hi = last; while (lo < hi){ const m = (lo + hi) >> 1; if (linesAbs(absAyah(x, a), absAyah(x, m)) >= left - 1e-6) hi = m; else lo = m + 1; } return [x, lo, true]; }
+    left -= seg; const nx = x + step; if (nx < 1 || nx > 114) return [x, last, false]; x = nx; a = 1; } return [x, D.ayat[x - 1], false]; }
+const arN = (n, one, two, few, many) => n === 1 ? one : n === 2 ? two : (n >= 3 && n <= 10 ? n + ' ' + few : n + ' ' + many);
+const fmtLn = n => { n = Math.round(n); return arN(n, 'سطر واحد', 'سطران', 'أسطر', 'سطراً'); };
+const fmtDays = n => arN(+n, 'يوم واحد', 'يومان', 'أيام', 'يوماً');
+function fmtPg(x){ x = +x || 0; let w = Math.floor(x + 1e-9), f = x - w; const FR = [[0, ''], [0.25, 'ربع'], [1 / 3, 'ثلث'], [0.5, 'نصف'], [2 / 3, 'ثلثان'], [0.75, 'ثلاثة أرباع'], [1, '']];
+  let best = FR[0]; FR.forEach(r => { if (Math.abs(r[0] - f) < Math.abs(best[0] - f)) best = r; }); if (best[0] === 1){ w++; best = FR[0]; }
+  const fr = best[1]; if (!w) return fr ? fr + ' وجه' : '0'; const base = w === 1 ? 'وجه' : w === 2 ? 'وجهان' : w <= 10 ? w + ' أوجه' : w + ' وجهاً'; return fr ? base + ' و' + fr : base; }
+const fmtAmt = (unit, v) => unit === 'سطر' ? fmtLn(v) : fmtPg(v);
+function planText(p){
+  if (!p.unit) return p.daily + ' آية يومياً (خطة قديمة — حدّثها بالأسطر أو الأوجه)' + (p.pct != null ? ' • أنجز ' + p.pct + '%' : '');
+  return 'يومياً: ' + fmtAmt(p.unit, p.daily) + ' • الهدف: ' + fmtAmt(p.unit, p.target) + ' خلال ' + fmtDays(p.days) + ' • أنجز ' + fmtAmt(p.unit, p.done) + (p.pct != null ? ' (' + p.pct + '%)' : '');
+}
+let plUnitV = 'وجه', plDirV = 'من الناس';
 function fillPlanForm(){
   const p = pl.s.plans[pl.type];
   $('plType').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === pl.type));
-  $('plDaily').value = p ? p.daily : '';
-  $('plFs').value = p ? p.fs : 78; $('plFa').value = p ? p.fa : 1;
-  $('plTs').value = p ? p.ts : 114; $('plTa').value = p ? p.ta : D.ayat[113];
-  $('plStart').value = p && p.start ? p.start : D.today; $('plEnd').value = p && p.end ? p.end : '';
+  plUnitV = p && p.unit ? p.unit : 'وجه'; plDirV = p && p.dir ? p.dir : (p && p.fs && p.fs < 78 ? 'من الفاتحة' : 'من الناس');
+  if (!$('plLn')){ const a = el('input'); a.id = 'plLn'; $('plLnW').appendChild(stepIn(a, 1, 150, 1)); const b = el('input'); b.id = 'plPg'; $('plPgW').appendChild(stepIn(b, 0, 20, 1));
+    a.addEventListener('input', planCount); b.addEventListener('input', planCount); $('plFr').onchange = planCount;
+    $('plUnit').querySelectorAll('button').forEach(x => x.onclick = () => { plUnitV = x.dataset.u; planCount(); });
+    $('plDir').querySelectorAll('button').forEach(x => x.onclick = () => { plDirV = x.dataset.d; planCount(); }); }
+  const amt = p && p.unit ? p.daily : 0;
+  $('plLn').value = p && p.unit === 'سطر' ? amt : 7;
+  const w = Math.floor(amt + 1e-9), f = amt - w; $('plPg').value = p && p.unit === 'وجه' ? w : 1; $('plFr').value = p && p.unit === 'وجه' ? (f > 0.45 ? '0.5' : f > 0.3 ? '0.3333' : f > 0.2 ? '0.25' : '0') : '0';
+  $('plFs').value = p && p.fs ? p.fs : 114; $('plFa').value = p && p.fa ? p.fa : 1;
   $('plNotes').value = p ? p.notes : '';
   $('plDel').classList.toggle('hidden', !p); msg('plMsg', '', ''); planCount();
 }
+const plAmt = () => plUnitV === 'سطر' ? +$('plLn').value || 0 : (+$('plPg').value || 0) + (+$('plFr').value || 0);
 function planCount(){
-  const fs = +$('plFs').value, fa = +$('plFa').value, ts = +$('plTs').value, ta = +$('plTa').value, d = +$('plDaily').value;
-  if (!fa || !ta){ $('plCount').textContent = ''; return; }
-  const n = Math.abs(absAyah(ts, ta) - absAyah(fs, fa)) + 1;
-  $('plCount').textContent = 'نطاق الخطة: ' + n + ' آية' + (d ? ' • تحتاج تقريباً ' + Math.ceil(n / d) + ' يوم دراسة' : '');
+  $('plUnit').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.u === plUnitV)); $('plDir').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.d === plDirV));
+  $('plAmtL').classList.toggle('hidden', plUnitV !== 'سطر'); $('plAmtP').classList.toggle('hidden', plUnitV !== 'وجه');
+  const p = pl.s && pl.s.plans[pl.type], keep = p && p.unit, days = keep ? p.days : (D.planLeft || 0), amt = plAmt(), fs = +$('plFs').value, fa = +$('plFa').value, g = $('plGoal'); g.innerHTML = '';
+  if (!days){ g.appendChild(el('b', '', 'لا توجد أيام دوام متبقية في تقويم الخطط')); return; }
+  if (!amt){ g.appendChild(el('small', '', 'حدد المقدار اليومي')); return; }
+  const tot = amt * days, lines = (plUnitV === 'سطر' ? amt : amt * LPP) * days;
+  g.appendChild(el('span', '', 'هدف الطالب')); g.appendChild(el('b', '', fmtAmt(plUnitV, tot) + ' خلال ' + fmtDays(days)));
+  if (plUnitV === 'سطر') g.appendChild(el('small', '', 'أي نحو ' + fmtPg(lines / LPP) + ' • '));
+  if (fs && fa && fa <= D.ayat[fs - 1]){ const e = planEndC(fs, fa, plDirV, lines); g.appendChild(el('small', '', 'من ' + D.surah[fs - 1] + ' ' + fa + ' وينتهي تقريباً عند ' + D.surah[e[0] - 1] + ' ' + e[1] + (e[2] ? '' : ' (نهاية المصحف بهذا الاتجاه)'))); }
+  if (keep) g.appendChild(el('small', '', ' • أيام الخطة محسوبة من يوم إدخالها (' + p.start + ')'));
 }
-['plFs','plFa','plTs','plTa','plDaily'].forEach(id => $(id).oninput = planCount);
+['plFs','plFa'].forEach(id => $(id).addEventListener('input', planCount)); $('plFs').addEventListener('change', planCount);
 function openPlan(s, type){
   pl.s = s; pl.type = type;
-  ['plFs','plTs'].forEach(id => { const e = $(id); if (e.options.length) return; D.surah.forEach((n, i) => { const o = el('option', '', (i + 1) + ' - ' + n); o.value = i + 1; e.appendChild(o); }); });
+  ['plFs'].forEach(id => { const e = $(id); if (e.options.length) return; D.surah.forEach((n, i) => { const o = el('option', '', (i + 1) + ' - ' + n); o.value = i + 1; e.appendChild(o); }); });
   const t = $('plType'); if (!t.children.length) D.types.forEach(x => { const b = el('button', '', x); b.dataset.t = x; b.onclick = () => { pl.type = x; fillPlanForm(); }; t.appendChild(b); });
   $('plName').textContent = 'خطة ' + s.name;
   fillPlanForm();
@@ -5640,15 +5724,30 @@ function closePlan(){ $('planSheet').classList.add('hidden'); document.body.styl
 $('plClose').onclick = closePlan;
 $('planSheet').onclick = e => { if (e.target === $('planSheet')) closePlan(); };
 $('plSave').onclick = async () => {
-  const p = { action:'savePlan', sid:pl.s.sid, type:pl.type, daily:+$('plDaily').value, fs:+$('plFs').value, fa:+$('plFa').value, ts:+$('plTs').value, ta:+$('plTa').value,
-    start:$('plStart').value, end:$('plEnd').value, notes:$('plNotes').value.trim() };
-  if (!p.daily) return msg('plMsg', 'أدخل المقدار اليومي.', 'err');
-  if (!p.end) return msg('plMsg', 'حدّد نهاية الخطة.', 'err');
+  const p = { action:'savePlan', sid:pl.s.sid, type:pl.type, unit:plUnitV, daily:plAmt(), dir:plDirV, fs:+$('plFs').value, fa:+$('plFa').value, notes:$('plNotes').value.trim() };
+  if (!p.daily) return msg('plMsg', 'حدد المقدار اليومي.', 'err');
+  if (!p.fa || p.fa > D.ayat[p.fs - 1]) return msg('plMsg', 'رقم الآية غير صحيح لسورة ' + D.surah[p.fs - 1] + '.', 'err');
   $('plSave').disabled = true; msg('plMsg', 'جاري الحفظ...', 'info');
   try { const r = await api(p); if (!r.ok) return msg('plMsg', r.msg, 'err'); toast(r.msg); closePlan(); loadPlans(); }
   catch(e){ msg('plMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('plSave').disabled = false; }
 };
+/* تقويم أيام الخطط */
+const WD_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+let pcDaysB = null;
+function pcCountUpd(){ const f = $('pcFrom').value, t = $('pcTo').value, dd = pcDaysB.get().map(x => WD_AR.indexOf(x)), off = new Set($('pcOff').value.split(/[\s,،]+/).filter(Boolean));
+  let n = 0, left = 0; if (f && t && t >= f){ for (let d = ud(f).getTime(); d <= ud(t).getTime(); d += 864e5){ const x = new Date(d), ds = x.toISOString().slice(0, 10); if (dd.indexOf(x.getUTCDay()) !== -1 && !off.has(ds)){ n++; if (ds >= D.today) left++; } } }
+  $('pcCount').innerHTML = ''; $('pcCount').appendChild(el('b', '', fmtDays(n) + ' دوام فعلي')); $('pcCount').appendChild(el('small', '', 'المتبقي من اليوم: ' + fmtDays(left))); }
+async function openPlanCal(){ const r = await cpCall({ action:'planCal' }, 'plCalInfo'); if (!r || !r.ok) return;
+  $('pcFrom').value = r.cal.from; $('pcTo').value = r.cal.to; $('pcOff').value = r.cal.off.join('\n');
+  $('pcDays').innerHTML = ''; pcDaysB = selBox(WD_AR, true); $('pcDays').appendChild(pcDaysB); pcDaysB.set(r.cal.days.map(i => WD_AR[i])); pcDaysB.onpick = pcCountUpd;
+  ['pcFrom', 'pcTo', 'pcOff'].forEach(id => $(id).oninput = pcCountUpd); pcCountUpd(); msg('pcMsg', '', ''); $('pcSheet').classList.remove('hidden'); }
+$('pcClose').onclick = () => $('pcSheet').classList.add('hidden');
+$('pcSave').onclick = async () => { $('pcSave').disabled = true;
+  const r = await cpCall({ action:'planCalSave', cal:{ from:$('pcFrom').value, to:$('pcTo').value, days:pcDaysB.get().map(x => WD_AR.indexOf(x)), off:$('pcOff').value } }, 'pcMsg'); $('pcSave').disabled = false;
+  if (r && r.ok){ D.planLeft = r.left; toast(r.msg); $('pcSheet').classList.add('hidden'); plCalInfo(); } };
+function plCalInfo(){ const b = $('plCalInfo'); b.innerHTML = ''; b.appendChild(el('span', '', 'أيام الدوام الفعلي المتبقية للخطط الجديدة: ')); b.appendChild(el('b', '', fmtDays(D.planLeft || 0)));
+  if (document.body.classList.contains('admin') || (D.perms || []).indexOf('students.plans_all') !== -1){ const x = el('button', 'mini', 'تقويم أيام الخطط'); x.onclick = openPlanCal; x.style.marginInlineStart = 'auto'; b.appendChild(x); } }
 $('plDel').onclick = async () => {
   msg('plMsg', 'جاري الحذف...', 'info');
   try { const r = await api({ action:'delPlan', sid:pl.s.sid, type:pl.type }); if (!r.ok) return msg('plMsg', r.msg, 'err'); toast(r.msg); closePlan(); loadPlans(); }
@@ -5699,7 +5798,7 @@ function plansBlock(s, box){
   ks.forEach(k => {
     const p = s.plans[k], w = el('div', 'row'), g = el('div', 'grow');
     g.appendChild(el('b', '', k + ': ' + (p.from && p.to ? p.from + ' ← ' + p.to : '')));
-    g.appendChild(el('small', '', planText(p) + (p.end ? ' • حتى ' + fmtD(p.end, { day:'numeric', month:'short' }) : '')));
+    g.appendChild(el('small', '', planText(p)));
     if (p.pct != null){ const bar = el('div', 'bar2'), i = el('i'); i.style.width = p.pct + '%'; bar.appendChild(i); g.appendChild(bar); }
     w.appendChild(g); box.appendChild(w);
   });
