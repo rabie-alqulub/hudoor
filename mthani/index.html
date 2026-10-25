@@ -531,6 +531,7 @@
   .evalstat b{display:block;font-size:16px;color:var(--navy)} .evalstat small{display:block;margin-top:6px;color:var(--red)}
   .strow .top .seqno{flex:none;width:28px;height:28px;border-radius:50%;background:var(--light);color:var(--navy);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
   .strow .top .eye{margin-inline-start:auto;width:36px;height:36px;border-radius:12px;background:var(--light);color:var(--navy);display:flex;align-items:center;justify-content:center;padding:0} .strow .top .eye svg{width:19px;height:19px}
+  .strow.flash{animation:flash 1.6s ease} @keyframes flash{0%,40%{box-shadow:0 0 0 3px var(--gold)}100%{box-shadow:none}}
   .numlist{display:flex;flex-direction:column;gap:6px;margin-top:6px} .numrow{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card);cursor:pointer}
   .numrow .no{flex:none;width:30px;height:30px;border-radius:50%;background:var(--light);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
   .numrow .nm{flex:1;min-width:0} .numrow .nm b{display:block} .numrow .nm small{color:var(--muted);font-size:12px}
@@ -849,7 +850,7 @@
         <small id="asSub"></small>
         <div class="stchips" id="asTabs"></div>
         <div class="stchips hidden" id="asDates"></div>
-        <div class="stact"><button class="good" id="asAdd">+ إضافة طلاب للاختبار القبلي</button><button id="asXls">تصدير Excel</button><button id="asPdf" class="hidden">طباعة / PDF</button><button id="asSetDate" class="hidden">تحديد موعد الاختبار للقائمة</button></div>
+        <div class="stact"><button class="good" id="asAdd">+ إضافة طلاب للاختبار القبلي</button><button id="asXls">تصدير Excel</button><button id="asPdf" class="hidden">طباعة / PDF</button><button id="asSetDate" class="hidden">تحديد موعد واحد لكل الطلاب المعروضين</button></div>
         <input id="asQ" placeholder="ابحث باسم الطالب أو الحلقة" style="margin-top:8px">
       </div>
       <div class="card" id="asBox"></div>
@@ -3004,7 +3005,10 @@ function renderAssoc(){
     if (asT === 'pass' && asMode === 'assocNom' && AX.canNom) b('ترشيح للجمعية', 'good', () => asSheet('nom', x));
     const sent = asT === 'nom' && (AX.batches || []).some(y => y.date === x.examDate && y.status !== AX.exSt.draft);
     w.appendChild(el('div', 'meta', asT !== 'nom' ? '' : sent ? 'ضمن ' + exbName((AX.batches || []).find(y => y.date === x.examDate)) + ' المرسلة لمشرف الجمعية — النتيجة يسجّلها المشرف.' : 'النتيجة يسجّلها مشرف الجمعية بعد إرسال مجموعته من «المختبرون».'));
-    if (asT === 'nom' && AX.canNom && !sent) b('إلغاء الترشيح', 'danger', () => asSheet('cancel', x));
+    if (asT === 'nom' && AX.canNom && !sent){
+      b(x.examDate ? 'تغيير موعد الاختبار' : 'تحديد موعد الاختبار', 'good', () => asSheet('date1', x));
+      if (x.examDate) b('اعتماد مجموعة ' + x.examDate + ' وإرسالها لمشرف الجمعية', 'gold', () => { asT = 'batch'; renderAssoc(); setTimeout(() => { const c = $('exb-' + x.examDate); if (c){ c.scrollIntoView({ behavior:'smooth', block:'start' }); c.classList.add('flash'); } }, 80); });
+      b('إلغاء الترشيح', 'danger', () => asSheet('cancel', x)); }
     if (asT === 'fail') b('إعادة الاختبار القبلي', '', () => asDo('retry', x.id, {}));
     b('ملف الطالب', '', () => goFile(x.sid)); if (asT === 'wait' || asT === 'fail') b('حذف', 'danger', () => { if (confirm('حذف ' + x.sname + ' من القائمة؟')) asDo('del', x.id, {}); });
     w.appendChild(ac); box.appendChild(w); });
@@ -3078,6 +3082,11 @@ function asSheet(op, x){
     $('asShT').textContent = x ? 'تعديل بيانات المشرف' : 'إضافة مشرف من الجمعية'; if (x) F.id = () => x.id;
     F.name = inp('الاسم الكامل *', 'text', x ? x.name : ''); F.nid = inp('رقم الهوية * (يدخل به نموذج الاختبار)', 'text', x ? x.nid : '', { inputMode:'numeric', maxLength:10, dir:'ltr' });
     F.phone = inp('الجوال *', 'tel', x ? x.phone : '', { dir:'ltr', placeholder:'05xxxxxxxx' }); F.org = inp('الجهة', 'text', x ? x.org : 'جمعية تذكرة لتحفيظ القرآن الكريم بعسير');
+  } else if (op === 'date1'){
+    $('asShT').textContent = 'موعد اختبار الجمعية: ' + x.sname + ' — ' + x.level; F.examDate = inp('تاريخ الاختبار *', 'date', x.examDate || ''); F.ids = () => [x.id];
+    const ds = [...new Set(AX.list.filter(y => y.status === AX.st.nom && y.examDate && y.id !== x.id).map(y => y.examDate))].sort();
+    if (ds.length){ b.appendChild(el('small', '', 'مواعيد مجموعات قائمة (اضغط للضم إليها):')); const w = el('div', 'rfsel'); ds.forEach(d0 => { const bb = el('button', '', d0); bb.type = 'button'; bb.onclick = () => { F.examDate.value = d0; }; w.appendChild(bb); }); b.appendChild(w); }
+    b.appendChild(el('small', '', 'الطلاب الذين لهم الموعد نفسه يكوّنون مجموعة واحدة تُعتمد وتُرسل لمشرف الجمعية.'));
   } else if (op === 'cancel'){
     $('asShT').textContent = 'إلغاء ترشيح: ' + x.sname + ' — ' + x.level;
     b.appendChild(el('div', 'msg err', 'يُلغى ترشيح الطالب نهائياً ويخرج من قوائم الترشيح والمختبرين، ويُغلق طلب المعلم ويصله إشعار بالسبب.'));
@@ -3096,6 +3105,7 @@ $('asShSave').onclick = async () => {
   const F = asAct.F, d = {}; Object.keys(F).forEach(k => d[k] = typeof F[k] === 'function' ? F[k]() : F[k].value.trim());
   if (asAct.op === 'add' && (!d.level || !d.sids.length)) return msg('asShMsg', 'اختر المرحلية والطلاب.', 'err');
   if (asAct.op === 'addMany'){ if (!d.items.length) return msg('asShMsg', 'حدد طالباً واحداً على الأقل.', 'err'); const miss = d.items.filter(x => !x.level).length; if (miss) return msg('asShMsg', 'حدد المرحلية لكل طالب محدد (' + miss + ' بدون مرحلية).', 'err'); }
+  if (asAct.op === 'date1'){ if (!d.examDate) return msg('asShMsg', 'حدد التاريخ.', 'err'); $('asShSave').disabled = true; await asDo('dateMany', '', d, 'asShMsg'); $('asShSave').disabled = false; return; }
   if (asAct.op === 'date'){ if (!d.examDate) return msg('asShMsg', 'حدد التاريخ.', 'err'); $('asShSave').disabled = true; const r = await asDo('dateMany', '', d, 'asShMsg'); $('asShSave').disabled = false; if (r && r.ok){ asDate = r.examDate; renderAssoc(); } return; }
   if (asAct.op === 'nomMany'){ if (!d.examDate) return msg('asShMsg', 'حدد تاريخ الاختبار.', 'err'); if (!d.items.length) return msg('asShMsg', 'حدد طالباً واحداً على الأقل.', 'err');
     const miss = d.items.filter(x => !x.level).length; if (miss) return msg('asShMsg', 'حدد المرحلية لكل طالب محدد (' + miss + ' بدون مرحلية).', 'err'); }
@@ -3149,11 +3159,11 @@ function renderBatches(){
     box.appendChild(el('div', 'msg err', 'الخادم ما زال على النسخة القديمة، لذلك لا تظهر خانة مشرفي الجمعية. الصق ملف Code.gs الأخير في مشروع مثاني، ثم: نشر ← إدارة عمليات النشر ← ✏️ ← الإصدار: «إصدار جديد» ← نشر.')); return; }
   if (AX.canNom) supCard(box);
   const nod = AX.list.filter(x => x.status === AX.st.nom && !x.examDate).length;
-  if (nod) box.appendChild(el('div', 'msg info', nod + ' طالب مرشح بلا موعد اختبار — حدد موعدهم من «المرشحون للجمعية» ليظهروا هنا في مجموعة يومهم.'));
+  if (nod) box.appendChild(el('div', 'msg info', nod + ' طالب مرشح بلا موعد اختبار — حدد موعدهم من «المرشحون» ليظهروا هنا في مجموعة يومهم.'));
   if (!ds.length) return box.appendChild(el('small', '', 'لا توجد مجموعات بعد. حدّد موعد الاختبار للمرشحين فتتجمع هنا حسب اليوم.'));
   ds.forEach(d => { const L = AX.list.filter(x => exbIn(x) && x.examDate === d).sort((a, b) => AX.levels.indexOf(a.level) - AX.levels.indexOf(b.level) || a.sname.localeCompare(b.sname, 'ar'));
     const bt = (AX.batches || []).find(b => b.date === d), stt = bt ? bt.status : AX.exSt.draft, rec = L.filter(x => x.status !== AX.st.nom).length, okN = L.filter(x => x.status === AX.st.ok).length, mid = 'exbM' + d;
-    const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', exbName(stt === AX.exSt.draft ? null : bt) + ' — ' + wDay(d) + ' ' + d)); w.appendChild(tp);
+    const w = el('div', 'strow'), tp = el('div', 'top'); w.id = 'exb-' + d; tp.appendChild(el('b', '', exbName(stt === AX.exSt.draft ? null : bt) + ' — ' + wDay(d) + ' ' + d)); w.appendChild(tp);
     const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (stt === AX.exSt.done ? 'p-ok' : stt === AX.exSt.ok ? 'p-late' : 'p-none'), stt)); pl.appendChild(el('span', 'pill p-none', L.length + ' طالب'));
     if (rec) pl.appendChild(el('span', 'pill p-ok', 'النتائج: ' + rec + ' من ' + L.length + ' • اجتاز ' + okN)); w.appendChild(pl);
     const lv = {}; L.forEach(x => lv[x.level] = (lv[x.level] || 0) + 1); w.appendChild(el('div', 'meta', Object.keys(lv).map(k => k.replace('المرحلية ', '') + ' × ' + lv[k]).join(' • ')));
@@ -4993,15 +5003,17 @@ function renderRefForm(k){
   if (!MS.students.length){ f.appendChild(el('small', '', 'لا يوجد طلاب في حلقتك.')); return; }
   const F = {};
   if (k === 'exam'){
-    f.appendChild(lab('الطلاب المرشحون', true));
+    f.appendChild(lab('الطلاب المرشحون ومرحلية كل طالب', true));
     const all = el('label', 'chk'); const ca = el('input'); ca.type = 'checkbox'; all.appendChild(ca); all.appendChild(document.createTextNode(' تحديد الكل')); f.appendChild(all);
-    const lst = el('div', 'stlist'); MS.students.forEach(s => { const l = el('label'); const c = el('input'); c.type = 'checkbox'; c.value = s.sid; l.appendChild(c); l.appendChild(el('span', '', s.name)); const sub = [MS.students.some(x => x.hid !== s.hid) ? s.hname : '', (s.passed || []).length ? 'اجتاز: ' + s.passed.map(v => v.replace('المرحلية ', '')).join('، ') : ''].filter(Boolean).join(' • '); if (sub) l.appendChild(el('small', '', sub)); lst.appendChild(l); });
+    const mOpt = s => [''].concat(MS.marhala.filter(m => (s.passed || []).indexOf(m) === -1)), stv = {};
+    const lst = el('div', 'stlist'); MS.students.forEach(s => { const l = el('label'); const c = el('input'); c.type = 'checkbox'; c.value = s.sid; l.appendChild(c); l.appendChild(el('span', '', s.name));
+      const sub = [MS.students.some(x => x.hid !== s.hid) ? s.hname : '', (s.passed || []).length ? 'اجتاز: ' + s.passed.map(v => v.replace('المرحلية ', '')).join('، ') : ''].filter(Boolean).join(' • '); if (sub) l.appendChild(el('small', '', sub));
+      const ls = el('select'); ls.style.cssText = 'width:auto;max-width:170px;padding:6px 8px;font-size:13px;margin:0;margin-inline-start:auto';
+      mOpt(s).forEach(m => { const o = el('option', '', m || 'المرحلية'); o.value = m; ls.appendChild(o); }); ls.onclick = e => e.stopPropagation();
+      ls.onchange = () => { stv[s.sid] = ls.value; if (ls.value) c.checked = true; }; l.appendChild(ls); lst.appendChild(l); });
     ca.onchange = () => lst.querySelectorAll('input').forEach(c => c.checked = ca.checked);
     f.appendChild(lst); F.sids = () => [...lst.querySelectorAll('input:checked')].map(c => c.value);
-    f.appendChild(lab('المرحلية', true)); const st = el('select'); f.appendChild(st); F.stage = () => st.value;
-    const stFill = () => { const on = F.sids(), pv = st.value, bad = new Set(); MS.students.filter(s => on.indexOf(s.sid) !== -1).forEach(s => (s.passed || []).forEach(v => bad.add(v)));
-      st.innerHTML = ''; fillSel2(st, MS.marhala.filter(m => !bad.has(m)).map(m => { const x = (D.marhala || []).find(y => y.name === m); return [m, m + (x && x.desc ? ' — ' + x.desc : '')]; }), '— اختر المرحلية —'); if (!bad.has(pv)) st.value = pv; };
-    lst.addEventListener('change', stFill); ca.addEventListener('change', stFill); stFill();
+    F.stages = () => { const o = {}; F.sids().forEach(k => o[k] = stv[k] || ''); return o; };
     f.appendChild(lab('اتجاه الحفظ')); const dir = selBox(['من الناس', 'من الفاتحة']); f.appendChild(dir); F.dir = dir.get;
     f.appendChild(lab('جاهزية الطالب في رأي المعلم', true)); const rd = selBox(['ممتاز', 'جيد جداً', 'جيد']); f.appendChild(rd); F.ready = rd.get;
     f.appendChild(lab('عدد مرات مراجعة المقدار كاملاً')); const rv = el('input'); rv.type = 'number'; rv.min = 0; rv.max = 99; rv.inputMode = 'numeric'; f.appendChild(rv); F.reviews = () => rv.value;
@@ -5032,7 +5044,7 @@ function renderRefForm(k){
     const data = {}; Object.keys(F).forEach(x => { if (x !== 'sids') data[x] = F[x](); });
     const sids = F.sids();
     if (!sids.length) return msg('msMsg', k === 'exam' ? 'اختر طالباً واحداً على الأقل.' : 'اختر الطالب.', 'err');
-    if (k === 'exam'){ if (!data.stage) return msg('msMsg', 'اختر المرحلية.', 'err'); if (!data.ready) return msg('msMsg', 'حدد جاهزية الطالب.', 'err'); }
+    if (k === 'exam'){ const miss = MS.students.filter(x => sids.indexOf(x.sid) !== -1 && !(data.stages || {})[x.sid]).map(x => x.name); if (miss.length) return msg('msMsg', 'اختر المرحلية أمام: ' + miss.join('، '), 'err'); if (!data.ready) return msg('msMsg', 'حدد جاهزية الطالب.', 'err'); }
     else { if (!data.reasons.length) return msg('msMsg', 'اختر سبب الإحالة.', 'err'); if (data.details.length < 5) return msg('msMsg', 'اكتب وصف الحالة.', 'err'); }
     btn.disabled = true; msg('msMsg', 'جاري الإرسال...', 'info');
     const r = await cpCall({ action:'refCreate', kind:k, sids:sids, data:data }, 'msMsg'); btn.disabled = false;
