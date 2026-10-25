@@ -762,7 +762,7 @@
         <small>لا يمكن تسكين طالب في الحلقة بعد اكتمال هذا العدد.</small>
         <label for="hnT">معلم الحلقة</label><select id="hnT"></select>
         <label for="hnNotes">ملاحظات</label><input id="hnNotes" maxlength="200" placeholder="مثال: المكان أو الفترة">
-        <label class="chk" style="margin-top:12px"><input type="checkbox" id="hnRemote"> حلقة عن بعد (Zoom)</label>
+        <label class="chk" style="margin-top:12px"><input type="checkbox" id="hnRemote"> حلقة عن بعد</label>
         <button class="btn" id="hnSave">إضافة الحلقة</button>
         <div id="hnMsg"></div>
       </div>
@@ -838,19 +838,16 @@
       <div class="card" id="txBox"></div>
     </div>
 
-    <!-- ربط Zoom -->
+    <!-- ربط الحلقات عن بعد (JaaS) -->
     <div id="pZoomCfg" class="hidden">
       <div class="card">
-        <h2>ربط Zoom للحلقات عن بعد</h2>
-        <div class="rfsec">1) تطبيق إنشاء الاجتماعات (Server-to-Server OAuth)</div>
-        <label for="zcAcc">Account ID</label><input id="zcAcc" dir="ltr" autocomplete="off">
-        <label for="zcCid">Client ID</label><input id="zcCid" dir="ltr" autocomplete="off">
-        <label for="zcSec">Client Secret</label><input id="zcSec" dir="ltr" type="password" autocomplete="off">
-        <div class="rfsec">2) تطبيق فتح الحلقة داخل مثاني (General App ← Meeting SDK)</div>
-        <label for="zcSdk">Client ID</label><input id="zcSdk" dir="ltr" autocomplete="off">
-        <label for="zcSdkSec">Client Secret</label><input id="zcSdkSec" dir="ltr" type="password" autocomplete="off">
-        <small>المفاتيح السرية لا تُعرض بعد حفظها، واتركها فارغة للإبقاء على المحفوظ.</small>
-        <div class="stact"><button class="good" id="zcSave">حفظ واختبار الاتصال</button><button id="zcCreate">إنشاء روابط الحلقات عن بعد</button></div>
+        <h2>ربط الحلقات عن بعد</h2>
+        <small>من حساب المجمع في Jitsi as a Service (jaas.8x8.vc): App ID، ثم API Keys ← Key ID والمفتاح الخاص (Private Key).</small>
+        <label for="zcApp">App ID</label><input id="zcApp" dir="ltr" autocomplete="off" placeholder="vpaas-magic-cookie-...">
+        <label for="zcKid">Key ID</label><input id="zcKid" dir="ltr" autocomplete="off" placeholder="vpaas-magic-cookie-.../xxxxxx">
+        <label for="zcPem">المفتاح الخاص (Private Key)</label><textarea id="zcPem" dir="ltr" class="rftxt" style="font-family:monospace;font-size:12px" placeholder="-----BEGIN PRIVATE KEY-----"></textarea>
+        <small>المفتاح الخاص لا يُعرض بعد حفظه، واتركه فارغاً للإبقاء على المحفوظ.</small>
+        <div class="stact"><button class="good" id="zcSave">حفظ واختبار</button><button id="zcCreate">إنشاء غرف الحلقات عن بعد</button></div>
         <div id="zcMsg"></div>
       </div>
       <div class="card" id="zcList"></div>
@@ -1711,8 +1708,7 @@
     <label for="hlT">معلم الحلقة</label><select id="hlT"></select>
     <label for="hlNotes">ملاحظات</label><input id="hlNotes" maxlength="200">
     <label class="chk" style="margin-top:12px"><input type="checkbox" id="hlOn"> الحلقة نشطة</label>
-    <label class="chk" style="margin-top:8px"><input type="checkbox" id="hlRemote"> حلقة عن بعد (Zoom)</label>
-    <div class="zmlink hidden" id="hlZm"></div>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" id="hlRemote"> حلقة عن بعد</label>
     <button class="btn" id="hlSave">حفظ التعديلات</button>
     <div id="hlMsg"></div>
   </div>
@@ -1978,7 +1974,7 @@ const ADMIN_NAV = [
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'المعاملات', ic:'exam', items:[['trxIn', 'المعاملات الواردة'], ['trxMemo', 'التعاميم والمذكرات']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع']] },
-  { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['zoomCfg', 'ربط Zoom (الحلقات عن بعد)'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
+  { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['zoomCfg', 'ربط الحلقات عن بعد'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
 ];
 function buildAdminNav(n){
   const lg = el('div', 'navlogo'), im = el('img'); im.src = '../logo.jpg'; im.alt = ''; lg.appendChild(im); lg.appendChild(el('b', '', (D && D.orgShort) || 'مجمع ربيع القلوب')); n.appendChild(lg);
@@ -2793,7 +2789,7 @@ function openHl(h){
   $('hlNo').textContent = 'رقم الحلقة: ' + h.hid + ' • ' + h.students + ' طالب';
   $('hlCap').value = h.cap || ''; $('hlCapN').textContent = 'في الحلقة الآن ' + h.students + ' طالب، فلا يقل الحد عن ' + Math.max(h.students, 1) + '.';
   $('hlName').value = h.name; $('hlNotes').value = h.notes || ''; teacherOpts('hlT'); $('hlT').value = h.tnid || ''; $('hlOn').checked = h.active; $('hlRemote').checked = !!h.remote;
-  const zl = $('hlZm'); zl.innerHTML = ''; zl.classList.toggle('hidden', !h.zmUrl); if (h.zmUrl){ zl.appendChild(el('span', '', 'رابط الحلقة: ')); zl.appendChild(zmCopyBtn(h.zmUrl)); }
+
   $('hlSheet').classList.remove('hidden');
 }
 $('hlOn').onchange = () => { hlForce = false; msg('hlMsg', '', ''); };
@@ -3090,38 +3086,32 @@ function txPrint(x){
 }
 
 /* ---------- الحلقات عن بعد (Zoom داخل مثاني) ---------- */
-const ZM_VER = '5.1.4';
 let zmClient = null, zmLoad = null, zmCur = null, zmPoll = null;
-function zmCopyBtn(url){ const b = el('button', 'link', 'نسخ الرابط'); b.type = 'button'; b.onclick = () => { try { navigator.clipboard.writeText(url); toast('نُسخ رابط الحلقة'); } catch(e){ prompt('انسخ الرابط', url); } }; return b; }
+const MTHANI_URL = new URL('./', location.href.split('?')[0]).href;
+function zmCopyBtn(url){ const b = el('button', 'link', 'نسخ الرابط'); b.type = 'button'; b.onclick = () => { try { navigator.clipboard.writeText(url); toast('نُسخ الرابط'); } catch(e){ prompt('انسخ الرابط', url); } }; return b; }
 function zmScript(src){ return new Promise((ok, no) => { const x = document.createElement('script'); x.src = src; x.onload = ok; x.onerror = no; document.head.appendChild(x); }); }
-function zmSdk(){
-  if (window.ZoomMtgEmbedded) return Promise.resolve();
-  if (!zmLoad){ const v = 'https://source.zoom.us/' + ZM_VER + '/lib/vendor/';
-    zmLoad = ['react.min.js', 'react-dom.min.js', 'redux.min.js', 'redux-thunk.min.js', 'lodash.min.js'].reduce((p, f) => p.then(() => zmScript(v + f)), Promise.resolve())
-      .then(() => zmScript('https://source.zoom.us/zoom-meeting-embedded-' + ZM_VER + '.min.js')).catch(e => { zmLoad = null; throw e; }); }
-  return zmLoad;
-}
-/* يفتح الحلقة داخل الصفحة. إن تعذّر (مفاتيح غير مضافة أو متصفح لا يدعم) يُفتح رابط Zoom مباشرة */
+function zmSdk(app){ if (window.JitsiMeetExternalAPI) return Promise.resolve(); if (!zmLoad) zmLoad = zmScript('https://8x8.vc/' + app + '/external_api.js').catch(e => { zmLoad = null; throw e; }); return zmLoad; }
+/* يفتح الحلقة داخل الصفحة: المعلم مشرف الغرفة، والطالب وولي الأمر مشاركان */
 async function zmOpen(hid, stage, msgBox){
   const S0 = $(stage); S0.classList.remove('hidden'); S0.innerHTML = '<div class="zmph">جاري فتح الحلقة...</div>';
   const r = await cpCall({ action:'zmJoin', hid:hid }, msgBox); if (!r || !r.ok){ S0.classList.add('hidden'); return null; }
-  zmCur = { hid:hid, stage:stage, url:r.url, host:r.host };
-  const fallback = why => { S0.innerHTML = ''; const p = el('div', 'zmph'); p.appendChild(el('div', '', why)); const a = el('a', 'btn', 'فتح الحلقة في Zoom'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.style.marginTop = '10px'; p.appendChild(a); S0.appendChild(p); };
-  if (!r.signature) return fallback('لم تُضف مفاتيح فتح Zoom داخل مثاني بعد.'), r;
+  zmCur = { hid:hid, stage:stage, host:r.host };
   try {
-    await zmSdk(); S0.innerHTML = ''; const root = el('div'); root.id = 'zmRoot_' + stage; S0.appendChild(root);
-    zmClient = ZoomMtgEmbedded.createClient();
-    const w = Math.max(280, S0.clientWidth - 8);
-    await zmClient.init({ zoomAppRoot:root, language:'en-US', patchJsMedia:true, customize:{ video:{ isResizable:true, viewSizes:{ default:{ width:w, height:Math.round(w * 0.62) } } } } });
-    await zmClient.join({ sdkKey:r.sdkKey, signature:r.signature, meetingNumber:r.mn, password:r.pwd, userName:r.userName, zak:r.zak || '' });
-    if (r.host){ await cpCall({ action:'zmLive', hid:hid, on:1 }, null); }
-  } catch(e){ fallback('تعذّر فتح الحلقة داخل الصفحة على هذا الجهاز.'); }
+    await zmSdk(r.app); S0.innerHTML = '';
+    const h = Math.max(320, Math.min(innerHeight - 160, Math.round(S0.clientWidth * (innerWidth < 700 ? 1.25 : 0.68))));
+    zmClient = new JitsiMeetExternalAPI('8x8.vc', { roomName:r.app + '/' + r.room, parentNode:S0, jwt:r.jwt, width:'100%', height:h, lang:'ar',
+      userInfo:{ displayName:r.userName },
+      configOverwrite:{ disableDeepLinking:true, prejoinConfig:{ enabled:false }, startWithAudioMuted:!r.host, startWithVideoMuted:!r.host, subject:'حلقة ' + r.name.replace(/^حلقة\s+/, ''),
+        disableInviteFunctions:true, enableWelcomePage:false, enableClosePage:false, hideConferenceSubject:false, toolbarButtons:['microphone', 'camera', 'raisehand', 'tileview', 'fullscreen', 'chat', 'participants-pane', 'settings', 'hangup'].concat(r.host ? ['mute-everyone', 'security'] : []) },
+      interfaceConfigOverwrite:{ MOBILE_APP_PROMO:false, SHOW_JITSI_WATERMARK:false } });
+    zmClient.addListener('readyToClose', () => zmStop(r.host));
+    if (r.host) await cpCall({ action:'zmLive', hid:hid, on:1 }, null);
+  } catch(e){ S0.innerHTML = '<div class="zmph">تعذّر فتح الحلقة. تحقق من الاتصال بالإنترنت ثم أعد المحاولة.</div>'; }
   return r;
 }
 async function zmStop(end){
   const cur = zmCur; zmCur = null; document.body.classList.remove('zmon');
-  try { if (zmClient) zmClient.leaveMeeting && await zmClient.leaveMeeting(); } catch(e){}
-  try { if (window.ZoomMtgEmbedded && ZoomMtgEmbedded.destroyClient) ZoomMtgEmbedded.destroyClient(); } catch(e){}
+  try { if (zmClient){ zmClient.executeCommand && zmClient.executeCommand('hangup'); zmClient.dispose(); } } catch(e){}
   zmClient = null; ['zmStage', 'zmStage2'].forEach(id => { const x = $(id); if (x){ x.innerHTML = ''; } }); $('zmStage').classList.add('hidden');
   if (end && cur && cur.host) await cpCall({ action:'zmLive', hid:cur.hid, on:0 }, null);
   zmTeachBar();
@@ -3131,36 +3121,34 @@ function zmTeachBar(){
   $('zmBar').classList.toggle('hidden', !(h && h.remote)); if (!h) return;
   const rm = (D.remote || []).find(x => x.hid === hal) || {}, live = zmCur && zmCur.hid === hal;
   $('zmGo').classList.toggle('hidden', !on); $('zmGo').textContent = live ? 'إنهاء الحلقة عن بعد' : 'بدء الحلقة عن بعد'; $('zmGo').classList.toggle('end', !!live);
-  $('zmLiveP').classList.toggle('hidden', !(live || rm.live)); $('zmCopy').classList.toggle('hidden', !rm.url);
+  $('zmLiveP').classList.toggle('hidden', !(live || rm.live));
 }
 $('zmGo').onclick = async () => {
   if (zmCur && zmCur.hid === hal){ if (!confirm('إنهاء الحلقة عن بعد؟')) return; await zmStop(true); return; }
   document.body.classList.add('zmon'); $('zmGo').disabled = true; const r = await zmOpen(hal, 'zmStage', 'zmMsg'); $('zmGo').disabled = false;
   if (!r) document.body.classList.remove('zmon'); zmTeachBar();
 };
-$('zmCopy').onclick = () => { const rm = (D.remote || []).find(x => x.hid === hal); if (rm && rm.url) zmCopyBtn(rm.url).onclick(); };
+$('zmCopy').onclick = () => zmCopyBtn(MTHANI_URL + '?p=student').onclick();   // الطلاب يدخلون الحلقة من صفحاتهم في مثاني
 /* بطاقة الحلقة عن بعد للطالب وولي الأمر */
 function zmCards(){
   const box = $('zmCards'); if (!box) return; box.innerHTML = '';
   (D.remote || []).filter(x => !x.host).forEach(x => { const c = el('div', 'zmcard'), g = el('div', 'grow'), b = el('b', '', 'حلقة ' + x.name.replace(/^حلقة\s+/, '') + ' عن بعد');
     if (x.live){ const l = el('span', 'lv', 'مباشر الآن'); b.appendChild(l); } g.appendChild(b); g.appendChild(el('small', '', x.live ? 'بدأت الحلقة الساعة ' + x.live : 'لم تبدأ الحلقة بعد، وستظهر هنا عند بدئها')); c.appendChild(g);
-    const go = el('button', '', x.live ? 'ادخل الحلقة' : 'دخول'); go.disabled = !x.ready; go.onclick = () => zmEnter(x); c.appendChild(go); box.appendChild(c); });
+    const go = el('button', '', x.live ? 'ادخل الحلقة' : 'دخول'); go.onclick = () => zmEnter(x); c.appendChild(go); box.appendChild(c); });
   clearInterval(zmPoll); if ((D.remote || []).some(x => !x.host)) zmPoll = setInterval(async () => { if (role !== 'welcome') return; try { const r = await api({ action:'zmState' }); if (r.ok){ D.remote = r.remote; zmCards(); } } catch(e){} }, 45000);
 }
 async function zmEnter(x){ openRole('zoom'); $('zmTitle').textContent = 'حلقة ' + x.name.replace(/^حلقة\s+/, '') + ' عن بعد'; await zmOpen(x.hid, 'zmStage2', 'zmMsg2'); }
 $('zmLeave').onclick = async () => { await zmStop(false); openRole('welcome'); };
-/* إعدادات ربط Zoom */
+/* إعدادات ربط الحلقات عن بعد */
 let ZC = null;
 async function openZoomCfg(){ const r = await cpCall({ action:'zmCfg' }, 'zcMsg'); if (r && r.ok){ ZC = r; fillZc(); } }
 function fillZc(){
-  $('zcAcc').value = ZC.acc || ''; $('zcCid').value = ZC.cid || ''; $('zcSdk').value = ZC.sdk || ''; $('zcSec').value = ''; $('zcSdkSec').value = '';
-  $('zcSec').placeholder = ZC.hasSec ? '•••••• محفوظ' : ''; $('zcSdkSec').placeholder = ZC.hasSdkSec ? '•••••• محفوظ' : '';
+  $('zcApp').value = ZC.app || ''; $('zcKid').value = ZC.kid || ''; $('zcPem').value = ''; $('zcPem').placeholder = ZC.hasPem ? '•••••• محفوظ' : '-----BEGIN PRIVATE KEY-----';
   const L = $('zcList'); L.innerHTML = ''; L.appendChild(el('h2', '', 'الحلقات عن بعد'));
   const rm = ZC.halaqat.filter(h => h.remote); if (!rm.length) L.appendChild(el('small', '', 'لا توجد حلقات عن بعد. فعّل «حلقة عن بعد» من تعديل الحلقة.'));
-  rm.forEach(h => { const w = el('div', 'strow'), t = el('div', 'top'); t.appendChild(el('b', '', h.name)); t.appendChild(el('span', 'pill ' + (h.url ? 'p-ok' : 'p-late'), h.url ? 'الرابط جاهز' : 'لم يُنشأ الرابط')); w.appendChild(t);
-    if (h.url){ const m = el('div', 'meta'); m.appendChild(el('span', '', 'رقم الاجتماع: ' + h.id + ' ')); m.appendChild(zmCopyBtn(h.url)); w.appendChild(m); } L.appendChild(w); });
+  rm.forEach(h => { const w = el('div', 'strow'), t = el('div', 'top'); t.appendChild(el('b', '', h.name)); t.appendChild(el('span', 'pill ' + (h.id ? 'p-ok' : 'p-late'), h.id ? 'الغرفة جاهزة' : 'لم تُنشأ الغرفة')); w.appendChild(t); L.appendChild(w); });
 }
-async function zcSave(create){ const cfg = { acc:$('zcAcc').value.trim(), cid:$('zcCid').value.trim(), sec:$('zcSec').value.trim(), sdk:$('zcSdk').value.trim(), sdkSec:$('zcSdkSec').value.trim() };
+async function zcSave(create){ const cfg = { app:$('zcApp').value.trim(), kid:$('zcKid').value.trim(), pem:$('zcPem').value.trim() };
   const r = await cpCall({ action:'zmCfgSave', cfg:cfg, test:1, create:create ? 1 : 0 }, 'zcMsg'); if (r && r.ok){ ZC = r; fillZc(); msg('zcMsg', r.msg, 'ok'); } }
 $('zcSave').onclick = () => zcSave(false); $('zcCreate').onclick = () => zcSave(true);
 
