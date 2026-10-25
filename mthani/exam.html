@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="mthani-64.png">
+<title>مثاني - اختبار المرحليات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#3B5F78; --navy3:#1F3546; --gold:#D08E2C; --light:#EAF0F4; --goldlight:#FBF1E1;
+    --bg:#F5F3EE; --card:#FFFFFF; --text:#1E2A33; --muted:#66727C; --red:#B3261E; --line:#E2DDD3; --ok:#1B6B40; --okbg:#E3F2EA; --errbg:#FCE8E6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --bg:#0F161C; --card:#18222B; --text:#E9EEF2; --muted:#9DABB6; --light:#1F2D38; --goldlight:#2E2618; --line:#2A3743; --ok:#8FD9AE; --okbg:#183326; --errbg:#3A1F1D; --red:#F2B8B5; }
+  }
+  :root[data-theme="dark"]{ --bg:#0F161C; --card:#18222B; --text:#E9EEF2; --muted:#9DABB6; --light:#1F2D38; --goldlight:#2E2618; --line:#2A3743; --ok:#8FD9AE; --okbg:#183326; --errbg:#3A1F1D; --red:#F2B8B5; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Tajawal,system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+  .hero{background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;padding:22px 16px 46px;text-align:center;border-bottom:4px solid var(--gold)}
+  .hero img{width:64px;height:64px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}
+  .hero h1{margin:8px 0 0;font-size:21px} .hero p{margin:6px 0 0;font-size:13px;color:#F3D9AE}
+  main{max-width:760px;margin:-28px auto 0;padding:0 16px 40px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  h2{margin:0 0 8px;font-size:18px;color:var(--navy)} @media (prefers-color-scheme: dark){ h2{color:#C9DCEA} }
+  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+  input,select,textarea{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text)}
+  textarea{min-height:70px}
+  button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:11px 16px;cursor:pointer;background:var(--light);color:var(--navy)}
+  button.main{background:var(--navy);color:#fff;width:100%;margin-top:12px;font-size:16px}
+  button.gold{background:var(--gold);color:#fff}
+  button:disabled{opacity:.6}
+  .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+  .kv div{background:var(--bg);border-radius:12px;padding:10px} .kv small{display:block;color:var(--muted);font-size:12px} .kv b{font-size:15px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0}
+  .chips button{padding:7px 12px;font-size:13px;background:var(--card);border:1px solid var(--line);color:var(--muted)}
+  .chips button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .st{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+  .st .nm{flex:1 1 220px} .st .nm b{display:block;font-size:16px} .st .nm small{color:var(--muted)}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;background:var(--light);color:var(--navy)}
+  .p-lv{background:var(--goldlight);color:var(--gold)} .p-ok{background:var(--okbg);color:var(--ok)} .p-no{background:var(--errbg);color:var(--red)}
+  .msg{padding:10px 12px;border-radius:12px;margin-top:10px;font-size:14px} .msg.err{background:var(--errbg);color:var(--red)} .msg.ok{background:var(--okbg);color:var(--ok)} .msg.info{background:var(--light);color:var(--navy)}
+  .hidden{display:none!important}
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px 0}
+  .sheet .card{width:min(760px,100%);margin:0 8px}
+  .shd{display:flex;justify-content:space-between;align-items:center;gap:8px} .shd button{padding:6px 12px;font-size:13px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+  .tw{overflow-x:auto;margin-top:10px}
+  table.q{width:100%;border-collapse:collapse;font-size:14px} table.q th{font-size:12px;color:var(--muted);font-weight:500;padding:6px 4px;text-align:right}
+  table.q td{padding:4px;border-top:1px solid var(--line)} table.q input,table.q select{padding:7px 8px;font-size:15px}
+  table.q input[type=number]{width:62px} table.q select{min-width:130px}
+  .tot{display:flex;justify-content:space-between;align-items:center;border-radius:14px;padding:12px 14px;margin-top:10px;font-weight:700}
+  .tot.ok{background:var(--okbg);color:var(--ok)} .tot.no{background:var(--errbg);color:var(--red)} .tot b{font-size:22px}
+  small.note{display:block;color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.7}
+  .bar{height:8px;background:var(--light);border-radius:8px;overflow:hidden;margin-top:10px} .bar i{display:block;height:100%;background:var(--ok)}
+  #print{display:none}
+  @media print{
+    body{background:#fff;color:#000} .hero,main,.sheet{display:none!important} #print{display:block;padding:10mm;font-size:12pt}
+    #print h1{font-size:16pt;margin:0} #print table{width:100%;border-collapse:collapse;margin-top:10px} #print th,#print td{border:1px solid #999;padding:5px 6px;text-align:right}
+    #print th{background:#eee} #print .ph{display:flex;justify-content:space-between;border-bottom:2px solid #333;padding-bottom:6px} #print .sig{margin-top:30px;display:flex;justify-content:space-between}
+  }
+</style>
+</head>
+<body>
+<div class="hero"><img src="mthani-192.png" alt="مثاني"><h1>اختبار المرحليات</h1><p id="hOrg">مجمع حلقات ربيع القلوب القرآني بجامع علي الشبلان - أبها</p></div>
+<main>
+  <div class="card" id="cLogin">
+    <h2>دخول مشرف الجمعية</h2>
+    <small class="note">أدخل رمز الدخول المرسل لك مع رابط الدفعة.</small>
+    <label for="pin">رمز الدخول</label>
+    <input id="pin" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••" dir="ltr" style="text-align:center;letter-spacing:6px;font-size:22px">
+    <button class="main" id="go">دخول</button>
+    <div id="lMsg"></div>
+  </div>
+  <div id="app" class="hidden">
+    <div class="card">
+      <h2 id="bTitle">دفعة الاختبار</h2>
+      <div class="kv" id="bKv"></div>
+      <div class="bar"><i id="bBar" style="width:0"></i></div>
+      <div class="row"><button class="gold" id="rPrint">طباعة تقرير النتائج / PDF</button><button id="rXls">تنزيل Excel</button></div>
+      <div id="bMsg"></div>
+    </div>
+    <div class="card">
+      <div class="chips" id="flt"></div>
+      <input id="q" placeholder="ابحث باسم الطالب أو الهوية" style="margin-top:10px">
+      <div id="list"></div>
+    </div>
+  </div>
+</main>
+<div class="sheet hidden" id="sh"><div class="card">
+  <div class="shd"><h2 id="shT" style="margin:0">اختبار الطالب</h2><button id="shX">إغلاق</button></div>
+  <div id="shB"></div>
+</div></div>
+<div id="print"></div>
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbx1n59uCh_fri9XsUyxZlB7bXst4Ay-gZzKn8hIiQjunFotQQsEfE_8eQbhNmshHcI/exec';
+const $ = id => document.getElementById(id);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+const K = new URLSearchParams(location.search).get('k') || '';
+const SKEY = 'ex_pin_' + K;
+const ss = { get(){ try { return sessionStorage.getItem(SKEY); } catch(e){ return null; } }, set(v){ try { sessionStorage.setItem(SKEY, v); } catch(e){} }, del(){ try { sessionStorage.removeItem(SKEY); } catch(e){} } };
+const W = { h:1, t:0.5, j:0.5 };
+const MR_RANGE = { 'الأولى':[114,67], 'الثانية':[66,52], 'الثالثة':[51,42], 'الرابعة':[41,36], 'الخامسة':[35,29], 'السادسة':[28,24], 'السابعة':[23,19], 'الثامنة':[18,15],
+  'التاسعة':[14,11], 'العاشرة':[10,8], 'الحادية عشرة':[7,7], 'الثانية عشرة':[6,5], 'الثالثة عشرة':[4,4], 'الرابعة عشرة':[3,3], 'الخامسة عشرة':[2,2] };
+const mrRange = lv => MR_RANGE[String(lv || '').replace(/^المرحلية\s*/, '').trim()] || null;
+const msg = (id, t, c) => { const b = $(id); b.innerHTML = ''; if (t) b.appendChild(el('div', 'msg ' + (c || 'info'), t)); };
+const dayName = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('ar-SA', { weekday:'long' }); } catch(e){ return ''; } };
+const toAr = s => String(s || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+let X = null, PIN = '', F = 'all';
+
+async function call(data){
+  const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(Object.assign({ k:K, pin:PIN }, data)) });
+  return r.json();
+}
+async function open1(pin, silent){
+  if (!K){ msg('lMsg', 'الرابط ناقص. افتح الرابط كما وصلك كاملاً.', 'err'); return; }
+  PIN = toAr(pin).replace(/\D/g, ''); if (PIN.length !== 6){ if (!silent) msg('lMsg', 'رمز الدخول 6 أرقام.', 'err'); return; }
+  $('go').disabled = true; if (!silent) msg('lMsg', 'جاري التحقق...', 'info');
+  try { const r = await call({ action:'exOpen' });
+    if (!r.ok){ ss.del(); msg('lMsg', r.msg || 'تعذّر الدخول.', 'err'); return; }
+    ss.set(PIN); X = r; $('cLogin').classList.add('hidden'); $('app').classList.remove('hidden'); render();
+  } catch(e){ msg('lMsg', 'تعذّر الاتصال. تأكد من الإنترنت وحاول مجدداً.', 'err'); }
+  finally { $('go').disabled = false; }
+}
+$('go').onclick = () => open1($('pin').value);
+$('pin').onkeydown = e => { if (e.key === 'Enter') open1($('pin').value); };
+const done = s => s.status === X.st.ok || s.status === X.st.no;
+function render(){
+  if (X.org) $('hOrg').textContent = X.org;
+  $('bTitle').textContent = 'دفعة اختبار المرحليات — ' + dayName(X.date) + ' ' + X.date;
+  const n = X.list.length, d = X.list.filter(done).length, ok = X.list.filter(s => s.status === X.st.ok).length;
+  const kv = $('bKv'); kv.innerHTML = ''; [['المختبِر', X.sup], ['عدد الطلاب', n], ['سُجّلت نتائجهم', d + ' من ' + n], ['اجتازوا', ok]].forEach(p => { const b = el('div'); b.appendChild(el('small', '', p[0])); b.appendChild(el('b', '', p[1])); kv.appendChild(b); });
+  $('bBar').style.width = (n ? Math.round(d * 100 / n) : 0) + '%';
+  msg('bMsg', !X.canEdit ? 'انتهت مدة تسجيل النتائج لهذه الدفعة، والتقرير متاح للاطلاع والطباعة.' : d === n && n ? '✓ اكتملت نتائج الدفعة. يمكنك طباعة التقرير أو تنزيله، وما زال بإمكانك تعديل أي نتيجة.' : '', !X.canEdit ? 'info' : 'ok');
+  const fl = $('flt'); fl.innerHTML = '';
+  [['all', 'الكل', n], ['wait', 'لم يُختبر', n - d], ['ok', 'اجتاز', ok], ['no', 'لم يجتز', d - ok]].forEach(f => { const b = el('button', F === f[0] ? 'on' : '', f[1] + ' (' + f[2] + ')'); b.onclick = () => { F = f[0]; render(); }; fl.appendChild(b); });
+  const q = $('q').value.trim(), box = $('list'); box.innerHTML = '';
+  const L = X.list.filter(s => (F === 'all' || (F === 'wait' ? !done(s) : s.status === X.st[F])) && (!q || (s.name + ' ' + s.nid).indexOf(q) !== -1));
+  if (!L.length) box.appendChild(el('small', 'note', 'لا يوجد طلاب في هذا التصنيف.'));
+  L.forEach(s => { const w = el('div', 'st'), nm = el('div', 'nm'); nm.appendChild(el('b', '', s.name)); nm.appendChild(el('small', '', 'الهوية: ' + (s.nid || '—') + ' • ' + s.hname)); w.appendChild(nm);
+    w.appendChild(el('span', 'pill p-lv', s.level));
+    if (done(s)) w.appendChild(el('span', 'pill ' + (s.status === X.st.ok ? 'p-ok' : 'p-no'), s.result + ' — ' + s.score));
+    else w.appendChild(el('span', 'pill', 'لم يُختبر'));
+    const b = el('button', done(s) ? '' : 'gold', !X.canEdit ? 'عرض' : done(s) ? 'تعديل النتيجة' : 'اختبار الطالب'); b.onclick = () => form(s); w.appendChild(b);
+    box.appendChild(w); });
+}
+$('q').oninput = () => X && render();
+function sOpt(){ const q = el('select'); const o0 = el('option', '', '— السورة —'); o0.value = ''; q.appendChild(o0); X.surah.forEach((nm, k) => { const o = el('option', '', (k + 1) + '. ' + nm); o.value = k + 1; q.appendChild(o); }); return q; }
+const absAyah = (s, a) => { let n = 0; for (let i = 0; i < s - 1; i++) n += X.ayat[i]; return n + a; };
+const absTo = n => { for (let k = 0; k < 114; k++){ if (n <= X.ayat[k]) return [k + 1, n]; n -= X.ayat[k]; } return [114, X.ayat[113]]; };
+function form(s){
+  const B = $('shB'); B.innerHTML = ''; $('shT').textContent = s.name + ' — ' + s.level; const old = s.data || {}, ro = !X.canEdit;
+  B.appendChild(el('small', 'note', 'الهوية: ' + (s.nid || '—') + ' • ' + s.hname));
+  const g = el('div', 'grid2'), fld = (l, i) => { const d = el('div'); d.appendChild(el('label', '', l)); d.appendChild(i); g.appendChild(d); return i; };
+  const rF = fld('النطاق: من سورة', sOpt()), rT = fld('إلى سورة', sOpt()); const nq = fld('عدد الأسئلة', el('select')); [3, 4, 5, 6, 8, 10].forEach(n => { const o = el('option', '', n + ' أسئلة'); o.value = n; nq.appendChild(o); });
+  nq.value = old.q && old.q.length ? old.q.length : 5; B.appendChild(g);
+  const rg = mrRange(s.level); if (rg){ rF.value = rg[0]; rT.value = rg[1]; }
+  const gen = el('button', '', '🎲 توليد الأسئلة تلقائياً'); gen.type = 'button'; gen.style.marginTop = '10px'; if (!ro) B.appendChild(gen);
+  B.appendChild(el('small', 'note', 'النطاق معبأ وفق جدول المرحليات المعتمد. لكل سؤال درجة متساوية من 100، والخصم: خطأ حفظ = درجة • تنبيه أو تردد = نصف درجة • خطأ تجويد = نصف درجة.'));
+  const tw = el('div', 'tw'), t = el('table', 'q'); tw.appendChild(t); B.appendChild(tw); const tot = el('div', 'tot'); B.appendChild(tot);
+  const rs = el('select'); [['', '— النتيجة —'], ['اجتاز', 'اجتاز'], ['لم يجتز', 'لم يجتز']].forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; rs.appendChild(o); });
+  B.appendChild(el('label', '', 'النتيجة النهائية')); B.appendChild(rs);
+  const nt = el('textarea'); nt.placeholder = 'ملاحظات المختبِر (اختياري)'; nt.value = old.notes || ''; B.appendChild(el('label', '', 'ملاحظات')); B.appendChild(nt);
+  const sv = el('button', 'main', 'حفظ النتيجة'); if (!ro) B.appendChild(sv); const m = el('div'); m.id = 'shM'; B.appendChild(m);
+  let rows = [], touched = !!s.result;
+  const calc = () => { const Q = 100 / rows.length; let sum = 0; rows.forEach(r => { const v = k => Math.max(0, +r[k].value || 0); r.sc = Math.max(0, Q - v('h') * W.h - v('t') * W.t - v('j') * W.j); r.out.textContent = Math.round(r.sc * 2) / 2; sum += r.sc; });
+    sum = Math.round(sum * 2) / 2; const ok = sum >= X.pass; tot.className = 'tot ' + (ok ? 'ok' : 'no'); tot.innerHTML = ''; tot.appendChild(el('span', '', 'المجموع (حد الاجتياز ' + X.pass + ')')); tot.appendChild(el('b', '', sum + ' / 100'));
+    if (!touched) rs.value = ok ? 'اجتاز' : 'لم يجتز'; return sum; };
+  rs.onchange = () => { touched = true; };
+  const generate = () => { const a1 = +rF.value, a2 = +rT.value; if (!a1 || !a2) return msg('shM', 'اختر النطاق: من سورة وإلى سورة.', 'err');
+    const lo = Math.min(a1, a2), hi = Math.max(a1, a2), A = absAyah(lo, 1), Z = absAyah(hi, X.ayat[hi - 1]), seg = (Z - A + 1) / rows.length;
+    rows.forEach((r, k) => { const sa = absTo(Math.min(Z, Math.floor(A + seg * k + Math.random() * seg))); r.s.value = sa[0]; r.a.max = X.ayat[sa[0] - 1]; r.a.value = sa[1]; });
+    msg('shM', '', ''); gen.textContent = '🎲 توليد مرة أخرى'; };
+  gen.onclick = generate;
+  const draw = keep => { const n = +nq.value, prev = keep ? rows.map(r => ({ s:r.s.value, a:r.a.value, h:r.h.value, t:r.t.value, j:r.j.value })) : (old.q || []).map(q => { const p = String(q.p || '').match(/^(.*\S)\s+(\d+)$/), si = p ? X.surah.indexOf(p[1]) + 1 : 0; return { s:si || '', a:p ? p[2] : '', h:q.h, t:q.t, j:q.j }; });
+    rows = []; t.innerHTML = '<thead><tr><th>السورة</th><th>الآية</th><th>أخطاء الحفظ</th><th>تنبيهات</th><th>أخطاء التجويد</th><th>الدرجة من ' + (Math.round(1000 / n) / 10) + '</th></tr></thead>'; const tb = el('tbody');
+    for (let i = 0; i < n; i++){ const tr = el('tr'), r = {}, o = prev[i] || {};
+      const td1 = el('td'); r.s = sOpt(); r.s.value = o.s || ''; td1.appendChild(r.s); tr.appendChild(td1);
+      const td2 = el('td'); r.a = el('input'); r.a.type = 'number'; r.a.min = 1; r.a.inputMode = 'numeric'; r.a.value = o.a || ''; if (r.s.value) r.a.max = X.ayat[r.s.value - 1]; td2.appendChild(r.a); tr.appendChild(td2);
+      r.s.onchange = () => { r.a.max = r.s.value ? X.ayat[r.s.value - 1] : ''; if (r.s.value && +r.a.value > +r.a.max) r.a.value = r.a.max; if (r.s.value && !r.a.value) r.a.value = 1; };
+      r.a.oninput = () => { if (r.s.value && +r.a.value > X.ayat[r.s.value - 1]) r.a.value = X.ayat[r.s.value - 1]; if (r.a.value !== '' && +r.a.value < 1) r.a.value = 1; };
+      ['h', 't', 'j'].forEach(k => { const td = el('td'), inp = el('input'); inp.type = 'number'; inp.min = 0; inp.inputMode = 'numeric'; inp.value = o[k] || ''; inp.oninput = calc; td.appendChild(inp); tr.appendChild(td); r[k] = inp; });
+      r.out = el('td'); tr.appendChild(r.out); if (ro) tr.querySelectorAll('input,select').forEach(x => x.disabled = true); tb.appendChild(tr); rows.push(r); }
+    t.appendChild(tb); calc(); };
+  nq.onchange = () => { draw(true); generate(); };
+  draw(false); if (!(old.q && old.q.length) && rg) generate();
+  if (s.result) rs.value = s.result;
+  if (ro) [rF, rT, nq, rs, nt].forEach(x => x.disabled = true);
+  sv.onclick = async () => { const score = calc(); if (!rs.value) return msg('shM', 'اختر النتيجة النهائية.', 'err');
+    if (!rows.some(r => r.s.value)) return msg('shM', 'حدد مواضع الأسئلة أو اضغط «توليد الأسئلة تلقائياً».', 'err');
+    sv.disabled = true; msg('shM', 'جاري الحفظ...', 'info');
+    try { const r = await call({ action:'exSave', id:s.id, data:{ score:score, result:rs.value, notes:nt.value.trim(), range: rF.value && rT.value ? X.surah[rF.value - 1] + ' — ' + X.surah[rT.value - 1] : '',
+        q: rows.map(r => ({ p: r.s.value ? X.surah[r.s.value - 1] + ' ' + (+r.a.value || 1) : '', h:+r.h.value || 0, t:+r.t.value || 0, j:+r.j.value || 0, s:Math.round(r.sc * 2) / 2 })) } });
+      if (!r.ok) return msg('shM', r.msg || 'تعذّر الحفظ.', 'err');
+      X = r; $('sh').classList.add('hidden'); render(); msg('bMsg', r.msg, 'ok'); window.scrollTo({ top:0, behavior:'smooth' });
+    } catch(e){ msg('shM', 'تعذّر الاتصال. لم تُحفظ النتيجة، حاول مجدداً.', 'err'); }
+    finally { sv.disabled = false; } };
+  $('sh').classList.remove('hidden'); $('sh').scrollTop = 0;
+}
+$('shX').onclick = () => $('sh').classList.add('hidden');
+const repRows = () => X.list.map((s, i) => [i + 1, s.name, s.nid, s.level, s.hname, done(s) ? Number(s.score) : '', done(s) ? s.result : 'لم يُختبر']);
+$('rPrint').onclick = () => { const p = $('print'); p.innerHTML = '';
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'تقرير نتائج اختبار المرحليات')); l.appendChild(el('div', '', dayName(X.date) + ' ' + X.date + ' • المختبِر: ' + X.sup)); hd.appendChild(l); hd.appendChild(el('div', '', X.org)); p.appendChild(hd);
+  const n = X.list.length, ok = X.list.filter(s => s.status === X.st.ok).length, d = X.list.filter(done).length;
+  p.appendChild(el('p', '', 'عدد الطلاب: ' + n + ' • اجتازوا: ' + ok + ' • لم يجتازوا: ' + (d - ok) + (n - d ? ' • لم يُختبروا: ' + (n - d) : '')));
+  const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>المرحلية</th><th>الحلقة</th><th>الدرجة</th><th>النتيجة</th></tr></thead>'; const tb = el('tbody');
+  repRows().forEach(r => { const tr = el('tr'); r.forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
+  const sg = el('div', 'sig'); sg.appendChild(el('div', '', 'المختبِر: ' + X.sup)); sg.appendChild(el('div', '', 'التوقيع: ....................')); p.appendChild(sg);
+  setTimeout(() => window.print(), 50); };
+$('rXls').onclick = () => { const rows = [['نتائج اختبار المرحليات — ' + X.date + ' — المختبِر ' + X.sup], ['م', 'اسم الطالب', 'رقم الهوية', 'المرحلية', 'الحلقة', 'الدرجة', 'النتيجة']].concat(repRows());
+  const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['النتائج', rows]])); a.download = 'نتائج-المرحليات-' + X.date + '.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); };
+function xlsxBlob(sheets){
+  const esc = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const col = i => { let s = ''; i++; while (i){ const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+  const sheetXml = rows => { const w = rows[0].map((_, i) => Math.min(40, Math.max(8, ...rows.map(r => String(r[i] == null ? '' : r[i]).length + 2))));
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0" rightToLeft="1"><pane ySplit="2" topLeftCell="A3" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>' +
+      w.map((x, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + x + '" customWidth="1"/>').join('') + '</cols><sheetData>' +
+      rows.map((r, ri) => '<row r="' + (ri + 1) + '">' + r.map((v, ci) => { const ref = col(ci) + (ri + 1), st = ri === 0 ? ' s="2"' : ri === 1 ? ' s="1"' : '';
+        if (v == null || v === '') return '<c r="' + ref + '"' + st + '/>';
+        return typeof v === 'number' ? '<c r="' + ref + '"' + st + '><v>' + v + '</v></c>' : '<c r="' + ref + '" t="inlineStr"' + st + '><is><t>' + esc(v) + '</t></is></c>'; }).join('') + '</row>').join('') +
+      '</sheetData>' + (rows[0].length > 1 ? '<mergeCells count="1"><mergeCell ref="A1:' + col(rows[1].length - 1) + '1"/></mergeCells>' : '') + '</worksheet>'; };
+  const files = [
+    ['[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + sheets.map((s, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '</Types>'],
+    ['_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+    ['xl/workbook.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets>' + sheets.map((s, i) => '<sheet name="' + esc(s[0]) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets></workbook>'],
+    ['xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + sheets.map((s, i) => '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+    ['xl/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="13"/><color rgb="FF2C4A60"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF3B5F78"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>']
+  ].concat(sheets.map((s, i) => ['xl/worksheets/sheet' + (i + 1) + '.xml', sheetXml(s[1])]));
+  // ملف zip مخزّن (بلا ضغط) مع CRC32
+  const enc = new TextEncoder(), crcT = (() => { const t = []; for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  const crc = b => { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = crcT[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  const parts = [], cen = []; let off = 0;
+  const u16 = n => [n & 255, (n >>> 8) & 255], u32 = n => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
+  files.forEach(f => { const nm = enc.encode(f[0]), data = enc.encode(f[1]), c = crc(data);
+    const lh = new Uint8Array([...u32(0x04034b50), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21), ...u32(c), ...u32(data.length), ...u32(data.length), ...u16(nm.length), ...u16(0)]);
+    parts.push(lh, nm, data);
+    cen.push(new Uint8Array([...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21), ...u32(c), ...u32(data.length), ...u32(data.length), ...u16(nm.length), ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(off)]), nm);
+    off += lh.length + nm.length + data.length; });
+  const cs = cen.reduce((m, x) => m + x.length, 0);
+  const end = new Uint8Array([...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length), ...u32(cs), ...u32(off), ...u16(0)]);
+  return new Blob([...parts, ...cen, end], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+if (!K) msg('lMsg', 'الرابط ناقص. افتح الرابط كما وصلك كاملاً.', 'err');
+else { const p0 = ss.get(); if (p0) open1(p0, true); }
+</script>
+</body>
+</html>
