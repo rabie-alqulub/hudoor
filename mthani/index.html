@@ -1572,11 +1572,10 @@
     <label>المقدار اليومي</label>
     <div class="amtrow" id="plAmtL"><span id="plLnW"></span><b>سطر</b></div>
     <div class="amtrow hidden" id="plAmtP"><b>وجه</b><span id="plPgW"></span><select id="plFr"><option value="0">فقط</option><option value="0.25">وربع</option><option value="0.3333">وثلث</option><option value="0.5">ونصف</option></select></div>
-    <label>اتجاه الحفظ</label>
-    <div class="types" id="plDir"><button type="button" data-d="من الناس">من الناس إلى الفاتحة</button><button type="button" data-d="من الفاتحة">من الفاتحة إلى الناس</button></div>
     <label>بداية الخطة (من سورة وآية)</label>
     <div class="pair"><select id="plFs"></select><input id="plFa" type="number" inputmode="numeric" min="1" placeholder="آية"></div>
     <div class="goal" id="plGoal"></div>
+    <div id="plLock"></div>
     <label for="plNotes">ملاحظات (اختياري)</label>
     <input id="plNotes" maxlength="200">
     <button class="btn" id="plSave">حفظ الخطة</button>
@@ -1998,7 +1997,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.view_all') !== -1){ if (r.portal !== 'edu') TABS.push(['studentsList', 'بيانات الطلاب']); TABS.push(['stuFile', 'ملف الطالب']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('competition.manage') !== -1 || P.indexOf('competition.store') !== -1)) TABS.push(['compete', 'المنافس']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('students.add') !== -1){ TABS.push(['studentNew', 'تسجيل طالب']); TABS.push(['regLink', 'رابط التسجيل']); TABS.push(['apps', 'طلبات المتقدمين']); }
-  if (r.roles.indexOf('admin') === -1 && mineH){ TABS.push(['myStu', 'طلاب الحلقة']); TABS.push(['candsT', 'الطلاب المرشحون']); if (P.indexOf('halaqat.reports_all') === -1) TABS.push(['report', 'تقارير الحلقة']); }
+  if (r.roles.indexOf('admin') === -1 && mineH){ TABS.push(['myStu', 'طلاب الحلقة']); TABS.push(['candsT', 'الطلاب المرشحون']); if (!TABS.some(x => x[0] === 'plans')) TABS.push(['plans', 'بناء الخطط']); if (!TABS.some(x => x[0] === 'planF')) TABS.push(['planF', 'متابعة سير الخطط']); if (P.indexOf('halaqat.reports_all') === -1) TABS.push(['report', 'تقارير الحلقة']); }
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.students') !== -1) TABS.push(['refsStu', 'إحالات شؤون الطلاب']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.edu') !== -1){ TABS.push(['refsEdu', 'الإحالات التعليمية']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
@@ -2021,7 +2020,7 @@ async function loadHome(){
   if (r.roles.indexOf('student') !== -1){ TABS.push(['mine', 'تقريري']); TABS.push(['shop', 'المتجر']); }
   if (r.roles.indexOf('admin') === -1) TABS.push(['me', 'الإعدادات']);
   // البوابة تحدد ما يظهر للموظف الذي له أكثر من دور
-  if (r.roles.indexOf('admin') === -1 && r.portal === 'teach') TABS = TABS.filter(x => ['teach', 'myStu', 'candsT', 'report', 'me', 'trxR', 'trxS', 'plans'].indexOf(x[0]) !== -1 && !(x[0] === 'teach' && x[1].indexOf('اطلاع') !== -1));
+  if (r.roles.indexOf('admin') === -1 && r.portal === 'teach') TABS = TABS.filter(x => ['teach', 'myStu', 'candsT', 'report', 'me', 'trxR', 'trxS', 'plans', 'planF'].indexOf(x[0]) !== -1 && !(x[0] === 'teach' && x[1].indexOf('اطلاع') !== -1));
   if (r.roles.indexOf('admin') === -1 && (r.portal === 'stu' || r.portal === 'edu')) TABS = TABS.filter(x => ['myStu'].indexOf(x[0]) === -1 && !(x[0] === 'report' && x[1] === 'تقارير الحلقة'));
   document.body.classList.toggle('ro', !!r.ro);
   $('gsWrap').classList.toggle('hidden', r.roles.every(x => x === 'student' || x === 'parent'));
@@ -4846,6 +4845,7 @@ function bellItems(){
   add(c.stu, 'إحالات شؤون الطلاب الجديدة', () => { rbF = 'open'; openRole('refsStu'); });
   add(c.edu, 'إحالات تعليمية جديدة', () => { rbF = 'open'; openRole('refsEdu'); });
   add(c.exam, 'ترشيحات جديدة من المعلمين', () => { if (has('exams')) openRole('exams'); else { rbF = 'open'; openRole('refsExam'); } });
+  add((D && D.planReqN) || 0, 'طلبات تعديل خطط من المعلمين', () => openRole('plans'));
   add(t.inbox, 'معاملات واردة جديدة', () => { txMode = 'trxIn'; txT = 'inbox'; openRole('trxIn'); });
   add(t.mine, 'ردود على معاملاتك', () => { txMode = 'trxS'; txT = 'mine'; openRole('trxS'); });
   add(t.memos, 'معاملات واردة لم تطّلع عليها', () => { txMode = 'trxR'; txT = 'memos'; openRole('trxR'); });
@@ -4870,7 +4870,7 @@ function bellDraw(){
 $('btnBell').onclick = e => { e.stopPropagation(); const p = $('bellPop'); if (!p.classList.contains('hidden')) return p.classList.add('hidden'); bellDraw(); p.classList.remove('hidden'); refreshCounts(); };
 document.addEventListener('click', e => { const p = $('bellPop'); if (p && !p.classList.contains('hidden') && !p.contains(e.target)) p.classList.add('hidden'); });
 $('btnHome').onclick = () => { if (D){ show('vHome'); closeMenu(); openRole('welcome'); window.scrollTo(0, 0); } };
-async function refreshCounts(){ try { if (!D || !store.get('hq_token')) return; const r = await api({ action:'home' }); if (r.ok){ D.refs = r.refs; D.trxN = r.trxN; D.ann = r.ann; updBell(); } } catch(e){} }
+async function refreshCounts(){ try { if (!D || !store.get('hq_token')) return; const r = await api({ action:'home' }); if (r.ok){ D.refs = r.refs; D.trxN = r.trxN; D.ann = r.ann; D.planReqN = r.planReqN; updBell(); } } catch(e){} }
 
 async function openMyStu(){
   const box = $('msTabs'); box.innerHTML = '';
@@ -5627,7 +5627,7 @@ $('peSave').onclick = async () => {
 let pl = { hal:null, s:null, type:'حفظ' }, planStuds = [];
 function openPlans(){
   plCalInfo();
-  const list = D.planHalaqat || D.halaqat || [];
+  const list = (D.planHalaqat || D.halaqat || []).filter(h => plEdu() || h.mine);
   if (!list.length){ msg('planList', 'لا توجد حلقات مسندة إليك.', 'info'); return; }
   if (!pl.hal || !list.some(h => h.hid === pl.hal)) pl.hal = hal && list.some(h => h.hid === hal) ? hal : (list.find(h => h.mine) || list[0]).hid;
   fill('planHal', list.map(h => { const b = el('button', h.hid === pl.hal ? 'on' : '', h.name); b.onclick = () => { pl.hal = h.hid; openPlans(); }; return b; }));
@@ -5639,7 +5639,15 @@ async function loadPlans(){
   let r;
   try { r = await api({ action:'plans', hid:pl.hal }); } catch(e){ if (e.message !== 'expired') msg('planList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (!r.ok) return msg('planList', r.msg, 'err');
-  planStuds = r.students; renderPlans();
+  planStuds = r.students; renderPlans(); renderPlanReqs(r.reqs || []);
+}
+function renderPlanReqs(L){
+  let c = $('plReqs'); if (!c){ c = el('div', 'card'); c.id = 'plReqs'; $('planList').parentNode.insertBefore(c, $('planList')); }
+  c.innerHTML = ''; c.classList.toggle('hidden', !L.length); if (!L.length) return; c.appendChild(el('h2', '', 'طلبات تعديل الخطط (' + L.length + ')'));
+  L.forEach(x => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', x.name + ' — ' + x.type)); w.appendChild(tp);
+    const m = el('div', 'meta'); [['الحلقة', x.hname], ['طلبه', x.by], ['الوقت', String(x.at).slice(0, 16)], ['السبب', x.reason]].forEach(p => { if (p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } }); w.appendChild(m);
+    const ac = el('div', 'stact'), b = (t, cls, op) => { const y = el('button', cls, t); y.onclick = async () => { const r = await cpCall({ action:'planReq', sid:x.sid, type:x.type, op:op }, 'plReqs'); if (r && r.ok){ toast(r.msg); loadPlans(); refreshCounts(); } }; ac.appendChild(y); };
+    b('الموافقة على التعديل', 'good', 'ok'); b('رفض', 'danger', 'no'); w.appendChild(ac); c.appendChild(w); });
 }
 function renderPlans(){
   const box = $('planList'); box.innerHTML = '';
@@ -5647,14 +5655,15 @@ function renderPlans(){
   planStuds.forEach(s => {
     const w = el('div', 'stu'), top = el('div', 'top'), nm = el('div', 'nm');
     nm.appendChild(el('b', '', s.name)); if (s.level) nm.appendChild(el('small', '', 'مقدار الحفظ: ' + s.level));
-    const add = el('button', 'mini', '+ خطة'); add.onclick = () => openPlan(s, D.types.find(t => !s.plans[t]) || 'حفظ');
+    const add = el('button', 'mini', '+ خطة'); add.onclick = () => openPlan(s, PLAN_T.find(t => !s.plans[t]) || 'حفظ'); if (PLAN_T.every(t => s.plans[t])) add.classList.add('hidden');
     top.appendChild(nm); top.appendChild(add); w.appendChild(top);
-    const ks = D.types.filter(t => s.plans[t]);
+    const ks = PLAN_T.filter(t => s.plans[t]);
     if (!ks.length) w.appendChild(el('div', 'plan none', 'لا توجد خطة'));
     ks.forEach(t => {
       const p = s.plans[t], row = el('div', 'row'), g = el('div', 'grow');
       g.appendChild(el('b', '', t + ': من ' + p.from + (p.to ? ' ← ' + p.to : '')));
       g.appendChild(el('small', '', planText(p)));
+      if (p.unit) g.appendChild(el('span', 'pill ' + (p.lock === 'معتمدة' ? 'p-ok' : p.lock === 'طلب تعديل' ? 'p-late' : 'p-none'), p.lock === 'معتمدة' ? '✓ معتمدة' : p.lock));
       if (p.pct != null){ const bar = el('div', 'bar2'), i = el('i'); i.style.width = p.pct + '%'; bar.appendChild(i); g.appendChild(bar); }
       const e = el('button', 'mini', 'تعديل'); e.onclick = () => openPlan(s, t);
       row.appendChild(g); row.appendChild(e); w.appendChild(row);
@@ -5663,6 +5672,7 @@ function renderPlans(){
   });
 }
 /* ---------- الخطة بالأسطر أو الأوجه: الهدف = المقدار اليومي × أيام الدوام المتبقية ---------- */
+const PLAN_T = ['حفظ', 'مراجعة قريبة', 'مراجعة بعيدة'];
 const PAGE_START = [1,8,13,24,32,37,45,56,65,69,77,84,91,96,101,109,113,120,127,134,142,149,153,161,171,177,184,189,194,198,204,210,218,223,227,232,238,241,245,253,256,260,264,267,272,277,282,289,290,294,303,309,316,323,331,339,346,355,364,371,377,385,394,402,409,415,426,434,442,447,451,459,467,474,480,488,494,500,505,508,513,517,520,527,531,538,545,553,559,568,573,580,585,588,595,599,607,615,621,628,634,641,648,656,664,669,672,675,679,683,687,693,701,706,711,715,720,727,734,740,746,752,759,765,773,778,783,790,798,808,817,825,834,842,849,858,863,871,880,884,891,900,908,914,921,927,932,936,941,947,955,966,977,985,992,998,1006,1012,1022,1028,1036,1042,1050,1059,1075,1085,1092,1098,1104,1110,1114,1118,1125,1133,1142,1150,1161,1169,1177,1186,1194,1201,1206,1213,1222,1230,1236,1242,1249,1256,1262,1267,1272,1276,1283,1290,1297,1304,1308,1315,1322,1329,1335,1342,1347,1353,1358,1365,1371,1379,1385,1390,1398,1407,1418,1426,1435,1443,1453,1462,1471,1479,1486,1493,1502,1511,1519,1527,1536,1545,1555,1562,1571,1582,1591,1601,1611,1619,1627,1634,1640,1649,1660,1666,1675,1683,1692,1700,1708,1713,1721,1726,1736,1742,1750,1756,1761,1769,1775,1784,1793,1803,1818,1834,1854,1873,1893,1908,1916,1928,1936,1944,1956,1966,1974,1981,1989,1995,2004,2012,2020,2030,2037,2047,2057,2068,2079,2088,2096,2105,2116,2126,2134,2145,2156,2161,2168,2175,2186,2194,2202,2215,2224,2238,2251,2262,2276,2289,2302,2315,2327,2346,2361,2386,2400,2413,2425,2436,2447,2462,2474,2484,2494,2508,2519,2528,2541,2556,2565,2574,2585,2596,2601,2611,2619,2626,2634,2642,2651,2660,2668,2674,2691,2701,2716,2733,2748,2763,2778,2792,2802,2812,2819,2823,2828,2835,2845,2850,2853,2858,2867,2876,2888,2899,2911,2923,2933,2952,2972,2993,3016,3044,3069,3092,3116,3139,3160,3173,3182,3195,3204,3215,3223,3236,3248,3258,3266,3274,3281,3288,3296,3303,3312,3323,3330,3337,3347,3355,3364,3371,3379,3386,3393,3404,3415,3425,3434,3442,3451,3460,3470,3481,3489,3498,3504,3515,3524,3534,3540,3549,3556,3564,3569,3577,3584,3588,3596,3607,3614,3621,3629,3638,3646,3655,3664,3672,3679,3691,3699,3705,3718,3733,3746,3760,3776,3789,3813,3840,3865,3891,3915,3942,3971,3987,3997,4013,4032,4054,4064,4069,4080,4090,4099,4106,4115,4126,4133,4141,4150,4159,4167,4174,4183,4192,4200,4211,4219,4230,4239,4248,4257,4265,4273,4283,4288,4295,4304,4317,4324,4336,4348,4359,4373,4386,4399,4415,4433,4454,4474,4487,4496,4506,4516,4525,4531,4539,4546,4557,4565,4575,4584,4593,4599,4607,4612,4617,4624,4631,4646,4666,4682,4706,4727,4750,4767,4785,4811,4829,4853,4874,4896,4918,4942,4969,4996,5030,5056,5079,5087,5094,5100,5105,5111,5116,5126,5130,5136,5143,5151,5156,5162,5169,5178,5186,5193,5200,5209,5218,5223,5230,5237,5242,5254,5268,5287,5314,5332,5358,5386,5415,5430,5448,5461,5476,5495,5513,5543,5571,5597,5617,5642,5673,5703,5728,5759,5801,5830,5855,5883,5910,5932,5964,5994,6017,6044,6073,6099,6126,6138,6156,6177,6194,6208,6222], LPP = 15;
 function lineAt(a){ if (a > 6236) return 604 * LPP; let lo = 0, hi = 603; while (lo < hi){ const m = (lo + hi + 1) >> 1; if (PAGE_START[m] <= a) lo = m; else hi = m - 1; }
   const st = PAGE_START[lo], en = lo < 603 ? PAGE_START[lo + 1] : 6237; return lo * LPP + (a - st) / (en - st) * LPP; }
@@ -5686,21 +5696,35 @@ let plUnitV = 'وجه', plDirV = 'من الناس';
 function fillPlanForm(){
   const p = pl.s.plans[pl.type];
   $('plType').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === pl.type));
-  plUnitV = p && p.unit ? p.unit : 'وجه'; plDirV = p && p.dir ? p.dir : (p && p.fs && p.fs < 78 ? 'من الفاتحة' : 'من الناس');
+  plUnitV = p && p.unit ? p.unit : 'وجه'; plDirV = 'من الناس';
   if (!$('plLn')){ const a = el('input'); a.id = 'plLn'; $('plLnW').appendChild(stepIn(a, 1, 150, 1)); const b = el('input'); b.id = 'plPg'; $('plPgW').appendChild(stepIn(b, 0, 20, 1));
     a.addEventListener('input', planCount); b.addEventListener('input', planCount); $('plFr').onchange = planCount;
-    $('plUnit').querySelectorAll('button').forEach(x => x.onclick = () => { plUnitV = x.dataset.u; planCount(); });
-    $('plDir').querySelectorAll('button').forEach(x => x.onclick = () => { plDirV = x.dataset.d; planCount(); }); }
+    $('plUnit').querySelectorAll('button').forEach(x => x.onclick = () => { if (!plLocked()) { plUnitV = x.dataset.u; planCount(); } }); }
   const amt = p && p.unit ? p.daily : 0;
   $('plLn').value = p && p.unit === 'سطر' ? amt : 7;
   const w = Math.floor(amt + 1e-9), f = amt - w; $('plPg').value = p && p.unit === 'وجه' ? w : 1; $('plFr').value = p && p.unit === 'وجه' ? (f > 0.45 ? '0.5' : f > 0.3 ? '0.3333' : f > 0.2 ? '0.25' : '0') : '0';
   $('plFs').value = p && p.fs ? p.fs : 114; $('plFa').value = p && p.fa ? p.fa : 1;
   $('plNotes').value = p ? p.notes : '';
-  $('plDel').classList.toggle('hidden', !p); msg('plMsg', '', ''); planCount();
+  $('plDel').classList.toggle('hidden', !p); msg('plMsg', '', ''); planCount(); plLockUI();
+}
+const plEdu = () => document.body.classList.contains('admin') || (D.perms || []).indexOf('students.plans_all') !== -1;
+const plLocked = () => { const p = pl.s && pl.s.plans[pl.type]; return !!(p && p.unit && !plEdu() && p.lock !== 'مفتوحة للتعديل'); };
+function plLockUI(){
+  const p = pl.s.plans[pl.type], lk = plLocked(), box = $('plLock'); box.innerHTML = '';
+  ['plLn', 'plPg', 'plFr', 'plFs', 'plFa', 'plNotes'].forEach(id => { const e = $(id); if (e) e.disabled = lk; });
+  document.querySelectorAll('#plAmtL .stepper button, #plAmtP .stepper button').forEach(b => b.disabled = lk);
+  $('plSave').classList.toggle('hidden', lk); $('plDel').classList.toggle('hidden', !p || lk);
+  $('plSave').textContent = p && p.unit ? 'حفظ التعديل واعتماده' : 'اعتماد الخطة';
+  if (!p || !p.unit) return;
+  if (lk && p.lock === 'طلب تعديل'){ box.appendChild(el('div', 'msg info', 'طلبت تعديل هذه الخطة، وهو بانتظار موافقة الشؤون التعليمية.')); return; }
+  if (lk){ box.appendChild(el('div', 'msg info', 'الخطة معتمدة. لتعديلها اطلب موافقة الشؤون التعليمية.')); const why = el('input'); why.placeholder = 'سبب طلب التعديل'; why.maxLength = 200; box.appendChild(why);
+    const b = el('button', 'btn soft', 'طلب تعديل الخطة'); b.onclick = async () => { if (why.value.trim().length < 3) return msg('plMsg', 'اكتب سبب طلب التعديل.', 'err');
+      const r = await cpCall({ action:'planReq', sid:pl.s.sid, type:pl.type, op:'ask', reason:why.value.trim() }, 'plMsg'); if (r && r.ok){ toast(r.msg); closePlan(); loadPlans(); } }; box.appendChild(b); return; }
+  if (!plEdu() && p.lock === 'مفتوحة للتعديل') box.appendChild(el('div', 'msg ok', 'وافقت الشؤون التعليمية على تعديل الخطة. عدّلها ثم اعتمدها، وتُقفل بعد الحفظ.'));
 }
 const plAmt = () => plUnitV === 'سطر' ? +$('plLn').value || 0 : (+$('plPg').value || 0) + (+$('plFr').value || 0);
 function planCount(){
-  $('plUnit').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.u === plUnitV)); $('plDir').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.d === plDirV));
+  $('plUnit').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.u === plUnitV));
   $('plAmtL').classList.toggle('hidden', plUnitV !== 'سطر'); $('plAmtP').classList.toggle('hidden', plUnitV !== 'وجه');
   const p = pl.s && pl.s.plans[pl.type], keep = p && p.unit, days = keep ? p.days : (D.planLeft || 0), amt = plAmt(), fs = +$('plFs').value, fa = +$('plFa').value, g = $('plGoal'); g.innerHTML = '';
   if (!days){ g.appendChild(el('b', '', 'لا توجد أيام دوام متبقية في تقويم الخطط')); return; }
@@ -5715,7 +5739,7 @@ function planCount(){
 function openPlan(s, type){
   pl.s = s; pl.type = type;
   ['plFs'].forEach(id => { const e = $(id); if (e.options.length) return; D.surah.forEach((n, i) => { const o = el('option', '', (i + 1) + ' - ' + n); o.value = i + 1; e.appendChild(o); }); });
-  const t = $('plType'); if (!t.children.length) D.types.forEach(x => { const b = el('button', '', x); b.dataset.t = x; b.onclick = () => { pl.type = x; fillPlanForm(); }; t.appendChild(b); });
+  const t = $('plType'); if (!t.children.length) PLAN_T.forEach(x => { const b = el('button', '', x); b.dataset.t = x; b.onclick = () => { pl.type = x; fillPlanForm(); }; t.appendChild(b); });
   $('plName').textContent = 'خطة ' + s.name;
   fillPlanForm();
   $('planSheet').classList.remove('hidden'); document.body.style.overflow = 'hidden';
