@@ -883,6 +883,19 @@
   .exsend{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:10px} .exsend .btn{margin:0;width:auto;padding:11px 18px}
   @media (max-width:640px){ .exsend{grid-template-columns:1fr} .exsend .btn{width:100%} }
   body.g2 .exgrp{background:rgba(255,255,255,.35);border-color:var(--glb)} body.g2 .exstep{background:rgba(255,255,255,.5)} body.g2 .exstep.on{background:linear-gradient(135deg,#46708C,#1F3546)}
+  .lvtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap} .lvtop h2{margin:0;font-size:24px} .lvtop .grow{flex:1} .lvtop .mini{width:auto} #lvTime{display:inline;color:var(--muted)}
+  .lvlive{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ok);background:var(--okbg);padding:3px 10px;border-radius:99px} .lvlive i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:zmp 1.4s infinite}
+  .lvkpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+  .lvk{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:14px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-align:right;color:var(--text);box-shadow:0 4px 12px rgba(30,42,51,.05);transition:transform .15s}
+  .lvk:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(30,42,51,.12)} .lvk b{font-size:26px;line-height:1.1;color:var(--navy3)} .lvk span{font-size:13px;color:var(--muted);font-weight:700} .lvk small{font-size:11.5px}
+  .lvk.g b{color:var(--ok)} .lvk.y b{color:var(--gold2)} .lvk.r b{color:var(--red)}
+  .lvk.hero{background:linear-gradient(140deg,#4A7591,#1F3546);border-color:transparent} .lvk.hero b{color:#fff} .lvk.hero span,.lvk.hero small{color:#F3D9AE}
+  @media (prefers-color-scheme: dark){ .lvk b{color:#fff} }
+  .lvlist{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto}
+  .lvi{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border-radius:12px;background:var(--light);border:0;text-align:right;color:var(--text);width:100%} button.lvi{cursor:pointer} .lvi i{font-style:normal;flex:none} .lvi b{display:block;font-size:13.5px} .lvi small{font-size:11.5px}
+  .lvi.a-ref,.lvi.a-abs{background:var(--errbg)} .lvi.a-appr,.lvi.a-plan{background:var(--goldlight)}
+  #pDash:fullscreen{background:var(--bg);overflow:auto;padding:20px} #pDash:fullscreen > .card:not(#lvWrap .card){display:none}
+  body.g2 .lvk{background:var(--gl);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border-color:var(--glb)} body.g2 .lvk.hero{background:linear-gradient(140deg,#4A7591,#1F3546)} body.g2 .lvi{background:rgba(255,255,255,.45)}
 </style>
 </head>
 <body>
@@ -1371,8 +1384,17 @@
 
     <!-- شاشة عرض المجمع -->
     <div id="pDash" class="hidden">
+      <div id="lvWrap">
+        <div class="card lvhead"><div class="lvtop"><h2>Dashboard</h2><span class="lvlive"><i></i>مباشر</span><span class="grow"></span><small id="lvTime"></small><button class="mini" id="lvRef" type="button">تحديث الآن</button><button class="mini" id="lvFull" type="button">ملء الشاشة</button></div><small id="lvDay"></small></div>
+        <div class="lvkpis" id="lvKpi"></div>
+        <div class="chgrid" id="lvRow1"></div>
+        <div class="chgrid" id="lvRow2"></div>
+        <div class="chgrid" id="lvRow3"></div>
+        <div class="chgrid" id="lvRow4"></div>
+        <div class="wsec">التحليل حسب الفترة</div>
+      </div>
       <div class="card">
-        <h2>Dashboard</h2>
+        <h2>التحليل حسب الفترة</h2>
         <div class="stchips" id="dsPer"></div>
         <div class="dsh-top"><button class="mini" id="dsPrev">السابق</button><span class="lbl" id="dsLbl"></span><button class="mini" id="dsNext">التالي</button></div>
         <div class="edgrid hidden" id="dsCustom"><div><label for="dsFrom">من تاريخ</label><input type="date" id="dsFrom"></div><div><label for="dsTo">إلى تاريخ</label><input type="date" id="dsTo"></div></div>
@@ -2340,7 +2362,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && P.indexOf('staff.courses') !== -1) TABS.push(['courses', 'الدورات التدريبية']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.staffAtt') !== -1) TABS.push(['staffAtt', 'تقرير بصمة الحضور']);
   if (r.roles.indexOf('admin') === -1 && ['ann.manage', 'refs.students', 'reports.students', 'refs.edu', 'reports.edu'].some(k => P.indexOf(k) !== -1)) TABS.push(['ann', 'الإعلانات']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'Dashboard']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1){ TABS.push(['msgs', 'رسائل أولياء الأمور']); TABS.push(['msgsStaff', 'رسائل الموظفين']); TABS.push(['msgArc', 'أرشيف الرسائل']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['exams', 'اختبارات الجمعية']); TABS.push(['planF', 'متابعة الخطط']); }
   else if (r.roles.indexOf('admin') === -1 && P.indexOf('assoc.nominate') !== -1){ TABS.push(['exams', 'اختبارات الجمعية']); }
@@ -2491,7 +2513,7 @@ function openRole(r, title, group){
     $('pRep').classList.remove('hidden'); openRep(e && st ? (D.portal === 'stu' ? 'stu' : 'edu') : e ? 'edu' : 'stu'); }
   else { rpBrief = false; $('pRep').classList.toggle('hidden', !REP_KIND[r]); if (REP_KIND[r]) openRep(REP_KIND[r]); }
   $('pDash').classList.toggle('hidden', r !== 'dash');
-  if (r === 'dash') openDash();
+  if (r === 'dash') openDash(); else lvStop();
   $('pMoveMany').classList.toggle('hidden', r !== 'moveMany');
   if (r === 'moveMany') openMoveMany();
   $('pAbsent').classList.toggle('hidden', r !== 'absent');
@@ -4877,7 +4899,66 @@ function dsShift(dir){
   if (dsDate > D.today) dsDate = D.today;
   loadDash();
 }
+/* ===== Dashboard المباشر: يتحدث كل 30 ثانية ===== */
+let LV = null, lvTimer = null, lvBusy = false;
+function lvStop(){ if (lvTimer){ clearInterval(lvTimer); lvTimer = null; } }
+function lvStart(){ lvStop(); loadLive(); lvTimer = setInterval(() => { if (role !== 'dash'){ lvStop(); return; } if (!document.hidden) loadLive(); }, 30000); }
+async function loadLive(){
+  if (lvBusy) return; lvBusy = true; $('lvTime').textContent = 'جاري التحديث...';
+  try { const r = await api({ action:'live' }); if (r.ok){ LV = r; renderLive(); } else $('lvTime').textContent = needSrv(r); } catch(e){ $('lvTime').textContent = 'تعذّر الاتصال — ستُعاد المحاولة'; }
+  lvBusy = false;
+}
+function lvTile(v, l, sub, cls, go){ const d = el('button', 'lvk ' + (cls || '')); d.type = 'button'; d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', l)); if (sub) d.appendChild(el('small', '', sub)); if (go) d.onclick = go; else d.disabled = true; return d; }
+function renderLive(){
+  const R = LV, K = R.kpi, at = K.present + K.late, mk = at + K.absent + K.excused;
+  $('lvTime').textContent = 'آخر تحديث ' + R.now.slice(11, 16);
+  $('lvDay').textContent = (R.day === R.today ? 'اليوم: ' : 'آخر يوم دراسي: ') + fmtD(R.day, { weekday:'long', day:'numeric', month:'long' }) + (R.studyToday ? '' : ' • اليوم ليس يوم دراسة');
+  const k = $('lvKpi'); k.innerHTML = ''; const H = R.halaqat, apN = H.filter(h => h.approved).length, S0 = R.staff, P = R.pend;
+  [lvTile(at + '/' + K.students, 'طلاب حاضرون', mk ? Math.round(at * 100 / mk) + '% من المحضَّرين' : 'لم يُحضَّر أحد بعد', 'hero', () => openRole('report')),
+   lvTile(K.absent, 'غائبون', K.excused ? 'مستأذنون ' + K.excused : '', K.absent ? 'r' : '', () => openRole('report')),
+   lvTile(K.recs, 'مرات التسميع', K.ayat + ' آية', 'g', () => openRole('repAll')),
+   lvTile(apN + '/' + H.length, 'حلقات معتمدة', '', apN === H.length ? 'g' : 'y', () => openRole('report')),
+   lvTile(S0 ? S0.present + '/' + S0.due : null, 'موظفون حاضرون', S0 ? 'متأخرون ' + S0.late : 'جدول البصمة غير مربوط', S0 && S0.present < S0.due ? 'y' : 'g', () => openRole('staffAtt')),
+   lvTile(P.refs, 'إحالات مفتوحة', P.urgent ? 'عاجلة ' + P.urgent : '', P.urgent ? 'r' : '', () => openRole('refsStu')),
+   lvTile(P.exam, 'ترشيحات مفتوحة', '', '', () => openRole('exams')),
+   lvTile(P.trx, 'معاملات بانتظار', '', P.trx ? 'y' : '', () => openRole('trxIn')),
+   lvTile(P.apps, 'طلبات تسجيل', '', P.apps ? 'y' : '', () => openRole('apps')),
+   lvTile(P.orders, 'طلبات جوائز', '', '', () => openRole('compete')),
+   lvTile(R.msgs.ok, 'رسائل اليوم', R.msgs.fail ? 'فشلت ' + R.msgs.fail : R.msgs.wait ? 'بالانتظار ' + R.msgs.wait : '', R.msgs.fail ? 'r' : '', () => openRole('msgArc')),
+   lvTile(P.planReq, 'طلبات تعديل خطط', '', P.planReq ? 'y' : '', () => openRole('plans'))].forEach(x => k.appendChild(x));
+  // الصف 1: الحلقات الآن + الحضور + الموظفون
+  const r1 = $('lvRow1'); r1.innerHTML = '';
+  const c1 = chCard('الحلقات الآن', 'اضغط الحلقة لتقييمها'); c1.appendChild(chStack(H.map(h => ({ label:h.name + (h.remote ? ' 🖥' : ''), sub:h.teacher + ' • تسميع ' + h.recs, parts:{ present:h.present, late:h.late, absent:h.absent, excused:h.excused, un:Math.max(0, h.students - h.present - h.late - h.absent - h.excused) }, onclick:() => { openRole('report'); } })),
+    ATT_SEGS.concat([['un', 'لم يُحضَّر', CHC.none]]), { rel:true, text:x => (LV.halaqat.find(h => h.name === x.label.replace(' 🖥', '')) || {}).approved ? '✓ معتمدة' : 'لم تُعتمد', empty:'لا توجد حلقات.' })); r1.appendChild(c1);
+  const c2 = chCard('حضور الطلاب'); c2.appendChild(chDonut(ATT_SEGS.map(x => [x[1], K[x[0]], x[2]]).concat([['لم يُحضَّر', Math.max(0, K.students - mk), CHC.none]]), K.students ? Math.round(at * 100 / K.students) + '%' : '—', 'حضور')); r1.appendChild(c2);
+  const c3 = chCard('حضور الموظفين (البصمة)'); c3.appendChild(S0 ? chDonut([['في الوقت', Math.max(0, S0.present - S0.late), CHC.ok], ['متأخر', S0.late, CHC.late], ['إجازة', S0.leave, CHC.exc], ['لم يبصم', S0.missing.length, CHC.abs]], S0.present + '/' + S0.due, 'موظف') : el('div', 'chempty', 'لم يُربط جدول البصمة.')); r1.appendChild(c3);
+  // الصف 2: الاتجاه
+  const r2 = $('lvRow2'); r2.innerHTML = ''; const T = R.trend;
+  const c4 = chCard('نسبة حضور الطلاب — آخر 30 يوماً دراسياً'); c4.appendChild(chLine(T.map(x => ({ x:fmtD(x.d, { day:'numeric', month:'short' }), y:x.n ? Math.round(x.p * 100 / x.n) : null, title:fmtD(x.d, { weekday:'long', day:'numeric', month:'short' }) + ': ' + (x.n ? Math.round(x.p * 100 / x.n) + '% (' + x.p + ' من ' + x.n + ')' : 'لا يوجد تحضير') })), { max:100, id:'lv1', color:CHC.ok, empty:'لا يوجد تحضير في آخر 30 يوماً.' })); r2.appendChild(c4);
+  const c5 = chCard('التسميع اليومي — آخر 30 يوماً دراسياً'); c5.appendChild(chLine(T.map(x => ({ x:fmtD(x.d, { day:'numeric', month:'short' }), y:x.recs || null, title:fmtD(x.d, { weekday:'long', day:'numeric', month:'short' }) + ': ' + x.recs + ' تسميع • ' + x.ayat + ' آية' })), { id:'lv2', color:CHC.gold, empty:'لا يوجد تسميع في آخر 30 يوماً.' })); r2.appendChild(c5);
+  // الصف 3: التنبيهات وآخر الأحداث
+  const r3 = $('lvRow3'); r3.innerHTML = '';
+  const c6 = chCard('تنبيهات تحتاج تصرفاً', R.alerts.length + ''); const al = el('div', 'lvlist');
+  if (!R.alerts.length) al.appendChild(el('div', 'chempty', 'لا توجد تنبيهات الآن. 👍'));
+  const AIC = { appr:'🕒', abs:'⚠️', ref:'🔴', plan:'📉', staff:'🧾' };
+  R.alerts.forEach(a => { const w = el('button', 'lvi a-' + a.k); w.type = 'button'; w.appendChild(el('i', '', AIC[a.k] || '•')); const g = el('div'); g.appendChild(el('b', '', a.t)); if (a.s) g.appendChild(el('small', '', a.s)); w.appendChild(g);
+    w.onclick = () => a.k === 'abs' && a.sid ? goFile(a.sid) : openRole({ appr:'report', ref:'refsStu', plan:'planF', staff:'staffAtt' }[a.k] || 'dash'); al.appendChild(w); }); c6.appendChild(al); r3.appendChild(c6);
+  const c7 = chCard('آخر الأحداث'); const fd = el('div', 'lvlist');
+  if (!R.feed.length) fd.appendChild(el('div', 'chempty', 'لا توجد أحداث اليوم بعد.'));
+  const FIC = { rec:'📖', appr:'✅', ref:'📨' };
+  R.feed.forEach(f => { const w = el('div', 'lvi'); w.appendChild(el('i', '', FIC[f.k] || '•')); const g = el('div'); g.appendChild(el('b', '', f.t)); g.appendChild(el('small', '', (f.at.length > 10 ? f.at.slice(11, 16) : '') + (f.by ? ' • ' + f.by : ''))); w.appendChild(g); fd.appendChild(w); }); c7.appendChild(fd); r3.appendChild(c7);
+  // الصف 4: الأعلى حفظاً، ترتيب الحلقات، الخطط
+  const r4 = $('lvRow4'); r4.innerHTML = '';
+  const c8 = chCard('الأعلى حفظاً هذا الشهر'); c8.appendChild(chBars(R.topHifz.map((x, i) => ({ label:(i < 3 ? ['🥇', '🥈', '🥉'][i] + ' ' : '') + x.name, sub:x.hname, value:x.v, text:x.v + ' آية', cls:i < 3 ? 'y' : '', onclick:() => goFile(x.sid) })), { empty:'لا يوجد حفظ هذا الشهر بعد.' })); r4.appendChild(c8);
+  const c9 = chCard('ترتيب الحلقات في الحضور هذا الشهر'); c9.appendChild(chBars(R.halRank.map(x => ({ label:x.name, sub:x.teacher, value:x.v, text:x.v + '%', cls:lvC(lvAtt(x.v)) })), { max:100, empty:'لا يوجد تحضير هذا الشهر.' })); r4.appendChild(c9);
+  if (R.plans){ const stc = { 'متقدم':CHC.teal, 'على المسار':CHC.ok, 'مكتملة':CHC.navy, 'متأخر':CHC.gold, 'متأخر جداً':CHC.abs, 'لم تبدأ':CHC.none, 'خطة قديمة (تحتاج تحديث)':CHC.purple };
+    const c10 = chCard('حالة الخطط', R.plans._noPlan ? R.plans._noPlan + ' طالب بلا خطة' : ''); c10.appendChild(chDonut(Object.keys(stc).filter(k => R.plans[k]).map(k => [k, R.plans[k], stc[k]]), null, 'خطة')); c10.onclick = () => openRole('planF'); c10.style.cursor = 'pointer'; r4.appendChild(c10); }
+}
+$('lvRef').onclick = loadLive;
+$('lvFull').onclick = () => { const e = $('pDash'); if (document.fullscreenElement) document.exitFullscreen(); else if (e.requestFullscreen) e.requestFullscreen(); };
+document.addEventListener('visibilitychange', () => { if (!document.hidden && role === 'dash' && lvTimer) loadLive(); });
 function openDash(){
+  lvStart();
   const per = $('dsPer'); per.innerHTML = '';
   DS_PER.forEach(p => { const b = el('button', dsP === p[0] ? 'on' : '', p[1]); b.onclick = () => { dsP = p[0]; dsDate = null; openDash(); }; per.appendChild(b); });
   $('dsCustom').classList.toggle('hidden', dsP !== 'custom');
