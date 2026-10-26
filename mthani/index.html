@@ -2386,7 +2386,7 @@ async function loadHome(){
   if (supRO){ $('gsWrap').classList.add('hidden'); buildAdminNav(n, RO_NAV); }
   else if (admin) buildAdminNav(n); else buildAdminNav(n, userNav(TABS));
   show('vHome');
-  openRole('welcome'); updBell(); clearInterval(window._bellT); window._bellT = setInterval(refreshCounts, 120000);
+  openRole('welcome'); updBell(); clearInterval(window._bellT); window._bellT = setInterval(() => { if (!document.hidden) refreshCounts(); }, 300000);
   if (r.ro && !r.peek && !$('roBar')){ const b = el('div', 'robar', 'حساب المشرف العام: للاطلاع فقط، ولا يمكن التعديل.'); b.id = 'roBar'; $('vHome').insertBefore(b, $('vHome').firstChild); }   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
 }
 /* قائمة بقية المستخدمين بنفس أسلوب المدير: الاختبارات والمعاملات مجموعتان، والباقي تبويبات مباشرة */
@@ -4907,7 +4907,7 @@ function dsShift(dir){
 /* ===== Dashboard المباشر: يتحدث كل 30 ثانية ===== */
 let LV = null, lvTimer = null, lvBusy = false;
 function lvStop(){ if (lvTimer){ clearInterval(lvTimer); lvTimer = null; } }
-function lvStart(){ lvStop(); loadLive(); lvTimer = setInterval(() => { if (role !== 'dash'){ lvStop(); return; } if (!document.hidden) loadLive(); }, 30000); }
+function lvStart(){ lvStop(); loadLive(); lvTimer = setInterval(() => { if (role !== 'dash'){ lvStop(); return; } if (!document.hidden) loadLive(); }, 60000); }
 async function loadLive(){
   if (lvBusy) return; lvBusy = true; $('lvTime').textContent = 'جاري التحديث...';
   try { const r = await api({ action:'live' }); if (r.ok){ LV = r; renderLive(); } else $('lvTime').textContent = needSrv(r); } catch(e){ $('lvTime').textContent = 'تعذّر الاتصال — ستُعاد المحاولة'; }
@@ -5704,7 +5704,7 @@ function mgWatch(cid){
     p.appendChild(el('div', 'rfsec', 'حالة الإرسال: أُرسلت ' + r.sent + ' من ' + r.total + (r.fail ? ' • فشلت ' + r.fail : '') + (r.wait ? ' • في الانتظار ' + r.wait : ''))); p.appendChild(bar);
     const fails = r.list.filter(x => x.status === 'فشلت'); if (fails.length){ const f = el('small', '', 'لم تصل: ' + fails.map(x => x.names + ' (' + x.err.slice(0, 40) + ')').join(' • ')); f.style.display = 'block'; f.style.marginTop = '6px'; p.appendChild(f); }
     renderCamps(r.camps);
-    if (r.wait && role === 'msgs' && MG && MG.ready) mgPoll = setTimeout(tick, 3000);
+    if (r.wait && role === 'msgs' && MG && MG.ready) mgPoll = setTimeout(tick, 10000);
   };
   tick();
 }
