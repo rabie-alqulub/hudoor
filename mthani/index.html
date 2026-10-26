@@ -620,6 +620,11 @@
   .rng3{display:grid;grid-template-columns:1fr 1.8fr 1fr;gap:8px;align-items:end;margin-top:4px}
   .rng3 label{text-align:center;margin:10px 0 6px}
   .rng3 .ayah{width:100%}
+  #apGrid .apmore{grid-column:1/-1;margin-top:6px;padding:11px;border-radius:12px;background:var(--goldlight);color:var(--gold2);font-weight:700;border:1.5px dashed var(--gold)}
+  .rng3 .ayah.off{background:var(--light);color:var(--muted);border-style:dashed;opacity:.7}
+  #rsToWrap{margin-top:10px;padding:12px;border:1.5px solid var(--gold);border-radius:16px;background:var(--goldlight)}
+  .rsto-h{display:flex;align-items:center;gap:8px} .rsto-h b{flex:1;color:var(--gold2)} .rsto-h .link{width:auto;margin:0;padding:4px}
+  .rng2{display:grid;grid-template-columns:1.8fr 1fr;gap:8px;align-items:end} .rng2 label{text-align:center;margin:8px 0 6px} .rng2 .ayah{width:100%} .rng2 select{text-align:center;font-weight:700}
   .rng3 select{text-align:center;font-weight:700}
   .sum{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--goldlight);color:var(--text);font-size:14px;line-height:1.7}
   .sum b{color:var(--gold2)}
@@ -834,6 +839,29 @@
   body.g2 .action:nth-child(n+5),body.g2 .kpi:nth-child(n+5){animation-delay:.2s}
   body.g2 main .card:nth-of-type(2){animation-delay:.06s} body.g2 main .card:nth-of-type(3){animation-delay:.12s}
   @media (prefers-reduced-motion: reduce){ body.g2 *{animation:none!important;transition:none!important} }
+  /* ===== ترقيم وفصل القوائم ===== */
+  .strow{padding:12px 14px;border:1px solid var(--line);border-radius:16px;margin-bottom:10px;background:var(--card);box-shadow:0 2px 8px rgba(30,42,51,.04)}
+  .strow:last-child{border-bottom:1px solid var(--line)}
+  *:has(> .strow){counter-reset:rn}
+  .strow{counter-increment:rn}
+  .strow > .top:not(:has(.seqno))::before{content:counter(rn);flex:none;width:28px;height:28px;border-radius:50%;background:var(--light);color:var(--navy);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .strow .empno{display:inline-block;margin-inline-start:8px;font-size:12px;font-weight:500;color:var(--muted);background:var(--light);border-radius:99px;padding:1px 9px;vertical-align:2px}
+  #planList{counter-reset:pn} #planList .stu{counter-increment:pn;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px;background:var(--card);box-shadow:0 2px 8px rgba(30,42,51,.04)}
+  #planList .stu > .top .nm b::before{content:counter(pn);display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--light);color:var(--navy);align-items:center;justify-content:center;font-size:12.5px;margin-inline-end:8px}
+  .stlist{counter-reset:sl} .stlist label{counter-increment:sl} .stlist label::before{content:counter(sl);flex:none;min-width:22px;font-size:12px;color:var(--muted);font-weight:700;text-align:center}
+  .stlist label{border:1px solid var(--line);border-radius:12px;margin:6px!important} .stlist label:last-child{border-bottom:1px solid var(--line)} .stlist{border:0}
+  #mvHist,#abBack{counter-reset:rw} #mvHist .row,#abBack .row{counter-increment:rw;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+  #mvHist .row::before,#abBack .row::before{content:counter(rw);flex:none;width:26px;height:26px;border-radius:50%;background:var(--light);color:var(--navy);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px}
+  .trkbox{border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:12px;background:var(--light)}
+  .trkh{font-weight:700;color:var(--navy);font-size:16px;padding:10px 14px;margin:-2px -2px 10px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+  @media (prefers-color-scheme: dark){ .trkh{color:#C9DCEA} }
+  .trow{display:flex;justify-content:center} .trow button{flex:0 0 calc((100% - 15px) / 4)}
+  body.g2 .strow,body.g2 #planList .stu{background:rgba(255,255,255,.5);border-color:var(--glb)}
+  body.g2 .trkbox{background:rgba(255,255,255,.3);border-color:var(--glb)}
+  .chkv b{font-size:18px;word-break:break-word}
+  .rmrow{display:block;cursor:pointer;margin:0 0 10px!important;color:var(--text)} .rmrow .top input{width:22px;height:22px;flex:none;accent-color:var(--navy)} .rmall{display:flex;align-items:center;gap:8px;margin-top:12px;font-weight:700;color:var(--text)} .rmall input{width:20px;height:20px;accent-color:var(--navy)}
+  #rsType{display:grid;grid-template-columns:repeat(3,1fr)}
+  #stuList{counter-reset:sc} #stuList > .stu{counter-increment:sc} #stuList > .stu > .top > .nm > b::before{content:counter(sc);display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--light);color:var(--navy);align-items:center;justify-content:center;font-size:12.5px;margin-inline-end:8px;vertical-align:1px}
 </style>
 </head>
 <body>
@@ -1021,6 +1049,15 @@
     </div>
 
     <!-- تعديل حلقة -->
+    <div id="pRemote" class="hidden">
+      <div class="card">
+        <h2>تفعيل حلقة عن بعد</h2>
+        <small>اختر الحلقة لتصبح «عن بعد»، وأزل الاختيار لتعود حضورية. يُحفظ التغيير فوراً.</small>
+        <label class="chk rmall"><input type="checkbox" id="rmAll"> اختيار الكل</label>
+        <div id="rmMsg"></div>
+      </div>
+      <div class="card" id="rmList"></div>
+    </div>
     <div id="pHalEdit" class="hidden">
       <div class="card">
         <h2>تعديل حلقة</h2>
@@ -1206,7 +1243,7 @@
     <!-- ملف الموظف (التقرير الشامل) -->
     <div id="pStfFile" class="hidden">
       <div class="card" id="efFind">
-        <h2>ملف الموظف</h2>
+        <h2>تقرير الموظف الشامل</h2>
         <input id="efQ" placeholder="ابحث باسم الموظف أو رقمه الوظيفي" style="margin-top:8px">
         <div class="sfres" id="efRes"></div>
       </div>
@@ -1240,7 +1277,7 @@
     <!-- تقرير حضور الموظفين -->
     <div id="pSAtt" class="hidden">
       <div class="card">
-        <h2>تقرير الحضور</h2>
+        <h2>تقرير بصمة الحضور</h2>
         <small>من نظام البصمة (الحضور والانصراف): أيام الدوام بعد خصم العطل الرسمية، والإجازات المعتمدة لا تُحتسب غياباً.</small>
         <div class="stchips" id="saPer"></div>
         <div class="dsh-top"><button class="mini" id="saPrev">السابق</button><span class="lbl" id="saLbl"></span><button class="mini" id="saNext">التالي</button></div>
@@ -1270,7 +1307,7 @@
     <!-- شاشة العرض العامة (تلفزيون الجامع) -->
     <div id="pTv" class="hidden">
       <div class="card">
-        <h2>شاشة العرض</h2>
+        <h2>شاشة عرض المجمع</h2>
         <label>رابط الشاشة</label>
         <div class="cfph"><input id="tvLink" readonly dir="ltr" style="font-size:13px"></div>
         <div class="stact"><button id="tvOpen" class="good">فتح الشاشة</button><button id="tvCopy">نسخ الرابط</button><button id="tvNew" class="danger">رابط جديد</button></div>
@@ -1304,7 +1341,7 @@
     <!-- شاشة عرض المجمع -->
     <div id="pDash" class="hidden">
       <div class="card">
-        <h2>شاشة عرض المجمع</h2>
+        <h2>Dashboard</h2>
         <div class="stchips" id="dsPer"></div>
         <div class="dsh-top"><button class="mini" id="dsPrev">السابق</button><span class="lbl" id="dsLbl"></span><button class="mini" id="dsNext">التالي</button></div>
         <div class="edgrid hidden" id="dsCustom"><div><label for="dsFrom">من تاريخ</label><input type="date" id="dsFrom"></div><div><label for="dsTo">إلى تاريخ</label><input type="date" id="dsTo"></div></div>
@@ -1727,8 +1764,12 @@
       <div><label>السورة</label><select id="rsFs"></select></div>
       <div><label>إلى آية</label><button class="ayah" id="rsTa"></button></div>
     </div>
-    <button class="link" id="rsMulti" style="margin-top:2px">النهاية في سورة أخرى؟</button>
-    <div id="rsToWrap" class="hidden"><label>سورة النهاية</label><select id="rsTs"></select></div>
+    <button class="link hidden" id="rsMulti" style="margin-top:2px">النهاية في سورة أخرى؟</button>
+    <div id="rsToWrap" class="hidden">
+      <div class="rsto-h"><b>النهاية من سورة أخرى</b><button class="link" id="rsOne" type="button">إلغاء: النهاية في نفس السورة</button></div>
+      <div class="rspick" id="rsSug"></div>
+      <div class="rng2"><div><label>سورة النهاية</label><select id="rsTs"></select></div><div><label>إلى آية</label><button class="ayah" id="rsTb" type="button"></button></div></div>
+    </div>
     <div class="count" id="rsCount"></div>
     <label>الدرجة من 10</label>
     <div class="scores" id="rsScores"></div>
@@ -2012,7 +2053,7 @@
     <label for="hlT">معلم الحلقة</label><select id="hlT"></select>
     <label for="hlNotes">ملاحظات</label><input id="hlNotes" maxlength="200">
     <label class="chk" style="margin-top:12px"><input type="checkbox" id="hlOn"> الحلقة نشطة</label>
-    <label class="chk" style="margin-top:8px"><input type="checkbox" id="hlRemote"> حلقة عن بعد</label>
+    <label class="chk hidden" style="margin-top:8px"><input type="checkbox" id="hlRemote"> حلقة عن بعد</label>
     <button class="btn" id="hlSave">حفظ التعديلات</button>
     <div id="hlMsg"></div>
   </div>
@@ -2301,18 +2342,19 @@ function userNav(T){
 }
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['repStu', 'تقارير الطلاب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
-  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير الحضور'], ['staffFile', 'ملف الموظف (التقرير الشامل)'], ['tchPerf', 'أداء المعلمين'], ['courses', 'الدورات التدريبية']] },
-  { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['report', 'تقرير الحلقات'], ['tvCfg', 'شاشة العرض']] },
-  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['repEdu', 'تقارير الطلاب'], ['refsEdu', 'الإحالات التعليمية'], ['planF', 'شاشة عرض متابعة الخطط']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
+  { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير بصمة الحضور'], ['courses', 'الدورات التدريبية']] },
+  { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['remote', 'تفعيل حلقة عن بعد']] },
+  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['planF', 'شاشة عرض متابعة الخطط']] },
   { t:'الاختبارات', ic:'exam', items:[['preT', 'الطلاب المرشحون للاختبار القبلي'], ['assocT', 'الطلاب المرشحون لاختبار الجمعية']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'المعاملات', ic:'exam', items:[['trxMemo', 'المعاملات الصادرة'], ['trxIn', 'المعاملات الواردة']] },
-  { t:'تقارير عامة', ic:'report', items:[['dash', 'شاشة عرض المجمع']] },
+  { t:'تقارير عامة', ic:'report', items:[['dash', 'Dashboard'], ['repAll', 'التقرير الشامل للطلاب'], ['report', 'التقرير الشامل للحلقات'], ['staffFile', 'تقرير الموظف الشامل'], ['tvCfg', 'شاشة عرض المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['zoomCfg', 'ربط الحلقات عن بعد'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
 ];
 function navLogo(){
   const lg = el('div', 'navlogo'), im = el('img'); im.src = '../logo.jpg'; im.alt = 'شعار مجمع ربيع القلوب';
+  lg.style.cursor = 'pointer'; lg.title = 'الصفحة الرئيسية'; lg.onclick = () => $('btnHome').onclick();
   lg.appendChild(im); lg.appendChild(el('b', '', 'مجمع حلقات ربيع القلوب القرآني')); lg.appendChild(el('small', '', 'بجامع علي الشبلان - أبها'));
   return lg;
 }
@@ -2373,6 +2415,7 @@ function openRole(r, title, group){
   if (r === 'studentNew') openStudentNew();
   $('pHalNew').classList.toggle('hidden', r !== 'halaqaNew');
   if (r === 'halaqaNew') openHalNew();
+  $('pRemote').classList.toggle('hidden', r !== 'remote'); if (r === 'remote') openRemote();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
   if (r === 'exams' || r === 'cands') r = role = 'preT';
@@ -2457,6 +2500,7 @@ function openRole(r, title, group){
   if (r === 'report') openReport();
   window.scrollTo(0, 0);
 }
+document.querySelectorAll('.wlogo').forEach(x => { x.style.cursor = 'pointer'; x.onclick = () => $('btnHome').onclick(); });
 $('brandHome').onclick = () => { if (D){ show('vHome'); closeMenu(); openRole('welcome'); window.scrollTo(0, 0); } };
 
 /* ---------- الترحيب ---------- */
@@ -2490,7 +2534,7 @@ function renderWelcome(){
     .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', x[2])); box.appendChild(d); });
   renderWeek();
   const ac = $('actions'); ac.innerHTML = '';
-  const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['بناء الخطط التعليمية', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['تقرير الحلقات', 'إنجاز الحلقات والطلاب', 'gold'], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''],
+  const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['بناء الخطط التعليمية', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['التقرير الشامل للحلقات', 'حضور الحلقات وتسميعها وطلابها', 'gold'], repAll:['التقرير الشامل للطلاب', 'الحضور والحفظ والدرجات والخطط لكل طالب', 'gold'], tvCfg:['شاشة عرض المجمع', 'شاشة العرض العامة في الجامع', ''], remote:['تفعيل حلقة عن بعد', 'تحويل الحلقات بين الحضوري وعن بعد', ''], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''],
     myStu:['طلاب الحلقة', 'إحالة الطلاب وترشيحهم للمرحلية ومتابعة الردود', 'gold'], refsStu:['إحالات شؤون الطلاب', 'استقبال إحالات المعلمين والرد عليها', ''],
     refsEdu:['الإحالات التعليمية', 'إحالات مستوى الحفظ والخطط', ''], refsExam:['ترشيحات المرحلية', 'مواعيد الاختبارات المرحلية ونتائجها', 'gold'],
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['المنافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
@@ -2504,11 +2548,11 @@ function renderWelcome(){
     me:['الإعدادات', 'بياناتك وتغيير الرمز السري', ''],
     arc:['الأرشفة السنوية', 'نقل السجلات القديمة لملف أرشيف', ''],
     ann:['الإعلانات', 'نشر الإعلانات ومتابعة الاطلاع عليها', ''],
-    staffFile:['ملف الموظف', 'تقرير شامل: البيانات والحضور والأداء والدورات', ''],
+    staffFile:['تقرير الموظف الشامل', 'الحضور وأداء المؤشرات والدورات', ''],
     courses:['الدورات التدريبية', 'دورات الموظفين ومتدربوها وشهاداتهم', ''],
     staffAtt:['تقرير حضور الموظفين', 'الحضور والتأخير والغياب من البصمة', ''],
     tchPerf:['أداء المعلمين', 'مؤشرات المعلمين وترتيبهم', ''],
-    dash:['شاشة عرض المجمع', 'لوحة المجمع اليومية وتقاريرها الشاملة', 'gold'],
+    dash:['Dashboard', 'لوحة المجمع المباشرة: كل المؤشرات والرسوم', 'gold'],
     absent:['الطلاب المنقطعون', 'المستبعدون لتجاوز حد الغياب وتفعيلهم', ''],
     stuFile:['ملف الطالب', 'بيانات الطالب وحفظه وحضوره وسجله كاملاً', ''],
     msgs:['رسائل أولياء الأمور', 'رسالة خاصة أو عامة عبر برق', ''],
@@ -2517,9 +2561,9 @@ function renderWelcome(){
     exams:['الاختبارات', 'الاختبار القبلي والترشيح لاختبار الجمعية ومجموعاتها', 'gold'], trxR:['المعاملات الواردة', 'التعاميم والمعاملات الواردة إليك', ''], trxS:['المعاملات الصادرة', 'إضافة معاملة ومتابعة معاملاتك', ''],
     exGrp:['المختبرون', 'مجموعات اختبار الجمعية ومشرفوها', 'gold'], assocNom:['ترشيح طالب لاختبار الجمعية', 'المرشحون ومواعيد اختبارهم ونتائجهم', 'gold'],
     halaqaNew:['إضافة حلقة', 'إضافة حلقة جديدة', ''], halaqaEdit:['تعديل حلقة', 'تعديل الحلقات وعدد طلابها', ''] };
-  const acts = document.body.classList.contains('admin') ? [['dash'], ['report'], ['plans'], ['planF'], ['trxMemo'], ['trxIn'], ['preT'], ['assocT'], ['ann'], ['settings']] : TABS;
+  const acts = document.body.classList.contains('admin') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['plans'], ['planF'], ['trxMemo'], ['trxIn'], ['preT'], ['assocT'], ['ann'], ['settings']] : TABS;
   ac.classList.toggle('one', acts.length === 1);
-  acts.filter(t => DESC[t[0]]).forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]] || ICONS[{ preT:'exam', assocT:'exam', exams:'exam', trxR:'exam', trxS:'exam', dash:'report', trxIn:'exam', trxMemo:'exam', cands:'exam', exGrp:'exam', ann:'chat', assocNom:'exam', trx:'exam' }[t[0]]] || ''; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
+  acts.filter(t => DESC[t[0]]).forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]] || ICONS[{ preT:'exam', assocT:'exam', exams:'exam', trxR:'exam', trxS:'exam', dash:'report', repAll:'report', staffFile:'staff', remote:'halaqa', trxIn:'exam', trxMemo:'exam', cands:'exam', exGrp:'exam', ann:'chat', assocNom:'exam', trx:'exam' }[t[0]]] || ''; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
 }
 
 /* ---------- الواجهة الزجاجية (معاينة): ?ui=2 لتفعيلها و ?ui=1 للعودة ---------- */
@@ -2732,7 +2776,18 @@ window.addEventListener('pagehide', flushAtt);
 // الترتيب: حفظ ← مراجعة قريبة ← مراجعة بعيدة ← تلاوة. "التالي" و"رجوع" يحفظان الخانة تلقائياً إن كانت مكتملة.
 let rs = { s:null, type:'حفظ', score:null, multi:false };
 const ayahVal = id => +$(id).dataset.v || 0;
-function setAyah(id, v){ $(id).dataset.v = v || ''; $(id).textContent = v || ''; }
+function setAyah(id, v){ $(id).dataset.v = v || ''; $(id).textContent = v || ''; if (id === 'rsTa'){ $('rsTb').textContent = v || ''; if (rs && rs.multi) $('rsTa').textContent = '—'; } }
+/* النهاية في سورة أخرى: تُفتح تلقائياً إذا بدأ من آخر آية في السورة، أو من زرّها في شبكة آيات النهاية */
+function goMulti(){
+  rs.multi = true; const fs = +$('rsFs').value, t = rs.type, p = (rs.s.plans || {})[t];
+  const fwd = t !== 'حفظ' && p && p.dir === 'من الفاتحة';
+  $('rsToWrap').classList.remove('hidden'); $('rsTa').classList.add('off'); setAyah('rsTa', '');
+  $('rsTs').value = ''; const sg = $('rsSug'); sg.innerHTML = ''; sg.appendChild(el('small', '', 'اختر سورة النهاية:'));
+  (fwd ? [fs + 1, fs - 1] : [fs - 1, fs + 1]).forEach((x, i) => { if (x < 1 || x > 114) return; const b = el('button', 'mini' + (i === 0 ? ' on' : ''), (x < fs ? 'السابقة: ' : 'التالية: ') + D.surah[x - 1]); b.type = 'button';
+    b.onclick = () => { $('rsTs').value = x; sg.querySelectorAll('button').forEach(y => y.classList.toggle('on', y === b)); setAyah('rsTa', ''); countAyat(); openAyah('rsTa'); }; sg.appendChild(b); });
+  countAyat(); $('rsToWrap').scrollIntoView({ block:'nearest', behavior:'smooth' });
+}
+function oneSurah(){ rs.multi = false; $('rsToWrap').classList.add('hidden'); $('rsTa').classList.remove('off'); $('rsTs').value = $('rsFs').value; setAyah('rsTa', ''); countAyat(); }
 function fillSurahs(){
   ['rsFs','rsTs'].forEach(id => { const e = $(id); if (e.options.length) return;
     const o0 = el('option', '', 'اختر السورة'); o0.value = ''; e.appendChild(o0);
@@ -2769,20 +2824,22 @@ function summary(){
 }
 function clearForm(){
   $('rsFs').value = ''; $('rsTs').value = ''; setAyah('rsFa', ''); setAyah('rsTa', '');
-  rs.multi = false; $('rsToWrap').classList.add('hidden'); $('rsMulti').classList.remove('hidden');
+  rs.multi = false; $('rsToWrap').classList.add('hidden'); $('rsTa').classList.remove('off');
   setScore(null); $('rsNote').value = ''; msg('rsMsg', '', ''); countAyat();
 }
 function absAyah(s, a){ let n = 0; for (let i = 0; i < s - 1; i++) n += D.ayat[i]; return n + a; }
+function ayatSpan(fs, fa, ts, ta){ if (ts >= fs) return Math.abs(absAyah(ts, ta) - absAyah(fs, fa)) + 1; let n = D.ayat[fs - 1] - fa + 1; for (let x = fs - 1; x > ts; x--) n += D.ayat[x - 1]; return n + ta; }
 const endSurah = () => rs.multi ? +$('rsTs').value : +$('rsFs').value;
 function countAyat(){
   const fs = +$('rsFs').value, ts = endSurah(), fa = ayahVal('rsFa'), ta = ayahVal('rsTa');
-  $('rsFa').disabled = !fs; $('rsTa').disabled = !ts;
+  $('rsFa').disabled = !fs; $('rsTa').disabled = !ts || rs.multi; $('rsTb').disabled = !ts;
   if (!fs){ $('rsCount').textContent = 'اختر السورة ثم آية البداية والنهاية'; return; }
   if (!fa || !ta){ $('rsCount').textContent = 'عدد آيات ' + D.surah[(ts || fs) - 1] + ': ' + D.ayat[(ts || fs) - 1]; return; }
-  $('rsCount').textContent = 'المقدار: ' + (Math.abs(absAyah(ts, ta) - absAyah(fs, fa)) + 1) + ' آية';
+  $('rsCount').textContent = 'المقدار: ' + ayatSpan(fs, fa, ts, ta) + ' آية';
 }
-$('rsFs').onchange = () => { setAyah('rsFa', ''); setAyah('rsTa', ''); if (!rs.multi) $('rsTs').value = $('rsFs').value; countAyat(); if ($('rsFs').value) openAyah('rsFa'); };
+$('rsFs').onchange = () => { if (rs.multi) oneSurah(); setAyah('rsFa', ''); setAyah('rsTa', ''); $('rsTs').value = $('rsFs').value; countAyat(); if ($('rsFs').value) openAyah('rsFa'); };
 $('rsTs').onchange = () => { setAyah('rsTa', ''); countAyat(); if ($('rsTs').value) openAyah('rsTa'); };
+$('rsOne').onclick = oneSurah; $('rsTb').onclick = () => openAyah('rsTa');
 $('rsMulti').onclick = () => { rs.multi = true; $('rsToWrap').classList.remove('hidden'); $('rsMulti').classList.add('hidden'); $('rsTs').value = $('rsFs').value; setAyah('rsTa', ''); countAyat(); };
 $('rsClear').onclick = clearForm;
 
@@ -2801,10 +2858,13 @@ function openAyah(which){
       setAyah(which, i);
       if (isFrom && !rs.multi && ayahVal('rsTa') && ayahVal('rsTa') < i) setAyah('rsTa', '');
       countAyat(); $('ayahSheet').classList.add('hidden');
-      if (isFrom && !ayahVal('rsTa')) openAyah('rsTa');
+      if (isFrom && i === n && su > 0){ if (!rs.multi) goMulti(); return; }   // آخر آية: النهاية لا بد أن تكون في سورة أخرى
+      if (isFrom && rs.multi && i < n && !$('rsTs').value) oneSurah();
+      if (isFrom && !ayahVal('rsTa') && (!rs.multi || $('rsTs').value)) openAyah('rsTa');
     };
     g.appendChild(b);
   }
+  if (!isFrom && !rs.multi){ const m = el('button', 'apmore', 'النهاية في سورة أخرى ←'); m.type = 'button'; m.onclick = () => { $('ayahSheet').classList.add('hidden'); goMulti(); }; g.appendChild(m); }
   $('ayahSheet').classList.remove('hidden');
 }
 $('rsFa').onclick = () => openAyah('rsFa');
@@ -2825,7 +2885,7 @@ function prefillStart(){
   const t = rs.type, s = rs.s, p = (s.plans || {})[t], pk = $('rsPick'); pk.innerHTML = '';
   let last = s.today.filter(r => r.type === t && r.ts).slice(-1)[0] || ((s.prev || {})[t] && (s.prev || {})[t].ts ? s.prev[t] : null);
   if (p && p.unit && p.start && last && last.date < p.start) last = null;
-  const put = (fs, fa) => { if (!fs || fs < 1 || fs > 114) return; $('rsFs').value = fs; $('rsTs').value = fs; setAyah('rsFa', fa || 1); setAyah('rsTa', ''); countAyat(); };
+  const put = (fs, fa) => { if (!fs || fs < 1 || fs > 114) return; $('rsFs').value = fs; $('rsTs').value = fs; setAyah('rsFa', fa || 1); setAyah('rsTa', ''); countAyat(); if ((fa || 1) === D.ayat[fs - 1]) goMulti(); };
   if (last){
     if (last.ta < D.ayat[last.ts - 1]) return put(last.ts, last.ta + 1);
     if (t === 'حفظ') return put(last.ts - 1, 1);   // الحفظ من الناس إلى البقرة
@@ -3044,14 +3104,13 @@ function renderStaff(){
   if (!list.length) box.appendChild(el('small', '', SD.staff.length ? 'لا توجد نتائج.' : 'لا يوجد موظفون نشطون في جدول الحضور.'));
   list.forEach(s => {
     const w = el('div', 'strow' + (s.st ? ' off' : '')), top = el('div', 'top');
-    top.appendChild(el('b', '', s.name));
+    top.appendChild(el('span', 'seqno', list.indexOf(s) + 1)); const nb = el('b', '', s.name); if (s.emp) nb.appendChild(el('span', 'empno', 'الرقم الوظيفي ' + s.emp)); top.appendChild(nb);
     top.appendChild(el('span', 'pill ' + (s.title === 'معلم' ? 'p-none' : 'p-ok'), s.title));
     if (s.st) top.appendChild(el('span', 'pill p-red', s.st === 'موقوف' ? 'الحساب موقوف' : 'محذوف من مثاني'));
-    else top.appendChild(el('span', 'pill ' + (s.pin === 'changed' ? 'p-ok' : 'p-late'), s.pin === 'changed' ? 'غيّر الرمز' : 'الرمز الأولي'));
     w.appendChild(top);
     const m = el('div', 'meta');
     const add = (k, v, href) => { if (!v) return; const d = el('span', '', k + ': '); const i = el(href ? 'a' : 'i', '', v); if (href){ i.href = href; i.style.fontWeight = '600'; } d.appendChild(i); m.appendChild(d); };
-    add('رقم الهوية', s.nid); add('الجوال', s.phone, 'tel:' + s.phone); add('الرقم الوظيفي', s.emp); add('الجنسية', s.nat);
+    add('رقم الهوية', s.nid); add('الجوال', s.phone, 'tel:' + s.phone); add('الجنسية', s.nat);
     add('المهمة', s.task && s.task !== s.sifa ? s.task : ''); add('المباشرة', s.start);
     add('الحلقات', s.halaqat.join('، ') || (s.title === 'معلم' ? 'لم تُسند' : ''));
     if (s.pin === 'changed' && /^\d{4}-/.test(s.last)) add('آخر دخول', s.last);
@@ -3222,6 +3281,23 @@ $('hnSave').onclick = async () => {
 };
 $('hnAgain').onclick = () => openHalNew();
 $('hnList').onclick = () => openRole('halaqaEdit');
+/* تفعيل الحلقات عن بعد */
+let RM = null;
+async function openRemote(){ $('rmList').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'halaqatAdmin' }, 'rmList'); if (!r || !r.ok) return; RM = r.halaqat.filter(h => h.active); renderRemote(); }
+function renderRemote(){
+  const box = $('rmList'); box.innerHTML = ''; $('rmAll').checked = RM.length && RM.every(h => h.remote);
+  if (!RM.length) return box.appendChild(el('small', '', 'لا توجد حلقات نشطة.'));
+  RM.forEach(h => { const w = el('label', 'strow rmrow'), top = el('div', 'top'), c = el('input'); c.type = 'checkbox'; c.checked = h.remote;
+    const nm = el('b', '', h.name); top.appendChild(nm); top.appendChild(el('span', 'pill ' + (h.remote ? 'p-late' : 'p-ok'), h.remote ? 'عن بعد' : 'حضوري')); top.appendChild(c); w.appendChild(top);
+    w.appendChild(el('small', '', (h.teacher ? 'المعلم: ' + h.teacher + ' • ' : '') + h.students + ' طالب'));
+    c.onchange = () => setRemote([h.hid], c.checked); box.appendChild(w); });
+}
+async function setRemote(ids, on){
+  msg('rmMsg', 'جاري الحفظ...', 'info'); const r = await cpCall({ action:'halRemote', hids:ids, on }, 'rmMsg');
+  if (r && r.ok){ RM.forEach(h => { if (ids.indexOf(h.hid) !== -1) h.remote = on; }); msg('rmMsg', '✓ ' + r.msg, 'ok'); }
+  renderRemote();
+}
+$('rmAll').onchange = () => setRemote(RM.map(h => h.hid), $('rmAll').checked);
 async function openHalEdit(){
   $('heList').innerHTML = '<div class="msg info">جاري التحميل...</div>';
   if (await loadHal('heList')) renderHalEdit();
@@ -3256,7 +3332,7 @@ function openHl(h){
 $('hlOn').onchange = () => { hlForce = false; msg('hlMsg', '', ''); };
 $('hlClose').onclick = () => $('hlSheet').classList.add('hidden');
 $('hlSave').onclick = async () => {
-  const h = { hid:hlCur.hid, name:$('hlName').value.trim(), tnid:$('hlT').value, notes:$('hlNotes').value.trim(), on:$('hlOn').checked, force:hlForce, cap:$('hlCap').value.trim(), remote:$('hlRemote').checked };
+  const h = { hid:hlCur.hid, name:$('hlName').value.trim(), tnid:$('hlT').value, notes:$('hlNotes').value.trim(), on:$('hlOn').checked, force:hlForce, cap:$('hlCap').value.trim() };
   if (h.name.length < 3) return msg('hlMsg', 'اكتب اسم الحلقة.', 'err');
   if (!(+h.cap >= 1 && +h.cap <= 200)) return msg('hlMsg', 'اكتب عدد الطلاب المسموح في الحلقة (من 1 إلى 200).', 'err');
   if (+h.cap < hlCur.students) return msg('hlMsg', 'في الحلقة الآن ' + hlCur.students + ' طالب، فلا يمكن أن يكون الحد أقل من ذلك. انقل بعض الطلاب أولاً.', 'err');
@@ -3755,7 +3831,7 @@ async function openZoomCfg(){ const r = await cpCall({ action:'zmCfg' }, 'zcMsg'
 function fillZc(){
   $('zcApp').value = ZC.app || ''; $('zcKid').value = ZC.kid || ''; $('zcPem').value = ''; $('zcPem').placeholder = ZC.hasPem ? '•••••• محفوظ' : '-----BEGIN PRIVATE KEY-----';
   const L = $('zcList'); L.innerHTML = ''; L.appendChild(el('h2', '', 'الحلقات عن بعد'));
-  const rm = ZC.halaqat.filter(h => h.remote); if (!rm.length) L.appendChild(el('small', '', 'لا توجد حلقات عن بعد. فعّل «حلقة عن بعد» من تعديل الحلقة.'));
+  const rm = ZC.halaqat.filter(h => h.remote); if (!rm.length) L.appendChild(el('small', '', 'لا توجد حلقات عن بعد. فعّلها من «تفعيل حلقة عن بعد» في تبويب الحلقات.'));
   rm.forEach(h => { const w = el('div', 'strow'), t = el('div', 'top'); t.appendChild(el('b', '', h.name)); t.appendChild(el('span', 'pill ' + (h.id ? 'p-ok' : 'p-late'), h.id ? 'الغرفة جاهزة' : 'لم تُنشأ الغرفة')); w.appendChild(t); L.appendChild(w); });
 }
 async function zcSave(create){ const cfg = { app:$('zcApp').value.trim(), kid:$('zcKid').value.trim(), pem:$('zcPem').value.trim() };
@@ -4019,8 +4095,8 @@ $('anSave').onclick = async () => {
 };
 
 /* ---------- ملف الموظف (التقرير الشامل) ---------- */
-let EF = null, EFL = null, sfNid = null, efP = 'month', efDate = null, efSec = 'info', efSeq = 0;
-const EF_TABS = [['info', 'البيانات'], ['att', 'الحضور والانصراف'], ['perf', 'الأداء في الحلقات'], ['courses', 'الدورات التدريبية']];
+let EF = null, EFL = null, sfNid = null, efP = 'month', efDate = null, efSec = 'sum', efSeq = 0;
+const EF_TABS = [['sum', 'ملخص المؤشرات والمهام'], ['att', 'الحضور والانصراف'], ['perf', 'أداء المؤشرات'], ['courses', 'الدورات التدريبية']];
 async function openStfFile(nid){
   sfNid = null;
   if (!nid){ $('efFile').classList.add('hidden'); $('efFind').classList.remove('hidden');
@@ -4061,13 +4137,36 @@ function renderEf(){
   [[A && A.pct != null ? A.pct + '%' : '—', 'نسبة الحضور'], [A ? A.late : '—', 'مرات التأخير'], [Pf && Pf.score != null ? Pf.score : '—', 'مؤشر الأداء'], [done.reduce((a, c) => a + c.hours, 0), 'ساعات التدريب']].forEach(x => { const d = el('div'); d.appendChild(el('b', '', x[0])); d.appendChild(el('span', '', x[1])); st.appendChild(d); });
   h.appendChild(st);
   const ac = el('div', 'stact'), pb = el('button', '', 'طباعة / PDF'), xb = el('button', '', 'تصدير Excel'); pb.onclick = efPrint; xb.onclick = efXls; ac.appendChild(pb); ac.appendChild(xb); h.appendChild(ac);
-  const tabs = EF_TABS.filter(t => t[0] === 'info' || (t[0] === 'att' && EF.att !== undefined) || (t[0] === 'perf' && I.halaqat.length && EF.perf !== undefined) || (t[0] === 'courses' && EF.courses));
-  if (!tabs.some(t => t[0] === efSec)) efSec = 'info';
+  const tabs = EF_TABS.filter(t => t[0] === 'sum' || (t[0] === 'att' && EF.att !== undefined) || (t[0] === 'perf' && I.halaqat.length && EF.perf !== undefined) || (t[0] === 'courses' && EF.courses));
+  if (!tabs.some(t => t[0] === efSec)) efSec = 'sum';
   const tb = $('efTabs'); tb.innerHTML = ''; tabs.forEach(t => { const b = el('button', efSec === t[0] ? 'on' : '', t[1]); b.onclick = () => { efSec = t[0]; renderEf(); }; tb.appendChild(b); });
   const body = $('efBody'); body.innerHTML = ''; efSection(efSec, body);
 }
 function efSection(k, b){
   const I = EF.info, H = t => b.appendChild(el('div', 'rfsec', t));
+  if (k === 'sum'){
+    const A = EF.att, T = EF.perf, C = EF.courses || [], mine = C.filter(c => c.me), done = mine.filter(c => c.me.status === 'أتمّ الدورة');
+    const items = [];
+    if (A && A.required) items.push({ label:'الحضور حسب البصمة', sub:A.present + ' من ' + (A.present + A.absent) + ' يوم', value:A.pct, text:A.pct == null ? '—' : A.pct + '%', cls:lvC(lvAtt(A.pct)) });
+    if (A && A.present) { const pv = Math.round((A.present - A.late) * 100 / A.present); items.push({ label:'الانضباط في وقت الحضور', sub:'تأخر ' + A.late + ' مرة • ' + A.lateMin + ' دقيقة', value:pv, text:pv + '%', cls:lvC(lvAtt(pv)) }); }
+    if (T){
+      items.push({ label:'اعتماد الحلقة يومياً', sub:T.approved + ' من ' + T.need + ' يوم', value:T.apprPct, text:T.apprPct == null ? '—' : T.apprPct + '%', cls:lvC(lvAtt(T.apprPct)) });
+      items.push({ label:'تسميع الطلاب الحاضرين', sub:T.recs + ' مرة', value:T.cover, text:T.cover == null ? '—' : T.cover + '%', cls:lvC(lvPl(T.cover)) });
+      items.push({ label:'حضور طلابه', sub:T.students + ' طالب', value:T.att, text:T.att == null ? '—' : T.att + '%', cls:lvC(lvAtt(T.att)) });
+      const av = T.avg == null ? null : Math.round(T.avg * 100 / D.maxScore); items.push({ label:'متوسط درجات طلابه', sub:T.avg == null ? '' : T.avg + ' من ' + D.maxScore, value:av, text:av == null ? '—' : av + '%', cls:lvC(lvAvg(T.avg)) });
+      items.push({ label:'إنجاز خطط طلابه', sub:'طلاب بخطة: ' + (T.withPlan || 0), value:T.plan, text:T.plan == null ? '—' : T.plan + '%', cls:lvC(lvPl(T.plan)) });
+    }
+    if (mine.length){ const pv = Math.round(done.length * 100 / mine.length); items.push({ label:'إتمام الدورات التدريبية', sub:done.length + ' من ' + mine.length + ' دورة', value:pv, text:pv + '%', cls:lvC(lvPl(pv)) }); }
+    const g = el('div', 'chgrid'); b.appendChild(g);
+    const c1 = chCard('المؤشرات', 'من 100%'); c1.appendChild(chBars(items, { max:100, empty:'لا توجد مؤشرات في هذه الفترة.' })); g.appendChild(c1);
+    const c2 = chCard('مؤشر الأداء العام'), rg = el('div'); rg.innerHTML = ringSvg(T ? T.score : null, T ? 'من 100' : 'للمعلمين فقط', T && T.score != null ? T.score : '—', T ? (T.score >= 85 ? '#2E7D5B' : T.score >= 65 ? '#D08E2C' : '#B3261E') : '#9AA5AE'); c2.appendChild(rg);
+    requestAnimationFrame(() => requestAnimationFrame(() => rg.querySelectorAll('.fg').forEach(c => c.style.strokeDashoffset = c.dataset.o)));
+    c2.appendChild(el('small', '', 'اعتماد الحلقة (25) • تسميع الحاضرين (25) • حضور الطلاب (20) • الدرجات (15) • الخطط (15)')); g.appendChild(c2);
+    H('المهام المناطة به');
+    b.appendChild(chKv([[I.title || '—', 'الصفة'], [I.halaqat.length ? I.halaqat.join('، ') : '—', 'الحلقات المسندة'], [T ? T.students : '—', 'طلابه'], [T ? T.approved + '/' + T.need : '—', 'أيام الاعتماد'],
+      [T ? T.recs : '—', 'مرات التسميع'], [T ? (T.hifz + ' / ' + T.mur) : '—', 'حفظ / مراجعة (آية)'], [T ? T.refs : '—', 'الإحالات المرفوعة'], [T ? T.exams : '—', 'الترشيحات'], [A ? A.required : '—', 'أيام الدوام المقررة'], [mine.length, 'الدورات المسجل فيها']]));
+    return;
+  }
   if (k === 'info'){
     H('البيانات الوظيفية'); b.appendChild(kvBox([['الاسم', I.name], ['الرقم الوظيفي', I.emp], ['رقم الهوية', I.nid], ['الجنسية', I.nat], ['الجوال', I.phone], ['الصفة', I.title], ['المهمة', I.task && I.task !== I.sifa ? I.task : ''], ['الفترة', I.shift], ['تاريخ المباشرة', I.start]]));
     H('في مثاني'); b.appendChild(kvBox([['الحلقات', I.halaqat.join('، ') || (I.title === 'معلم' ? 'لم تُسند' : '—')], ['حالة الحساب', I.st || 'نشط'], ['آخر دخول', I.last || '—']]));
@@ -4083,6 +4182,7 @@ function efSection(k, b){
   }
   if (k === 'perf'){
     const T = EF.perf; if (!T){ b.appendChild(el('small', '', 'لا توجد بيانات أداء في هذه الفترة.')); return; }
+    b.appendChild(el('small', '', 'مؤشر الأداء من 100: اعتماد الحلقة يومياً (25)، تسميع الطلاب الحاضرين (25)، حضور الطلاب (20)، متوسط الدرجات (15)، إنجاز الخطط (15).'));
     b.appendChild(el('div', 'slabel ' + lvSc(T.score).replace('lv-', 'c-').replace('c-g', 'c-ok').replace('c-y', 'c-late').replace('c-r', 'c-abs'), 'مؤشر الأداء: ' + (T.score == null ? '—' : T.score + ' من 100')));
     b.appendChild(kvBox([['الحلقات', T.halaqat.join('، ')], ['الطلاب', T.students], ['الاعتماد', T.approved + ' من ' + T.need + (T.apprPct != null ? ' (' + T.apprPct + '%)' : '')], ['تغطية التسميع', T.cover == null ? '—' : T.cover + '%'], ['التسميع', T.recs + ' مرة'],
       ['الحفظ / المراجعة', T.hifz + ' / ' + T.mur + ' آية'], ['حضور الطلاب', T.att == null ? '—' : T.att + '%'], ['متوسط الدرجات', T.avg == null ? '—' : T.avg + ' من ' + D.maxScore], ['إنجاز الخطط', T.plan == null ? '—' : T.plan + '%'], ['الإحالات', T.refs], ['ترشيحات المرحلية', T.exams + (T.passed ? ' • اجتاز ' + T.passed : '')], ['منقطعون في حلقته', T.excluded]]));
@@ -4100,7 +4200,7 @@ function efSection(k, b){
 }
 function efPrint(){
   const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
-  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'ملف الموظف: ' + EF.info.name)); l.appendChild(el('div', '', EF.info.title + ' • الرقم الوظيفي ' + EF.info.emp + ' • ' + $('efLbl').textContent)); hd.appendChild(l); hd.appendChild(el('div', '', EF.org)); p.appendChild(hd);
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'تقرير الموظف الشامل: ' + EF.info.name)); l.appendChild(el('div', '', EF.info.title + ' • الرقم الوظيفي ' + EF.info.emp + ' • ' + $('efLbl').textContent)); hd.appendChild(l); hd.appendChild(el('div', '', EF.org)); p.appendChild(hd);
   EF_TABS.forEach(t => { if (t[0] === 'perf' && !EF.perf) return; if (t[0] === 'att' && EF.att === undefined) return; if (t[0] === 'courses' && !EF.courses) return; p.appendChild(el('h3', '', t[1])); const d = el('div'); efSection(t[0], d); p.appendChild(d); });
   setTimeout(() => window.print(), 50);
 }
@@ -4375,7 +4475,7 @@ $('tvSave').onclick = async () => {
 const REP_KIND = { repStu:'stu', repEdu:'edu', repAll:'all' };
 let RP = null, rpK = 'stu', rpP = 'day', rpDate = null, rpSid = '', rpSeq = 0, rpNames = null;
 const RP_T = { stu:['تقارير شؤون الطلاب', 'الحضور والتأخر والغياب والاستئذان والإحالات والاستبعاد لأي طالب أو حلقة. مناسب للعرض على ولي الأمر.'],
-  edu:['التقارير التعليمية', 'الحفظ والمراجعة والدرجات والخطط والاختبارات المرحلية لأي طالب أو حلقة.'], all:['تقرير طالب', 'تقرير شامل لطالب باسمه: الحضور والحفظ والدرجات والخطة والإحالات.'] };
+  edu:['التقارير التعليمية', 'الحفظ والمراجعة والدرجات والخطط والاختبارات المرحلية لأي طالب أو حلقة.'], all:['التقرير الشامل للطلاب', 'تقرير شامل لطالب باسمه: الحضور والحفظ والدرجات والخطة والإحالات.'] };
 function rpRange(){
   const t = D.today, d = rpDate || t;
   if (rpP === 'day') return [d, d];
@@ -4418,7 +4518,7 @@ async function loadRep(){
 }
 const RP_COLS = { stu:[['name', 'الطالب'], ['hname', 'الحلقة'], ['days', 'أيام مسجلة'], ['present', 'حاضر'], ['late', 'متأخر'], ['absent', 'غائب'], ['excused', 'مستأذن'], ['att', 'الحضور %'], ['refs', 'إحالات']],
   edu:[['name', 'الطالب'], ['hname', 'الحلقة'], ['recs', 'تسميع'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['til', 'تلاوة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %'], ['refs', 'إحالات وترشيحات']] };
-RP_COLS.all = RP_COLS.stu.slice(0, 2).concat([['att', 'الحضور %'], ['absent', 'غائب'], ['excused', 'مستأذن'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %']]);
+RP_COLS.all = [['name', 'الطالب'], ['hname', 'الحلقة'], ['days', 'أيام مسجلة'], ['present', 'حاضر'], ['late', 'متأخر'], ['absent', 'غائب'], ['excused', 'مستأذن'], ['att', 'الحضور %'], ['recs', 'تسميع'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['til', 'تلاوة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %'], ['refs', 'إحالات']];
 let rpSort = ['name', 1];
 function rpCell(c, x){ const v = x[c]; if (v == null) return ['—']; if (c === 'att') return [v + '%', lvAtt(v)]; if (c === 'avg') return [v, lvAvg(v)]; if (c === 'plan') return [v + '%', lvPl(v)]; if (c === 'absent') return [v, v ? 'lv-r' : '']; return [v]; }
 let rpM = {};
@@ -5534,8 +5634,8 @@ function renderTrack(){
   const all = MS.refs.filter(x => x.kind !== 'exam'); chipsSum('mtSum', all, mtF, v => { mtF = v; renderTrack(); });
   const box = $('mtList'); box.innerHTML = '';
   [['edu', 'متابعة إحالات الشؤون التعليمية'], ['stu', 'متابعة إحالات شؤون الطلاب']].forEach(k => { const list = all.filter(x => x.kind === k[0] && stFilter(x, mtF));
-    const h = el('div', 'rfsec', k[1] + ' (' + list.length + ')'); box.appendChild(h);
-    if (!list.length) box.appendChild(el('small', '', 'لا توجد إحالات في هذا التصنيف.')); list.forEach(x => box.appendChild(refRow(x, 't'))); });
+    const sec = el('div', 'trkbox'), h = el('div', 'trkh', k[1] + ' (' + list.length + ')'); sec.appendChild(h); box.appendChild(sec);
+    if (!list.length) sec.appendChild(el('small', '', 'لا توجد إحالات في هذا التصنيف.')); list.forEach(x => sec.appendChild(refRow(x, 't'))); });
 }
 /* صندوق الجهة المختصة */
 async function openRefs(k){
