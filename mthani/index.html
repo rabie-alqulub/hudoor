@@ -3123,7 +3123,7 @@ function renderStaff(){
       if (!s.admin){
         if (s.st === 'موقوف') btn('good', 'restore', 'رفع الإيقاف', () => staffOp(s, 'restore'));
         else btn('warn', 'pause', 'إيقاف الحساب', () => confirmOp('إيقاف حساب ' + s.name, 'لن يستطيع الدخول على مثاني حتى ترفع الإيقاف، ويخرج فوراً إن كان داخلاً. بياناته وحلقاته تبقى كما هي.', 'إيقاف الحساب', () => staffOp(s, 'suspend')));
-        btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + s.name + ' من النظام', 'يُحذف من مثاني: يُمنع من الدخول، وتُلغى إسنادات حلقاته وصلاحياته ورمزه السري. يبقى في جدول الحضور وبصمته لا تتأثر، ويمكنك استعادته من «المحذوفون».', 'حذف من النظام', () => staffOp(s, 'delete')));
+        btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + s.name + ' من النظام', 'حذف نهائي من مثاني ومن نظام البصمة: يُمنع من الدخول والبصم، وتُلغى إسنادات حلقاته وصلاحياته ورمزه السري، ويُمسح صفه وبصمة وجهه وسجل حضوره وإجازاته من جدول البصمة. لا يمكن التراجع (تُحفظ نسخة نصية في تبويب «أرشيف المحذوفين من البصمة» بجدول مثاني).', 'حذف نهائي', () => staffOp(s, 'delete')));
       }
     }
     w.appendChild(ac); box.appendChild(w);
@@ -3144,7 +3144,7 @@ $('cfGo').onclick = () => { $('cfSheet').classList.add('hidden'); if (cfFn) cfFn
 async function staffOp(s, op){
   try {
     const r = await api({ action:'staffStatus', nid:s.nid, op:op });
-    toast(r.msg); if (r.ok){ s.st = r.st; if (op === 'delete'){ s.halaqat = []; s.pin = 'default'; } renderStaff(); }
+    toast(r.msg); if (r.ok){ s.st = r.st; if (op === 'delete'){ s.halaqat = []; s.pin = 'default'; if (r.gone) SD.staff = SD.staff.filter(x => x !== s); } renderStaff(); }
   } catch(e){ if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
 }
 /* ---------- أدوات مشتركة: المراحل، تاريخ الميلاد الهجري/الميلادي، نموذج الطالب ---------- */
