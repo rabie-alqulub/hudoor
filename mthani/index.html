@@ -1148,6 +1148,15 @@
       </div>
       <div class="card hidden" id="arPv"></div>
       <div class="card" id="arLog"></div>
+      <div class="card" id="rsCard">
+        <h2>تصفير بيانات التجربة</h2>
+        <small>يمسح السجلات التي أُدخلت أثناء التجربة، ويُبقي البيانات الأساسية: الطلاب والموظفين والحلقات والصلاحيات والحسابات والإعدادات والمعاملات والإعلانات والرسائل والنقاط اليدوية والمتجر.</small>
+        <div class="msg info" style="margin-top:8px">قبل التصفير تُؤخذ نسخة احتياطية كاملة من الجدول في حسابك، فيمكن الرجوع إليها.</div>
+        <div id="rsList" style="margin-top:10px"></div>
+        <label for="rsConf">للتأكيد اكتب كلمة: تصفير</label><input id="rsConf" autocomplete="off">
+        <div class="stact"><button class="danger" id="rsRun">تصفير الآن</button></div>
+        <div id="rsMsg"></div>
+      </div>
     </div>
 
     <!-- الإعدادات: الشؤون التعليمية -->
@@ -3875,7 +3884,20 @@ $('meChangePin').onclick = () => openPin();
 
 /* ---------- الأرشفة السنوية ---------- */
 let AR = null;
-async function openArc(){ $('arPv').classList.add('hidden'); $('arRun').disabled = true; const r = await cpCall({ action:'arcInfo' }, 'arMsg'); if (r && r.ok){ AR = r; if (!$('arBefore').value) $('arBefore').value = r.def; renderArc(); } }
+const RS_T = { eval:['التقييم والتقارير', 'الحضور والتسميع واعتماد الحلقات (ومنها تُحسب التقارير وفارس الحلقة)'], refs:['الإحالات والترشيحات', 'الإحالات وترشيحات الاختبار القبلي والجمعية ومجموعاتها'], plans:['الخطط', 'خطط الطلاب وطلبات تعديلها'] };
+async function openRs(){ const b = $('rsList'); b.innerHTML = ''; $('rsConf').value = ''; msg('rsMsg', '', ''); const r = await cpCall({ action:'resetInfo' }, 'rsMsg'); if (!r || !r.ok) return;
+  Object.keys(RS_T).forEach(g => { const l = el('label', 'chk'), c = el('input'); c.type = 'checkbox'; c.value = g; c.checked = true; c.style.width = 'auto'; l.style.display = 'flex'; l.style.gap = '8px'; l.style.alignItems = 'flex-start';
+    const t = el('div'); t.appendChild(el('b', '', RS_T[g][0] + ' — ' + r.groups[g].reduce((a, x) => a + x.n, 0) + ' سجل')); t.appendChild(el('small', '', RS_T[g][1] + ' • ' + r.groups[g].map(x => x.name + ': ' + x.n).join('، ')));
+    l.appendChild(c); l.appendChild(t); b.appendChild(l); }); }
+$('rsRun').onclick = async () => {
+  const gs = [...$('rsList').querySelectorAll('input:checked')].map(x => x.value); if (!gs.length) return msg('rsMsg', 'اختر ما تريد تصفيره.', 'err');
+  if ($('rsConf').value.trim() !== 'تصفير') return msg('rsMsg', 'اكتب كلمة «تصفير» للتأكيد.', 'err');
+  if (!confirm('سيُمسح: ' + gs.map(g => RS_T[g][0]).join('، ') + '. متأكد؟')) return;
+  $('rsRun').disabled = true; msg('rsMsg', 'جاري أخذ نسخة احتياطية ثم التصفير...', 'info');
+  const r = await cpCall({ action:'resetRun', groups:gs, confirm:'تصفير' }, 'rsMsg'); $('rsRun').disabled = false;
+  if (r && r.ok){ msg('rsMsg', '✓ ' + r.msg, 'ok'); const a = el('a', '', 'فتح النسخة الاحتياطية'); a.href = r.backup; a.target = '_blank'; $('rsMsg').appendChild(a); const keep = $('rsMsg').innerHTML; await openRs(); $('rsMsg').innerHTML = keep; }
+};
+async function openArc(){ openRs(); $('arPv').classList.add('hidden'); $('arRun').disabled = true; const r = await cpCall({ action:'arcInfo' }, 'arMsg'); if (r && r.ok){ AR = r; if (!$('arBefore').value) $('arBefore').value = r.def; renderArc(); } }
 function renderArc(){
   const q = $('arQuick'); q.innerHTML = ''; const opts = [['قبل سنة', AR.def]]; if (AR.term && AR.term.from) opts.unshift(['قبل بداية الفصل الحالي', AR.term.from]);
   opts.forEach(o => { const b = el('button', $('arBefore').value === o[1] ? 'on' : '', o[0]); b.onclick = () => { $('arBefore').value = o[1]; $('arPv').classList.add('hidden'); $('arRun').disabled = true; renderArc(); }; q.appendChild(b); });
