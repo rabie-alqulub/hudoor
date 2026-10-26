@@ -862,6 +862,9 @@
   .rmrow{display:block;cursor:pointer;margin:0 0 10px!important;color:var(--text)} .rmrow .top input{width:22px;height:22px;flex:none;accent-color:var(--navy)} .rmall{display:flex;align-items:center;gap:8px;margin-top:12px;font-weight:700;color:var(--text)} .rmall input{width:20px;height:20px;accent-color:var(--navy)}
   #rsType{display:grid;grid-template-columns:repeat(3,1fr)}
   #stuList{counter-reset:sc} #stuList > .stu{counter-increment:sc} #stuList > .stu > .top > .nm > b::before{content:counter(sc);display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--light);color:var(--navy);align-items:center;justify-content:center;font-size:12.5px;margin-inline-end:8px;vertical-align:1px}
+  .dsh-top > button.mini,.pnav > #rPrev,.pnav > #rNext{display:none!important}
+  .dsh-top{justify-content:center}
+  .perpick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px} .perpick label{margin:0;font-weight:700;color:var(--navy)} .perpick input,.perpick select{width:auto;min-width:220px;flex:1;max-width:360px}
 </style>
 </head>
 <body>
@@ -1716,7 +1719,9 @@
     <!-- المدير: التقارير -->
     <div id="pReport" class="hidden">
       <div class="card">
-        <div class="tabs" id="repTabs" style="margin-top:0"><button data-p="day" class="on">يومي</button><button data-p="week">أسبوعي</button><button data-p="month">شهري</button></div>
+        <h2>التقرير الشامل للحلقات</h2>
+        <div class="stchips" id="repTabs"></div>
+        <div class="edgrid hidden" id="repCustom"><div><label for="repFrom">من تاريخ</label><input type="date" id="repFrom"></div><div><label for="repTo">إلى تاريخ</label><input type="date" id="repTo"></div></div>
         <div class="pnav"><button id="rPrev">السابق</button><b id="rLabel"></b><button id="rNext">التالي</button></div>
         <div class="tiles" id="repTiles"></div>
         <div class="tiles three" id="repTiles2"></div>
@@ -2121,7 +2126,7 @@ const store = {
 let D = null;              // بيانات الصفحة الرئيسية من الخادم
 let approval = null, apprStar = '';
 let exStuds = [], role = null, hal = null, day = null, studs = [], pending = {}, saveTimer = null;
-let rep = { period:'day', date:null, seq:0 };
+let rep = { period:'day', date:null, mon:null, seq:0 };
 
 /* ---------- أدوات ---------- */
 async function api(data){
@@ -3575,14 +3580,15 @@ function exbPrint(d, L, bt){ const p = $('dsPrint'); p.innerHTML = ''; $('sfPrin
   L.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.level, x.hname, x.status === AX.st.nom ? '' : x.score, x.status === AX.st.nom ? '' : x.result].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
   setTimeout(() => window.print(), 50); }
 /* ---------- الطلاب المتعثرون ---------- */
-let SG = null, sgP = 'month', sgSeq = 0;
+let SG = null, sgP = 'month', sgDate = null, sgSeq = 0;
 function openStrug(){
   const per = $('sgPer'); per.innerHTML = '';
-  [['week', 'هذا الأسبوع'], ['month', 'آخر 30 يوماً'], ['term', 'الفصل'], ['custom', 'من تاريخ إلى تاريخ']].forEach(p => { const b = el('button', sgP === p[0] ? 'on' : '', p[1]); b.onclick = () => { sgP = p[0]; openStrug(); }; per.appendChild(b); });
+  [['month', 'شهري'], ['custom', 'من تاريخ إلى تاريخ']].forEach(p => { const b = el('button', sgP === p[0] ? 'on' : '', p[1]); b.onclick = () => { sgP = p[0]; openStrug(); }; per.appendChild(b); });
+  perPick('sgPer', sgP, sgDate, v => { sgDate = v; loadStrug(); });
   $('sgCustom').classList.toggle('hidden', sgP !== 'custom'); loadStrug();
 }
 async function loadStrug(){
-  const t = D.today, tr = (SG && SG.term) || (DS && DS.term) || {}, rg = sgP === 'week' ? [addDays(t, -ud(t).getUTCDay()), t] : sgP === 'month' ? [addDays(t, -30), t] : sgP === 'term' ? [tr.from || addDays(t, -90), t] : [$('sgFrom').value || addDays(t, -30), $('sgTo').value || t];
+  const t = D.today, tr = (SG && SG.term) || (DS && DS.term) || {}, rg = sgP === 'custom' ? [$('sgFrom').value || addDays(t, -30), $('sgTo').value || t] : monthRange(sgDate, tr);
   const my = ++sgSeq; $('sgBox').innerHTML = '<div class="msg info">جاري التحليل...</div>';
   const r = await cpCall({ action:'strugglers', from:rg[0], to:rg[1], hid:$('sgHal').value }, 'sgBox'); if (!r || !r.ok || my !== sgSeq) return; SG = r;
   if (!$('sgHal').children.length){ fillSel('sgHal', r.halaqat.map(h => [h.hid, h.name]), 'كل الحلقات'); }
@@ -3650,6 +3656,7 @@ let MA = null, maP = 'month', maT = 'stats', maDate = null, maQ = '', maCid = ''
 document.querySelectorAll('#maTab button').forEach(b => b.onclick = () => { maT = b.dataset.t; document.querySelectorAll('#maTab button').forEach(x => x.classList.toggle('on', x === b)); maCid = ''; renderMsgArc(); });
 function openMsgArc(){
   const per = $('maPer'); per.innerHTML = ''; DS_PER.forEach(p => { const b = el('button', maP === p[0] ? 'on' : '', p[1]); b.onclick = () => { maP = p[0]; maDate = null; openMsgArc(); }; per.appendChild(b); });
+  perPick('maPer', maP, maDate, v => { maDate = v; loadMsgArc(); });
   $('maCustom').classList.toggle('hidden', maP !== 'custom'); if (maP === 'custom' && !$('maFrom').value){ $('maFrom').value = addDays(D.today, -30); $('maTo').value = D.today; } loadMsgArc();
 }
 async function loadMsgArc(){ const rg = perRange(maP, maDate, 'maFrom', 'maTo', (MA && MA.term) || (DS && DS.term)); $('maBox').innerHTML = '<div class="msg info">جاري التحميل...</div>';
@@ -4114,7 +4121,7 @@ $('efQ').oninput = () => EFL && efList();
 function efPerUI(){
   const per = $('efPer'); per.innerHTML = '';
   DS_PER.forEach(p => { const b = el('button', efP === p[0] ? 'on' : '', p[1]); b.onclick = () => { efP = p[0]; efDate = null; efPerUI(); loadEf(); }; per.appendChild(b); });
-  $('efCustom').classList.toggle('hidden', efP !== 'custom'); ['efPrev', 'efNext'].forEach(id => $(id).classList.toggle('hidden', efP === 'term' || efP === 'custom'));
+  $('efCustom').classList.toggle('hidden', efP !== 'custom'); perPick('efPer', efP, efDate, v => { efDate = v; loadEf(); });
   if (efP === 'custom' && !$('efFrom').value){ $('efFrom').value = addDays(D.today, -30); $('efTo').value = D.today; }
 }
 async function loadEf(){
@@ -4282,7 +4289,7 @@ function openSAtt(){
   const per = $('saPer'); per.innerHTML = '';
   DS_PER.forEach(p => { const b = el('button', saP === p[0] ? 'on' : '', p[1]); b.onclick = () => { saP = p[0]; saDate = null; openSAtt(); }; per.appendChild(b); });
   $('saCustom').classList.toggle('hidden', saP !== 'custom');
-  ['saPrev', 'saNext'].forEach(id => $(id).classList.toggle('hidden', saP === 'term' || saP === 'custom'));
+  perPick('saPer', saP, saDate, v => { saDate = v; loadSAtt(); });
   if (saP === 'custom' && !$('saFrom').value){ $('saFrom').value = addDays(D.today, -30); $('saTo').value = D.today; }
   loadSAtt();
 }
@@ -4349,14 +4356,12 @@ $('saPdf').onclick = () => {
 };
 
 /* ---------- أداء المعلمين ---------- */
-let TC = null, tcP = 'week', tcDate = null, tcOne = '', tcSeq = 0, tcSort = ['score', -1];
+let TC = null, tcP = 'month', tcDate = null, tcOne = '', tcSeq = 0, tcSort = ['score', -1];
 const lvSc = v => v == null ? '' : v >= 85 ? 'lv-g' : v >= 65 ? 'lv-y' : 'lv-r';
 function perRange(p, date, fromEl, toEl, term){
   const t = D.today, d = date || t;
   if (p === 'day') return [d, d];
-  if (p === 'week'){ const s = addDays(d, -ud(d).getUTCDay()), e = addDays(s, 6); return [s, e > t ? t : e]; }
-  if (p === 'month'){ const s = d.slice(0, 8) + '01', n = ud(s); n.setUTCMonth(n.getUTCMonth() + 1); const e = addDays(iso(n), -1); return [s, e > t ? t : e]; }
-  if (p === 'term'){ const tr = term || {}; return [tr.from || addDays(t, -90), tr.to && tr.to < t ? tr.to : t]; }
+  if (p === 'month' || p === 'week' || p === 'term') return monthRange(p === 'term' ? 'term' : date, term);
   return [$(fromEl).value || addDays(t, -30), $(toEl).value || t];
 }
 function perShift(p, date, dir){
@@ -4371,7 +4376,7 @@ function openTch(){
   const per = $('tcPer'); per.innerHTML = '';
   DS_PER.forEach(p => { const b = el('button', tcP === p[0] ? 'on' : '', p[1]); b.onclick = () => { tcP = p[0]; tcDate = null; openTch(); }; per.appendChild(b); });
   $('tcCustom').classList.toggle('hidden', tcP !== 'custom');
-  ['tcPrev', 'tcNext'].forEach(id => $(id).classList.toggle('hidden', tcP === 'term' || tcP === 'custom'));
+  perPick('tcPer', tcP, tcDate, v => { tcDate = v; loadTch(); });
   if (tcP === 'custom' && !$('tcFrom').value){ $('tcFrom').value = addDays(D.today, -30); $('tcTo').value = D.today; }
   loadTch();
 }
@@ -4479,9 +4484,7 @@ const RP_T = { stu:['تقارير شؤون الطلاب', 'الحضور والت
 function rpRange(){
   const t = D.today, d = rpDate || t;
   if (rpP === 'day') return [d, d];
-  if (rpP === 'week'){ const s = addDays(d, -ud(d).getUTCDay()), e = addDays(s, 6); return [s, e > t ? t : e]; }
-  if (rpP === 'month'){ const s = d.slice(0, 8) + '01', n = ud(s); n.setUTCMonth(n.getUTCMonth() + 1); const e = addDays(iso(n), -1); return [s, e > t ? t : e]; }
-  if (rpP === 'term'){ const tr = (RP && RP.term) || (DS && DS.term) || {}; return [tr.from || addDays(t, -90), tr.to && tr.to < t ? tr.to : t]; }
+  if (rpP !== 'custom') return monthRange(rpDate, (RP && RP.term) || (DS && DS.term));
   return [$('rpFrom').value || addDays(t, -30), $('rpTo').value || t];
 }
 function openRep(k, sid){
@@ -4491,7 +4494,7 @@ function openRep(k, sid){
   const per = $('rpPer'); per.innerHTML = '';
   DS_PER.forEach(p => { const b = el('button', rpP === p[0] ? 'on' : '', p[1]); b.onclick = () => { rpP = p[0]; rpDate = null; openRep(rpK); }; per.appendChild(b); });
   $('rpCustom').classList.toggle('hidden', rpP !== 'custom');
-  ['rpPrev', 'rpNext'].forEach(id => $(id).classList.toggle('hidden', rpP === 'term' || rpP === 'custom'));
+  perPick('rpPer', rpP, rpDate, v => { rpDate = v; loadRep(); });
   if (rpP === 'custom' && !$('rpFrom').value){ $('rpFrom').value = addDays(D.today, -30); $('rpTo').value = D.today; }
   loadRep();
 }
@@ -4697,13 +4700,40 @@ const ATT_SEGS = [['present', 'حاضر', CHC.ok], ['late', 'متأخر', CHC.la
 const ST_COL = { 'حاضر':CHC.ok, 'متأخر':CHC.late, 'غائب':CHC.abs, 'مستأذن':CHC.exc };
 /* ---------- شاشة عرض المجمع ---------- */
 let DS = null, dsP = 'day', dsDate = null, dsSort = { stu:['hifz', -1], hal:['name', 1] }, dsSeq = 0;
-const DS_PER = [['day', 'اليوم'], ['week', 'أسبوعي'], ['month', 'شهري'], ['term', 'فصلي'], ['custom', 'من تاريخ إلى تاريخ']];
+const DS_PER = [['day', 'يومي'], ['month', 'شهري'], ['custom', 'من تاريخ إلى تاريخ']];
+/* فلتر الفترة الموحد: يومي (تاريخ) • شهري (قائمة الأشهر الميلادية والهجرية والفصل) • من تاريخ إلى تاريخ */
+let _hm = null;
+function hijriMonths(){
+  if (_hm && _hm.t === D.today) return _hm;
+  const f = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { timeZone:'UTC', year:'numeric', month:'numeric' }), nm = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { timeZone:'UTC', month:'long' }), yr = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { timeZone:'UTC', year:'numeric' });
+  const o = {}, list = [];
+  for (let i = 0; i < 400; i++){ const d = addDays(D.today, -i), k = f.format(ud(d)); if (!o[k]){ o[k] = { k, from:d, to:d, name:nm.format(ud(d)), year:yr.format(ud(d)).replace(/\s*هـ$/, '') }; list.push(o[k]); } else o[k].from = d; }
+  const cur = list[0]; for (let i = 1; i < 31; i++){ const d = addDays(D.today, i); if (f.format(ud(d)) === cur.k) cur.to = d; else break; }
+  list.pop(); _hm = { t:D.today, o, list }; return _hm;
+}
+function monthRange(v, term){
+  const t = D.today; v = v || 'g:' + t.slice(0, 7);
+  if (v === 'term'){ const tr = term || {}; return [tr.from || addDays(t, -90), tr.to && tr.to < t ? tr.to : t]; }
+  if (v.indexOf('h:') === 0){ const m = hijriMonths().o[v.slice(2)]; if (m) return [m.from, m.to > t ? t : m.to]; }
+  const ym = v.indexOf('g:') === 0 ? v.slice(2) : v.slice(0, 7), st = ym + '-01', n = ud(st); n.setUTCMonth(n.getUTCMonth() + 1); const e = addDays(iso(n), -1); return [st, e > t ? t : e];
+}
+function perPick(perId, p, val, onCh, noTerm){
+  const per = $(perId); let w = $(perId + 'Pk'); if (!w){ w = el('div', 'perpick'); w.id = perId + 'Pk'; per.parentNode.insertBefore(w, per.nextSibling); } w.innerHTML = '';
+  if (p === 'day'){ const i = el('input'); i.type = 'date'; i.max = D.today; i.value = val || D.today; i.onchange = () => i.value && onCh(i.value); w.appendChild(el('label', '', 'اختر اليوم')); w.appendChild(i); }
+  else if (p === 'month'){
+    const sl = el('select'), grp = (lbl, items) => { const og = document.createElement('optgroup'); og.label = lbl; items.forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; og.appendChild(o); }); sl.appendChild(og); };
+    if (!noTerm){ const o = el('option', '', 'الفصل الدراسي كاملاً'); o.value = 'term'; sl.appendChild(o); }
+    const gy = {}; for (let i = 0; i < 12; i++){ const n = ud(D.today.slice(0, 8) + '01'); n.setUTCMonth(n.getUTCMonth() - i); const k = iso(n).slice(0, 7), y = fmtD(k + '-01', { year:'numeric' }); (gy[y] = gy[y] || []).push(['g:' + k, fmtD(k + '-01', { month:'long' })]); }
+    Object.keys(gy).forEach(y => grp('الأشهر الميلادية ' + y, gy[y]));
+    const hy = {}; hijriMonths().list.forEach(m => (hy[m.year] = hy[m.year] || []).push(['h:' + m.k, m.name])); Object.keys(hy).forEach(y => grp('الأشهر الهجرية ' + y + 'هـ', hy[y]));
+    sl.value = val && [...sl.options].some(o => o.value === val) ? val : 'g:' + D.today.slice(0, 7); sl.onchange = () => onCh(sl.value);
+    w.appendChild(el('label', '', 'اختر الشهر')); w.appendChild(sl);
+  }
+}
 function dsRange(){
   const t = D.today, d = dsDate || t;
   if (dsP === 'day') return [d, d];
-  if (dsP === 'week'){ const s = addDays(d, -ud(d).getUTCDay()); return [s, addDays(s, 6) > t ? t : addDays(s, 6)]; }
-  if (dsP === 'month'){ const s = d.slice(0, 8) + '01', n = ud(s); n.setUTCMonth(n.getUTCMonth() + 1); const e = addDays(iso(n), -1); return [s, e > t ? t : e]; }
-  if (dsP === 'term'){ const tr = (DS && DS.term) || {}; return [tr.from || addDays(t, -90), tr.to && tr.to < t ? tr.to : t]; }
+  if (dsP !== 'custom') return monthRange(dsDate, DS && DS.term);
   return [$('dsFrom').value || addDays(t, -30), $('dsTo').value || t];
 }
 function dsShift(dir){
@@ -4718,7 +4748,7 @@ function openDash(){
   const per = $('dsPer'); per.innerHTML = '';
   DS_PER.forEach(p => { const b = el('button', dsP === p[0] ? 'on' : '', p[1]); b.onclick = () => { dsP = p[0]; dsDate = null; openDash(); }; per.appendChild(b); });
   $('dsCustom').classList.toggle('hidden', dsP !== 'custom');
-  ['dsPrev', 'dsNext'].forEach(id => $(id).classList.toggle('hidden', dsP === 'term' || dsP === 'custom'));
+  perPick('dsPer', dsP, dsDate, v => { dsDate = v; loadDash(); });
   if (dsP === 'custom' && !$('dsFrom').value){ $('dsFrom').value = addDays(D.today, -30); $('dsTo').value = D.today; }
   loadDash();
 }
@@ -4733,8 +4763,8 @@ async function loadDash(){
   DS = r;
   if (!$('dsHal').children.length){ fillSel('dsHal', r.allHalaqat.map(h => [h.hid, h.name]), 'كل الحلقات'); fillSel('dsStage', r.stages.map(v => [v, v]), 'كل المراحل'); }
   // الفصل غير محدد
-  const tm = $('dsTerm'); tm.innerHTML = ''; tm.classList.toggle('hidden', dsP !== 'term');
-  if (dsP === 'term'){
+  const tm = $('dsTerm'); tm.innerHTML = ''; tm.classList.toggle('hidden', !(dsP === 'month' && dsDate === 'term'));
+  if (dsP === 'month' && dsDate === 'term'){
     if (!r.term.from) tm.appendChild(el('div', 'mgwarn', 'لم تُحدَّد تواريخ الفصل بعد، والعرض الحالي لآخر 90 يوماً.'));
     if (r.admin){ const g = el('div', 'edgrid'), f = el('input'), t = el('input'); f.type = t.type = 'date'; f.value = r.term.from || ''; t.value = r.term.to || '';
       const a = el('div'); a.appendChild(lab('بداية الفصل')); a.appendChild(f); const b = el('div'); b.appendChild(lab('نهاية الفصل')); b.appendChild(t); g.appendChild(a); g.appendChild(b); tm.appendChild(g);
@@ -6554,7 +6584,7 @@ function kidCard(s, box){
 /* ---------- تقارير المدير ---------- */
 const periodStart = (p, d) => p === 'week' ? addDays(d, -ud(d).getUTCDay()) : p === 'month' ? d.slice(0, 8) + '01' : d;
 function lastStudy(d){ for (let i = 0; i < 7 && !isStudy(d); i++) d = addDays(d, -1); return d; }
-function openReport(){ if (!rep.date) rep.date = rep.period === 'day' ? lastStudy(D.today) : D.today; loadReport(); }
+function openReport(){ if (!rep.date) rep.date = lastStudy(D.today); repPerUI(); loadReport(); }
 function nextStart(){
   if (rep.period === 'day'){ let d = addDays(rep.date, 1); while (!isStudy(d)) d = addDays(d, 1); return d; }
   if (rep.period === 'week') return addDays(periodStart('week', rep.date), 7);
@@ -6569,20 +6599,21 @@ function shiftRep(dir){
 }
 $('rPrev').onclick = () => shiftRep(-1);
 $('rNext').onclick = () => shiftRep(1);
-document.querySelectorAll('#repTabs button').forEach(b => b.onclick = () => {
-  rep.period = b.dataset.p; if (rep.period === 'day') rep.date = lastStudy(rep.date > D.today ? D.today : rep.date); loadReport();
-});
+function repPerUI(){
+  const per = $('repTabs'); per.innerHTML = '';
+  DS_PER.forEach(p => { const b = el('button', rep.period === p[0] ? 'on' : '', p[1]); b.onclick = () => { rep.period = p[0]; repPerUI(); loadReport(); }; per.appendChild(b); });
+  perPick('repTabs', rep.period, rep.period === 'day' ? rep.date : rep.mon, v => { if (rep.period === 'day') rep.date = v; else rep.mon = v; loadReport(); }, true);
+  $('repCustom').classList.toggle('hidden', rep.period !== 'custom');
+  if (rep.period === 'custom' && !$('repFrom').value){ $('repFrom').value = addDays(D.today, -30); $('repTo').value = D.today; }
+}
+['repFrom', 'repTo'].forEach(id => $(id).onchange = () => loadReport());
 async function loadReport(){
   const my = ++rep.seq;
-  document.querySelectorAll('#repTabs button').forEach(b => b.classList.toggle('on', b.dataset.p === rep.period));
-  const s = periodStart('week', rep.date);
-  $('rLabel').textContent = rep.period === 'day' ? fmtD(rep.date, { weekday:'long', day:'numeric', month:'long' })
-    : rep.period === 'week' ? fmtD(s, { day:'numeric', month:'short' }) + ' – ' + fmtD(addDays(s, 3), { day:'numeric', month:'short' })
-    : fmtD(rep.date, { month:'long', year:'numeric' });
-  $('rNext').disabled = nextStart() > D.today;
+  const rg = rep.period === 'day' ? [rep.date, rep.date] : rep.period === 'month' ? monthRange(rep.mon) : [$('repFrom').value || addDays(D.today, -30), $('repTo').value || D.today];
+  $('rLabel').textContent = rgLabel(rg);
   fill('repTiles', []); fill('repTiles2', []); $('repBody').innerHTML = '<div class="msg info">جاري تحميل التقرير...</div>';
   let r;
-  try { r = await api({ action:'report', period:rep.period, date:rep.date }); } catch(e){ if (my === rep.seq && e.message !== 'expired') msg('repBody', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  try { r = await api(rep.period === 'day' ? { action:'report', period:'day', date:rep.date } : { action:'report', period:'range', from:rg[0], to:rg[1] }); } catch(e){ if (my === rep.seq && e.message !== 'expired') msg('repBody', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (my !== rep.seq) return;
   if (!r.ok) return msg('repBody', r.msg, 'err');
   renderReport(r);
