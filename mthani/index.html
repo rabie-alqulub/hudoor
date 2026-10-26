@@ -1503,14 +1503,13 @@
       </div>
       <div class="card">
         <h2>بيانات الربط مع برق</h2>
-        <small>من لوحة برق: الملف الشخصي (Key و Secret). لا يُعرض المفتاح بعد حفظه، ويكفي تركه فارغاً للإبقاء على المحفوظ.</small>
-        <label for="cfPhone">رقم واتساب الإرسال</label><div class="cfph"><span>+966</span><input id="cfPhone" inputmode="numeric" maxlength="10" placeholder="05xxxxxxxx" dir="ltr"></div>
-        <label for="cfUrl">رابط الإرسال (API)</label><input id="cfUrl" dir="ltr" placeholder="https://...">
-        <label for="cfKey">Key</label><input id="cfKey" type="password" autocomplete="off" dir="ltr">
-        <label for="cfSecret">Secret</label><input id="cfSecret" type="password" autocomplete="off" dir="ltr">
-        <label for="cfDev">معرّف الجهاز (إن طلبه برق)</label><input id="cfDev" dir="ltr">
+        <small>الربط مع منصة برق (api.barq.wide-techno.com). تحتاج ثلاثة أشياء فقط: Client-Id و Client-Secret من حسابك في برق، ورقم الواتساب المسجل في برق الذي تُرسل منه الرسائل. لا يُعرض Client-Id و Client-Secret بعد حفظهما، واتركهما فارغين للإبقاء على المحفوظ.</small>
+        <label for="cfPhone">رقم واتساب الإرسال (المسجل في برق)</label><div class="cfph"><span>+966</span><input id="cfPhone" inputmode="numeric" maxlength="10" placeholder="05xxxxxxxx" dir="ltr"></div>
+        <label for="cfKey">Client-Id</label><input id="cfKey" type="password" autocomplete="off" dir="ltr">
+        <label for="cfSecret">Client-Secret</label><input id="cfSecret" type="password" autocomplete="off" dir="ltr">
+        <div class="hidden"><label for="cfUrl">رابط برق</label><input id="cfUrl" dir="ltr" placeholder="https://api.barq.wide-techno.com"><label for="cfDev">معرّف الجهاز</label><input id="cfDev" dir="ltr"></div>
         <button class="btn" id="cfSaveConn">حفظ بيانات الربط</button>
-        <div class="stact"><button id="cfClear" class="danger">مسح المفتاح والرمز السري</button></div>
+        <div class="stact"><button class="good" id="cfCheck" type="button">فحص الاتصال ببرق</button><button id="cfClear" class="danger">مسح Client-Id و Client-Secret</button></div>
         <div id="cfConnMsg"></div>
       </div>
       <div class="card">
@@ -5536,10 +5535,11 @@ async function cfSave(cfg, box, btn){
   const r = await cpCall({ action:'msgCfgSave', cfg:cfg }, box); if (btn) btn.disabled = false;
   if (!r || !r.ok) return; msg(box, '✓ ' + r.msg, 'ok'); renderCfg(r, false); $('cfKey').value = ''; $('cfSecret').value = ''; $('cfKey').placeholder = r.key || 'لم يُحفظ بعد'; $('cfSecret').placeholder = r.secret || 'لم يُحفظ بعد';
 }
+$('cfCheck').onclick = async () => { msg('cfConnMsg', 'جاري الفحص...', 'info'); const r = await cpCall({ action:'barqCheck' }, 'cfConnMsg'); if (r && r.ok) msg('cfConnMsg', r.msg, 'ok'); };
 $('cfSaveConn').onclick = () => {
   const ph = $('cfPhone').value.replace(/\D/g, '');
   if (ph && !/^05\d{8}$/.test(ph)) return msg('cfConnMsg', 'رقم واتساب الإرسال يبدأ بـ 05 ويتكون من 10 أرقام.', 'err');
-  cfSave({ phone:ph, url:$('cfUrl').value.trim(), key:$('cfKey').value.trim(), secret:$('cfSecret').value.trim(), dev:$('cfDev').value.trim() }, 'cfConnMsg', $('cfSaveConn'));
+  cfSave({ phone:ph, url:'', key:$('cfKey').value.trim(), secret:$('cfSecret').value.trim(), dev:$('cfDev').value.trim() }, 'cfConnMsg', $('cfSaveConn'));
 };
 $('cfClear').onclick = () => { if (confirm('مسح المفتاح والرمز السري؟ سيتوقف الإرسال حتى تُدخلهما من جديد.')) cfSave({ clearKeys:true }, 'cfConnMsg'); };
 $('cfSaveRun').onclick = () => {
