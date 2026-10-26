@@ -865,6 +865,24 @@
   .dsh-top > button.mini,.pnav > #rPrev,.pnav > #rNext{display:none!important}
   .dsh-top{justify-content:center}
   .perpick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px} .perpick label{margin:0;font-weight:700;color:var(--navy)} .perpick input,.perpick select{width:auto;min-width:220px;flex:1;max-width:360px}
+  .exhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap} .exhead h2{margin:0} .exhead .grow{flex:1} .exhead .mini{width:auto} #exSupBtn.on{background:var(--navy);color:#fff}
+  .exsteps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px;position:relative}
+  .exstep{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:16px;background:var(--light);border:1.5px solid transparent;color:var(--muted);text-align:center;position:relative}
+  .exstep i{font-style:normal;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--navy);font-weight:700;border:2px solid var(--line)}
+  .exstep b{display:block;font-size:13.5px;color:var(--text)} .exstep small{font-size:12px}
+  .exstep.has i{border-color:var(--gold);color:var(--gold2)}
+  .exstep.on small{color:#F3D9AE} #exSupBox .strow > .top::before{display:none}
+  .exstep.on{background:var(--navy);border-color:var(--navy);color:#F3D9AE;box-shadow:0 8px 20px rgba(31,53,70,.25)} .exstep.on b{color:#fff} .exstep.on i{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .exstep:not(:last-child)::after{content:'';position:absolute;top:27px;left:-8px;width:8px;height:2px;background:var(--line)}
+  @media (max-width:640px){ .exsteps{grid-template-columns:repeat(5,minmax(64px,1fr));overflow-x:auto;gap:6px} .exstep{padding:8px 2px} .exstep b{font-size:11.5px} .exstep i{width:28px;height:28px} }
+  .exact{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px} .exact .exmain{width:auto;margin:0;padding:10px 22px;font-size:15px}
+  .exlinks{display:flex;flex-wrap:wrap;gap:4px 12px} .exlinks .link{width:auto;margin:0;padding:4px 2px;font-size:13px} .exlinks .link.red{color:var(--red)}
+  .exgrp{border:1.5px solid var(--line);border-radius:18px;padding:12px;margin-bottom:14px;background:var(--light)}
+  .exgh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px} .exgh b{flex:1;font-size:16px;color:var(--navy)} .exgh .mini{width:auto}
+  @media (prefers-color-scheme: dark){ .exgh b{color:#C9DCEA} }
+  .exsend{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:10px} .exsend .btn{margin:0;width:auto;padding:11px 18px}
+  @media (max-width:640px){ .exsend{grid-template-columns:1fr} .exsend .btn{width:100%} }
+  body.g2 .exgrp{background:rgba(255,255,255,.35);border-color:var(--glb)} body.g2 .exstep{background:rgba(255,255,255,.5)} body.g2 .exstep.on{background:linear-gradient(135deg,#46708C,#1F3546)}
 </style>
 </head>
 <body>
@@ -1153,6 +1171,16 @@
     </div>
 
     <!-- الطلاب المرشحون: ترشيحات المعلمين + الاختبار قبل الترشيح + الموافقة -->
+    <div id="pExam" class="hidden">
+      <div class="card">
+        <div class="exhead"><h2>اختبارات الجمعية</h2><span class="grow"></span><button class="mini" id="exSupBtn" type="button">مشرفو الجمعية</button><button class="mini good" id="exAdd" type="button">+ إضافة طالب للاختبار القبلي</button></div>
+        <div class="exsteps" id="exSteps"></div>
+        <div class="stchips" id="exSub"></div>
+        <input id="exQ" placeholder="ابحث باسم الطالب أو الحلقة" style="margin-top:8px">
+      </div>
+      <div id="exSupBox" class="hidden"></div>
+      <div id="exBox"></div>
+    </div>
     <div id="pCands" class="hidden">
       <div class="card">
         <h2 id="cdTitle">الطلاب المرشحون</h2>
@@ -2307,15 +2335,15 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.students') !== -1 && r.portal !== 'edu') TABS.push(['repStu', 'التقارير']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.edu') !== -1 && (r.portal === 'edu' || P.indexOf('reports.students') === -1)) TABS.push(['repEdu', 'التقارير']);
-  if (r.roles.indexOf('admin') === -1 && ['reports.staffAtt', 'reports.teachers', 'staff.courses'].some(k => P.indexOf(k) !== -1)) TABS.push(['staffFile', 'ملف الموظف']);
+  if (r.roles.indexOf('admin') === -1 && ['refs.students', 'reports.students', 'refs.edu', 'reports.edu'].some(k => P.indexOf(k) !== -1)) TABS.push(['stuBrief', 'تقرير طالب']);
+  if (r.roles.indexOf('admin') === -1 && ['reports.staffAtt', 'reports.teachers', 'staff.courses'].some(k => P.indexOf(k) !== -1)) TABS.push(['staffFile', 'تقرير الموظف الشامل']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('staff.courses') !== -1) TABS.push(['courses', 'الدورات التدريبية']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.staffAtt') !== -1) TABS.push(['staffAtt', 'تقرير حضور الموظفين']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.teachers') !== -1) TABS.push(['tchPerf', 'أداء المعلمين']);
+  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.staffAtt') !== -1) TABS.push(['staffAtt', 'تقرير بصمة الحضور']);
   if (r.roles.indexOf('admin') === -1 && ['ann.manage', 'refs.students', 'reports.students', 'refs.edu', 'reports.edu'].some(k => P.indexOf(k) !== -1)) TABS.push(['ann', 'الإعلانات']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'شاشة عرض المجمع']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1){ TABS.push(['msgs', 'رسائل أولياء الأمور']); TABS.push(['msgsStaff', 'رسائل الموظفين']); TABS.push(['msgArc', 'أرشيف الرسائل']); }
-  if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['preT', 'الطلاب المرشحون للاختبار القبلي']); TABS.push(['assocT', 'الطلاب المرشحون لاختبار الجمعية']); TABS.push(['planF', 'متابعة الخطط']); }
-  else if (r.roles.indexOf('admin') === -1 && P.indexOf('assoc.nominate') !== -1){ TABS.push(['preT', 'الطلاب المرشحون للاختبار القبلي']); TABS.push(['assocT', 'الطلاب المرشحون لاختبار الجمعية']); }
+  if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['exams', 'اختبارات الجمعية']); TABS.push(['planF', 'متابعة الخطط']); }
+  else if (r.roles.indexOf('admin') === -1 && P.indexOf('assoc.nominate') !== -1){ TABS.push(['exams', 'اختبارات الجمعية']); }
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
   if (r.roles.indexOf('admin') !== -1 || (P.indexOf('halaqat.reports_all') !== -1 && r.portal !== 'edu')) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
@@ -2340,7 +2368,7 @@ async function loadHome(){
 /* قائمة بقية المستخدمين بنفس أسلوب المدير: الاختبارات والمعاملات مجموعتان، والباقي تبويبات مباشرة */
 function userNav(T){
   const out = [], grp = { preT:['الاختبارات', 'exam'], assocT:['الاختبارات', 'exam'], trxS:['المعاملات', 'exam'], trxR:['المعاملات', 'exam'] }, seen = {};
-  const icOf = k => ICONS[k] ? k : ({ candsT:'exam', ann:'chat', repStu:'report', repEdu:'report', planF:'plans', studentsList:'users' }[k] || 'exam');
+  const icOf = k => ICONS[k] ? k : ({ candsT:'exam', ann:'chat', repStu:'report', repEdu:'report', stuBrief:'users', planF:'plans', studentsList:'users' }[k] || 'exam');
   T.forEach(x => { const g = grp[x[0]]; if (!g){ out.push({ t:x[1], ic:icOf(x[0]), r:x[0] }); return; }
     if (!seen[g[0]]){ seen[g[0]] = { t:g[0], ic:g[1], items:[] }; out.push(seen[g[0]]); } seen[g[0]].items.push(x); });
   return out;
@@ -2351,7 +2379,7 @@ const ADMIN_NAV = [
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير بصمة الحضور'], ['courses', 'الدورات التدريبية']] },
   { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['remote', 'تفعيل حلقة عن بعد']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['planF', 'شاشة عرض متابعة الخطط']] },
-  { t:'الاختبارات', ic:'exam', items:[['preT', 'الطلاب المرشحون للاختبار القبلي'], ['assocT', 'الطلاب المرشحون لاختبار الجمعية']] },
+  { t:'الاختبارات', ic:'exam', r:'exams' },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'المعاملات', ic:'exam', items:[['trxMemo', 'المعاملات الصادرة'], ['trxIn', 'المعاملات الواردة']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'Dashboard'], ['repAll', 'التقرير الشامل للطلاب'], ['report', 'التقرير الشامل للحلقات'], ['staffFile', 'تقرير الموظف الشامل'], ['tvCfg', 'شاشة عرض المجمع']] },
@@ -2423,7 +2451,8 @@ function openRole(r, title, group){
   $('pRemote').classList.toggle('hidden', r !== 'remote'); if (r === 'remote') openRemote();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
-  if (r === 'exams' || r === 'cands') r = role = 'preT';
+  if (r === 'cands' || r === 'preT' || r === 'assocT' || r === 'assocNom' || r === 'exGrp') r = role = 'exams';
+  $('pExam').classList.toggle('hidden', r !== 'exams'); if (r === 'exams') openExam();
   if (r === 'assocNom' || r === 'exGrp') r = role = 'assocT';
   $('pAssoc').classList.toggle('hidden', r !== 'preTest' && r !== 'assocT');
   if (r === 'assocT'){ asMode = 'assocNom'; if (AS_TABS.assocNom.every(t => t[0] !== asT)) asT = 'nom'; openAssoc('assocNom'); }
@@ -2458,8 +2487,9 @@ function openRole(r, title, group){
   if (r === 'tchPerf') openTch();
   $('pTv').classList.toggle('hidden', r !== 'tvCfg');
   if (r === 'tvCfg') openTv();
-  $('pRep').classList.toggle('hidden', !REP_KIND[r]);
-  if (REP_KIND[r]) openRep(REP_KIND[r]);
+  if (r === 'stuBrief'){ rpBrief = true; if (rpP === 'day'){ rpP = 'month'; rpDate = null; } rpSid = ''; const P = D.perms || [], e = P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1, st = P.indexOf('refs.students') !== -1 || P.indexOf('reports.students') !== -1;
+    $('pRep').classList.remove('hidden'); openRep(e && st ? (D.portal === 'stu' ? 'stu' : 'edu') : e ? 'edu' : 'stu'); }
+  else { rpBrief = false; $('pRep').classList.toggle('hidden', !REP_KIND[r]); if (REP_KIND[r]) openRep(REP_KIND[r]); }
   $('pDash').classList.toggle('hidden', r !== 'dash');
   if (r === 'dash') openDash();
   $('pMoveMany').classList.toggle('hidden', r !== 'moveMany');
@@ -2553,6 +2583,7 @@ function renderWelcome(){
     me:['الإعدادات', 'بياناتك وتغيير الرمز السري', ''],
     arc:['الأرشفة السنوية', 'نقل السجلات القديمة لملف أرشيف', ''],
     ann:['الإعلانات', 'نشر الإعلانات ومتابعة الاطلاع عليها', ''],
+    stuBrief:['تقرير طالب', 'تقرير مختصر لطالب حسب تخصصك', 'gold'],
     staffFile:['تقرير الموظف الشامل', 'الحضور وأداء المؤشرات والدورات', ''],
     courses:['الدورات التدريبية', 'دورات الموظفين ومتدربوها وشهاداتهم', ''],
     staffAtt:['تقرير حضور الموظفين', 'الحضور والتأخير والغياب من البصمة', ''],
@@ -2563,10 +2594,10 @@ function renderWelcome(){
     msgs:['رسائل أولياء الأمور', 'رسالة خاصة أو عامة عبر برق', ''],
     trxIn:['المعاملات الواردة', 'طلبات الموظفين ومعاملاتهم', ''], trxMemo:['المعاملات الصادرة', 'إضافة معاملة جديدة وأرشيف الصادرة', ''],
     preT:['الطلاب المرشحون للاختبار القبلي', 'ترشيحات المعلمين والاختبار القبلي', 'gold'], assocT:['الطلاب المرشحون لاختبار الجمعية', 'المواعيد والمختبرون ومجموعات الجمعية', 'gold'], repStu:['التقارير', 'تقارير الطلاب في تخصصك', ''], repEdu:['التقارير', 'تقارير الطلاب في تخصصك', ''],
-    exams:['الاختبارات', 'الاختبار القبلي والترشيح لاختبار الجمعية ومجموعاتها', 'gold'], trxR:['المعاملات الواردة', 'التعاميم والمعاملات الواردة إليك', ''], trxS:['المعاملات الصادرة', 'إضافة معاملة ومتابعة معاملاتك', ''],
+    exams:['اختبارات الجمعية', 'من ترشيح المعلم حتى نتيجة الجمعية في شاشة واحدة', 'gold'], trxR:['المعاملات الواردة', 'التعاميم والمعاملات الواردة إليك', ''], trxS:['المعاملات الصادرة', 'إضافة معاملة ومتابعة معاملاتك', ''],
     exGrp:['المختبرون', 'مجموعات اختبار الجمعية ومشرفوها', 'gold'], assocNom:['ترشيح طالب لاختبار الجمعية', 'المرشحون ومواعيد اختبارهم ونتائجهم', 'gold'],
     halaqaNew:['إضافة حلقة', 'إضافة حلقة جديدة', ''], halaqaEdit:['تعديل حلقة', 'تعديل الحلقات وعدد طلابها', ''] };
-  const acts = document.body.classList.contains('admin') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['plans'], ['planF'], ['trxMemo'], ['trxIn'], ['preT'], ['assocT'], ['ann'], ['settings']] : TABS;
+  const acts = document.body.classList.contains('admin') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['plans'], ['planF'], ['trxMemo'], ['trxIn'], ['exams'], ['ann'], ['settings']] : TABS;
   ac.classList.toggle('one', acts.length === 1);
   acts.filter(t => DESC[t[0]]).forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]] || ICONS[{ preT:'exam', assocT:'exam', exams:'exam', trxR:'exam', trxS:'exam', dash:'report', repAll:'report', staffFile:'staff', remote:'halaqa', trxIn:'exam', trxMemo:'exam', cands:'exam', exGrp:'exam', ann:'chat', assocNom:'exam', trx:'exam' }[t[0]]] || ''; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
 }
@@ -3369,6 +3400,7 @@ async function openAssoc(mode){
   $('asBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'assoc' }, 'asBox'); if (r && r.ok){ AX = r; renderAssoc(); }
 }
 function renderAssoc(){
+  if (role === 'exams') return renderExam();
   $('asAdd').textContent = asMode === 'preTest' ? '+ إضافة طلاب للاختبار القبلي' : '+ ترشيح طلاب';
   $('asAdd').classList.toggle('hidden', asMode === 'assocNom');
   const isB = asT === 'batch'; $('asXls').classList.toggle('hidden', isB); $('asQ').classList.toggle('hidden', isB);
@@ -3401,7 +3433,8 @@ function renderAssoc(){
     w.appendChild(ac); box.appendChild(w); });
 }
 $('asQ').oninput = () => AX && renderAssoc();
-const asList = () => AX.list.filter(x => x.status === AX.st[asT] && (asT !== 'nom' || asMode !== 'assocNom' || !asDate || (x.examDate || '') === asDate));
+let asOverride = null;
+const asList = () => asOverride || AX.list.filter(x => x.status === AX.st[asT] && (asT !== 'nom' || asMode !== 'assocNom' || !asDate || (x.examDate || '') === asDate));
 async function asDo(op, id, data, box){ const r = await cpCall({ action:'assocSave', op:op, id:id, data:data }, box || 'asBox'); if (r && r.ok){ AX = r; toast(r.msg); $('asSheet').classList.add('hidden'); if (role === 'preT') renderCands(); else renderAssoc(); } return r; }
 function asSheet(op, x){
   asAct = { op:op, x:x }; msg('asShMsg', '', ''); const b = $('asShBody'); b.innerHTML = ''; const F = {};
@@ -3850,6 +3883,97 @@ let cdF = 'new';
 const CD_F_ALL = [['new', 'بانتظار الاختبار القبلي'], ['pass', 'اجتازوا (لم يُرشّحوا بعد)'], ['fail', 'لم يجتازوا'], ['nom', 'رُشّحوا للجمعية'], ['all', 'الكل']];
 const stL = t => String(t || '').replace('الداخلي', 'القبلي');
 let CD_F = CD_F_ALL;
+/* ===== اختبارات الجمعية: شاشة واحدة بمراحل مرقّمة ===== */
+let exS = 1, exSub = '', exSupOpen = false;
+const EX_STEPS = [[1, 'ترشيح المعلم', 'بانتظار الاختبار القبلي'], [2, 'الاختبار القبلي', 'نتائج القبلي'], [3, 'تحديد الموعد', 'المواعيد والمجموعات'], [4, 'عند المشرف', 'مجموعات مرسلة'], [5, 'النتيجة', 'نتائج الجمعية']];
+async function openExam(){ $('exBox').innerHTML = '<div class="card"><div class="msg info">جاري التحميل...</div></div>'; const r = await cpCall({ action:'assoc' }, 'exBox'); if (r && r.ok){ AX = r; renderExam(); } }
+function exData(){
+  const st = AX.st, cd = cdItems(), sent = d => (AX.batches || []).find(b => b.date === d && b.status !== AX.exSt.draft);
+  const nom = AX.list.filter(x => x.status === st.nom), wait3 = nom.filter(x => !x.examDate || !sent(x.examDate));
+  const bOk = (AX.batches || []).filter(b => b.status === AX.exSt.ok).sort((a, b) => (a.no || 0) - (b.no || 0));
+  return { s1:cd.filter(x => x.k === 'new'), s2:cd.filter(x => x.k === 'fail' || x.k === 'pass'), s3:wait3, s4:bOk, s5:AX.list.filter(x => x.status === st.ok || x.status === st.no), sent };
+}
+function exCard(name, pills, meta, main, links){
+  const w = el('div', 'strow excard'), tp = el('div', 'top'); tp.appendChild(el('b', '', name)); w.appendChild(tp);
+  const pl = el('div', 'rfpills'); pills.forEach(p => p && pl.appendChild(el('span', 'pill ' + p[1], p[0]))); w.appendChild(pl);
+  const m = el('div', 'meta'); meta.forEach(p => { if (p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } }); w.appendChild(m);
+  const ac = el('div', 'exact'); if (main){ const b = el('button', 'btn exmain', main[0]); b.onclick = main[1]; ac.appendChild(b); }
+  const lk = el('div', 'exlinks'); (links || []).forEach(l => { if (!l) return; const a = el('button', 'link' + (l[2] ? ' red' : ''), l[0]); a.type = 'button'; a.onclick = l[1]; lk.appendChild(a); }); ac.appendChild(lk); w.appendChild(ac);
+  return w;
+}
+function renderExam(){
+  const X = exData(), q = normAr($('exQ').value), mq = n => !q || normAr(n).indexOf(q) !== -1, can = AX.canNom;
+  const cnt = { 1:X.s1.length, 2:X.s2.length, 3:X.s3.length, 4:X.s4.length, 5:X.s5.length };
+  const sb = $('exSteps'); sb.innerHTML = '';
+  EX_STEPS.forEach(t => { const b = el('button', 'exstep' + (exS === t[0] ? ' on' : '') + (cnt[t[0]] ? ' has' : '')); b.type = 'button';
+    b.appendChild(el('i', '', t[0])); const tx = el('span'); tx.appendChild(el('b', '', t[1])); tx.appendChild(el('small', '', cnt[t[0]] + (t[0] === 4 ? ' مجموعة' : ' طالب'))); b.appendChild(tx);
+    b.onclick = () => { exS = t[0]; exSub = ''; renderExam(); }; sb.appendChild(b); });
+  $('exAdd').classList.toggle('hidden', !can || exS !== 1); $('exSupBtn').classList.toggle('hidden', !can);
+  const sup = $('exSupBox'); sup.classList.toggle('hidden', !exSupOpen); if (exSupOpen){ sup.innerHTML = ''; const c = el('div', 'card'); supCard(c); sup.appendChild(c); }
+  const sub = $('exSub'); sub.innerHTML = ''; const chips = list => { list.forEach(x => { const b = el('button', exSub === x[0] ? 'on' : '', x[1]); b.onclick = () => { exSub = x[0]; renderExam(); }; sub.appendChild(b); }); };
+  const box = $('exBox'); box.innerHTML = ''; const wrap = el('div', 'card'); box.appendChild(wrap);
+  const empty = t => wrap.appendChild(el('div', 'chempty', t));
+  if (exS === 1){
+    const L = X.s1.filter(x => mq(x.name + ' ' + x.hname)); if (!L.length) return empty('لا يوجد طلاب بانتظار الاختبار القبلي.');
+    L.forEach(x => wrap.appendChild(exCard(x.name, [[x.level || '—', 'p-late'], [x.ref ? 'ترشيح المعلم' : 'إضافة مباشرة', 'p-none']], [['الحلقة', x.hname], ['المعلم', x.teacher], ['تاريخ الترشيح', x.date], ['جاهزية الطالب', x.ready]],
+      can ? ['إجراء الاختبار القبلي', () => ptStart(x)] : null, [x.ref && ['تفاصيل ترشيح المعلم', () => openRf(x.ref, 'h')], ['ملف الطالب', () => goFile(x.sid)], can && x.a && ['حذف من القائمة', () => { if (confirm('حذف ' + x.name + ' من القائمة؟')) asDo('del', x.a.id, {}, 'exBox'); }, 1]])));
+    return;
+  }
+  if (exS === 2){
+    const f = X.s2.filter(x => x.k === 'fail'), ps = X.s2.filter(x => x.k === 'pass'); if (!exSub) exSub = f.length || !ps.length ? 'fail' : 'pass';
+    chips([['fail', 'لم يجتازوا القبلي (' + f.length + ')'], ['pass', 'اجتازوا ولم يُرشّحوا (' + ps.length + ')']]);
+    const L = (exSub === 'fail' ? f : ps).filter(x => mq(x.name + ' ' + x.hname)); if (!L.length) return empty('لا يوجد طلاب هنا.');
+    L.forEach(x => wrap.appendChild(exCard(x.name, [[x.level || '—', 'p-late'], [x.a ? stL(x.a.status) : '', x.k === 'fail' ? 'p-red' : 'p-ok']], [['الحلقة', x.hname], ['المعلم', x.teacher], ['درجة القبلي', x.a && x.a.preScore ? x.a.preScore + ' من 100' : ''], ['المختبِر', x.a && x.a.preExaminer]],
+      can ? (x.k === 'fail' ? ['إعادة الاختبار القبلي', () => ptStart(x)] : ['ترشيح لاختبار الجمعية', () => cdApprove(x)]) : null,
+      [x.a && x.a.preData && ['نموذج الاختبار', () => ptView(x)], ['ملف الطالب', () => goFile(x.sid)]])));
+    return;
+  }
+  if (exS === 3){
+    const L = X.s3.filter(x => mq(x.sname + ' ' + x.hname)), nd = L.filter(x => !x.examDate), ds = [...new Set(L.filter(x => x.examDate).map(x => x.examDate))].sort();
+    if (!L.length) return empty('لا يوجد مرشحون بانتظار تحديد موعد أو اعتماد مجموعة.');
+    const stu = (x, box) => box.appendChild(exCard(x.sname, [[x.level, 'p-late']], [['الحلقة', x.hname], ['الترشيح', x.nomDate], ['القبلي', x.preScore ? x.preScore + ' من 100' : '']],
+      can ? [x.examDate ? 'تغيير الموعد' : 'تحديد موعد الاختبار', () => asSheet('date1', x)] : null, [['ملف الطالب', () => goFile(x.sid)], can && ['إلغاء الترشيح', () => asSheet('cancel', x), 1]]));
+    if (nd.length){ const g = el('div', 'exgrp'), h = el('div', 'exgh'); h.appendChild(el('b', '', 'بلا موعد بعد (' + nd.length + ')'));
+      if (can && nd.length > 1){ const all = el('button', 'mini good', 'تحديد موعد واحد للجميع'); all.onclick = () => { asOverride = nd; asDate = ''; asSheet('date', null); asOverride = null; }; h.appendChild(all); }
+      g.appendChild(h); nd.forEach(x => stu(x, g)); wrap.appendChild(g); }
+    ds.forEach(d => { const Ld = L.filter(x => x.examDate === d), g = el('div', 'exgrp'), h = el('div', 'exgh'), mid = 'exM' + d; g.id = 'exb-' + d;
+      h.appendChild(el('b', '', 'مجموعة ' + wDay(d) + ' ' + d + ' — ' + Ld.length + ' طالب')); g.appendChild(h);
+      if (can){ const row = el('div', 'exsend'), sp = el('select'); fillSel2(sp, AX.sups.map(s => [s.id, s.name + (s.org ? ' — ' + s.org : '')]), AX.sups.length ? '— اختر مشرف الجمعية المختبِر —' : '— أضف مشرفاً من «مشرفو الجمعية» —');
+        const go = el('button', 'btn gold', 'اعتماد المجموعة وإرسالها للمشرف'); go.onclick = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر.', 'err'); exbDo('exbApprove', { date:d, supId:sp.value }, mid).then(r => { if (r && r.ok){ exS = 4; renderExam(); } }); };
+        row.appendChild(sp); row.appendChild(go); g.appendChild(row); const m = el('div'); m.id = mid; g.appendChild(m); }
+      Ld.forEach(x => stu(x, g)); wrap.appendChild(g); });
+    return;
+  }
+  if (exS === 4){
+    if (!X.s4.length) return empty('لا توجد مجموعات عند المشرفين الآن.');
+    X.s4.forEach(bt => { const L = AX.list.filter(x => exbIn(x) && x.examDate === bt.date), rec = L.filter(x => x.status !== AX.st.nom).length, g = el('div', 'exgrp'), h = el('div', 'exgh'), mid = 'exM' + bt.date;
+      h.appendChild(el('b', '', exbName(bt) + ' — ' + wDay(bt.date) + ' ' + bt.date)); h.appendChild(el('span', 'pill p-late', 'سُجّلت ' + rec + ' من ' + L.length)); g.appendChild(h);
+      g.appendChild(el('div', 'meta', 'المختبِر: ' + bt.sup + (bt.phone ? ' • ' + bt.phone : '')));
+      if (bt.back) g.appendChild(el('div', 'msg err', 'أُعيدت النتائج للمشرف ليراجعها: ' + bt.back.reason));
+      const nl = el('div', 'numlist'); L.forEach((x, i) => { const r = el('div', 'numrow'); r.appendChild(el('span', 'no', i + 1)); const nm = el('div', 'nm'); nm.appendChild(el('b', '', x.sname)); nm.appendChild(el('small', '', x.level + ' • ' + x.hname)); r.appendChild(nm);
+        r.appendChild(el('span', 'pill ' + (x.status === AX.st.nom ? 'p-none' : x.status === AX.st.ok ? 'p-ok' : 'p-red'), x.status === AX.st.nom ? 'بانتظار النتيجة' : x.result + ' (' + x.score + ')')); nl.appendChild(r); }); g.appendChild(nl);
+      const ac = el('div', 'exact'); if (can){ const b = el('button', 'btn exmain', 'إرسال للمشرف عبر واتساب'); b.onclick = () => window.open('https://wa.me/966' + String(bt.phone).replace(/^0/, '') + '?text=' + encodeURIComponent(exbText(bt, L.length)), '_blank'); ac.appendChild(b); }
+      const lk = el('div', 'exlinks'), a = (t, fn, red) => { const y = el('button', 'link' + (red ? ' red' : ''), t); y.type = 'button'; y.onclick = fn; lk.appendChild(y); };
+      if (can) a('نسخ الرسالة', async () => { try { await navigator.clipboard.writeText(exbText(bt, L.length)); toast('نُسخت الرسالة مع الرابط'); } catch(e){ prompt('انسخ الرسالة:', exbText(bt, L.length)); } });
+      a('طباعة الكشف', () => exbPrint(bt.date, L, bt));
+      if (can) a('سحب المجموعة من المشرف', () => { if (confirm('سحب المجموعة من المشرف وإرجاعها لمرحلة تحديد الموعد؟')) exbDo('exbRevoke', { date:bt.date }, mid); }, 1);
+      ac.appendChild(lk); g.appendChild(ac); const m = el('div'); m.id = mid; g.appendChild(m); wrap.appendChild(g); });
+    return;
+  }
+  const ok = X.s5.filter(x => x.status === AX.st.ok), no = X.s5.filter(x => x.status === AX.st.no), done = (AX.batches || []).filter(b => b.status === AX.exSt.done).sort((a, b) => (b.no || 0) - (a.no || 0));
+  if (!exSub) exSub = 'ok'; chips([['ok', 'اجتازوا الجمعية (' + ok.length + ')'], ['no', 'لم يجتازوا (' + no.length + ')'], ['grp', 'المجموعات المعتمدة (' + done.length + ')']]);
+  if (exSub === 'grp'){ if (!done.length) return empty('لا توجد مجموعات معتمدة بعد.');
+    done.forEach(bt => { const L = AX.list.filter(x => exbIn(x) && x.examDate === bt.date), okN = L.filter(x => x.status === AX.st.ok).length;
+      wrap.appendChild(exCard(exbName(bt) + ' — ' + wDay(bt.date) + ' ' + bt.date, [['اعتمد المشرف النتائج', 'p-ok'], [L.length + ' طالب • اجتاز ' + okN, 'p-none']], [['المختبِر', bt.sup], ['اعتماد النتائج', (bt.done || '').slice(0, 16)]],
+        null, [['طباعة الكشف', () => exbPrint(bt.date, L, bt)], D.roles.indexOf('admin') !== -1 && ['إرجاع النتائج للمشرف', () => asSheet('exbBack', bt), 1]])); });
+    return; }
+  const L = (exSub === 'ok' ? ok : no).filter(x => mq(x.sname + ' ' + x.hname)); if (!L.length) return empty('لا يوجد طلاب هنا.');
+  L.forEach(x => wrap.appendChild(exCard(x.sname, [[x.level, 'p-late'], [x.result + (x.score ? ' (' + x.score + ')' : ''), exSub === 'ok' ? 'p-ok' : 'p-red']], [['الحلقة', x.hname], ['موعد الاختبار', x.examDate], ['المختبِر', x.examiner]],
+    x.cert && /^https?:/.test(x.cert) ? ['الشهادة', () => window.open(x.cert, '_blank')] : null, [['ملف الطالب', () => goFile(x.sid)]])));
+}
+$('exQ').oninput = () => AX && renderExam();
+$('exAdd').onclick = () => asSheet('addMany', null);
+$('exSupBtn').onclick = () => { exSupOpen = !exSupOpen; $('exSupBtn').classList.toggle('on', exSupOpen); renderExam(); };
 async function openCands(){ $('cdBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'assoc' }, 'cdBox'); if (r && r.ok){ AX = r; renderCands(); } }
 function cdItems(){
   const st = AX.st, used = new Set(), out = [];
@@ -3861,6 +3985,7 @@ function cdItems(){
   return out;
 }
 function renderCands(){
+  if (role === 'exams') return renderExam();
   CD_F = CD_F_ALL.filter(f => f[0] === 'new' || f[0] === 'fail' || (f[0] === 'pass' && cdItems().some(x => x.k === 'pass'))); if (!CD_F.some(f => f[0] === cdF)) cdF = 'new';
   $('cdTitle').textContent = 'الطلاب المرشحون للاختبار القبلي';
   const all = cdItems(), sum = $('cdSum'); sum.innerHTML = ''; $('cdAdd').classList.toggle('hidden', !AX.canNom);
@@ -4490,7 +4615,7 @@ function rpRange(){
 function openRep(k, sid){
   if (k !== rpK){ rpK = k; rpSid = ''; RP = null; rpNames = null; $('rpQ').value = ''; }
   if (sid){ rpSid = sid; if (rpP === 'day'){ rpP = 'month'; rpDate = null; } }
-  $('rpTitle').textContent = RP_T[k][0]; $('rpSub').textContent = RP_T[k][1];
+  $('rpTitle').textContent = rpBrief ? 'تقرير طالب' : RP_T[k][0]; $('rpSub').textContent = rpBrief ? 'تقرير مختصر لطالب واحد بما يخص ' + (k === 'edu' ? 'الشؤون التعليمية' : 'شؤون الطلاب') + '.' : RP_T[k][1];
   const per = $('rpPer'); per.innerHTML = '';
   DS_PER.forEach(p => { const b = el('button', rpP === p[0] ? 'on' : '', p[1]); b.onclick = () => { rpP = p[0]; rpDate = null; openRep(rpK); }; per.appendChild(b); });
   $('rpCustom').classList.toggle('hidden', rpP !== 'custom');
@@ -4517,7 +4642,7 @@ async function loadRep(){
   if (!$('rpHal').children.length) fillSel('rpHal', r.halaqat.map(h => [h.hid, h.name]), rpK === 'all' ? 'كل الحلقات' : 'كل حلقات المجمع');
   if (r.list) rpNames = r.list.map(x => ({ sid:x.sid, name:x.name, hname:x.hname }));
   if (!rpNames && !r.list){ api({ action:'stuRep', kind:rpK, from:rg[1], to:rg[1] }).then(x => { if (x.ok) rpNames = x.list.map(y => ({ sid:y.sid, name:y.name, hname:y.hname })); }).catch(() => {}); }
-  r.student ? rpOne() : rpList();
+  r.student ? rpOne() : rpBrief ? rpBriefPick() : rpList();
 }
 const RP_COLS = { stu:[['name', 'الطالب'], ['hname', 'الحلقة'], ['days', 'أيام مسجلة'], ['present', 'حاضر'], ['late', 'متأخر'], ['absent', 'غائب'], ['excused', 'مستأذن'], ['att', 'الحضور %'], ['refs', 'إحالات']],
   edu:[['name', 'الطالب'], ['hname', 'الحلقة'], ['recs', 'تسميع'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['til', 'تلاوة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %'], ['refs', 'إحالات وترشيحات']] };
@@ -4525,6 +4650,14 @@ RP_COLS.all = [['name', 'الطالب'], ['hname', 'الحلقة'], ['days', 'أ
 let rpSort = ['name', 1];
 function rpCell(c, x){ const v = x[c]; if (v == null) return ['—']; if (c === 'att') return [v + '%', lvAtt(v)]; if (c === 'avg') return [v, lvAvg(v)]; if (c === 'plan') return [v + '%', lvPl(v)]; if (c === 'absent') return [v, v ? 'lv-r' : '']; return [v]; }
 let rpM = {};
+let rpBrief = false;
+function rpBriefPick(){
+  const b = $('rpBody'); b.innerHTML = ''; b.appendChild(el('h2', '', 'تقرير طالب مختصر'));
+  b.appendChild(el('small', '', rpK === 'edu' ? 'اكتب اسم الطالب في خانة البحث أعلاه لعرض تقريره التعليمي: الحفظ والمراجعة، وإنجاز الخطة، وتطور الدرجات، والترشيحات، والإحالات التعليمية.' : 'اكتب اسم الطالب في خانة البحث أعلاه لعرض تقريره: الحضور والغياب وتقويمه، وتنبيهات الغياب والانقطاع، وإحالات شؤون الطلاب، والرسائل لولي الأمر.'));
+  const L = (RP.list || []).slice().sort((a, c) => a.name.localeCompare(c.name, 'ar')), nl = el('div', 'numlist'); nl.style.marginTop = '12px';
+  L.forEach((x, i) => { const r = el('div', 'numrow'); r.appendChild(el('span', 'no', i + 1)); const nm = el('div', 'nm'); nm.appendChild(el('b', '', x.name)); nm.appendChild(el('small', '', x.hname)); r.appendChild(nm);
+    r.onclick = () => { rpSid = x.sid; $('rpQ').value = x.name; loadRep(); }; nl.appendChild(r); }); b.appendChild(nl);
+}
 function rpList(){
   const b = $('rpBody'); b.innerHTML = ''; const L = RP.list, has = k => L.some(x => x[k] != null), sum = k => L.reduce((a, x) => a + (x[k] || 0), 0);
   b.appendChild(el('h2', '', 'طلاب ' + ($('rpHal').value ? $('rpHal').selectedOptions[0].textContent : 'المجمع') + ' (' + L.length + ')'));
