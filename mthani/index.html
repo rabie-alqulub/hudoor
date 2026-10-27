@@ -17,6 +17,7 @@
 <style>
   .remember{display:flex;align-items:center;gap:8px;margin:10px 0 2px;font-weight:600;cursor:pointer} .remember input{width:20px;height:20px;margin:0;accent-color:#3B5F78}
   .rq{color:#B3261E;font-weight:800}
+  .sw.lock{opacity:.55;cursor:not-allowed} small.lockr{display:block;color:#1E8E4E;font-weight:700;font-size:12px}
   @media (max-width:440px){ body.hasRoles .brand small{display:none} body.hasRoles .appbar .iconbtn{min-width:38px;padding:6px 3px;font-size:10px} body.hasRoles .brand b{font-size:16px} }
   #rlGrid .portal.cur{outline:3px solid #F3D9AE;outline-offset:2px} #rlGrid .portal{min-height:100px}
   .strow .snum{min-width:38px;text-align:center;font-weight:800;font-size:12px;background:var(--light);color:var(--navy2,#2C4A60);border-radius:8px;padding:3px 6px}
@@ -1783,11 +1784,11 @@
     <div id="pSettings" class="hidden">
       <div class="card">
         <h2>الإعدادات</h2>
-        <div class="tabs" id="setTabs" style="margin-top:6px"><button data-s="perms" class="on">الصلاحيات</button><button data-s="general">الإعدادات العامة</button></div>
+        <div class="tabs" id="setTabs" style="margin-top:6px"><button data-s="roles" class="on">الأدوار</button><button data-s="perms">صلاحيات موظف</button><button data-s="general">الإعدادات العامة</button></div>
       </div>
       <div id="sPerms">
         <div class="card" id="permUsersCard">
-          <small>اختر الموظف لتحديد صلاحياته. الصلاحية تظهر في صفحته فور الحفظ.</small>
+          <small id="permHint">اختر الموظف لتحديد صلاحياته. الصلاحية تظهر في صفحته فور الحفظ.</small>
           <input id="permSearch" placeholder="ابحث بالاسم أو رقم الهوية" style="margin-top:10px">
           <div id="permUsers"></div>
         </div>
@@ -2445,41 +2446,25 @@ async function loadHome(){
   fillSurahs();
   // التبويبات على يمين الصفحة
   TABS = [];
-  const P = r.perms || [];
-  const mineH = (r.halaqat || []).some(h => h.mine), evAll = P.indexOf('halaqat.evaluate_all') !== -1;
-  if (r.roles.indexOf('admin') === -1){ if (mineH || evAll) TABS.push(['teach', 'التقييم']); }
-  if (P.indexOf('students.plans_all') !== -1) TABS.push(['plans', 'بناء الخطط التعليمية']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('students.view_all') !== -1) TABS.push(['studentsList', 'بيانات الطلاب']);
-  if (r.roles.indexOf('admin') === -1 && (P.indexOf('competition.manage') !== -1 || P.indexOf('competition.store') !== -1)) TABS.push(['compete', 'المنافس']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('students.add') !== -1){ TABS.push(['studentNew', 'تسجيل طالب']); TABS.push(['regLink', 'رابط التسجيل']); TABS.push(['apps', 'طلبات المتقدمين']); }
-  if (r.roles.indexOf('admin') === -1 && mineH){ TABS.push(['myStu', 'طلاب الحلقة']); TABS.push(['candsT', 'ترشيح طالب لاختبار المرحلية']); if (!TABS.some(x => x[0] === 'plans')) TABS.push(['plans', 'بناء الخطط']); if (!TABS.some(x => x[0] === 'planF')) TABS.push(['planF', 'متابعة سير الخطط']); if (P.indexOf('halaqat.reports_all') === -1) TABS.push(['report', 'تقارير الحلقة']); }
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.students') !== -1) TABS.push(['refsStu', 'إحالات شؤون الطلاب']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('refs.edu') !== -1){ TABS.push(['refsEdu', 'الإحالات التعليمية']); }
-  if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.students') !== -1 || P.indexOf('students.add') !== -1)) TABS.push(['absent', 'الطلاب المنقطعون']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.students') !== -1 && r.portal !== 'edu') TABS.push(['repStu', 'التقارير']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.edu') !== -1 && (r.portal === 'edu' || P.indexOf('reports.students') === -1)) TABS.push(['repEdu', 'التقارير']);
-  if (r.roles.indexOf('admin') === -1 && ['refs.students', 'reports.students', 'refs.edu', 'reports.edu'].some(k => P.indexOf(k) !== -1)) TABS.push(['stuBrief', 'تقرير طالب']);
-  if (r.roles.indexOf('admin') === -1 && ['reports.staffAtt', 'reports.teachers', 'staff.courses'].some(k => P.indexOf(k) !== -1)) TABS.push(['staffFile', 'تقرير الموظف الشامل']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('staff.courses') !== -1) TABS.push(['courses', 'الدورات التدريبية']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.staffAtt') !== -1) TABS.push(['staffAtt', 'تقرير بصمة الحضور']);
-  if (r.roles.indexOf('admin') === -1 && ['ann.manage', 'refs.students', 'reports.students', 'refs.edu', 'reports.edu'].some(k => P.indexOf(k) !== -1)) TABS.push(['ann', 'الإعلانات']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('reports.dashboard') !== -1) TABS.unshift(['dash', 'Dashboard']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1){ TABS.push(['msgs', 'رسائل أولياء الأمور']); TABS.push(['msgsStaff', 'رسائل الموظفين']); TABS.push(['msgArc', 'أرشيف الرسائل']); }
-  if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['exams', 'اختبارات الجمعية']); TABS.push(['planF', 'متابعة الخطط']); }
-  else if (r.roles.indexOf('admin') === -1 && P.indexOf('assoc.nominate') !== -1){ TABS.push(['exams', 'اختبارات الجمعية']); }
-  if (r.roles.indexOf('admin') === -1 && (P.indexOf('halaqat.view') !== -1 || P.indexOf('halaqat.manage') !== -1)) TABS.push(['halaqaView', 'استعراض الحلقات']);
-  if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
-  if (r.roles.indexOf('admin') !== -1 || (P.indexOf('halaqat.reports_all') !== -1 && r.portal !== 'edu')) TABS.push(['report', 'التقارير']);
-  if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
+  const P = r.perms || [], has = k => [].concat(k).some(x => P.indexOf(x) !== -1), isAdm = r.roles.indexOf('admin') !== -1, isStaff = !isAdm && r.roles.indexOf('teacher') !== -1;
+  const mineH = (r.halaqat || []).some(h => h.mine);
+  if (isAdm){ TABS.push(['report', 'التقارير']); TABS.push(['settings', 'الإعدادات']); }
+  if (isStaff){
+    // ١) صفحات «حلقتي» لمن له حلقة (تأتي من إسناد الحلقة لا من الصلاحيات)
+    if (mineH){ TABS.push(['teach', 'التقييم', 'own']); TABS.push(['myStu', 'طلاب الحلقة', 'own']); TABS.push(['candsT', 'ترشيح طالب لاختبار المرحلية', 'own']);
+      if (!has('students.plans_all')) TABS.push(['plans', 'خطط طلاب الحلقة', 'own']);
+      if (!has('plans.follow')) TABS.push(['planF', 'متابعة سير الخطط', 'own']);
+      if (!has('halaqat.reports_all')) TABS.push(['report', 'تقارير الحلقة', 'own']); }
+    else if (has('halaqat.evaluate_all')) TABS.push(['teach', 'تقييم الحلقات']);
+    // ٢) كل خانة من قائمة المدير منحها دور الموظف أو صلاحياته الإضافية، بنفس اسمها
+    ADMIN_NAV.forEach(g => (g.items || [[g.r, g.t]]).forEach(it => { if (NAV_PERM[it[0]] && has(NAV_PERM[it[0]]) && !TABS.some(x => x[0] === it[0])) TABS.push([it[0], it[1]]); }));
+    STAFF_EXTRA.forEach(it => { if (has(it[2]) && !TABS.some(x => x[0] === it[0])) TABS.push([it[0], it[1]]); });
+    if (r.canFix && !TABS.some(x => x[0] === 'reeval')) TABS.push(['reeval', 'طلبات إعادة التقييم في حلقة']);
+    TABS.push(['trxS', 'المعاملات الصادرة']); TABS.push(['trxR', 'المعاملات الواردة']);
+  }
   if (r.roles.indexOf('parent') !== -1) TABS.push(['parent', 'أبنائي']);
-  if (r.roles.indexOf('admin') === -1 && r.roles.indexOf('teacher') !== -1){ TABS.push(['trxS', 'المعاملات الصادرة']); TABS.push(['trxR', 'المعاملات الواردة']); }
   if (r.roles.indexOf('student') !== -1){ TABS.push(['mine', 'تقريري']); TABS.push(['shop', 'المتجر']); }
-  if (r.roles.indexOf('admin') === -1) TABS.push(['me', 'الإعدادات']);
-  // البوابة تحدد ما يظهر للموظف الذي له أكثر من دور
-  // ما أُعطي للموظف من صلاحيات يظهر له في أي بوابة دخل منها: كل خانة من قائمة المدير مُنحت صلاحيتها تُضاف بنفس اسمها
-  if (r.roles.indexOf('admin') === -1) ADMIN_NAV.forEach(g => (g.items || [[g.r, g.t]]).forEach(it => { const k = NAV_PERM[it[0]]; if (!k || TABS.some(x => x[0] === it[0])) return;
-    if ([].concat(k).some(x => P.indexOf(x) !== -1)) TABS.splice(TABS.findIndex(x => x[0] === 'me') === -1 ? TABS.length : TABS.findIndex(x => x[0] === 'me'), 0, [it[0], it[1]]); }));
-  if (r.roles.indexOf('admin') === -1 && (r.portal === 'stu' || r.portal === 'edu')) TABS = TABS.filter(x => ['myStu'].indexOf(x[0]) === -1 && !(x[0] === 'report' && x[1] === 'تقارير الحلقة'));
+  if (!isAdm) TABS.push(['me', 'الإعدادات']);
   document.body.classList.toggle('ro', !!r.ro);
   $('gsWrap').classList.toggle('hidden', r.roles.every(x => x === 'student' || x === 'parent'));
   const n = $('nav'); n.innerHTML = '';
@@ -2487,7 +2472,6 @@ async function loadHome(){
   document.body.classList.toggle('admin', admin);
   n.classList.add('groups'); document.body.classList.add('gnav');
   const supRO = admin && r.ro && !r.peek; document.body.classList.toggle('suro', supRO);
-  if (!admin && r.canFix && !TABS.some(x => x[0] === 'reeval')) TABS.push(['reeval', 'طلبات إعادة التقييم في حلقة']);
   if (supRO){ $('gsWrap').classList.add('hidden'); buildAdminNav(n, RO_NAV); }
   else if (admin) buildAdminNav(n); else buildAdminNav(n, userNav(TABS));
   show('vHome');
@@ -2498,8 +2482,9 @@ async function loadHome(){
 /* قائمة الموظف: كل صلاحية تظهر داخل تبويبها الكامل (بنفس تبويبات المدير)، وفيه الخانات المسموح له بها فقط */
 function userNav(T){
   const G = {}; ADMIN_NAV.forEach((g, i) => (g.items || []).forEach(it => { if (it[0] !== 'me') G[it[0]] = i; }));
-  const own = [], byG = {}, last = [];
-  T.forEach(x => { if (x[0] === 'me'){ last.push({ t:x[1], ic:'settings', r:'me' }); return; }
+  const rg = ADMIN_NAV.findIndex(g => g.t === 'تقارير عامة'), hg = ADMIN_NAV.findIndex(g => g.t === 'الحلقات'); STAFF_EXTRA.forEach(x => G[x[0]] = rg); G.teach = hg;
+  const own = [], byG = {}, last = [], mine = T.filter(x => x[2] === 'own');
+  T.forEach(x => { if (x[2] === 'own') return; if (x[0] === 'me'){ last.push({ t:x[1], ic:'settings', r:'me' }); return; }
     if (x[0] === 'exams'){ byG.ex = byG.ex || { t:'الاختبارات', ic:'exam', r:'exams', o:ADMIN_NAV.findIndex(g => g.r === 'exams') }; return; }
     const gi = G[x[0]]; if (gi === undefined){ own.push(x); return; }
     const g = byG[gi] = byG[gi] || { t:ADMIN_NAV[gi].t, ic:ADMIN_NAV[gi].ic, items:[], o:gi }; g.items.push(x); });
@@ -2507,7 +2492,8 @@ function userNav(T){
   if (byG[sg] && last.length){ byG[sg].items.unshift(['me', 'تعديل البيانات']); last.length = 0; }
   Object.keys(byG).forEach(k => { const g = byG[k], ord = ((ADMIN_NAV[g.o] || {}).items || []).map(x => x[0]); if (g.items) g.items.sort((a, b) => (ord.indexOf(a[0]) + 99) % 99 - (ord.indexOf(b[0]) + 99) % 99); });
   const grouped = Object.keys(byG).map(k => byG[k]).sort((a, b) => a.o - b.o);
-  return userNavOld(own).concat(grouped, last);
+  const myG = mine.length ? [{ t:'حلقتي', ic:'teach', items:mine.map(x => [x[0], x[1]]) }] : [];
+  return myG.concat(userNavOld(own), grouped, last);
 }
 function userNavOld(T){
   const out = [], grp = { halaqaNew:['الحلقات', 'halaqa'], halaqaEdit:['الحلقات', 'halaqa'], reeval:['الحلقات', 'halaqa'], preT:['الاختبارات', 'exam'], assocT:['الاختبارات', 'exam'], trxS:['المعاملات', 'exam'], trxR:['المعاملات', 'exam'] }, seen = {};
@@ -2517,12 +2503,14 @@ function userNavOld(T){
   return out;
 }
 /* كل خانة في قائمة المدير وصلاحيتها (الخانات الحساسة ليست هنا فلا تُمنح لأحد) */
-const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:['students.add', 'students.apps'], refsStu:'refs.students', compete:['competition.manage', 'competition.store'],
-  moveMany:'students.move', absent:['students.absent', 'refs.students', 'students.add'], staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
-  halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', remote:['halaqat.remote', 'halaqat.manage'], reeval:'halaqat.reeval',
-  plans:'students.plans_all', refsEdu:'refs.edu', planF:['plans.follow', 'refs.edu', 'reports.edu'], exams:['assoc.nominate', 'refs.edu', 'reports.edu'],
-  msgs:'messages.send', msgsStaff:'messages.send', msgArc:'messages.send', dash:'reports.dashboard', repAll:['reports.all', 'reports.dashboard'], report:'halaqat.reports_all',
-  staffFile:['reports.teachers', 'reports.staffAtt', 'staff.courses'], tvCfg:'tv.manage', ann:'ann.manage' };
+/* خانات تقارير خاصة بالموظفين (تظهر داخل «تقارير عامة») */
+const STAFF_EXTRA = [['repStu', 'تقارير شؤون الطلاب', 'reports.students'], ['repEdu', 'تقارير الشؤون التعليمية', 'reports.edu'], ['stuBrief', 'تقرير طالب', ['reports.students', 'reports.edu', 'students.view_all']]];
+const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students', compete:['competition.manage', 'competition.store'],
+  moveMany:'students.move', absent:'students.absent', staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
+  halaqaView:'halaqat.view', halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', remote:'halaqat.remote', reeval:'halaqat.reeval',
+  plans:'students.plans_all', refsEdu:'refs.edu', planF:'plans.follow', exams:'assoc.nominate',
+  msgs:'messages.send', msgsStaff:'messages.send', msgArc:'messages.send', dash:'reports.dashboard', repAll:'reports.all', report:'halaqat.reports_all',
+  staffFile:'reports.teachers', tvCfg:'tv.manage', ann:'ann.manage' };
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
@@ -2684,7 +2672,7 @@ function openRole(r, title, group){
   $('pNewStaff').classList.toggle('hidden', r !== 'staffNew');
   if (r === 'staffNew') openNewStaff();
   if (r === 'soon'){ $('soonTitle').textContent = title; $('soonIc').innerHTML = ICONS[(group && group.ic) || 'settings']; }
-  if (r === 'perms' || r === 'general'){ setSub(r); r = 'settings'; }
+  if (r === 'perms' || r === 'general'){ setSub(r === 'perms' ? 'roles' : r); r = 'settings'; }
   $('pWelcome').classList.toggle('hidden', r !== 'welcome');
   $('pTeach').classList.toggle('hidden', r !== 'teach');
   $('pPlans').classList.toggle('hidden', r !== 'plans');
@@ -2693,7 +2681,7 @@ function openRole(r, title, group){
   $('pShop').classList.toggle('hidden', r !== 'shop'); if (r === 'shop') renderShop();
   $('pReport').classList.toggle('hidden', r !== 'report');
   $('pSettings').classList.toggle('hidden', r !== 'settings');
-  if (r === 'settings' && setSubNow === 'perms') openSettings();
+  if (r === 'settings' && setSubNow !== 'general') openSettings();
   if (r === 'welcome') renderWelcome();
   if (r === 'teach') openTeach();
   if (r === 'plans') openPlans();
@@ -6775,19 +6763,36 @@ $('stSearch').oninput = () => SD && SD.ok && renderStaff();
 /* ---------- الإعدادات والصلاحيات (للمدير) ---------- */
 const CAT_ICON = { 'شؤون الطلاب':'users', 'شؤون الموظفين':'staff', 'الحلقات':'halaqa', 'الشؤون التعليمية':'book', 'الاختبارات':'exam', 'الاتصالات والرسائل':'chat', 'تقارير عامة':'report', 'الإعدادات':'settings' };
 let PD = null, peUser = null, peKeys = new Set();
-let setSubNow = 'perms';
+let setSubNow = 'roles';
 function setSub(sub){
   setSubNow = sub;
   document.querySelectorAll('#setTabs button').forEach(x => x.classList.toggle('on', x.dataset.s === sub));
-  $('sPerms').classList.toggle('hidden', sub !== 'perms'); $('sGeneral').classList.toggle('hidden', sub !== 'general');
+  $('sPerms').classList.toggle('hidden', sub === 'general'); $('sGeneral').classList.toggle('hidden', sub !== 'general');
 }
-document.querySelectorAll('#setTabs button').forEach(b => b.onclick = () => { setSub(b.dataset.s); if (b.dataset.s === 'perms') openSettings(); });
+document.querySelectorAll('#setTabs button').forEach(b => b.onclick = () => { setSub(b.dataset.s); if (b.dataset.s !== 'general') openSettings(); });
+/* الأدوار: قالب صلاحيات لكل صفة (معلم، مدير شؤون الطلاب...)؛ وصلاحيات الموظف: إضافات شخصية فوق دوره */
+let pmMode = 'roles', peLock = new Set();
 async function openSettings(){
+  pmMode = setSubNow === 'perms' ? 'users' : 'roles';
   $('permEdit').classList.add('hidden'); $('permUsersCard').classList.remove('hidden');
+  $('permSearch').classList.toggle('hidden', pmMode === 'roles');
+  $('permHint').textContent = pmMode === 'roles' ? 'اختر الدور لتحديد صلاحياته. كل موظف يأخذ صلاحيات دوره (صفته في جدول الموظفين) تلقائياً، وأي تعديل هنا يسري على الجميع فوراً.'
+    : 'اختر الموظف لإضافة صلاحيات خاصة به فوق صلاحيات دوره. صلاحيات الدور تظهر مؤشَّرة ولا تُعدَّل من هنا.';
   $('permUsers').innerHTML = '<div class="msg info">جاري التحميل...</div>';
-  try { PD = await api({ action:'perms' }); } catch(e){ if (e.message !== 'expired') msg('permUsers', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  try { PD = await api({ action:pmMode === 'roles' ? 'rolesData' : 'perms' }); } catch(e){ if (e.message !== 'expired') msg('permUsers', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (!PD.ok) return msg('permUsers', PD.msg === 'إجراء غير معروف' ? 'الصلاحيات تحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : PD.msg, 'err');
+  if (pmMode === 'roles') return renderRoles();
   renderUsers();
+}
+function renderRoles(){
+  const box = $('permUsers'); box.innerHTML = '';
+  PD.roles.forEach(x => { const b = el('button', 'uitem'); b.appendChild(el('div', 'avatar', x.role.charAt(0)));
+    const g = el('div', 'grow'); g.appendChild(el('b', '', x.role)); g.appendChild(el('small', 'muted', x.n + ' موظف')); b.appendChild(g);
+    b.appendChild(el('span', 'pill ' + (x.keys.length ? 'p-late' : 'p-none'), x.keys.length ? x.keys.length + ' صلاحية' : 'بلا صلاحيات'));
+    b.onclick = () => { peUser = { role:x.role, isRole:true, rk:x }; peKeys = new Set(x.keys); peLock = new Set();
+      $('peName').textContent = 'دور: ' + x.role; $('peAvatar').textContent = x.role.charAt(0); $('peSub').textContent = x.n + ' موظف بهذه الصفة • التعديل يسري عليهم جميعاً';
+      $('peSave').textContent = 'حفظ صلاحيات الدور'; $('permUsersCard').classList.add('hidden'); $('permEdit').classList.remove('hidden'); renderCats(); window.scrollTo(0, 0); };
+    box.appendChild(b); });
 }
 function renderUsers(){
   const q = $('permSearch').value.trim(), box = $('permUsers'); box.innerHTML = '';
@@ -6796,15 +6801,15 @@ function renderUsers(){
   list.forEach(u => {
     const b = el('button', 'uitem'); b.appendChild(el('div', 'avatar', u.name.charAt(0)));
     const g = el('div', 'grow'); g.appendChild(el('b', '', u.name)); g.appendChild(el('small', 'muted', [u.halaqat.join('، '), u.role].filter(Boolean).join(' • '))); b.appendChild(g);
-    b.appendChild(el('span', 'pill ' + (u.keys.length ? 'p-late' : 'p-none'), u.keys.length ? u.keys.length + ' صلاحية' : 'بلا صلاحيات'));
+    b.appendChild(el('span', 'pill ' + (u.keys.length ? 'p-late' : 'p-none'), (u.roleKeys || []).length + ' من الدور' + (u.keys.length ? ' + ' + u.keys.length + ' إضافية' : '')));
     b.onclick = () => openPermUser(u); box.appendChild(b);
   });
 }
 $('permSearch').oninput = () => PD && PD.ok && renderUsers();
 function openPermUser(u){
-  peUser = u; peKeys = new Set(u.keys);
+  peUser = u; peLock = new Set(u.roleKeys || []); peKeys = new Set((u.keys || []).concat(u.roleKeys || [])); $('peSave').textContent = 'حفظ الصلاحيات الإضافية';
   $('peName').textContent = u.name; $('peAvatar').textContent = u.name.charAt(0);
-  $('peSub').textContent = [u.halaqat.join('، '), 'هوية: \u2066' + u.nid.slice(0, 2) + '••••••' + u.nid.slice(-2) + '\u2069'].filter(Boolean).join(' • ');
+  $('peSub').textContent = ['الدور: ' + u.role, u.halaqat.join('، '), 'هوية: \u2066' + u.nid.slice(0, 2) + '••••••' + u.nid.slice(-2) + '\u2069'].filter(Boolean).join(' • ');
   $('permUsersCard').classList.add('hidden'); $('permEdit').classList.remove('hidden'); renderCats(); window.scrollTo(0, 0);
 }
 function renderCats(){
@@ -6819,25 +6824,26 @@ function renderCats(){
     if (!defs.length) body.appendChild(el('small', '', 'لا توجد صلاحيات في هذا التبويب بعد. تُضاف من تبويب "الصلاحيات المتاحة" في جدول البيانات.'));
     else {
       const all = el('button', 'allbtn', on === defs.length ? 'إلغاء الكل' : 'تحديد الكل');
-      all.onclick = () => { const full = on === defs.length; defs.forEach(d => full ? peKeys.delete(d.key) : peKeys.add(d.key)); renderCats(); };
+      all.onclick = () => { const full = on === defs.length; defs.forEach(d => full ? (!peLock.has(d.key) && peKeys.delete(d.key)) : peKeys.add(d.key)); renderCats(); };
       body.appendChild(all);
     }
     defs.forEach(d => {
       const r = el('div', 'prow'), g = el('div', 'grow'), t = el('b', '', d.name);
       if (d.status && d.status !== 'مفعّلة') t.appendChild(el('span', 'badge2', d.status));
-      g.appendChild(t); if (d.desc) g.appendChild(el('small', 'muted', d.desc));
-      const sw = el('button', 'sw' + (peKeys.has(d.key) ? ' on' : '')); sw.setAttribute('aria-label', d.name);
-      sw.onclick = () => { peKeys.has(d.key) ? peKeys.delete(d.key) : peKeys.add(d.key); renderCats(); };
+      g.appendChild(t); if (d.desc) g.appendChild(el('small', 'muted', d.desc)); if (peLock.has(d.key)) g.appendChild(el('small', 'lockr', '✓ من صلاحيات الدور'));
+      const sw = el('button', 'sw' + (peKeys.has(d.key) ? ' on' : '') + (peLock.has(d.key) ? ' lock' : '')); sw.setAttribute('aria-label', d.name);
+      sw.onclick = () => { if (peLock.has(d.key)) return toast('هذه من صلاحيات الدور، وتُعدَّل من تبويب «الأدوار».'); peKeys.has(d.key) ? peKeys.delete(d.key) : peKeys.add(d.key); renderCats(); };
       r.appendChild(g); r.appendChild(sw); body.appendChild(r);
     });
     w.appendChild(body); box.appendChild(w);
   });
 }
-$('peBack').onclick = () => { $('permEdit').classList.add('hidden'); $('permUsersCard').classList.remove('hidden'); renderUsers(); };
+$('peBack').onclick = () => { $('permEdit').classList.add('hidden'); $('permUsersCard').classList.remove('hidden'); if (pmMode === 'roles') renderRoles(); else renderUsers(); };
 $('peSave').onclick = async () => {
   $('peSave').disabled = true;
   try {
-    const r = await api({ action:'savePerms', nid:peUser.nid, keys:[...peKeys] });
+    if (peUser.isRole){ const r = await api({ action:'roleSave', role:peUser.role, keys:[...peKeys] }); if (!r.ok) return toast(r.msg); PD = r; toast(r.msg); $('peBack').click(); return; }
+    const r = await api({ action:'savePerms', nid:peUser.nid, keys:[...peKeys].filter(k => !peLock.has(k)) });
     if (!r.ok) return toast(r.msg);
     peUser.keys = r.keys; toast(r.msg); $('peBack').click();
   } catch(e){ toast('تعذّر الاتصال بالخادم'); }
