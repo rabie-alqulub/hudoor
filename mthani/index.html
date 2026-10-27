@@ -17,6 +17,18 @@
 <style>
   .remember{display:flex;align-items:center;gap:8px;margin:10px 0 2px;font-weight:600;cursor:pointer} .remember input{width:20px;height:20px;margin:0;accent-color:#3B5F78}
   .rq{color:#B3261E;font-weight:800}
+  .strow .snum{min-width:38px;text-align:center;font-weight:800;font-size:12px;background:var(--light);color:var(--navy2,#2C4A60);border-radius:8px;padding:3px 6px}
+  .txacts{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap} .txacts .mini{margin:0}
+  .txadd{width:100%;margin:4px 0;background:var(--light);color:var(--text);border:1px dashed var(--line);border-radius:12px;padding:12px;font-weight:700;box-shadow:none}
+  .txchips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0} .txchip{display:inline-flex;align-items:center;gap:6px;background:#E8F0F6;color:#2C4A60;border-radius:99px;padding:4px 6px 4px 12px;font-weight:700;font-size:14px}
+  .txchip button{margin:0;padding:0 6px;background:none;border:0;color:inherit;box-shadow:none;font-size:12px}
+  .txpop{border:1px solid var(--line);border-radius:14px;padding:10px;margin:6px 0;background:var(--card);box-shadow:0 10px 24px rgba(0,0,0,.1)} .txpop input{margin:0}
+  .txtl{position:relative;margin:12px 0;padding-inline-start:4px}
+  .tle{display:flex;gap:12px;position:relative;padding-bottom:14px} .tle:last-child{padding-bottom:0}
+  .tle>i{flex:none;width:14px;height:14px;border-radius:50%;background:#3B5F78;margin-top:4px;position:relative;z-index:1;box-shadow:0 0 0 3px var(--card)}
+  .tle:not(:last-child)::before{content:'';position:absolute;inset-inline-start:6px;top:16px;bottom:-2px;width:2px;background:var(--line)}
+  .tle.read>i{background:#1E9E5A} .tle.st>i{background:#D08E2C} .tle.wait>i{background:transparent;border:2px dashed #B3261E}
+  .tle b{display:block;font-size:14.5px;line-height:1.6} .tle small{color:var(--muted)}
   .sq-wrap{position:relative;margin:8px 0 4px} .sq-wrap input{width:100%;margin:0}
   .sq-list{position:absolute;inset-inline:0;top:100%;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.14);max-height:260px;overflow:auto;margin-top:4px}
   .sq-list button{display:flex;justify-content:space-between;width:100%;margin:0;padding:10px 14px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--text);font-size:15px;font-weight:600;border-radius:0;box-shadow:none}
@@ -2442,7 +2454,7 @@ const ADMIN_NAV = [
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['planF', 'شاشة عرض متابعة الخطط']] },
   { t:'الاختبارات', ic:'exam', r:'exams' },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
-  { t:'المعاملات', ic:'exam', items:[['trxMemo', 'المعاملات الصادرة'], ['trxIn', 'المعاملات الواردة']] },
+  { t:'المعاملات', ic:'exam', items:[['trxS', 'المعاملات الصادرة'], ['trxR', 'المعاملات الواردة']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'Dashboard'], ['repAll', 'التقرير الشامل للطلاب'], ['report', 'التقرير الشامل للحلقات'], ['staffFile', 'تقرير الموظف الشامل'], ['tvCfg', 'شاشة عرض المجمع']] },
   { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['zoomCfg', 'ربط الحلقات عن بعد'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
 ];
@@ -2658,10 +2670,10 @@ function renderWelcome(){
     msgs:['رسائل أولياء الأمور', 'رسالة خاصة أو عامة عبر برق', ''],
     trxIn:['المعاملات الواردة', 'طلبات الموظفين ومعاملاتهم', ''], trxMemo:['المعاملات الصادرة', 'إضافة معاملة جديدة وأرشيف الصادرة', ''],
     preT:['الطلاب المرشحون للاختبار القبلي', 'ترشيحات المعلمين والاختبار القبلي', 'gold'], assocT:['الطلاب المرشحون لاختبار الجمعية', 'المواعيد والمختبرون ومجموعات الجمعية', 'gold'], repStu:['التقارير', 'تقارير الطلاب في تخصصك', ''], repEdu:['التقارير', 'تقارير الطلاب في تخصصك', ''],
-    exams:['اختبارات الجمعية', 'من ترشيح المعلم حتى نتيجة الجمعية في شاشة واحدة', 'gold'], trxR:['المعاملات الواردة', 'التعاميم والمعاملات الواردة إليك', ''], trxS:['المعاملات الصادرة', 'إضافة معاملة ومتابعة معاملاتك', ''],
+    exams:['اختبارات الجمعية', 'من ترشيح المعلم حتى نتيجة الجمعية في شاشة واحدة', 'gold'], trxR:['المعاملات الواردة', 'المعاملات والتعاميم الواردة إليك', ''], trxS:['المعاملات الصادرة', 'إضافة معاملة جديدة ومتابعة حالتها', ''],
     exGrp:['المختبرون', 'مجموعات اختبار الجمعية ومشرفوها', 'gold'], assocNom:['ترشيح طالب لاختبار الجمعية', 'المرشحون ومواعيد اختبارهم ونتائجهم', 'gold'],
     halaqaNew:['إضافة حلقة', 'إضافة حلقة جديدة', ''], halaqaEdit:['تعديل حلقة', 'تعديل الحلقات وعدد طلابها', ''] };
-  const acts = document.body.classList.contains('suro') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['trxS'], ['trxR'], ['me']] : document.body.classList.contains('admin') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['plans'], ['planF'], ['trxMemo'], ['trxIn'], ['exams'], ['ann'], ['settings']] : TABS;
+  const acts = document.body.classList.contains('suro') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['trxS'], ['trxR'], ['me']] : document.body.classList.contains('admin') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['plans'], ['planF'], ['trxS'], ['trxR'], ['exams'], ['ann'], ['settings']] : TABS;
   ac.classList.toggle('one', acts.length === 1);
   acts.filter(t => DESC[t[0]]).forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]] || ICONS[{ preT:'exam', assocT:'exam', exams:'exam', trxR:'exam', trxS:'exam', dash:'report', repAll:'report', staffFile:'staff', remote:'halaqa', trxIn:'exam', trxMemo:'exam', cands:'exam', exGrp:'exam', ann:'chat', assocNom:'exam', trx:'exam' }[t[0]]] || ''; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
 }
@@ -3867,88 +3879,129 @@ function renderMsgArc(){
 }
 
 /* ---------- المعاملات الإدارية ---------- */
-let TX = null, txMode = 'trx', txT = '', txF = '', txCur = null;
-const TX_TABS = { trx:[['new', 'معاملة جديدة'], ['mine', 'معاملاتي'], ['memos', 'التعاميم الواردة']], trxR:[['memos', 'الواردة']], trxS:[['new', 'إضافة معاملة جديدة'], ['mine', 'الصادرة']], trxIn:[['inbox', 'الواردة']], trxMemo:[['memoNew', 'إضافة معاملة جديدة'], ['sent', 'الصادرة']] };
+let TX = null, txMode = 'trxS', txT = '', txF = '', txCur = null;
+// مسميات موحدة للجميع: «المعاملات الصادرة» (إضافة معاملة جديدة + الصادرة) و«المعاملات الواردة»
+const TX_TABS = { trxS:[['new', 'إضافة معاملة جديدة'], ['mine', 'الصادرة']], trxR:[['inbox', 'الواردة']] };
+const TX_ALIAS = { trx:'trxS', trxMemo:'trxS', trxIn:'trxR' };
 const TX_CLS = { 'جديدة':'p-late', 'قيد المراجعة':'p-none', 'معادة للاستكمال':'p-red', 'معتمدة':'p-ok', 'مرفوضة':'p-red', 'منجزة':'p-ok' };
+const txNo = x => String(x.serial || x.id || '').padStart(4, '0');
 async function openTrx(mode){
-  if (mode !== txMode){ txMode = mode; txT = ''; txF = ''; } if (!txT) txT = TX_TABS[mode][mode === 'trx' ? 1 : 0][0];   // الصادرة: «إضافة معاملة جديدة» أولاً
-  $('txTitle').textContent = { trx:'المعاملات', trxR:'المعاملات الواردة', trxS:'المعاملات الصادرة', trxIn:'المعاملات الواردة', trxMemo:'المعاملات الصادرة' }[mode];
+  mode = TX_ALIAS[mode] || mode;
+  if (mode !== txMode){ txMode = mode; txT = ''; txF = ''; } if (!txT) txT = TX_TABS[mode][0][0];
+  $('txTitle').textContent = mode === 'trxR' ? 'المعاملات الواردة' : 'المعاملات الصادرة';
   $('txBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'trxList' }, 'txBox'); if (r && r.ok){ TX = r; renderTrx(); }
 }
 function renderTrx(){
   const tb = $('txTabs'), tabs = TX_TABS[txMode]; tb.innerHTML = ''; tb.style.gridTemplateColumns = 'repeat(' + tabs.length + ',1fr)'; tb.classList.toggle('hidden', tabs.length < 2);
-  const cnt = { mine:TX.counts.mineNew, memos:TX.counts.memosNew, inbox:TX.counts.inboxNew };
+  const cnt = { mine:TX.counts.mineNew, inbox:TX.counts.inboxNew };
   tabs.forEach(t => { const b = el('button', txT === t[0] ? 'on' : '', t[1] + (cnt[t[0]] ? ' (' + cnt[t[0]] + ')' : '')); b.onclick = () => { txT = t[0]; txF = ''; renderTrx(); }; tb.appendChild(b); });
   const box = $('txBox'), sum = $('txSum'); box.innerHTML = ''; sum.innerHTML = '';
-  if (txT === 'new' || txT === 'memoNew') return txForm(box);
-  const L = txT === 'mine' ? TX.mine : txT === 'inbox' ? TX.inbox : txT === 'memos' ? TX.memos : TX.sent;
-  if (txT === 'mine' || txT === 'inbox'){ [''].concat(TX.statuses).forEach(k => { const n = L.filter(x => !k || x.status === k).length; if (k && !n) return; const b = el('button', txF === k ? 'on' : '', (k || 'الكل') + ' (' + n + ')'); b.onclick = () => { txF = k; renderTrx(); }; sum.appendChild(b); }); }
-  const list = L.filter(x => !txF || x.status === txF);
+  if (txT === 'new') return txForm(box);
+  const L = txT === 'mine' ? TX.mine : TX.inbox;
+  const stOf = x => x.memo ? 'تعميم' : x.status;
+  [''].concat(['تعميم'], TX.statuses).forEach(k => { const n = L.filter(x => !k || stOf(x) === k).length; if (k && !n) return; const b = el('button', txF === k ? 'on' : '', (k || 'الكل') + ' (' + n + ')'); b.onclick = () => { txF = k; renderTrx(); }; sum.appendChild(b); });
+  const list = L.filter(x => !txF || stOf(x) === txF);
   if (!list.length) return box.appendChild(el('small', '', 'لا توجد معاملات.'));
-  list.forEach(x => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', x.subject));
-    const unseen = txT === 'inbox' ? x.seenA !== 'نعم' : txT === 'mine' ? x.seenR !== 'نعم' : txT === 'memos' ? !x.read : false; if (unseen) tp.appendChild(el('span', 'nbdg', 'جديد')); w.appendChild(tp);
-    const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill p-none', x.no)); pl.appendChild(el('span', 'pill p-none', x.type)); if (x.kind === 'وارد') pl.appendChild(el('span', 'pill ' + (TX_CLS[x.status] || 'p-none'), x.status));
-    if (txT === 'sent') pl.appendChild(el('span', 'pill ' + (x.readN === x.targets ? 'p-ok' : 'p-late'), 'اطلع ' + x.readN + ' من ' + x.targets)); w.appendChild(pl);
-    const m = el('div', 'meta'); [['التاريخ', x.at.slice(0, 16)], [txT === 'inbox' ? 'المرسل' : txT === 'memos' ? 'من' : '', txT === 'inbox' || txT === 'memos' ? x.fromName : ''], ['إلى', txT === 'sent' ? (x.toAll || 'موظفون محددون') : '']]
-      .forEach(p => { if (p[0] && p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } }); w.appendChild(m);
+  list.forEach(x => { const w = el('div', 'strow'), tp = el('div', 'top');
+    tp.appendChild(el('span', 'snum', txNo(x))); tp.appendChild(el('b', '', x.subject)); if (x.unread) tp.appendChild(el('span', 'nbdg', 'جديد')); w.appendChild(tp);
+    const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill p-none', 'رقم المعاملة: ' + x.no)); pl.appendChild(el('span', 'pill p-none', x.type));
+    pl.appendChild(el('span', 'pill ' + (x.memo ? 'p-none' : TX_CLS[x.status] || 'p-none'), x.memo ? 'تعميم' : x.status));
+    if (x.memo && x.mine) pl.appendChild(el('span', 'pill ' + (x.readN === x.targets ? 'p-ok' : 'p-late'), 'اطلع ' + x.readN + ' من ' + x.targets)); w.appendChild(pl);
+    const m = el('div', 'meta'); [['التاريخ', x.at.slice(0, 16)], [x.mine ? 'إلى' : 'من', x.mine ? x.toNames : x.fromName]].forEach(p => { if (p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } }); w.appendChild(m);
+    const ac = el('div', 'txacts'), op = el('button', 'mini', 'فتح المعاملة'), tr = el('button', 'mini gold', '📍 تتبع الحالة');
+    op.onclick = e => { e.stopPropagation(); txOpen(x); }; tr.onclick = e => { e.stopPropagation(); txTrackOpen(x); }; ac.appendChild(op); ac.appendChild(tr); w.appendChild(ac);
     w.style.cursor = 'pointer'; w.onclick = () => txOpen(x); box.appendChild(w); });
 }
+/* نموذج معاملة جديدة: المرسل لهم أولاً، ثم النوع والموضوع والتفاصيل. التعميم لمدير المجمع فقط */
 function txForm(box){
-  const memo = txT === 'memoNew', F = {}, f = el('div');
-  const inp = (l, type, req, ph) => { f.appendChild(lab(l, req)); const i = el(type === 'textarea' ? 'textarea' : 'input'); if (type === 'textarea') i.className = 'rftxt'; if (ph) i.placeholder = ph; f.appendChild(i); return i; };
-  f.appendChild(lab(memo ? 'النوع' : 'نوع المعاملة', true)); const ty = selBox(memo ? TX.memoTypes : Object.keys(TX.types)); f.appendChild(ty);
-  const flds = el('div'); f.appendChild(flds);
-  const drawF = () => { flds.innerHTML = ''; F.data = {}; if (memo) return; (TX.types[ty.get()] || []).forEach(x => { flds.appendChild(lab(x[1], true)); if (x[2] && x[2].length){ const sb = selBox(x[2]); flds.appendChild(sb); F.data[x[0]] = sb.get; } else { const i = el('input'); flds.appendChild(i); F.data[x[0]] = () => i.value.trim(); } }); };
-  ty.onpick = drawF;
-  F.subject = inp('الموضوع', 'text', true); F.body = inp('التفاصيل', 'textarea', false);
-  if (memo){
-    f.appendChild(lab('المستلمون', true)); const to = selBox(['كل الموظفين', 'بحسب الصفة', 'موظفون محددون']); f.appendChild(to);
-    const tw = el('div'); f.appendChild(tw); let tb = null, nb = null;
-    to.onpick = () => { tw.innerHTML = ''; tb = nb = null; if (to.get() === 'بحسب الصفة'){ tb = selBox(TX.titles.filter(x => x && x !== D.title && x !== (D.me || {}).title), true); tw.appendChild(tb); } if (to.get() === 'موظفون محددون'){ const q = el('input'); q.placeholder = 'ابحث بالاسم'; tw.appendChild(q); const lst = el('div', 'stlist'); tw.appendChild(lst); const sel = new Set();
-      const draw = () => { lst.innerHTML = ''; TX.staff.filter(p => !q.value.trim() || normAr(p.name).indexOf(normAr(q.value)) !== -1).forEach(p => { const l = el('label'), c = el('input'); c.type = 'checkbox'; c.checked = sel.has(p.nid); c.onchange = () => c.checked ? sel.add(p.nid) : sel.delete(p.nid); l.appendChild(c); l.appendChild(el('span', '', p.name)); l.appendChild(el('small', '', p.title)); lst.appendChild(l); }); };
-      q.oninput = draw; draw(); nb = { get:() => [...sel] }; } };
-    F.to = () => ({ toAll:to.get() === 'كل الموظفين' ? 'الكل' : '', titles:tb ? tb.get() : [], nids:nb ? nb.get() : [] });
-  } else f.appendChild(el('div', 'msg info', 'تُرفع المعاملة إلى مدير المجمع. طلبات الإجازة والاستئذان تُقدَّم من صفحة البصمة.'));
-  const btn = el('button', 'btn', memo ? 'إصدار' : 'رفع المعاملة'), m = el('div'); m.id = 'txFMsg'; f.appendChild(btn); f.appendChild(m); box.appendChild(f);
-  btn.onclick = async () => { const d = { kind:memo ? 'صادر' : 'وارد', type:ty.get(), subject:F.subject.value.trim(), body:F.body.value.trim(), data:{} };
-    Object.keys(F.data || {}).forEach(k => d.data[k] = F.data[k]()); if (memo) Object.assign(d, F.to());
+  const F = {}, f = el('div'); let memo = false;
+  if (TX.boss){ f.appendChild(lab('نوع الإرسال', true)); const k = selBox(['معاملة', 'تعميم']); k.set('معاملة'); f.appendChild(k); k.onpick = () => { memo = k.get() === 'تعميم'; drawTo(); drawTy(); }; }
+  const toW = el('div'), tyW = el('div'); f.appendChild(toW); f.appendChild(tyW);
+  const sel = new Map();
+  function drawTo(){
+    toW.innerHTML = ''; sel.clear();
+    if (memo){
+      toW.appendChild(lab('إضافة المرسل لهم', true)); const to = selBox(['كل الموظفين', 'بحسب الصفة', 'موظفون محددون']); toW.appendChild(to); const tw = el('div'); toW.appendChild(tw); let tb = null, nb = null;
+      to.onpick = () => { tw.innerHTML = ''; tb = nb = null; if (to.get() === 'بحسب الصفة'){ tb = selBox(TX.titles, true); tw.appendChild(tb); } if (to.get() === 'موظفون محددون'){ nb = txPicker(tw, TX.staff); } };
+      F.to = () => ({ toAll:to.get() === 'كل الموظفين' ? 'الكل' : '', titles:tb ? tb.get() : [], nids:nb ? nb.get() : [] }); return;
+    }
+    toW.appendChild(lab('إضافة المرسل لهم', true)); const nb = txPicker(toW, TX.targets); F.to = () => ({ nids:nb.get() });
+  }
+  function drawTy(){
+    tyW.innerHTML = ''; F.data = {};
+    tyW.appendChild(lab(memo ? 'نوع التعميم' : 'نوع المعاملة', true)); const ty = selBox(memo ? TX.memoTypes : Object.keys(TX.types)); tyW.appendChild(ty); F.type = ty.get;
+    const flds = el('div'); tyW.appendChild(flds);
+    ty.onpick = () => { flds.innerHTML = ''; F.data = {}; if (memo) return; (TX.types[ty.get()] || []).forEach(x => { flds.appendChild(lab(x[1], true)); if (x[2] && x[2].length){ const sb = selBox(x[2]); flds.appendChild(sb); F.data[x[0]] = sb.get; } else { const i = el('input'); flds.appendChild(i); F.data[x[0]] = () => i.value.trim(); } }); };
+    tyW.appendChild(lab('الموضوع', true)); F.subject = el('input'); tyW.appendChild(F.subject);
+    tyW.appendChild(lab('التفاصيل')); F.body = el('textarea', 'rftxt'); tyW.appendChild(F.body);
+  }
+  drawTo(); drawTy();
+  const btn = el('button', 'btn', 'إرسال'), m = el('div'); m.id = 'txFMsg'; f.appendChild(btn); f.appendChild(m); box.appendChild(f);
+  btn.onclick = async () => { const d = Object.assign({ kind:memo ? 'صادر' : 'وارد', type:F.type(), subject:F.subject.value.trim(), body:F.body.value.trim(), data:{} }, F.to());
+    Object.keys(F.data || {}).forEach(k => d.data[k] = F.data[k]());
+    if (!memo && !d.nids.length) return msg('txFMsg', 'أضف المرسل لهم أولاً.', 'err');
+    if (memo && !d.toAll && !d.titles.length && !d.nids.length) return msg('txFMsg', 'أضف المرسل لهم أولاً.', 'err');
     if (!d.type) return msg('txFMsg', 'اختر النوع.', 'err'); if (d.subject.length < 3) return msg('txFMsg', 'اكتب الموضوع.', 'err');
     btn.disabled = true; const r = await cpCall({ action:'trxCreate', trx:d }, 'txFMsg'); btn.disabled = false; if (!r || !r.ok) return;
-    TX = r; toast(r.msg); txT = memo ? 'sent' : 'mine'; renderTrx(); };
+    TX = r; toast(r.msg); txT = 'mine'; renderTrx(); };
+}
+/* خانة «إضافة المرسل لهم»: عند الضغط تظهر فقط الأسماء المسموح بالإرسال إليها */
+function txPicker(host, people){
+  const sel = new Map(), chips = el('div', 'txchips'), fld = el('button', 'txadd', '＋ إضافة المرسل لهم'), pop = el('div', 'txpop hidden'), q = el('input'), lst = el('div', 'stlist');
+  fld.type = 'button'; q.placeholder = 'ابحث بالاسم'; pop.appendChild(q); pop.appendChild(lst);
+  const done = el('button', 'btn soft', 'تم'); done.type = 'button'; done.onclick = () => pop.classList.add('hidden'); pop.appendChild(done);
+  const drawChips = () => { chips.innerHTML = ''; sel.forEach((p, n) => { const c = el('span', 'txchip', p.name); const x = el('button', '', '✕'); x.type = 'button'; x.onclick = () => { sel.delete(n); drawChips(); draw(); }; c.appendChild(x); chips.appendChild(c); }); };
+  const draw = () => { lst.innerHTML = ''; const L = people.filter(p => !q.value.trim() || normAr(p.name + ' ' + p.title).indexOf(normAr(q.value)) !== -1);
+    if (!L.length) lst.appendChild(el('div', 'ge', people.length ? 'لا توجد نتائج.' : 'لا يوجد من يمكنك الإرسال إليه.'));
+    L.forEach(p => { const l = el('label'), c = el('input'); c.type = 'checkbox'; c.checked = sel.has(p.nid); c.onchange = () => { c.checked ? sel.set(p.nid, p) : sel.delete(p.nid); drawChips(); }; l.appendChild(c); l.appendChild(el('span', '', p.name)); l.appendChild(el('small', '', p.title)); lst.appendChild(l); }); };
+  fld.onclick = () => { pop.classList.toggle('hidden'); draw(); if (!pop.classList.contains('hidden')) q.focus(); }; q.oninput = draw;
+  host.appendChild(fld); host.appendChild(chips); host.appendChild(pop);
+  return { get:() => [...sel.keys()] };
 }
 const TX_LBL = { letter:'نوع الخطاب', to:'الجهة الموجَّه إليها', item:'الصنف', qty:'الكمية', place:'الموقع', issue:'وصف العطل' };
+/* تتبع الحالة: ماذا تم على المعاملة خطوة بخطوة */
+function txTrackOpen(x){
+  txCur = x; msg('txMsg', '', ''); $('txShT').textContent = '📍 تتبع الحالة • ' + x.no; $('txReply').innerHTML = ''; const b = $('txShBody'); b.innerHTML = '';
+  const g = el('div', 'kv'); kvRow(g, 'الموضوع', x.subject); kvRow(g, 'الحالة الحالية', x.memo ? 'تعميم' : x.status); kvRow(g, 'من', x.fromName); kvRow(g, 'إلى', x.toNames); b.appendChild(g);
+  const tl = el('div', 'txtl'); (x.track || []).forEach(e => { const r = el('div', 'tle ' + e.k); r.appendChild(el('i')); const c = el('div'); c.appendChild(el('b', '', e.text)); c.appendChild(el('small', '', (e.at || '').slice(0, 16))); r.appendChild(c); tl.appendChild(r); });
+  if (x.memo && x.mine && x.unreadNames && x.unreadNames.length){ const r = el('div', 'tle wait'); r.appendChild(el('i')); const c = el('div'); c.appendChild(el('b', '', 'لم يطّلع بعد: ' + x.unreadNames.join('، '))); r.appendChild(c); tl.appendChild(r); }
+  else if (!x.memo && TX_CLOSED_C.indexOf(x.status) === -1){ const r = el('div', 'tle wait'); r.appendChild(el('i')); const c = el('div'); c.appendChild(el('b', '', 'بانتظار الإجراء من: ' + x.toNames)); r.appendChild(c); tl.appendChild(r); }
+  b.appendChild(tl);
+  const op = el('button', 'mini', 'فتح المعاملة'); op.onclick = () => txOpen(x); b.appendChild(op);
+  $('txSheet').classList.remove('hidden'); txMarkSeen(x);
+}
+const TX_CLOSED_C = ['معتمدة', 'مرفوضة', 'منجزة'];
+function txMarkSeen(x){ if (x.unread){ api({ action:'trxSeen', id:x.id }).then(() => { x.unread = false; if (TX && TX.counts){ if (x.mine) TX.counts.mineNew = Math.max(0, TX.counts.mineNew - 1); else TX.counts.inboxNew = Math.max(0, TX.counts.inboxNew - 1); } renderTrx(); }).catch(() => {}); } }
 function txOpen(x){
   txCur = x; msg('txMsg', '', ''); $('txShT').textContent = x.type + ' • ' + x.no; const b = $('txShBody'); b.innerHTML = '';
-  const g = el('div', 'kv'); kvRow(g, 'الموضوع', x.subject); kvRow(g, x.kind === 'وارد' ? 'مقدم الطلب' : 'من', x.fromName); kvRow(g, 'التاريخ', x.at.slice(0, 16)); if (x.kind === 'وارد') kvRow(g, 'الحالة', x.status);
+  const g = el('div', 'kv'); kvRow(g, 'رقم المعاملة', x.no); kvRow(g, 'الموضوع', x.subject); kvRow(g, 'من', x.fromName); kvRow(g, 'إلى', x.toNames); kvRow(g, 'التاريخ', x.at.slice(0, 16)); kvRow(g, 'الحالة', x.memo ? 'تعميم' : x.status);
   Object.keys(x.data || {}).forEach(k => kvRow(g, TX_LBL[k] || k, x.data[k])); b.appendChild(g);
   if (x.body){ const p = el('div', 'rfauto', x.body); p.style.whiteSpace = 'pre-line'; p.style.marginTop = '8px'; b.appendChild(p); }
-  if (x.unread && x.unread.length) b.appendChild(el('small', '', 'لم يطلع: ' + x.unread.join('، ')));
   b.appendChild(el('div', 'rfsec', 'الإجراءات')); const th = el('div', 'thread'); if (!x.thread.length) th.appendChild(el('small', '', 'لا توجد إجراءات بعد.'));
   x.thread.forEach(e => { const bb = el('div', 'bub ' + e.side), w = el('div', 'who'); w.appendChild(el('b', '', e.by)); w.appendChild(el('span', '', e.at.slice(0, 16))); bb.appendChild(w); if (e.text) bb.appendChild(el('p', '', e.text)); if (e.status) bb.appendChild(el('span', 'pill ' + (TX_CLS[e.status] || 'p-none'), 'الحالة: ' + e.status)); th.appendChild(bb); });
   b.appendChild(th);
-  const pr = el('button', 'mini', 'طباعة / PDF'); pr.onclick = () => txPrint(x); b.appendChild(pr);
-  const rp = $('txReply'); rp.innerHTML = ''; const boss = TX.boss && !(D.ro), closed = ['معتمدة', 'مرفوضة', 'منجزة'].indexOf(x.status) !== -1;
-  if (!D.ro && (x.kind === 'صادر' || boss || !closed || x.status === 'معادة للاستكمال')){
-    rp.appendChild(lab(boss ? 'الإجراء / التوجيه' : x.kind === 'صادر' ? 'رد أو إفادة' : 'إضافة أو استكمال')); const tx = el('textarea', 'rftxt'); rp.appendChild(tx); let st = null;
-    if (boss && x.kind === 'وارد'){ rp.appendChild(lab('الحالة')); st = selBox(['قيد المراجعة', 'معادة للاستكمال', 'معتمدة', 'مرفوضة', 'منجزة']); rp.appendChild(st); }
+  const ab = el('div', 'txacts'), tr = el('button', 'mini gold', '📍 تتبع الحالة'); tr.onclick = () => txTrackOpen(x); ab.appendChild(tr);
+  const pr = el('button', 'mini', 'طباعة / PDF'); pr.onclick = () => txPrint(x); ab.appendChild(pr); b.appendChild(ab);
+  const rp = $('txReply'); rp.innerHTML = ''; const closed = TX_CLOSED_C.indexOf(x.status) !== -1;
+  if (x.canReply && (x.memo || x.canStatus || !closed || x.status === 'معادة للاستكمال')){
+    rp.appendChild(lab(x.canStatus ? 'الإجراء / التوجيه' : x.memo ? 'رد أو إفادة' : 'إضافة أو استكمال')); const tx = el('textarea', 'rftxt'); rp.appendChild(tx); let st = null;
+    if (x.canStatus){ rp.appendChild(lab('الحالة')); st = selBox(['قيد المراجعة', 'معادة للاستكمال', 'معتمدة', 'مرفوضة', 'منجزة']); rp.appendChild(st); }
     const sb = el('button', 'btn', 'إرسال'); rp.appendChild(sb);
     sb.onclick = async () => { sb.disabled = true; const r = await cpCall({ action:'trxReply', id:x.id, text:tx.value.trim(), status:st ? st.get() : '' }, 'txMsg'); sb.disabled = false; if (!r || !r.ok) return; TX = r; toast(r.msg);
-      const L = [].concat(r.mine, r.inbox, r.memos, r.sent); const nx = L.find(y => y.id === x.id); renderTrx(); if (nx) txOpen(nx); };
+      const nx = [].concat(r.mine, r.inbox).find(y => y.id === x.id); renderTrx(); if (nx) txOpen(nx); };
   }
-  $('txSheet').classList.remove('hidden');
-  const unseen = (x.kind === 'وارد' && ((TX.boss && x.seenA !== 'نعم') || (!TX.boss && x.seenR !== 'نعم'))) || (x.kind === 'صادر' && x.read === false);
-  if (unseen && !D.ro){ api({ action:'trxSeen', id:x.id }).then(() => { if (x.kind === 'صادر') x.read = true; else if (TX.boss) x.seenA = 'نعم'; else x.seenR = 'نعم'; renderTrx(); }).catch(() => {}); }
+  $('txSheet').classList.remove('hidden'); txMarkSeen(x);
 }
 $('txClose').onclick = () => $('txSheet').classList.add('hidden');
 function txPrint(x){
   const p = $('sfPrint'); p.innerHTML = ''; $('dsPrint').innerHTML = '';
   const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', x.type)); l.appendChild(el('div', '', 'رقم المعاملة: ' + x.no + ' • ' + x.at.slice(0, 10))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
   const t = el('table'), tb = el('tbody'), row = (k, v) => { if (!v) return; const tr = el('tr'); tr.appendChild(el('th', '', k)); tr.appendChild(el('td', '', v)); tb.appendChild(tr); };
-  row('الموضوع', x.subject); row(x.kind === 'وارد' ? 'مقدم الطلب' : 'من', x.fromName); row('إلى', x.kind === 'وارد' ? 'مدير المجمع' : (x.toAll || 'موظفون محددون')); if (x.kind === 'وارد') row('الحالة', x.status);
+  row('الموضوع', x.subject); row('من', x.fromName); row('إلى', x.toNames); if (!x.memo) row('الحالة', x.status);
   Object.keys(x.data || {}).forEach(k => row(TX_LBL[k] || k, x.data[k])); row('التفاصيل', x.body); t.appendChild(tb); p.appendChild(t);
   if (x.thread.length){ p.appendChild(el('h3', '', 'الإجراءات')); const t2 = el('table'); t2.innerHTML = '<thead><tr><th>التاريخ</th><th>بواسطة</th><th>الإجراء</th><th>الحالة</th></tr></thead>'; const b2 = el('tbody');
     x.thread.forEach(e => { const tr = el('tr'); [e.at.slice(0, 16), e.by, e.text, e.status || ''].forEach(v => tr.appendChild(el('td', '', v))); b2.appendChild(tr); }); t2.appendChild(b2); p.appendChild(t2); }
-  const sg = el('div'); sg.style.cssText = 'display:flex;justify-content:space-between;margin-top:30px'; sg.appendChild(el('div', '', 'توقيع مقدم الطلب: ............')); sg.appendChild(el('div', '', 'اعتماد مدير المجمع: ............')); p.appendChild(sg);
+  const sg = el('div'); sg.style.cssText = 'display:flex;justify-content:space-between;margin-top:30px'; sg.appendChild(el('div', '', 'توقيع المرسل: ............')); sg.appendChild(el('div', '', 'اعتماد المستلم: ............')); p.appendChild(sg);
   setTimeout(() => window.print(), 50);
 }
 
@@ -5040,7 +5093,7 @@ function renderLive(){
    lvTile(S0 ? S0.present + '/' + S0.due : null, 'موظفون حاضرون', S0 ? 'متأخرون ' + S0.late : 'جدول البصمة غير مربوط', S0 && S0.present < S0.due ? 'y' : 'g', () => openRole('staffAtt')),
    lvTile(P.refs, 'إحالات مفتوحة', P.urgent ? 'عاجلة ' + P.urgent : '', P.urgent ? 'r' : '', () => openRole('refsStu')),
    lvTile(P.exam, 'ترشيحات مفتوحة', '', '', () => openRole('exams')),
-   lvTile(P.trx, 'معاملات بانتظار', '', P.trx ? 'y' : '', () => openRole('trxIn')),
+   lvTile(P.trx, 'معاملات بانتظار', '', P.trx ? 'y' : '', () => openRole('trxR')),
    lvTile(P.apps, 'طلبات تسجيل', '', P.apps ? 'y' : '', () => openRole('apps')),
    lvTile(P.orders, 'طلبات جوائز', '', '', () => openRole('compete')),
    lvTile(R.msgs.ok, 'رسائل اليوم', R.msgs.fail ? 'فشلت ' + R.msgs.fail : R.msgs.wait ? 'بالانتظار ' + R.msgs.wait : '', R.msgs.fail ? 'r' : '', () => openRole('msgArc')),
@@ -5878,15 +5931,14 @@ function bellItems(){
   add(c.edu, 'إحالات تعليمية جديدة', () => { rbF = 'open'; openRole('refsEdu'); });
   add(c.exam, 'ترشيحات جديدة من المعلمين', () => { if (has('preT')) openRole('preT'); else { rbF = 'open'; openRole('refsExam'); } });
   add((D && D.planReqN) || 0, 'طلبات تعديل خطط من المعلمين', () => openRole('plans'));
-  add(t.inbox, 'معاملات واردة جديدة', () => { txMode = 'trxIn'; txT = 'inbox'; openRole('trxIn'); });
+  add(t.inbox, 'معاملات واردة لم تطّلع عليها', () => { txMode = 'trxR'; txT = 'inbox'; openRole('trxR'); });
   add(t.mine, 'ردود على معاملاتك', () => { txMode = 'trxS'; txT = 'mine'; openRole('trxS'); });
-  add(t.memos, 'معاملات واردة لم تطّلع عليها', () => { txMode = 'trxR'; txT = 'memos'; openRole('trxR'); });
   add((D && D.ann || []).filter(a => !a.read).length, 'إعلانات جديدة', () => { openRole('welcome'); setTimeout(() => { const a = $('annWelcome'); if (a) a.scrollIntoView({ behavior:'smooth', block:'center' }); }, 100); });
   return out;
 }
 function updBell(){
   const c = refUnread();
-  const bm = { myStu:c.mine, refsStu:c.stu, refsEdu:c.edu, refsExam:c.exam, cands:c.exam, preT:c.exam, trxIn:((D && D.trxN) || {}).inbox || 0, trxS:((D && D.trxN) || {}).mine || 0, trxR:((D && D.trxN) || {}).memos || 0 };
+  const bm = { myStu:c.mine, refsStu:c.stu, refsEdu:c.edu, refsExam:c.exam, cands:c.exam, preT:c.exam, trxS:((D && D.trxN) || {}).mine || 0, trxR:(((D && D.trxN) || {}).inbox || 0) + (((D && D.trxN) || {}).memos || 0) };
   document.querySelectorAll('#nav button[data-r]').forEach(b => { const k = b.dataset.r; let x = b.querySelector('.nbdg'); const v = bm[k] || 0;
     if (!(k in bm)) return; if (!v){ if (x) x.remove(); return; } if (!x){ x = el('span', 'nbdg'); b.appendChild(x); } x.textContent = v; });
   document.querySelectorAll('#nav .ngroup').forEach(w => { const h = w.querySelector('.ghead'); if (!h) return; let x = h.querySelector('.nbdg'); const v = [...w.querySelectorAll('.gitems .nbdg')].reduce((a, y) => a + (+y.textContent || 0), 0);
