@@ -2236,13 +2236,23 @@ let exStuds = [], role = null, hal = null, day = null, studs = [], pending = {},
 let rep = { period:'day', date:null, mon:null, seq:0 };
 
 /* ---------- أدوات ---------- */
+/* إعادة المحاولة تلقائياً وقت الضغط: القراءة والحفظ الآمن تُعاد عند انقطاع الاتصال، وأي طلب يُعاد إذا ردّ الخادم «مشغول» (لم يُنفَّذ) */
+const API_SAFE = ['home', 'zmState', 'zmCfg', 'trxList', 'leaveInfo', 'arcInfo', 'attendance', 'students', 'halaqatAdmin', 'staff', 'perms', 'compete', 'compStudents', 'store', 'orders', 'apps', 'plans', 'student', 'report',
+  'myStu', 'refs', 'msgInfo', 'msgCfg', 'stuFile', 'stuSearch', 'dash', 'stuRep', 'tch', 'staffAtt', 'courses', 'staffFile', 'annList', 'eduCfg', 'accData', 'moveData', 'absData', 'gsearch', 'tvCfg', 'check',
+  'applyInfo', 'planCal', 'assoc', 'strugglers', 'planFollow', 'msgArchive', 'resetInfo', 'live', 'msgStatus', 'reevalList', 'saveAtt', 'trxSeen', 'annRead', 'login', 'peekList'];
+const apiWait = ms => new Promise(r => setTimeout(r, ms));
 async function api(data){
   if (API_URL.indexOf('http') !== 0) throw new Error('لم يُضبط رابط الخادم بعد في الملف.');
   const tok = store.get('hq_token'); if (tok) data.token = tok;
-  const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(data) });
-  const j = await r.json();
-  if (j.expired){ store.del('hq_token'); showLogin('انتهت الجلسة، سجّل الدخول مجدداً.'); throw new Error('expired'); }
-  return j;
+  const safe = API_SAFE.indexOf(data.action) !== -1;
+  for (let i = 0; ; i++){
+    let j;
+    try { const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(data) }); j = await r.json(); }
+    catch(e){ if (safe && i < 3){ await apiWait(1200 * (i + 1) + Math.random() * 600); continue; } throw e; }
+    if (j.busy && i < 4){ await apiWait(1500 * (i + 1) + Math.random() * 1000); continue; }
+    if (j.expired){ store.del('hq_token'); showLogin('انتهت الجلسة، سجّل الدخول مجدداً.'); throw new Error('expired'); }
+    return j;
+  }
 }
 function show(v){
   ['vLogin','vHome','vStudent','loading'].forEach(x => $(x).classList.toggle('hidden', x !== v));
