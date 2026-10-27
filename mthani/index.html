@@ -426,7 +426,7 @@
   .pttot b{font-size:24px} .pttot.ok{background:var(--okbg);color:var(--ok)} .pttot.no{background:var(--errbg);color:var(--red)}
   .nbdg{background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;line-height:18px;margin-inline-start:auto;text-align:center}
   .welcome .role{font-size:14px;color:#F3D9AE;margin:-2px 0 6px;font-weight:700}
-  #pTeach.ro .att button{pointer-events:none} #pTeach.ro .trow,#pTeach.ro #btnAllPresent,#pTeach.ro #btnApprove{display:none!important}
+  #pTeach.ro .att button,#pTeach.ro .trow button{pointer-events:none} #pTeach.ro #btnAllPresent,#pTeach.ro #btnApprove{display:none!important}
   .navlogo{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px 14px;margin-bottom:6px;background:var(--card);border:1px solid var(--line);border-radius:18px;text-align:center}
   .navlogo img{width:92px;height:92px;border-radius:50%;background:#fff;padding:5px;border:3px solid var(--gold);object-fit:contain;box-shadow:0 6px 16px rgba(0,0,0,.12)}
   .navlogo b{font-size:15px;color:var(--navy);line-height:1.4} .navlogo small{font-size:11.5px;color:var(--muted);line-height:1.5}
@@ -527,7 +527,7 @@
   .att button.def{border-style:dashed;opacity:.85}
   .trow{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px}
   .trow button{padding:9px 2px;border-radius:9px;font-size:13px;font-weight:700;background:var(--navy);color:#fff}
-  .trow button.done{background:var(--okbg);color:var(--ok)}
+  .trow button.done{background:#1E8E4E;color:#fff}
   .todays{margin-top:6px}
   .todays div{font-size:12px;color:var(--muted);padding:2px 0}
   .chips.wrap{flex-wrap:wrap;overflow:visible}
@@ -2830,12 +2830,12 @@ function renderStuds(){
       a.appendChild(b);
     });
     w.appendChild(a);
-    // الحاضر ينتقل لاختيار نوع التسميع
-    if (isPresent(s)){
+    // أزرار أنواع التقييم تظهر دائماً (عدا الغائب والمستأذن): المعتمد بالأخضر ✓ والمتبقي بالأزرق
+    if (isPresent(s) || !s.att){
       const t = el('div', 'trow');
       EVT().forEach(ty => {
         const n = s.today.filter(r => r.type === ty).length;
-        const b = el('button', n ? 'done' : '', (n ? '✓ ' : '') + ty); b.onclick = () => openRec(s, ty); t.appendChild(b);
+        const b = el('button', n ? 'done' : '', (n ? '✓ ' : '') + ty); b.onclick = () => openRec(s, ty, isPresent(s) ? '' : 'حاضر'); t.appendChild(b);
       });
       w.appendChild(t);
     }
@@ -2920,7 +2920,7 @@ function setNone(on){ rs.none = !!on; $('rsNone').classList.toggle('on', rs.none
 function markType(){
   const i = EVT().indexOf(rs.type);
   $('rsType').querySelectorAll('button').forEach(x => { x.classList.toggle('on', x.dataset.t === rs.type); x.classList.toggle('done', rs.s.today.some(r => r.type === x.dataset.t)); });
-  $('rsNext').textContent = 'اعتماد ' + rs.type;
+  $('rsNext').textContent = 'اعتماد';
   $('rsName').textContent = rs.s.name + ' • ' + rs.type;
 }
 /* ملخص الخانة: أين وصل الطالب في آخر تسميع من هذا النوع */
