@@ -104,20 +104,20 @@ function tickClock(){
   $('dG').textContent = n.toLocaleDateString('ar-SA-u-ca-gregory', { day:'numeric', month:'long', year:'numeric', timeZone:'Asia/Riyadh' });
 }
 setInterval(tickClock, 15000); tickClock();
-function slide(icon, title, sub){ const s = el('section', 'slide'), h = el('div', 'st'), i = el('div', 'ic', icon), t = el('div'); t.appendChild(el('h1', '', title)); if (sub) t.appendChild(el('p', '', sub)); h.appendChild(i); h.appendChild(t); s.appendChild(h); return s; }
+function slide(icon, title, sub){ const s = el('section', 'slide'), h = el('div', 'st'), i = el('div', 'ic', icon), t = el('div'); t.appendChild(el('h1', '', title)); if (sub) t.appendChild(el('p', '', sub)); if (icon) h.appendChild(i); h.appendChild(t); s.appendChild(h); return s; }
 const fmtDay = d => d ? new Date(d + 'T12:00:00Z').toLocaleDateString('ar-SA-u-ca-islamic-umalqura', { weekday:'long', day:'numeric', month:'long', timeZone:'UTC' }) : '';
 function build(){
   const box = $('slides'); box.innerHTML = ''; slides = [];
   const on = k => T.parts.indexOf(k) !== -1;
   if (on('stars') && T.stars.length){
-    const s = slide('⭐', 'فرسان الحلقات', T.starDay === T.today ? 'فرسان اليوم — بارك الله فيهم' : 'فرسان ' + fmtDay(T.starDay));
+    const s = slide('', 'فرسان الحلقات', T.starDay === T.today ? 'فرسان اليوم — بارك الله فيهم' : 'فرسان ' + fmtDay(T.starDay));
     const g = el('div', 'grid'), n = T.stars.length; g.style.gridTemplateColumns = 'repeat(' + (n <= 4 ? n : n <= 9 ? 3 : 4) + ',1fr)';
-    T.stars.forEach(x => { const c = el('div', 'card'); c.appendChild(el('span', 'star', '⭐')); const t = el('div', 'tx'); t.appendChild(el('div', 'n', x.name)); t.appendChild(el('div', 'h', x.hname)); c.appendChild(t); g.appendChild(c); });
+    T.stars.forEach(x => { const c = el('div', 'card'); const t = el('div', 'tx'); t.appendChild(el('div', 'n', x.name)); t.appendChild(el('div', 'h', x.hname)); c.appendChild(t); g.appendChild(c); });
     s.appendChild(g); slides.push(s);
   }
   if (on('hifz') && T.hifz.length){
-    const s = slide('📖', 'الأعلى حفظاً هذا الأسبوع', 'عدد الآيات المحفوظة منذ بداية الأسبوع');
-    const top = T.hifz.slice(0, 3), pd = el('div', 'podium'), order = [1, 0, 2], md = ['🥇', '🥈', '🥉'];
+    const s = slide('', 'الأعلى حفظاً هذا الأسبوع', 'عدد الآيات المحفوظة منذ بداية الأسبوع');
+    const top = T.hifz.slice(0, 3), pd = el('div', 'podium'), order = [1, 0, 2], md = ['1', '2', '3'];
     order.forEach(i => { const x = top[i], d = el('div', 'pd p' + (i + 1)); if (x){ d.appendChild(el('div', 'medal', md[i])); d.appendChild(el('div', 'n', x.name)); d.appendChild(el('div', 'h', x.hname)); const v = el('div', 'val', x.ayat); v.appendChild(el('small', '', 'آية')); d.appendChild(v); } else d.style.visibility = 'hidden'; pd.appendChild(d); });
     s.appendChild(pd);
     if (T.hifz.length > 3){ const g = el('div', 'grid'); g.style.gridTemplateColumns = 'repeat(' + Math.min(3, T.hifz.length - 3) + ',1fr)';
@@ -125,19 +125,19 @@ function build(){
     slides.push(s);
   }
   if (on('att') && T.fullCount){
-    const s = slide('✅', 'الحضور الكامل هذا الشهر', 'طلاب لم يغيبوا يوماً — قدوة في الانضباط');
+    const s = slide('', 'الحضور الكامل هذا الشهر', 'طلاب لم يغيبوا يوماً — قدوة في الانضباط');
     const b = el('div', 'big'); b.appendChild(el('b', '', T.fullCount)); b.appendChild(el('span', '', 'طالباً حضروا كل الأيام')); s.appendChild(b);
     const ch = el('div', 'chips'); T.full.slice(0, 36).forEach(x => { const c = el('span', 'chip', x.name); c.appendChild(el('i', '', x.hname)); ch.appendChild(c); }); s.appendChild(ch); slides.push(s);
   }
   if (on('halaqat') && T.halaqat.length){
-    const s = slide('🏆', 'تنافس الحلقات هذا الأسبوع', 'الترتيب حسب نسبة الحضور ثم الحفظ');
+    const s = slide('', 'تنافس الحلقات هذا الأسبوع', 'الترتيب حسب نسبة الحضور ثم الحفظ');
     const bs = el('div', 'bars');
     T.halaqat.forEach((x, i) => { const r = el('div', 'bar'); r.appendChild(el('span', 'rk' + (i < 3 ? ' r' + (i + 1) : ''), i + 1)); const nm = el('div', 'nm'); nm.appendChild(el('b', '', x.name)); nm.appendChild(el('span', '', x.teacher)); r.appendChild(nm);
       const tr = el('div', 'track'), f = el('i'); f.dataset.w = x.att; tr.appendChild(f); r.appendChild(tr); const pc = el('div', 'pc', x.att + '%'); pc.appendChild(el('small', '', x.hifz + ' آية حفظ')); r.appendChild(pc); bs.appendChild(r); });
     s.appendChild(bs); slides.push(s);
   }
   if (on('points') && T.points.length){
-    const s = slide('🎁', 'أبطال المنافس', 'أعلى أرصدة النقاط — اجمع نقاطك واختر جائزتك');
+    const s = slide('', 'أبطال نافس', 'أعلى أرصدة النقاط — اجمع نقاطك واختر جائزتك');
     const g = el('div', 'grid'); g.style.gridTemplateColumns = 'repeat(2,1fr)';
     T.points.forEach((x, i) => { const c = el('div', 'card'); c.appendChild(el('span', 'rk' + (i < 3 ? ' r' + (i + 1) : ''), i + 1)); const t = el('div', 'tx'); t.appendChild(el('div', 'n', x.name)); t.appendChild(el('div', 'h', x.hname)); c.appendChild(t); const v = el('div', 'val', x.points); v.appendChild(el('small', '', 'نقطة')); c.appendChild(v); g.appendChild(c); });
     s.appendChild(g); slides.push(s);

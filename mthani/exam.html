@@ -203,7 +203,7 @@ function form(s){
   fld('تاريخ الاختبار (ميلادي)', roIn(X.date)); fld('التاريخ الهجري', roIn(hijri(X.date)));
   const rF = fld('النطاق: من سورة', sOpt()), rT = fld('إلى سورة', sOpt()); B.appendChild(g);
   const rg = mrRange(s.level); if (rg){ rF.value = rg[0]; rT.value = rg[1]; }
-  const gen = el('button', '', '🎲 توليد الأسئلة تلقائياً'); gen.type = 'button'; gen.style.marginTop = '10px'; if (!ro) B.appendChild(gen);
+  const gen = el('button', '', 'توليد الأسئلة تلقائياً'); gen.type = 'button'; gen.style.marginTop = '10px'; if (!ro) B.appendChild(gen);
   B.appendChild(el('small', 'note', 'أربعة أسئلة، لكل سؤال 20 درجة، و20 درجة للأداء. تبدأ كل درجة كاملة، واستخدم − و + للخصم أو التعديل.'));
   const tw = el('div', 'tw'), t = el('table', 'q'); tw.appendChild(t); B.appendChild(tw);
   const pf = el('div', 'perf'); pf.appendChild(el('b', '', 'الأداء (من 20)')); const pIn = el('input'); pIn.value = old.perf != null ? old.perf : PERF; pf.appendChild(stepIn(pIn, 0, PERF, 0.5, ro)); B.appendChild(pf);
@@ -220,7 +220,7 @@ function form(s){
   const generate = () => { const a1 = +rF.value, a2 = +rT.value; if (!a1 || !a2) return msg('shM', 'اختر النطاق: من سورة وإلى سورة.', 'err');
     const lo = Math.min(a1, a2), hi = Math.max(a1, a2), A = absAyah(lo, 1), Z = absAyah(hi, X.ayat[hi - 1]), seg = (Z - A + 1) / rows.length;
     rows.forEach((r, k) => { const sa = absTo(Math.min(Z, Math.floor(A + seg * k + Math.random() * seg))); r.s.value = sa[0]; r.a.max = X.ayat[sa[0] - 1]; r.a.value = sa[1]; });
-    msg('shM', '', ''); gen.textContent = '🎲 توليد مرة أخرى'; };
+    msg('shM', '', ''); gen.textContent = 'توليد نموذج اختبار مرة أخرى'; };
   gen.onclick = generate;
   const prev = (old.q || []).map(q => { const p = String(q.p || '').match(/^(.*\S)\s+(\d+)$/), si = p ? X.surah.indexOf(p[1]) + 1 : 0; return { s:si || '', a:p ? p[2] : '', v:q.s }; });
   t.innerHTML = '<thead><tr><th>السؤال</th><th>السورة</th><th>الآية</th><th>الدرجة من 20</th></tr></thead>'; const tb = el('tbody');
@@ -254,7 +254,7 @@ $('rPrint').onclick = () => { const p = $('print'); p.innerHTML = '';
   p.appendChild(el('p', '', 'عدد الطلاب: ' + n + ' • اجتازوا: ' + ok + ' • لم يجتازوا: ' + (d - ok) + (n - d ? ' • لم يُختبروا: ' + (n - d) : '')));
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>المرحلية</th><th>الحلقة</th><th>الدرجة</th><th>النتيجة</th></tr></thead>'; const tb = el('tbody');
   repRows().forEach(r => { const tr = el('tr'); r.forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
-  if (!X.final) p.appendChild(el('p', '', '⚠ مسودة: لم يعتمد المختبِر النتائج بعد.'));
+  if (!X.final) p.appendChild(el('p', '', 'مسودة: لم يعتمد المختبِر النتائج بعد.'));
   const sg = el('div', 'sig'); sg.appendChild(el('div', '', 'المختبِر: ' + X.sup + (X.final ? ' • اعتمد النتائج في ' + X.final.slice(0, 16) : ''))); sg.appendChild(el('div', '', 'التوقيع: ....................')); p.appendChild(sg);
   setTimeout(() => window.print(), 50); };
 $('rXls').onclick = () => { const rows = [['نتائج ' + bName(X.no) + ' — اختبار المرحليات — ' + X.date + ' — المختبِر ' + X.sup + (X.final ? ' — اعتُمدت ' + X.final.slice(0, 16) : ' — مسودة')], ['م', 'اسم الطالب', 'رقم الهوية', 'المرحلية', 'الحلقة', 'الدرجة', 'النتيجة']].concat(repRows());
