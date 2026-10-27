@@ -2476,7 +2476,9 @@ async function loadHome(){
   if (r.roles.indexOf('student') !== -1){ TABS.push(['mine', 'تقريري']); TABS.push(['shop', 'المتجر']); }
   if (r.roles.indexOf('admin') === -1) TABS.push(['me', 'الإعدادات']);
   // البوابة تحدد ما يظهر للموظف الذي له أكثر من دور
-  // ما أُعطي للموظف من صلاحيات يظهر له في أي بوابة دخل منها
+  // ما أُعطي للموظف من صلاحيات يظهر له في أي بوابة دخل منها: كل خانة من قائمة المدير مُنحت صلاحيتها تُضاف بنفس اسمها
+  if (r.roles.indexOf('admin') === -1) ADMIN_NAV.forEach(g => (g.items || [[g.r, g.t]]).forEach(it => { const k = NAV_PERM[it[0]]; if (!k || TABS.some(x => x[0] === it[0])) return;
+    if ([].concat(k).some(x => P.indexOf(x) !== -1)) TABS.splice(TABS.findIndex(x => x[0] === 'me') === -1 ? TABS.length : TABS.findIndex(x => x[0] === 'me'), 0, [it[0], it[1]]); }));
   if (r.roles.indexOf('admin') === -1 && (r.portal === 'stu' || r.portal === 'edu')) TABS = TABS.filter(x => ['myStu'].indexOf(x[0]) === -1 && !(x[0] === 'report' && x[1] === 'تقارير الحلقة'));
   document.body.classList.toggle('ro', !!r.ro);
   $('gsWrap').classList.toggle('hidden', r.roles.every(x => x === 'student' || x === 'parent'));
@@ -2503,6 +2505,7 @@ function userNav(T){
     const g = byG[gi] = byG[gi] || { t:ADMIN_NAV[gi].t, ic:ADMIN_NAV[gi].ic, items:[], o:gi }; g.items.push(x); });
   const sg = ADMIN_NAV.findIndex(g => g.t === 'الإعدادات');
   if (byG[sg] && last.length){ byG[sg].items.unshift(['me', 'تعديل البيانات']); last.length = 0; }
+  Object.keys(byG).forEach(k => { const g = byG[k], ord = ((ADMIN_NAV[g.o] || {}).items || []).map(x => x[0]); if (g.items) g.items.sort((a, b) => (ord.indexOf(a[0]) + 99) % 99 - (ord.indexOf(b[0]) + 99) % 99); });
   const grouped = Object.keys(byG).map(k => byG[k]).sort((a, b) => a.o - b.o);
   return userNavOld(own).concat(grouped, last);
 }
@@ -2513,6 +2516,13 @@ function userNavOld(T){
     if (!seen[g[0]]){ seen[g[0]] = { t:g[0], ic:g[1], items:[] }; out.push(seen[g[0]]); } seen[g[0]].items.push(x); });
   return out;
 }
+/* كل خانة في قائمة المدير وصلاحيتها (الخانات الحساسة ليست هنا فلا تُمنح لأحد) */
+const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:['students.add', 'students.apps'], refsStu:'refs.students', compete:['competition.manage', 'competition.store'],
+  moveMany:'students.move', absent:['students.absent', 'refs.students', 'students.add'], staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
+  halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', remote:['halaqat.remote', 'halaqat.manage'], reeval:'halaqat.reeval',
+  plans:'students.plans_all', refsEdu:'refs.edu', planF:['plans.follow', 'refs.edu', 'reports.edu'], exams:['assoc.nominate', 'refs.edu', 'reports.edu'],
+  msgs:'messages.send', msgsStaff:'messages.send', msgArc:'messages.send', dash:'reports.dashboard', repAll:['reports.all', 'reports.dashboard'], report:'halaqat.reports_all',
+  staffFile:['reports.teachers', 'reports.staffAtt', 'staff.courses'], tvCfg:'tv.manage', ann:'ann.manage' };
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
@@ -6763,7 +6773,7 @@ async function saveEdit(data){
 $('stSearch').oninput = () => SD && SD.ok && renderStaff();
 
 /* ---------- الإعدادات والصلاحيات (للمدير) ---------- */
-const CAT_ICON = { 'الطلاب':'users', 'الموظفين':'staff', 'الحلقات':'halaqa', 'الاتصال والرسائل':'chat', 'الإعدادات العامة':'settings', 'المنافس':'trophy', 'الاختبارات':'exam' };
+const CAT_ICON = { 'شؤون الطلاب':'users', 'شؤون الموظفين':'staff', 'الحلقات':'halaqa', 'الشؤون التعليمية':'book', 'الاختبارات':'exam', 'الاتصالات والرسائل':'chat', 'تقارير عامة':'report', 'الإعدادات':'settings' };
 let PD = null, peUser = null, peKeys = new Set();
 let setSubNow = 'perms';
 function setSub(sub){
