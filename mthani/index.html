@@ -2466,7 +2466,7 @@ async function loadHome(){
   if (r.roles.indexOf('student') !== -1){ TABS.push(['mine', 'تقريري']); TABS.push(['shop', 'المتجر']); }
   if (r.roles.indexOf('admin') === -1) TABS.push(['me', 'الإعدادات']);
   // البوابة تحدد ما يظهر للموظف الذي له أكثر من دور
-  if (r.roles.indexOf('admin') === -1 && r.portal === 'teach') TABS = TABS.filter(x => ['teach', 'myStu', 'candsT', 'report', 'me', 'trxR', 'trxS', 'plans', 'planF'].indexOf(x[0]) !== -1 && !(x[0] === 'teach' && x[1].indexOf('اطلاع') !== -1));
+  // ما أُعطي للموظف من صلاحيات يظهر له في أي بوابة دخل منها
   if (r.roles.indexOf('admin') === -1 && (r.portal === 'stu' || r.portal === 'edu')) TABS = TABS.filter(x => ['myStu'].indexOf(x[0]) === -1 && !(x[0] === 'report' && x[1] === 'تقارير الحلقة'));
   document.body.classList.toggle('ro', !!r.ro);
   $('gsWrap').classList.toggle('hidden', r.roles.every(x => x === 'student' || x === 'parent'));
@@ -2475,15 +2475,28 @@ async function loadHome(){
   document.body.classList.toggle('admin', admin);
   n.classList.add('groups'); document.body.classList.add('gnav');
   const supRO = admin && r.ro && !r.peek; document.body.classList.toggle('suro', supRO);
-  if (supRO){ $('gsWrap').classList.add('hidden'); buildAdminNav(n, RO_NAV); }
   if (!admin && r.canFix && !TABS.some(x => x[0] === 'reeval')) TABS.push(['reeval', 'طلبات إعادة التقييم في حلقة']);
+  if (supRO){ $('gsWrap').classList.add('hidden'); buildAdminNav(n, RO_NAV); }
   else if (admin) buildAdminNav(n); else buildAdminNav(n, userNav(TABS));
   show('vHome');
   restoreRoute(); updBell(); clearInterval(window._bellT); window._bellT = setInterval(() => { if (!document.hidden) refreshCounts(); }, 300000);
   if (r.ro && !r.peek && !$('roBar')){ const b = el('div', 'robar', 'حساب المشرف العام: للاطلاع فقط، ولا يمكن التعديل.'); b.id = 'roBar'; $('vHome').insertBefore(b, $('vHome').firstChild); }   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
 }
 /* قائمة بقية المستخدمين بنفس أسلوب المدير: الاختبارات والمعاملات مجموعتان، والباقي تبويبات مباشرة */
+/* قائمة الموظف: كل صلاحية تظهر داخل تبويبها الكامل (بنفس تبويبات المدير)، وفيه الخانات المسموح له بها فقط */
 function userNav(T){
+  const G = {}; ADMIN_NAV.forEach((g, i) => (g.items || []).forEach(it => { if (it[0] !== 'me') G[it[0]] = i; }));
+  const own = [], byG = {}, last = [];
+  T.forEach(x => { if (x[0] === 'me'){ last.push({ t:x[1], ic:'settings', r:'me' }); return; }
+    if (x[0] === 'exams'){ byG.ex = byG.ex || { t:'الاختبارات', ic:'exam', r:'exams', o:ADMIN_NAV.findIndex(g => g.r === 'exams') }; return; }
+    const gi = G[x[0]]; if (gi === undefined){ own.push(x); return; }
+    const g = byG[gi] = byG[gi] || { t:ADMIN_NAV[gi].t, ic:ADMIN_NAV[gi].ic, items:[], o:gi }; g.items.push(x); });
+  const sg = ADMIN_NAV.findIndex(g => g.t === 'الإعدادات');
+  if (byG[sg] && last.length){ byG[sg].items.unshift(['me', 'تعديل البيانات']); last.length = 0; }
+  const grouped = Object.keys(byG).map(k => byG[k]).sort((a, b) => a.o - b.o);
+  return userNavOld(own).concat(grouped, last);
+}
+function userNavOld(T){
   const out = [], grp = { halaqaNew:['الحلقات', 'halaqa'], halaqaEdit:['الحلقات', 'halaqa'], reeval:['الحلقات', 'halaqa'], preT:['الاختبارات', 'exam'], assocT:['الاختبارات', 'exam'], trxS:['المعاملات', 'exam'], trxR:['المعاملات', 'exam'] }, seen = {};
   const icOf = k => ICONS[k] ? k : ({ candsT:'exam', ann:'chat', repStu:'report', repEdu:'report', stuBrief:'users', planF:'plans', studentsList:'users' }[k] || 'exam');
   T.forEach(x => { const g = grp[x[0]]; if (!g){ out.push({ t:x[1], ic:icOf(x[0]), r:x[0] }); return; }
