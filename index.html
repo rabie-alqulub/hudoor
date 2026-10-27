@@ -116,7 +116,7 @@
   .stay.full .bar i{background:#1E9E5A}
   .stay small{display:block;margin-top:6px;font-size:12px;opacity:.75}
   #mainId{direction:rtl;unicode-bidi:isolate}
-  #mainId span{unicode-bidi:isolate}
+  #mainId .nid{direction:ltr;unicode-bidi:isolate;display:inline-block}
   .who{flex:1;min-width:0}
   .logout{flex:none;width:auto;margin:0;padding:8px 10px;border-radius:12px;background:var(--light);color:var(--muted);font-size:12px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:3px}
   .logout svg{width:22px;height:22px}
@@ -601,7 +601,7 @@ async function route(){
   } else {
     empName = st.name || '';
     $('mainName').textContent = st.name || ''; $('mainAvatar').textContent = (st.name || '؟').trim().charAt(0);
-    $('mainId').innerHTML = 'رقم الهوية: <span dir="ltr">' + empId.slice(0,2) + '</span><span>••••••</span><span dir="ltr">' + empId.slice(-2) + '</span>';
+    $('mainId').innerHTML = 'رقم الهوية: <bdi dir="ltr" class="nid">' + empId.slice(0,2) + '••••••' + empId.slice(-2) + '</bdi>';
     setToday(st.today);
     if (st.otherDevice){ show('vLogin'); rbMode(true); $('rbPin').value = ''; msg('loginMsg', 'هذا ليس جوالك المسجل. يمكنك نقل بصمتك إلى هذا الجوال برمزك في برنامج مثاني.', 'info'); return; }
     rbMode(false);

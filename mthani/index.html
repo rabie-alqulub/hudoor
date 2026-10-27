@@ -6493,7 +6493,7 @@ $('permSearch').oninput = () => PD && PD.ok && renderUsers();
 function openPermUser(u){
   peUser = u; peKeys = new Set(u.keys);
   $('peName').textContent = u.name; $('peAvatar').textContent = u.name.charAt(0);
-  $('peSub').textContent = [u.halaqat.join('، '), 'هوية: ' + u.nid.slice(0, 2) + '••••••' + u.nid.slice(-2)].filter(Boolean).join(' • ');
+  $('peSub').textContent = [u.halaqat.join('، '), 'هوية: \u2066' + u.nid.slice(0, 2) + '••••••' + u.nid.slice(-2) + '\u2069'].filter(Boolean).join(' • ');
   $('permUsersCard').classList.add('hidden'); $('permEdit').classList.remove('hidden'); renderCats(); window.scrollTo(0, 0);
 }
 function renderCats(){
