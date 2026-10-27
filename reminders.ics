@@ -16,12 +16,12 @@ END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
 UID:hudoor-in@rabie-alqulub.github.io
-DTSTAMP:20261023T000000Z
-DTSTART;TZID=Asia/Riyadh:20261025T131500
-DTEND;TZID=Asia/Riyadh:20261025T132000
+DTSTAMP:20261027T000000Z
+DTSTART;TZID=Asia/Riyadh:20261025T154000
+DTEND;TZID=Asia/Riyadh:20261025T154500
 RRULE:FREQ=WEEKLY;BYDAY=SU,MO,TU,WE
 SUMMARY:لا تنسَ تسجيل بصمة حضورك
-DESCRIPTION:تبدأ بصمة الحضور الساعة 1:50 م\nhttps://ra
+DESCRIPTION:تبدأ بصمة الحضور الساعة 3:45 م\nhttps://ra
  bie-alqulub.github.io/hudoor/
 URL:https://rabie-alqulub.github.io/hudoor/
 TRANSP:TRANSPARENT
@@ -33,12 +33,12 @@ END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:hudoor-out@rabie-alqulub.github.io
-DTSTAMP:20261023T000000Z
-DTSTART;TZID=Asia/Riyadh:20261025T173000
-DTEND;TZID=Asia/Riyadh:20261025T173500
+DTSTAMP:20261027T000000Z
+DTSTART;TZID=Asia/Riyadh:20261025T174500
+DTEND;TZID=Asia/Riyadh:20261025T175000
 RRULE:FREQ=WEEKLY;BYDAY=SU,MO,TU,WE
 SUMMARY:لا تنسَ تسجيل بصمة خروجك
-DESCRIPTION:آخر وقت للبصمة الساعة 6:15 م\nhttps://rabie-
+DESCRIPTION:آخر وقت للبصمة الساعة 6:00 م\nhttps://rabie-
  alqulub.github.io/hudoor/
 URL:https://rabie-alqulub.github.io/hudoor/
 TRANSP:TRANSPARENT

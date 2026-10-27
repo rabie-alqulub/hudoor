@@ -3,7 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>بصمة الحضور - ربيع القلوب</title>
+<title>نظام البصمة - ربيع القلوب</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="fp-192.png">
+<link rel="apple-touch-icon" href="fp-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="نظام البصمة">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1F3546">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js"></script>
@@ -142,6 +150,32 @@
   @media (prefers-color-scheme: dark){ .choice button{color:#E8B867} }
   #pinBox input{margin-top:12px}
   .hidden{display:none}
+  /* إطار قراءة الوجه: زوايا بدل الدائرة */
+  .ring{position:absolute;inset:14% 12% 18%;border:0;border-radius:28px;box-shadow:none;background:none}
+  .ring::before{content:'';position:absolute;inset:0;border-radius:28px;
+    background:linear-gradient(#F3D9AE,#F3D9AE) top left/38px 4px,linear-gradient(#F3D9AE,#F3D9AE) top left/4px 38px,
+      linear-gradient(#F3D9AE,#F3D9AE) top right/38px 4px,linear-gradient(#F3D9AE,#F3D9AE) top right/4px 38px,
+      linear-gradient(#F3D9AE,#F3D9AE) bottom left/38px 4px,linear-gradient(#F3D9AE,#F3D9AE) bottom left/4px 38px,
+      linear-gradient(#F3D9AE,#F3D9AE) bottom right/38px 4px,linear-gradient(#F3D9AE,#F3D9AE) bottom right/4px 38px;
+    background-repeat:no-repeat;filter:drop-shadow(0 0 6px rgba(0,0,0,.45));transition:filter .3s}
+  .ring::after{content:'';position:absolute;left:6%;right:6%;height:2px;top:8%;background:linear-gradient(90deg,transparent,rgba(243,217,174,.95),transparent);box-shadow:0 0 14px rgba(243,217,174,.8);border-radius:2px;animation:scan 1.8s ease-in-out infinite alternate}
+  .ring.found::before{background:linear-gradient(#5DD39E,#5DD39E) top left/38px 4px,linear-gradient(#5DD39E,#5DD39E) top left/4px 38px,
+      linear-gradient(#5DD39E,#5DD39E) top right/38px 4px,linear-gradient(#5DD39E,#5DD39E) top right/4px 38px,
+      linear-gradient(#5DD39E,#5DD39E) bottom left/38px 4px,linear-gradient(#5DD39E,#5DD39E) bottom left/4px 38px,
+      linear-gradient(#5DD39E,#5DD39E) bottom right/38px 4px,linear-gradient(#5DD39E,#5DD39E) bottom right/4px 38px;background-repeat:no-repeat;animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.55}}
+  .cam{border-radius:24px;box-shadow:0 10px 26px rgba(0,0,0,.25)}
+  .cam::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 62% at 50% 46%,transparent 60%,rgba(0,0,0,.35) 100%);pointer-events:none}
+  .cam .hint{z-index:2;bottom:14px;font-weight:700}
+  /* نافذة اختيار طريقة التحقق */
+  .sheet{position:fixed;inset:0;background:rgba(10,18,24,.55);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+  .sheet .panel{background:var(--card);width:100%;max-width:460px;border-radius:24px 24px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));animation:up .25s ease-out}
+  @keyframes up{from{transform:translateY(40px);opacity:0}}
+  .sheet h2{text-align:center;margin-bottom:4px} .sheet .sub{text-align:center;color:var(--muted);font-size:14px;margin:0 0 14px}
+  .choice button{padding:22px 8px;font-size:17px}
+  .tools button.soon{opacity:.55;cursor:not-allowed;position:relative} .tools button.soon i{font-style:normal;font-size:11px;background:var(--goldlight);color:var(--gold2);border-radius:99px;padding:1px 8px}
+  .sheet.hidden,.tools .hidden{display:none!important}
+  .inst{margin-top:10px;font-size:13px;line-height:1.7}
   small{color:var(--muted);display:block;margin-top:8px;line-height:1.6}
 </style>
 </head>
@@ -163,8 +197,11 @@
       <button class="link" id="btnRebindNo">رقم هوية آخر</button>
     </div>
     <label for="empId">رقم الهوية / الإقامة</label>
-    <input id="empId" inputmode="numeric" autocomplete="off" placeholder="10 أرقام" maxlength="15">
-    <button class="primary" id="btnLogin">متابعة</button>
+    <input id="empId" inputmode="numeric" autocomplete="username" placeholder="10 أرقام" maxlength="15">
+    <label for="empPin" id="empPinL">الرمز السري (نفس رمز برنامج مثاني)</label>
+    <input id="empPin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="الرمز السري" maxlength="6">
+    <button class="primary" id="btnLogin">دخول</button>
+    <small id="pinHelp">أول دخول: الرمز 123456، ثم غيّره من برنامج مثاني ← الإعدادات. وإذا غيّرت رمزك في مثاني يتغير هنا تلقائياً.</small>
     <div id="loginMsg"></div>
   </section>
 
@@ -224,25 +261,9 @@
       <div id="mainMsg"></div>
     </div>
 
-    <div class="card hidden" id="choiceCard">
-      <h2 id="choiceTitle">تسجيل حضور</h2>
-      <small>اختر طريقة التحقق</small>
-      <div class="choice">
-        <button id="chFace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>بصمة الوجه</button>
-        <button id="chPin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/><path d="M19 4l2 2"/></svg>الرمز البديل</button>
-      </div>
-      <div id="pinBox" class="hidden">
-        <input id="pinFallback" type="password" inputmode="numeric" maxlength="4" placeholder="الرمز البديل (4 أرقام)">
-        <button class="primary" id="btnPinGo">تأكيد</button>
-        <small>التسجيل بالرمز البديل يُعلَّم للمراجعة من الإدارة.</small>
-      </div>
-      <div id="pinMsg"></div>
-      <button class="link" id="btnChoiceCancel">إلغاء</button>
-    </div>
-
     <div class="tools">
       <button id="btnReports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M8 17v-5"/><path d="M13 17V8"/><path d="M18 17v-8"/></svg>التقارير</button>
-      <button id="btnLeave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>الإجازات والاستئذان</button>
+      <button id="btnLeave" class="soon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>الإجازات والاستئذان <i>قريباً</i></button>
       <a id="lnkRemind" href="reminders.ics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>التذكير</a>
     </div>
   </section>
@@ -300,7 +321,7 @@
   <div class="card verify hidden" id="camCard">
   <div id="scanBox">
     <h2 id="scanTitle">التحقق من بصمة الوجه</h2>
-    <p class="sub" id="scanSub">ضع وجهك داخل الدائرة وانظر للكاميرا</p>
+    <p class="sub" id="scanSub">ضع وجهك داخل الإطار وانظر للكاميرا</p>
     <div class="cam"><video id="vidPunch" playsinline muted autoplay></video><div class="ring" id="ring"></div><div class="hint" id="hintPunch"></div></div>
     <button class="link" id="btnCancel">إلغاء</button>
   </div>
@@ -315,6 +336,22 @@
 
   <div id="loading" class="card"><div class="msg info">جاري التحميل...</div></div>
 </main>
+    <div class="sheet hidden" id="choiceCard"><div class="panel">
+      <h2 id="choiceTitle">تسجيل حضور</h2>
+      <p class="sub">اختر طريقة التحقق</p>
+      <div class="choice">
+        <button id="chFace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>بصمة الوجه</button>
+        <button id="chPin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/><path d="M19 4l2 2"/></svg>الرمز البديل</button>
+      </div>
+      <div id="pinBox" class="hidden">
+        <input id="pinFallback" type="password" inputmode="numeric" maxlength="4" placeholder="الرمز البديل (4 أرقام)">
+        <button class="primary" id="btnPinGo">تأكيد</button>
+        <small>التسجيل بالرمز البديل يُعلَّم للمراجعة من الإدارة.</small>
+      </div>
+      <div id="pinMsg"></div>
+      <button class="link" id="btnChoiceCancel">إلغاء</button>
+    </div></div>
+
 
 <script>
 /* ======================================================================
@@ -323,6 +360,9 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbw5bv1rSm_zSkemNT6nuFVQGIrYRAFxx8oD4xnzoPRFbnUYge2cLcjTDT7vSz5ex_ShZA/exec';
 
 const MODELS = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/model/';
+/* رقم إصدار الصفحة: عند تغييره (تحديث الموقع) يُطلب تسجيل الدخول من جديد */
+const APP_VER = '2026-10-27a';
+const ADMIN_NIDS = ['1076080405'];   // التقارير تظهر لهذا الحساب فقط
 const $ = id => document.getElementById(id);
 const store = {
   get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
@@ -440,7 +480,7 @@ function distanceM(a, b, c, d){
 /* ---------- متابعة الموقع: تفعيل أزرار البصمة داخل النطاق فقط ---------- */
 function setGeo(state, text){ $('geo').className = 'geo ' + state; $('geoText').textContent = text; }
 /* ---------- أوقات الدوام (الخادم هو المرجع، وهذه للعرض وتعطيل الأزرار) ---------- */
-const RULES = () => (cfg && cfg.rules) || { days:[0,1,2,3], start:'13:50', late:'16:35', end:'18:15' };
+const RULES = () => (cfg && cfg.rules) || { days:[0,1,2,3], start:'15:45', late:'16:05', end:'18:00' };
 function hm(t){ const a = String(t).split(':'); return +a[0] * 60 + +a[1]; }
 function ampm(t){ const m = hm(t), h = Math.floor(m / 60); return (h % 12 || 12) + ':' + ('0' + m % 60).slice(-2) + (h < 12 ? ' ص' : ' م'); }
 function riyadhNow(){
@@ -494,7 +534,8 @@ async function boot(){
   loadModels();
   $('empId').value = store.get('rq_nid') || '';
   empId = store.get('rq_emp');
-  if (empId) await route(); else show('vLogin');
+  if (empId && store.get('rq_ver') !== APP_VER){ empId = null; store.del('rq_emp'); store.del('lv_token'); }   // تحديث للموقع: يُطلب الدخول من جديد
+  if (empId) await route(); else { show('vLogin'); if (store.get('rq_nid')) $('empPin').focus(); }
 }
 
 async function route(){
@@ -518,15 +559,26 @@ async function route(){
     if (st.otherDevice){ show('vLogin'); rbMode(true); $('rbPin').value = ''; msg('loginMsg', 'هذا ليس جوالك المسجل. يمكنك نقل بصمتك إلى هذا الجوال برمزك في برنامج مثاني.', 'info'); return; }
     rbMode(false);
     loadModels();
-    gateVerify();
+    $('btnReports').classList.toggle('hidden', ADMIN_NIDS.indexOf(store.get('rq_nid') || '') === -1);
+    enterMain();
   }
 }
 
 $('btnLogin').onclick = async () => {
-  const v = $('empId').value.replace(/[^0-9٠-٩]/g,'').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+  const v = $('empId').value.replace(/[^0-9٠-٩]/g,'').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)), pin = $('empPin').value.replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
   if (!v) return msg('loginMsg', 'أدخل رقم هويتك أو إقامتك', 'err');
-  empId = v; await route();
+  if (!/^\d{4,6}$/.test(pin)) return msg('loginMsg', 'أدخل الرمز السري (رمزك في برنامج مثاني)', 'err');
+  const b = $('btnLogin'); b.disabled = true; msg('loginMsg', 'جاري التحقق...', 'info');
+  try {
+    const l = await mApi({ action:'login', nid:v, pin:pin }, true);
+    if (!l.ok){ msg('loginMsg', l.msg || 'الرمز غير صحيح.', 'err'); return; }
+    store.set('lv_token', l.token); store.set('rq_ver', APP_VER); $('empPin').value = '';
+    empId = v; await route();
+    if (l.mustChange) msg('mainMsg', 'تدخل بالرمز الأولي. غيّره من برنامج مثاني ← الإعدادات، وسيتغير هنا تلقائياً.', 'info');
+  } catch(e){ msg('loginMsg', 'تعذّر الاتصال بالخادم. تحقق من الإنترنت.', 'err'); }
+  finally { b.disabled = false; }
 };
+$('empPin').onkeydown = e => { if (e.key === 'Enter') $('btnLogin').onclick(); };
 
 /* ---------- التسجيل الأول ---------- */
 function enrollStep(n){
@@ -581,7 +633,7 @@ $('btnEnroll').onclick = async () => {
 $('btnRecheck').onclick = route;
 /* تسجيل الخروج: يبقى رقم الهوية محفوظاً ويُطلب التحقق بالوجه عند الدخول مجدداً */
 function logout(){
-  stopCam(); stopGeo(); gateMode = false; store.del('rq_emp'); empId = null;
+  stopCam(); stopGeo(); gateMode = false; store.del('rq_emp'); store.del('lv_token'); store.del('rq_ver'); empId = null; closeChoice();
   $('empId').value = store.get('rq_nid') || ''; show('vLogin'); msg('loginMsg', 'تم تسجيل الخروج.', 'info');
 }
 /* تغيير رقم الهوية: يمسح الرقم المحفوظ */
@@ -642,7 +694,7 @@ async function gateVerify(){
     await loadModels(); const v = await camP;
     $('hintPunch').textContent = 'انظر للكاميرا';
     const face = await captureFace(v, 'hintPunch', 1, 10000);
-    if (!face) return showResult(false, 'لم يُلتقط الوجه', 'تأكد من الإضاءة وأن وجهك داخل الدائرة ثم أعد المحاولة.', true);
+    if (!face) return showResult(false, 'لم يُلتقط الوجه', 'تأكد من الإضاءة وأن وجهك داخل الإطار ثم أعد المحاولة.', true);
     $('ring').classList.add('found'); $('hintPunch').textContent = 'جاري مطابقة الوجه...';
     const r = await api({ action:'verify', method:'face', id:empId, device:deviceId(), descriptor:face.descriptor, photo:face.photo });
     if (r.ok || r.msg === 'إجراء غير معروف') showResult(true, 'تم التحقق من هويتك', 'أهلاً ' + empName);
@@ -677,7 +729,7 @@ async function punch(type){
   $('choiceCard').classList.add('hidden'); msg('mainMsg', '', '');
   const label = type === 'in' ? 'الحضور' : 'الانصراف';
   try {
-    scanMode('التحقق من بصمة الوجه - ' + (type === 'in' ? 'حضور' : 'انصراف'), 'ضع وجهك داخل الدائرة وانظر للكاميرا');
+    scanMode('التحقق من بصمة الوجه - ' + (type === 'in' ? 'حضور' : 'انصراف'), 'ضع وجهك داخل الإطار وانظر للكاميرا');
     $('hintPunch').textContent = 'جاري تشغيل الكاميرا...';
     const camP = startCam('vidPunch');
     const loc = await freshLocation();
@@ -688,7 +740,7 @@ async function punch(type){
     await loadModels(); const v = await camP;
     $('hintPunch').textContent = 'انظر للكاميرا';
     const face = await captureFace(v, 'hintPunch', 1, 10000);
-    if (!face){ showResult(false, 'لم يُلتقط الوجه', 'تأكد من الإضاءة وأن وجهك داخل الدائرة ثم أعد المحاولة.', true); return; }
+    if (!face){ showResult(false, 'لم يُلتقط الوجه', 'تأكد من الإضاءة وأن وجهك داخل الإطار ثم أعد المحاولة.', true); return; }
     $('ring').classList.add('found'); $('hintPunch').textContent = 'جاري مطابقة الوجه...';
     const r = await api({ action:'punch', type, method:'face', id:empId, device:deviceId(),
                           lat:loc.lat, lng:loc.lng, accuracy:loc.accuracy, descriptor:face.descriptor, photo:face.photo });
@@ -708,13 +760,13 @@ function openChoice(type, pinFirst){
   $('pinFallback').value = ''; msg('pinMsg', '', ''); msg('mainMsg', '', '');
   $('pinBox').classList.toggle('hidden', !pinFirst); $('chPin').classList.toggle('sel', !!pinFirst);
   $('choiceCard').classList.remove('hidden');
-  $('choiceCard').scrollIntoView({ behavior:'smooth', block:'center' });
   if (pinFirst) $('pinFallback').focus();
 }
 function closeChoice(){ $('choiceCard').classList.add('hidden'); }
 $('chFace').onclick = () => { closeChoice(); punch(lastType); };
 $('chPin').onclick = () => { $('pinBox').classList.remove('hidden'); $('chPin').classList.add('sel'); $('pinFallback').focus(); };
 $('btnChoiceCancel').onclick = closeChoice;
+$('choiceCard').onclick = e => { if (e.target === $('choiceCard')) closeChoice(); };
 $('btnPinGo').onclick = () => pinPunch(lastType);
 function openPin(){ openChoice(lastType, true); }
 
@@ -741,7 +793,7 @@ async function pinPunch(pinType){
 $('btnIn').onclick = () => { if (!$('btnIn').disabled) openChoice('in'); };
 $('btnOut').onclick = () => { if (!$('btnOut').disabled) openChoice('out'); };
 $('btnCancel').onclick = closeVerify;
-$('lnkRemind').onclick = () => msg('mainMsg', 'أضف التذكير إلى تقويم جوالك: تنبيه الساعة 1:15 م لبصمة الحضور، والساعة 5:30 م لبصمة الخروج، من الأحد إلى الأربعاء.', 'info');
+$('lnkRemind').onclick = () => msg('mainMsg', 'أضف التذكير إلى تقويم جوالك: تنبيه الساعة 3:40 م لبصمة الحضور، والساعة 5:45 م لبصمة الخروج، من الأحد إلى الأربعاء.', 'info');
 
 /* ---------- التقارير ---------- */
 const rep = { period:'day', date:null, seq:0 };
@@ -828,7 +880,7 @@ $('btnReports').onclick = openReports;
 /* ---------- الإجازات والاستئذان: تُرفع لمدير المجمع عبر برنامج مثاني ---------- */
 const MTHANI_API = 'https://script.google.com/macros/s/AKfycbx1n59uCh_fri9XsUyxZlB7bXst4Ay-gZzKn8hIiQjunFotQQsEfE_8eQbhNmshHcI/exec';
 let LV = null;
-async function mApi(data){ const t = store.get('lv_token'); if (t) data.token = t; const r = await fetch(MTHANI_API, { method:'POST', body: JSON.stringify(data) }); return r.json(); }
+async function mApi(data, noTok){ const t = store.get('lv_token'); if (t && !noTok) data.token = t; const r = await fetch(MTHANI_API, { method:'POST', body: JSON.stringify(data) }); return r.json(); }
 function lvFill(id, list){ const s = $(id); s.innerHTML = ''; list.forEach(x => { const o = document.createElement('option'); o.value = o.textContent = x; s.appendChild(o); }); }
 async function openLeave(){
   show('vLeave'); $('lvAuth').classList.add('hidden'); ['lvForm','lvPend','lvMine'].forEach(x => $(x).classList.add('hidden')); msg('lvMsg', 'جاري التحميل...', 'info');
@@ -877,18 +929,18 @@ $('btnLvSend').onclick = async () => {
     LV = r; msg('lvFMsg', r.msg, 'ok'); $('lvReason').value = ''; $('lvLink').value = ''; renderLeave(); }
   catch(e){ msg('lvFMsg', 'تعذّر الاتصال بالخادم.', 'err'); } finally { $('btnLvSend').disabled = false; }
 };
-$('btnLeave').onclick = openLeave;
+$('btnLeave').onclick = () => msg('mainMsg', 'الإجازات والاستئذان: قريباً بإذن الله.', 'info');
 /* نقل البصمة لجوال جديد برمز مثاني (لمن غيّر جواله أو فتح الصفحة من متصفح آخر) */
 $('btnRebind').onclick = async () => {
-  const pin = $('rbPin').value; if (!/^\d{4,6}$/.test(pin)) return msg('loginMsg', 'أدخل رمزك في برنامج مثاني.', 'err');
+  const pin = $('rbPin').value, has = !!store.get('lv_token'); if (!has && !/^\d{4,6}$/.test(pin)) return msg('loginMsg', 'أدخل رمزك في برنامج مثاني.', 'err');
   $('btnRebind').disabled = true;
   try {
-    const l = await mApi({ action:'login', nid:empId, pin:pin }); if (!l.ok) return msg('loginMsg', l.msg, 'err'); store.set('lv_token', l.token);
+    if (!has){ const l = await mApi({ action:'login', nid:empId, pin:pin }); if (!l.ok) return msg('loginMsg', l.msg, 'err'); store.set('lv_token', l.token); }
     const r = await mApi({ action:'fpRebind', device:deviceId() }); if (!r.ok) return msg('loginMsg', r.msg, 'err');
     rbMode(false); msg('loginMsg', r.msg, 'ok'); await route();
   } catch(e){ msg('loginMsg', 'تعذّر الاتصال بالخادم.', 'err'); } finally { $('btnRebind').disabled = false; }
 };
-function rbMode(on){ $('rebindBox').classList.toggle('hidden', !on); ['empId', 'btnLogin'].forEach(id => $(id).classList.toggle('hidden', on)); document.querySelector('label[for=empId]').classList.toggle('hidden', on); }
+function rbMode(on){ $('rebindBox').classList.toggle('hidden', !on); ['rbPin'].forEach(id => $(id).classList.toggle('hidden', !!store.get('lv_token'))); document.querySelector('label[for=rbPin]').classList.toggle('hidden', !!store.get('lv_token')); ['empPin', 'empPinL', 'pinHelp'].forEach(id => $(id).classList.toggle('hidden', on)); ['empId', 'btnLogin'].forEach(id => $(id).classList.toggle('hidden', on)); document.querySelector('label[for=empId]').classList.toggle('hidden', on); }
 $('btnRebindNo').onclick = () => { rbMode(false); store.del('rq_emp'); msg('loginMsg', '', ''); };
 $('btnLvBack').onclick = () => { show('vMain'); lockPunch(!inRange); };
 $('btnRepBack').onclick = () => { show('vMain'); lockPunch(!inRange); };
@@ -911,6 +963,7 @@ function tick(){
   $('today').textContent = now.toLocaleDateString('ar-SA', { ...tz, weekday:'long', day:'numeric', month:'long', year:'numeric' });
   $('todayG').textContent = now.toLocaleDateString('ar-SA-u-ca-gregory', { ...tz, day:'numeric', month:'long', year:'numeric' }) + ' م';
 }
+document.addEventListener('visibilitychange', () => { if (document.hidden){ if (geoWatch !== null){ navigator.geolocation.clearWatch(geoWatch); geoWatch = null; } } else if (!$('vMain').classList.contains('hidden')) startGeo(); });
 tick(); setInterval(() => { tick(); if (!$('vMain').classList.contains('hidden') && !punching) lockPunch(!inRange); }, 1000);
 
 boot();
