@@ -186,7 +186,8 @@
   .sheet h2{text-align:center;margin-bottom:4px} .sheet .sub{text-align:center;color:var(--muted);font-size:14px;margin:0 0 14px}
   .choice button{padding:22px 8px;font-size:17px}
   .tools button.soon{opacity:.55;cursor:not-allowed;position:relative} .tools button.soon i{font-style:normal;font-size:11px;background:var(--goldlight);color:var(--gold2);border-radius:99px;padding:1px 8px}
-  .sheet.hidden,.tools .hidden{display:none!important}
+  .sheet.hidden,.tools .hidden,#choiceCard .choice.hidden{display:none!important}
+  .tools a.on{color:var(--green,#0E7C66);border-color:currentColor}
   .inst{margin-top:10px;font-size:13px;line-height:1.7}
   small{color:var(--muted);display:block;margin-top:8px;line-height:1.6}
 </style>
@@ -201,7 +202,7 @@
 <main>
   <!-- 1) إدخال الرقم الوظيفي -->
   <section id="vLogin" class="card hidden">
-    <h2>الدخول</h2>
+    <h2>بيانات الدخول</h2>
     <div id="rebindBox" class="hidden">
       <label for="rbPin">رمزك السري في برنامج مثاني</label>
       <input id="rbPin" type="password" inputmode="numeric" maxlength="6" placeholder="الرمز السري">
@@ -210,10 +211,9 @@
     </div>
     <label for="empId">رقم الهوية / الإقامة</label>
     <input id="empId" inputmode="numeric" autocomplete="username" placeholder="10 أرقام" maxlength="15">
-    <label for="empPin" id="empPinL">الرمز السري (نفس رمز برنامج مثاني)</label>
+    <label for="empPin" id="empPinL">الرمز السري (رمز برنامج مثاني)</label>
     <input id="empPin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="الرمز السري" maxlength="6">
     <button class="primary" id="btnLogin">دخول</button>
-    <small id="pinHelp">أول دخول: الرمز 123456، ثم غيّره من برنامج مثاني ← الإعدادات. وإذا غيّرت رمزك في مثاني يتغير هنا تلقائياً.</small>
     <div id="loginMsg"></div>
   </section>
 
@@ -230,14 +230,14 @@
       <button class="link hidden" id="btnRetake">إعادة الالتقاط</button>
     </div>
     <div id="enrollPin" class="hidden">
-      <small>اختر رمزاً من 4 أرقام، تستخدمه إذا تعذّرت بصمة الوجه.</small>
+      <small id="pinIntro">اختر رمزاً من 4 أرقام، تستخدمه إذا تعذّرت بصمة الوجه.</small>
       <label for="pin1">الرمز البديل</label>
       <input id="pin1" type="password" inputmode="numeric" maxlength="4">
       <label for="pin2">تأكيد الرمز</label>
       <input id="pin2" type="password" inputmode="numeric" maxlength="4">
       <button class="primary" id="btnEnroll">إرسال للاعتماد</button>
       <button class="link" id="btnBackFace">رجوع لإعادة التقاط الوجه</button>
-      <small>بالضغط على "إرسال للاعتماد" توافق على حفظ صورة وجهك لدى إدارة المجمع لغرض إثبات الحضور فقط.</small>
+      <small id="faceConsent">بالضغط على "إرسال للاعتماد" توافق على حفظ صورة وجهك لدى إدارة المجمع لغرض إثبات الحضور فقط.</small>
     </div>
     <div id="enrollMsg"></div>
   </section>
@@ -281,7 +281,7 @@
     <div class="tools">
       <button id="btnReports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M8 17v-5"/><path d="M13 17V8"/><path d="M18 17v-8"/></svg>التقارير</button>
       <button id="btnLeave" class="soon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>الإجازات والاستئذان <i>قريباً</i></button>
-      <a id="lnkRemind" href="reminders.ics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>التذكير</a>
+      <a id="lnkRemind" href="reminders.ics" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="pushLbl">التنبيهات</span></a>
     </div>
   </section>
 
@@ -363,7 +363,7 @@
       <div id="pinBox" class="hidden">
         <input id="pinFallback" type="password" inputmode="numeric" maxlength="4" placeholder="الرمز البديل (4 أرقام)">
         <button class="primary" id="btnPinGo">تأكيد</button>
-        <small>التسجيل بالرمز البديل يُعلَّم للمراجعة من الإدارة.</small>
+        <small id="pinReviewNote">التسجيل بالرمز البديل يُعلَّم للمراجعة من الإدارة.</small>
       </div>
       <div id="pinMsg"></div>
       <button class="link" id="btnChoiceCancel">إلغاء</button>
@@ -386,7 +386,7 @@ const store = {
   set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
   del(k){ try { localStorage.removeItem(k); } catch(e){} }
 };
-let todayP = { date:'', in:'', out:'' };
+let todayP = { date:'', in:'', out:'' }, noFaceMode = false;
 let geoWatch = null, lastLoc = null, inRange = false, enrollData = null;
 let gateMode = false, empName = '', cfg = null, empId = null, stream = null, modelsReady = null, punching = false, faceFails = 0;
 
@@ -588,7 +588,10 @@ async function route(){
   catch(e){ show('vLogin'); msg('loginMsg', 'تعذّر الاتصال بالخادم. تحقق من الإنترنت.', 'err'); return; }
   if (!st.ok){ store.del('rq_emp'); store.del('rq_nid'); show('vLogin'); msg('loginMsg', st.msg, 'err'); return; }
   store.set('rq_emp', empId); store.set('rq_nid', empId);
-  if (st.status === 'غير مسجل' || st.status === 'مرفوض'){
+  noFaceMode = !!st.noFace;
+  if (noFaceMode && st.status !== 'معتمد'){
+    $('enrollName').textContent = 'أهلاً ' + st.name; show('vEnroll'); enrollNoFace();
+  } else if (st.status === 'غير مسجل' || st.status === 'مرفوض'){
     $('enrollName').textContent = 'أهلاً ' + st.name;
     show('vEnroll'); enrollStep(1);
     startEnrollCapture();
@@ -602,7 +605,7 @@ async function route(){
     setToday(st.today);
     if (st.otherDevice){ show('vLogin'); rbMode(true); $('rbPin').value = ''; msg('loginMsg', 'هذا ليس جوالك المسجل. يمكنك نقل بصمتك إلى هذا الجوال برمزك في برنامج مثاني.', 'info'); return; }
     rbMode(false);
-    loadModels();
+    if (!noFaceMode) loadModels();
     $('btnReports').classList.toggle('hidden', ADMIN_NIDS.indexOf(store.get('rq_nid') || '') === -1);
     enterMain();
   }
@@ -631,6 +634,15 @@ function enrollStep(n){
   $('enrollTitle').textContent = n === 1 ? 'الخطوة ١: بصمة الوجه' : 'الخطوة ٢: الرمز البديل';
   msg('enrollMsg', '', '');
   if (n === 2){ $('pin1').value = $('pin2').value = ''; $('pin1').focus(); }
+}
+
+/* المعفى من بصمة الوجه بقرار الإدارة: ينشئ رمزاً بديلاً فقط ويُعتمد مباشرة */
+function enrollNoFace(){
+  enrollStep(2);
+  $('st1').classList.add('hidden'); $('st2').textContent = 'الرمز البديل';
+  $('enrollTitle').textContent = 'إنشاء الرمز البديل';
+  $('pinIntro').textContent = 'اختر رمزاً من 4 أرقام. هذا الرمز يقوم مقام بصمة الوجه، وستستخدمه في كل تسجيل حضور وانصراف.';
+  $('btnEnroll').textContent = 'حفظ الرمز'; $('btnBackFace').classList.add('hidden'); $('faceConsent').classList.add('hidden');
 }
 
 async function startEnrollCapture(){
@@ -662,12 +674,14 @@ $('btnBackFace').onclick = () => { enrollStep(1); startEnrollCapture(); };
 
 $('btnEnroll').onclick = async () => {
   const p1 = $('pin1').value, p2 = $('pin2').value;
-  if (!enrollData){ enrollStep(1); return startEnrollCapture(); }
+  if (!enrollData && !noFaceMode){ enrollStep(1); return startEnrollCapture(); }
   if (!/^\d{4}$/.test(p1)) return msg('enrollMsg', 'الرمز البديل يجب أن يكون 4 أرقام', 'err');
   if (p1 !== p2) return msg('enrollMsg', 'الرمزان غير متطابقين', 'err');
   const b = $('btnEnroll'); b.disabled = true; msg('enrollMsg', 'جاري الإرسال...', 'info');
   try {
-    const r = await api({ action:'enroll', id:empId, device:deviceId(), pin:p1, descriptor:enrollData.descriptor, photo:enrollData.photo });
+    const r = noFaceMode ? await api({ action:'enroll', id:empId, device:deviceId(), pin:p1 })
+                         : await api({ action:'enroll', id:empId, device:deviceId(), pin:p1, descriptor:enrollData.descriptor, photo:enrollData.photo });
+    if (r.ok && r.approved){ msg('enrollMsg', r.msg, 'ok'); b.disabled = false; return route(); }
     if (r.ok){ enrollData = null; $('pendingName').textContent = ''; show('vPending'); msg('pendingMsg', r.msg, 'info'); }
     else msg('enrollMsg', r.msg, 'err');
   } catch(e){ msg('enrollMsg', 'تعذّر الاتصال بالخادم. أعد المحاولة.', 'err'); }
@@ -727,7 +741,7 @@ function showResult(ok, title, text, retry){
 function closeVerify(){ stopCam(); $('camCard').classList.add('hidden'); }
 
 /* ---------- التحقق بالوجه عند الدخول ---------- */
-function enterMain(){ gateMode = false; closeVerify(); show('vMain'); startGeo(); }
+function enterMain(){ gateMode = false; closeVerify(); show('vMain'); startGeo(); pushUi(); }
 
 async function gateVerify(){
   gateMode = true; show('none');
@@ -809,6 +823,10 @@ function openChoice(type, pinFirst){
   lastType = type;
   $('choiceTitle').textContent = type === 'in' ? 'تسجيل حضور' : 'تسجيل انصراف';
   $('pinFallback').value = ''; msg('pinMsg', '', ''); msg('mainMsg', '', '');
+  if (noFaceMode) pinFirst = true;
+  document.querySelector('#choiceCard .choice').classList.toggle('hidden', noFaceMode);
+  $('choiceCard').querySelector('.sub').textContent = noFaceMode ? 'أدخل رمزك البديل' : 'اختر طريقة التحقق';
+  $('pinReviewNote').classList.toggle('hidden', noFaceMode);
   $('pinBox').classList.toggle('hidden', !pinFirst); $('chPin').classList.toggle('sel', !!pinFirst);
   $('choiceCard').classList.remove('hidden');
   if (pinFirst) $('pinFallback').focus();
@@ -831,8 +849,8 @@ async function pinPunch(pinType){
     msg('pinMsg', 'جاري التسجيل...', 'info');
     const loc = await freshLocation();
     let photo = '';
-    try { const v = await startCam('vidPunch'); await sleep(800); photo = snapshot(v); } catch(e){}
-    stopCam();
+    if (!noFaceMode){ try { const v = await startCam('vidPunch'); await sleep(800); photo = snapshot(v); } catch(e){}
+    stopCam(); }
     const r = await api({ action:'punch', type:pinType, method:'pin', pin, id:empId, device:deviceId(),
                           lat:loc.lat, lng:loc.lng, accuracy:loc.accuracy, photo });
     if (r.ok){ closeChoice(); markPunch(pinType); showResult(true, 'تم تسجيل ' + (pinType === 'in' ? 'الحضور' : 'الانصراف') + ' بالرمز', r.msg + (r.review ? ' (سيُراجع من الإدارة)' : '')); }
@@ -844,7 +862,48 @@ async function pinPunch(pinType){
 $('btnIn').onclick = () => { if (!$('btnIn').disabled) openChoice('in'); };
 $('btnOut').onclick = () => { if (!$('btnOut').disabled) openChoice('out'); };
 $('btnCancel').onclick = closeVerify;
-$('lnkRemind').onclick = () => msg('mainMsg', 'أضف التذكير إلى تقويم جوالك: تنبيه الساعة 3:40 م لبصمة الحضور، والساعة 5:45 م لبصمة الخروج، من الأحد إلى الأربعاء.', 'info');
+/* ---------- التنبيهات عبر OneSignal (تُرسل فقط لمن لم يبصم) ---------- */
+let osReady = null;
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function pushInit(){
+  if (osReady) return osReady;
+  if (!cfg || !cfg.push || !('serviceWorker' in navigator) || !('Notification' in window)) return Promise.resolve(null);
+  osReady = new Promise(res => {
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async OS => {
+      try {
+        await OS.init({ appId:cfg.push, serviceWorkerPath:'hudoor/OneSignalSDKWorker.js', serviceWorkerParam:{ scope:'/hudoor/' } });
+        if (empId) await OS.login(empId);
+        res(OS);
+      } catch(e){ console.warn('push', e); res(null); }
+    });
+    const sc = document.createElement('script'); sc.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'; sc.defer = true;
+    sc.onerror = () => res(null); document.head.appendChild(sc);
+  });
+  return osReady;
+}
+async function pushUi(){
+  const OS = await pushInit();
+  const on = !!(OS && OS.Notifications.permission && OS.User.PushSubscription.optedIn);
+  $('pushLbl').textContent = on ? 'التنبيهات مفعّلة' : 'تفعيل التنبيهات';
+  $('lnkRemind').classList.toggle('on', on);
+}
+$('lnkRemind').onclick = async ev => {
+  ev.preventDefault();
+  const hint = 'التنبيه: ' + ampm('15:40') + ' لبصمة الحضور، و' + ampm('17:25') + ' لبصمة الخروج، ويصل فقط إن لم تكن بصمت.';
+  if (isIOS && !standalone()) return msg('mainMsg', 'على الآيفون: اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية»، وافتح نظام البصمة من الأيقونة، ثم فعّل التنبيهات من هنا.', 'info');
+  if (!cfg || !cfg.push || !('Notification' in window)){ location.href = 'reminders.ics'; return msg('mainMsg', 'أضف التذكير إلى تقويم جوالك: 3:40 م لبصمة الحضور و5:25 م لبصمة الخروج، من الأحد إلى الأربعاء.', 'info'); }
+  if (Notification.permission === 'denied') return msg('mainMsg', 'التنبيهات محظورة لهذا الموقع. فعّلها من إعدادات المتصفح أو الجوال ثم أعد المحاولة.', 'err');
+  const perm = Notification.permission === 'granted' ? Promise.resolve('granted') : Notification.requestPermission();
+  msg('mainMsg', 'جاري تفعيل التنبيهات...', 'info');
+  try {
+    if (await perm !== 'granted') return msg('mainMsg', 'لم يتم السماح بالتنبيهات.', 'err');
+    const OS = await pushInit(); if (!OS) return msg('mainMsg', 'تعذّر تفعيل التنبيهات على هذا الجهاز.', 'err');
+    await OS.login(empId); await OS.User.PushSubscription.optIn();
+    await pushUi(); msg('mainMsg', 'تم تفعيل التنبيهات ✔ ' + hint, 'ok');
+  } catch(e){ msg('mainMsg', 'تعذّر تفعيل التنبيهات: ' + e.message, 'err'); }
+};
 
 /* ---------- التقارير ---------- */
 const rep = { period:'day', date:null, seq:0 };
@@ -991,7 +1050,7 @@ $('btnRebind').onclick = async () => {
     rbMode(false); msg('loginMsg', r.msg, 'ok'); await route();
   } catch(e){ msg('loginMsg', 'تعذّر الاتصال بالخادم.', 'err'); } finally { $('btnRebind').disabled = false; }
 };
-function rbMode(on){ $('rebindBox').classList.toggle('hidden', !on); ['rbPin'].forEach(id => $(id).classList.toggle('hidden', !!store.get('lv_token'))); document.querySelector('label[for=rbPin]').classList.toggle('hidden', !!store.get('lv_token')); ['empPin', 'empPinL', 'pinHelp'].forEach(id => $(id).classList.toggle('hidden', on)); ['empId', 'btnLogin'].forEach(id => $(id).classList.toggle('hidden', on)); document.querySelector('label[for=empId]').classList.toggle('hidden', on); }
+function rbMode(on){ $('rebindBox').classList.toggle('hidden', !on); ['rbPin'].forEach(id => $(id).classList.toggle('hidden', !!store.get('lv_token'))); document.querySelector('label[for=rbPin]').classList.toggle('hidden', !!store.get('lv_token')); ['empPin', 'empPinL'].forEach(id => $(id).classList.toggle('hidden', on)); ['empId', 'btnLogin'].forEach(id => $(id).classList.toggle('hidden', on)); document.querySelector('label[for=empId]').classList.toggle('hidden', on); }
 $('btnRebindNo').onclick = () => { rbMode(false); store.del('rq_emp'); msg('loginMsg', '', ''); };
 $('btnLvBack').onclick = () => { show('vMain'); lockPunch(!inRange); };
 $('btnRepBack').onclick = () => { show('vMain'); lockPunch(!inRange); };
