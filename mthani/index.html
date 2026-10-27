@@ -189,6 +189,8 @@
   .stact button.warn{color:var(--gold2)}
   .stact button.danger{color:var(--red)}
   .stact button.good{color:var(--ok)}
+  .mini.rvok{background:#1E8E4E;color:#fff;border-color:#1E8E4E} .mini.rvno{background:#FCE8E6;color:#B3261E;border-color:#F2B8B5}
+  #btnReeval{margin-top:8px} #btnReeval:disabled{background:#C9CFD4;color:#5F6B74;opacity:1;cursor:not-allowed}
   .stact button:disabled{opacity:.5}
   .pill.p-red{background:var(--errbg);color:var(--red)}
   .empno{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:12px 0 2px;padding:10px 12px;border-radius:12px;background:var(--light);font-size:14px}
@@ -475,7 +477,7 @@
   .warnbox{background:var(--errbg);color:var(--red);border-radius:10px;padding:6px 10px;font-size:13px;margin-top:6px}
   .edgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
   .edgrid .full{grid-column:1/-1}
-  @media (max-width:430px){ .stact button span{display:none} .stact button{padding:8px 12px} }
+  @media (max-width:430px){ .stact button span{display:none} .stact button{padding:8px 12px} .stact.lbl{flex-wrap:wrap} .stact.lbl button span{display:inline} .stact.lbl button{padding:7px 10px} }
   .asrow{padding:12px 0;border-bottom:1px solid var(--line)}
   .asrow:last-child{border-bottom:0}
   .asrow .top{display:flex;align-items:center;gap:8px}
@@ -1041,6 +1043,7 @@
       <div class="card" id="apprCard">
         <div id="apprState" class="muted" style="font-size:14px"></div>
         <button class="btn gold" id="btnApprove">اعتماد التقييمات</button>
+        <button class="btn soft hidden" id="btnReeval" type="button">طلب إعادة تقييم</button>
       </div>
     </div>
 
@@ -1117,6 +1120,10 @@
     </div>
 
     <!-- تعديل حلقة -->
+    <div id="pReeval" class="hidden">
+      <div class="card"><h2>طلبات إعادة التقييم في حلقة</h2><small>طلبات المعلمين لإعادة فتح تقييم يوم بعد اعتماده. عند الموافقة يستطيع المعلم التعديل ثم الاعتماد مرة أخرى دون إعادة إرسال الرسائل.</small></div>
+      <div class="card" id="rvList"></div>
+    </div>
     <div id="pRemote" class="hidden">
       <div class="card">
         <h2>تفعيل حلقة عن بعد</h2>
@@ -1220,7 +1227,7 @@
     <!-- الطلاب المرشحون: ترشيحات المعلمين + الاختبار قبل الترشيح + الموافقة -->
     <div id="pExam" class="hidden">
       <div class="card">
-        <div class="exhead"><h2>اختبارات الجمعية</h2><span class="grow"></span><button class="mini" id="exSupBtn" type="button">مشرفو الجمعية</button><button class="mini good" id="exAdd" type="button">+ إضافة طالب للاختبار القبلي</button></div>
+        <div class="exhead"><h2>المرشحون لاختبار المرحليات</h2><span class="grow"></span><button class="mini" id="exSupBtn" type="button">مشرف الجمعية</button><button class="mini good" id="exAdd" type="button">+ إضافة طالب للاختبار القبلي</button></div>
         <div class="exsteps" id="exSteps"></div>
         <div class="stchips" id="exSub"></div>
         <input id="exQ" placeholder="ابحث باسم الطالب أو الحلقة" style="margin-top:8px">
@@ -2138,7 +2145,7 @@
     <small class="muted" id="hlCapN"></small>
     <label for="hlT">معلم الحلقة</label><select id="hlT"></select>
     <label for="hlNotes">ملاحظات</label><input id="hlNotes" maxlength="200">
-    <label class="chk" style="margin-top:12px"><input type="checkbox" id="hlOn"> الحلقة نشطة</label>
+    <label class="chk hidden" style="margin-top:12px"><input type="checkbox" id="hlOn"> الحلقة نشطة</label>
     <label class="chk hidden" style="margin-top:8px"><input type="checkbox" id="hlRemote"> حلقة عن بعد</label>
     <button class="btn" id="hlSave">حفظ التعديلات</button>
     <div id="hlMsg"></div>
@@ -2433,6 +2440,7 @@ async function loadHome(){
   n.classList.add('groups'); document.body.classList.add('gnav');
   const supRO = admin && r.ro && !r.peek; document.body.classList.toggle('suro', supRO);
   if (supRO){ $('gsWrap').classList.add('hidden'); buildAdminNav(n, RO_NAV); }
+  if (!admin && r.canFix && !TABS.some(x => x[0] === 'reeval')) TABS.push(['reeval', 'طلبات إعادة التقييم في حلقة']);
   else if (admin) buildAdminNav(n); else buildAdminNav(n, userNav(TABS));
   show('vHome');
   restoreRoute(); updBell(); clearInterval(window._bellT); window._bellT = setInterval(() => { if (!document.hidden) refreshCounts(); }, 300000);
@@ -2440,7 +2448,7 @@ async function loadHome(){
 }
 /* قائمة بقية المستخدمين بنفس أسلوب المدير: الاختبارات والمعاملات مجموعتان، والباقي تبويبات مباشرة */
 function userNav(T){
-  const out = [], grp = { preT:['الاختبارات', 'exam'], assocT:['الاختبارات', 'exam'], trxS:['المعاملات', 'exam'], trxR:['المعاملات', 'exam'] }, seen = {};
+  const out = [], grp = { halaqaNew:['الحلقات', 'halaqa'], halaqaEdit:['الحلقات', 'halaqa'], reeval:['الحلقات', 'halaqa'], preT:['الاختبارات', 'exam'], assocT:['الاختبارات', 'exam'], trxS:['المعاملات', 'exam'], trxR:['المعاملات', 'exam'] }, seen = {};
   const icOf = k => ICONS[k] ? k : ({ candsT:'exam', ann:'chat', repStu:'report', repEdu:'report', stuBrief:'users', planF:'plans', studentsList:'users' }[k] || 'exam');
   T.forEach(x => { const g = grp[x[0]]; if (!g){ out.push({ t:x[1], ic:icOf(x[0]), r:x[0] }); return; }
     if (!seen[g[0]]){ seen[g[0]] = { t:g[0], ic:g[1], items:[] }; out.push(seen[g[0]]); } seen[g[0]].items.push(x); });
@@ -2450,7 +2458,7 @@ function userNav(T){
 const ADMIN_NAV = [
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير بصمة الحضور'], ['courses', 'الدورات التدريبية']] },
-  { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['remote', 'تفعيل حلقة عن بعد']] },
+  { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['planF', 'شاشة عرض متابعة الخطط']] },
   { t:'الاختبارات', ic:'exam', r:'exams' },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
@@ -2536,6 +2544,7 @@ function openRole(r, title, group){
   $('pHalNew').classList.toggle('hidden', r !== 'halaqaNew');
   if (r === 'halaqaNew') openHalNew();
   $('pRemote').classList.toggle('hidden', r !== 'remote'); if (r === 'remote') openRemote();
+  $('pReeval').classList.toggle('hidden', r !== 'reeval'); if (r === 'reeval') openReeval();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
   if (r === 'cands' || r === 'preT' || r === 'assocT' || r === 'assocNom' || r === 'exGrp') r = role = 'exams';
@@ -2804,8 +2813,8 @@ async function loadAtt(){
   let r;
   try { r = await api({ action:'attendance', hid:hal, date:day }); } catch(e){ if (e.message !== 'expired') msg('stuList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (!r.ok) return msg('stuList', r.msg, 'err');
-  dayCanFix = !!r.canFix; teachRO = !!r.ro || !!r.locked; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !r.ro); zmTeachBar();
-  studs = r.students; exStuds = r.excluded || []; approval = r.approval; renderStuds(); renderAppr();
+  dayCanFix = !!r.canFix; teachVO = !!r.ro; teachRO = !!r.ro || !!r.locked; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !r.ro); zmTeachBar();
+  studs = r.students; exStuds = r.excluded || []; approval = r.approval; reeval = r.reeval || null; renderStuds(); renderAppr();
   if (!r.studyDay) $('saveState').textContent = 'تنبيه: هذا اليوم ليس من أيام الدراسة.';
 }
 const EVT = () => (D.types || []).slice();   // حفظ، مراجعة قريبة، مراجعة بعيدة، تلاوة
@@ -3176,15 +3185,42 @@ async function saveCurrent(){
 
 /* ---------- اعتماد التقييمات وفارس الحلقة ---------- */
 /* بعد الاعتماد يُقفل اليوم: لا تعديل للحضور ولا للتقييم ولا للاعتماد (المدير وحده يستطيع التصحيح) */
-let dayCanFix = false;   // المدير والشؤون التعليمية يصححان بعد الاعتماد
-function lockDay(){ if (dayCanFix) return; teachRO = true; $('pTeach').classList.add('ro'); }
+let dayCanFix = false, reeval = null, teachVO = false;
+$('btnReeval').onclick = () => confirmOp('طلب إعادة تقييم', 'يُرسل الطلب إلى الإدارة لإعادة فتح تقييم هذا اليوم. يُسمح بطلب واحد فقط لكل يوم.', 'إرسال الطلب', async () => {
+  $('btnReeval').disabled = true;
+  try { const r = await api({ action:'reevalReq', hid:hal, date:day }); toast(r.msg); if (r.ok){ reeval = r.reeval; renderAppr(); } else $('btnReeval').disabled = !!reeval; }
+  catch(e){ $('btnReeval').disabled = false; if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
+});
+/* طلبات إعادة التقييم (مدير المجمع والشؤون التعليمية) */
+async function openReeval(){ $('rvList').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'reevalList' }, 'rvList'); if (r && r.ok) renderReeval(r.list); }
+function renderReeval(list){
+  const box = $('rvList'); box.innerHTML = ''; if (D){ D.reevalN = list.length; updBell(); }
+  if (!list.length) return box.appendChild(el('small', '', 'لا توجد طلبات إعادة تقييم.'));
+  list.forEach((x, i) => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('span', 'snum', i + 1)); tp.appendChild(el('b', '', x.hname)); w.appendChild(tp);
+    const m = el('div', 'meta'); [['المعلم', x.tname], ['يوم التقييم', fmtD(x.date, { weekday:'long', day:'numeric', month:'long' })], ['وقت الطلب', x.at.slice(0, 16)]].forEach(p => { const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); }); w.appendChild(m);
+    const ac = el('div', 'txacts'), ok = el('button', 'mini rvok', '✓ موافق'), no = el('button', 'mini rvno', '✕ رفض');
+    const go = async v => { ok.disabled = no.disabled = true; try { const r = await api({ action:'reevalDecide', id:x.id, ok:v }); toast(r.msg); if (r.list) renderReeval(r.list); else ok.disabled = no.disabled = false; } catch(e){ ok.disabled = no.disabled = false; } };
+    ok.onclick = () => go(true); no.onclick = () => confirmOp('رفض الطلب', 'سيظهر للمعلم أن طلبه رُفض، ولا يستطيع الطلب مرة أخرى لهذا اليوم.', 'رفض', () => go(false));
+    ac.appendChild(ok); ac.appendChild(no); w.appendChild(ac); box.appendChild(w); });
+}   // المدير والشؤون التعليمية يصححان بعد الاعتماد
+function lockDay(){ if (dayCanFix) return; teachRO = true; $('pTeach').classList.add('ro'); if (approval) approval.reopen = false; renderAppr(); }
 function renderAppr(){
-  const st = $('apprState'); st.innerHTML = '';
-  if (approval){
+  const st = $('apprState'); st.innerHTML = ''; const rv = $('btnReeval'); rv.classList.add('hidden');
+  if (approval && approval.reopen){
+    st.appendChild(el('div', 'msg info', 'أُعيد فتح تقييم هذا اليوم بموافقة الإدارة. عدّل ما تحتاج ثم اعتمد مرة أخرى (لن تُعاد رسائل أولياء الأمور).'));
+    $('btnApprove').textContent = 'اعتماد التقييمات';
+  } else if (approval){
     const d = el('div', 'appr', '✓ تم اعتماد تقييمات هذا اليوم' + (approval.at ? ' الساعة ' + approval.at : ''));
     st.appendChild(d);
     if (approval.starName) st.appendChild(el('div', '', '⭐ فارس الحلقة: ' + approval.starName));
     $('btnApprove').textContent = 'تعديل الاعتماد';
+    // المعلم بعد الاعتماد: طلب إعادة تقييم واحد فقط
+    if (teachRO && !dayCanFix && !teachVO){
+      rv.classList.remove('hidden'); rv.disabled = !!reeval;
+      rv.textContent = !reeval ? 'طلب إعادة تقييم' : reeval.status === 'بانتظار' ? 'تم إرسال طلب إعادة التقييم' : reeval.status === 'مرفوض' ? 'رُفض طلب إعادة التقييم' : 'سبق طلب إعادة التقييم';
+      if (reeval && reeval.status === 'مرفوض') st.appendChild(el('div', 'msg err', 'رُفض طلب إعادة التقييم لهذا اليوم من الإدارة.'));
+      if (reeval && reeval.status === 'بانتظار') st.appendChild(el('div', 'msg info', 'طلب إعادة التقييم بانتظار موافقة الإدارة.'));
+    }
   } else {
     st.textContent = studs.some(s => !s.att) ? 'حدد حالة كل طالب (حاضر، متأخر، غائب، مستأذن) قبل الاعتماد.' : '';
     $('btnApprove').textContent = 'اعتماد التقييمات';
@@ -3512,15 +3548,23 @@ function renderHalEdit(){
   list.forEach(h => {
     const w = el('div', 'strow' + (h.active ? '' : ' off')), top = el('div', 'top');
     top.appendChild(el('b', '', h.name + (h.remote ? ' 🖥️' : ''))); top.appendChild(el('span', 'pill ' + (h.cap && h.students >= h.cap ? 'p-red' : 'p-none'), h.cap ? h.students + ' / ' + h.cap + ' طالب' + (h.students >= h.cap ? ' • مكتملة' : '') : h.students + ' طالب • بلا حد'));
-    if (!h.active) top.appendChild(el('span', 'pill p-red', 'موقوفة'));
+    top.appendChild(el('span', 'pill ' + (h.active ? 'p-ok' : 'p-red'), h.active ? 'نشطة' : 'موقوفة'));
     w.appendChild(top);
     const m = el('div', 'meta'); [['رقم الحلقة', h.hid], ['المعلم', h.teacher || (h.tnid ? h.tnid : 'لم تُسند')], ['ملاحظات', h.notes]].forEach(x => { if (x[1]){ const d = el('span', '', x[0] + ': '); d.appendChild(el('i', '', x[1])); m.appendChild(d); } });
     w.appendChild(m);
-    const ac = el('div', 'stact'), b = el('button'); b.innerHTML = ST_IC.edit; b.appendChild(el('span', '', 'تعديل')); b.onclick = () => openHl(h); ac.appendChild(b);
+    const ac = el('div', 'stact lbl'), mk = (ic, t, cls, fn) => { const x = el('button', cls || ''); x.innerHTML = ST_IC[ic]; x.appendChild(el('span', '', t)); x.onclick = fn; ac.appendChild(x); };
+    mk('edit', 'تعديل', '', () => openHl(h));
+    if (h.active) mk('pause', 'إيقاف', '', () => confirmOp('إيقاف ' + h.name, h.students ? 'في الحلقة ' + h.students + ' طالباً. إيقافها يخفيها من التقييم ويبقى طلابها مسجلين عليها.' : 'تختفي الحلقة من التقييم حتى تعيد تنشيطها.', 'إيقاف', () => halOp(h, 'stop')));
+    else mk('restore', 'إعادة تنشيط', 'good', () => halOp(h, 'on'));
+    mk('trash', 'حذف', 'danger', () => confirmOp('حذف ' + h.name, h.students ? 'في الحلقة ' + h.students + ' طالباً نشطاً، فلا يمكن حذفها حتى تنقلهم إلى حلقة أخرى.' : 'تُحذف الحلقة من القوائم ويبقى سجلها السابق محفوظاً في التقارير.', 'حذف', () => halOp(h, 'del')));
     w.appendChild(ac); box.appendChild(w);
   });
 }
 $('heQ').oninput = () => HL && renderHalEdit();
+async function halOp(h, op){
+  try { const r = await api({ action:'halaqaStatus', hid:h.hid, op, force:true }); toast(needSrv(r)); if (r.ok) openHalEdit(); }
+  catch(e){ if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
+}
 function openHl(h){
   hlCur = h; hlForce = false; msg('hlMsg', '', ''); $('hlSave').textContent = 'حفظ التعديلات';
   $('hlNo').textContent = 'رقم الحلقة: ' + h.hid + ' • ' + h.students + ' طالب';
@@ -3532,7 +3576,7 @@ function openHl(h){
 $('hlOn').onchange = () => { hlForce = false; msg('hlMsg', '', ''); };
 $('hlClose').onclick = () => $('hlSheet').classList.add('hidden');
 $('hlSave').onclick = async () => {
-  const h = { hid:hlCur.hid, name:$('hlName').value.trim(), tnid:$('hlT').value, notes:$('hlNotes').value.trim(), on:$('hlOn').checked, force:hlForce, cap:$('hlCap').value.trim() };
+  const h = { hid:hlCur.hid, name:$('hlName').value.trim(), tnid:$('hlT').value, notes:$('hlNotes').value.trim(), on:hlCur.active, force:hlForce, cap:$('hlCap').value.trim() };
   if (h.name.length < 3) return msg('hlMsg', 'اكتب اسم الحلقة.', 'err');
   if (!(+h.cap >= 1 && +h.cap <= 200)) return msg('hlMsg', 'اكتب عدد الطلاب المسموح في الحلقة (من 1 إلى 200).', 'err');
   if (+h.cap < hlCur.students) return msg('hlMsg', 'في الحلقة الآن ' + hlCur.students + ' طالب، فلا يمكن أن يكون الحد أقل من ذلك. انقل بعض الطلاب أولاً.', 'err');
@@ -5942,6 +5986,7 @@ function bellItems(){
   add(c.edu, 'إحالات تعليمية جديدة', () => { rbF = 'open'; openRole('refsEdu'); });
   add(c.exam, 'ترشيحات جديدة من المعلمين', () => { if (has('preT')) openRole('preT'); else { rbF = 'open'; openRole('refsExam'); } });
   add((D && D.planReqN) || 0, 'طلبات تعديل خطط من المعلمين', () => openRole('plans'));
+  add((D && D.reevalN) || 0, 'طلبات إعادة تقييم من المعلمين', () => openRole('reeval'));
   add(t.inbox, 'معاملات واردة لم تطّلع عليها', () => { txMode = 'trxR'; txT = 'inbox'; openRole('trxR'); });
   add(t.mine, 'ردود على معاملاتك', () => { txMode = 'trxS'; txT = 'mine'; openRole('trxS'); });
   add((D && D.ann || []).filter(a => !a.read).length, 'إعلانات جديدة', () => { openRole('welcome'); setTimeout(() => { const a = $('annWelcome'); if (a) a.scrollIntoView({ behavior:'smooth', block:'center' }); }, 100); });
@@ -5949,7 +5994,7 @@ function bellItems(){
 }
 function updBell(){
   const c = refUnread();
-  const bm = { myStu:c.mine, refsStu:c.stu, refsEdu:c.edu, refsExam:c.exam, cands:c.exam, preT:c.exam, trxS:((D && D.trxN) || {}).mine || 0, trxR:(((D && D.trxN) || {}).inbox || 0) + (((D && D.trxN) || {}).memos || 0) };
+  const bm = { reeval:(D && D.reevalN) || 0, myStu:c.mine, refsStu:c.stu, refsEdu:c.edu, refsExam:c.exam, cands:c.exam, preT:c.exam, trxS:((D && D.trxN) || {}).mine || 0, trxR:(((D && D.trxN) || {}).inbox || 0) + (((D && D.trxN) || {}).memos || 0) };
   document.querySelectorAll('#nav button[data-r]').forEach(b => { const k = b.dataset.r; let x = b.querySelector('.nbdg'); const v = bm[k] || 0;
     if (!(k in bm)) return; if (!v){ if (x) x.remove(); return; } if (!x){ x = el('span', 'nbdg'); b.appendChild(x); } x.textContent = v; });
   document.querySelectorAll('#nav .ngroup').forEach(w => { const h = w.querySelector('.ghead'); if (!h) return; let x = h.querySelector('.nbdg'); const v = [...w.querySelectorAll('.gitems .nbdg')].reduce((a, y) => a + (+y.textContent || 0), 0);
