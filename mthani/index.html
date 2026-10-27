@@ -16,7 +16,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   .remember{display:flex;align-items:center;gap:8px;margin:10px 0 2px;font-weight:600;cursor:pointer} .remember input{width:20px;height:20px;margin:0;accent-color:#3B5F78}
-  .rq{color:#B3261E;font-weight:800} #rsNone.on{background:#FCE8E6;color:#B3261E;border-color:#B3261E}
+  .rq{color:#B3261E;font-weight:800}
+  .sq-wrap{position:relative;margin:8px 0 4px} .sq-wrap input{width:100%;margin:0}
+  .sq-list{position:absolute;inset-inline:0;top:100%;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.14);max-height:260px;overflow:auto;margin-top:4px}
+  .sq-list button{display:flex;justify-content:space-between;width:100%;margin:0;padding:10px 14px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--text);font-size:15px;font-weight:600;border-radius:0;box-shadow:none}
+  .sq-list button small{color:var(--muted);font-weight:500} .sq-list button.on,.sq-list button:hover{background:var(--light)}
+  .mushaf-btn{margin-top:6px}
+  #mushafSheet .panel{max-width:760px}
+  .mushaf{font-family:'Amiri Quran','Amiri','Traditional Arabic',serif;font-size:26px;line-height:2.25;text-align:justify;text-align-last:center;padding:14px 16px;margin-top:10px;border-radius:14px;background:#FFFBF2;color:#1E2A33;border:2px solid #E6D3A8;box-shadow:inset 0 0 0 4px #FFFBF2,inset 0 0 0 5px #E6D3A8}
+  .mushaf .sh{display:block;text-align:center;font-family:Tajawal,sans-serif;font-weight:700;font-size:16px;color:#7A5A1E;background:#F6EAD0;border-radius:10px;padding:4px 0;margin:10px 0 4px;line-height:1.8}
+  .mushaf .bs{display:block;text-align:center;margin-bottom:4px}
+  .mushaf .an{font-family:'Amiri Quran','Amiri',serif;color:#9A6B16;white-space:nowrap}
+  @media (prefers-color-scheme: dark){ .mushaf{background:#1F1A10;color:#F2E9D8;border-color:#5A4826;box-shadow:inset 0 0 0 4px #1F1A10,inset 0 0 0 5px #5A4826} .mushaf .sh{background:#3A2E18;color:#E9C98A} .mushaf .an{color:#E0B45E} }
+  .mf-src{display:block;text-align:center;margin-top:8px;opacity:.7} #rsNone.on{background:#FCE8E6;color:#B3261E;border-color:#B3261E}
   :root{
     --navy:#3B5F78; --navy2:#2C4A60; --navy3:#1F3546; --gold:#D08E2C; --gold2:#B87A1F;
     --light:#EAF0F4; --goldlight:#FBF1E1;
@@ -1823,6 +1835,7 @@
     <div id="rsForm">
     <div class="sum" id="rsSum"></div>
     <div class="rspick" id="rsPick"></div>
+    <div class="sq-wrap"><input id="rsQ" type="search" autocomplete="off" placeholder="🔍 ابحث عن السورة بالاسم أو الرقم"><div class="sq-list hidden" id="rsQList"></div></div>
     <div class="rng3">
       <div><label>من آية</label><button class="ayah" id="rsFa"></button></div>
       <div><label>السورة <b class="rq">*</b></label><select id="rsFs"></select></div>
@@ -1835,6 +1848,7 @@
       <div class="rng2"><div><label>سورة النهاية</label><select id="rsTs"></select></div><div><label>إلى آية</label><button class="ayah" id="rsTb" type="button"></button></div></div>
     </div>
     <div class="count" id="rsCount"></div>
+    <button class="btn soft mushaf-btn hidden" id="rsMushaf" type="button">📖 فتح المصحف على المقطع المحدد</button>
     <label id="rsScoreL">قيّم الطالب من 10 <b class="rq">*</b></label>
     <div class="scores" id="rsScores"></div>
     <div class="slabel" id="rsLabel"></div>
@@ -2158,6 +2172,14 @@
 </div>
 
 <!-- اختيار رقم الآية -->
+<div class="sheet hidden" id="mushafSheet">
+  <div class="panel">
+    <div class="head"><h2 id="mfTitle">المصحف</h2><div style="display:flex;gap:6px"><button class="iconbtn" id="mfMinus" title="تصغير الخط">ـأ</button><button class="iconbtn" id="mfPlus" title="تكبير الخط">أ+</button><button class="iconbtn" id="mfClose" aria-label="إغلاق" title="إغلاق">✕</button></div></div>
+    <small id="mfSub"></small>
+    <div class="mushaf" id="mfText"></div>
+    <small class="mf-src">نص المصحف العثماني من مشروع تنزيل <a href="https://tanzil.net" target="_blank" rel="noopener">tanzil.net</a></small>
+  </div>
+</div>
 <div class="sheet hidden" id="ayahSheet">
   <div class="panel">
     <div class="head"><h2 id="apTitle"></h2><button class="iconbtn" id="apClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
@@ -2759,7 +2781,7 @@ async function loadAtt(){
   let r;
   try { r = await api({ action:'attendance', hid:hal, date:day }); } catch(e){ if (e.message !== 'expired') msg('stuList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (!r.ok) return msg('stuList', r.msg, 'err');
-  teachRO = !!r.ro || !!r.locked; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !r.ro); zmTeachBar();
+  dayCanFix = !!r.canFix; teachRO = !!r.ro || !!r.locked; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !r.ro); zmTeachBar();
   studs = r.students; exStuds = r.excluded || []; approval = r.approval; renderStuds(); renderAppr();
   if (!r.studyDay) $('saveState').textContent = 'تنبيه: هذا اليوم ليس من أيام الدراسة.';
 }
@@ -2903,7 +2925,7 @@ function summary(){
   const pk = $('rsPick'); if (pk) pk.innerHTML = '';
 }
 function clearForm(){
-  $('rsFs').value = ''; $('rsTs').value = ''; setAyah('rsFa', ''); setAyah('rsTa', '');
+  $('rsFs').value = ''; $('rsTs').value = ''; setAyah('rsFa', ''); setAyah('rsTa', ''); $('rsQ').value = ''; $('rsQList').classList.add('hidden');
   rs.multi = false; $('rsToWrap').classList.add('hidden'); $('rsTa').classList.remove('off');
   setScore(null); setNone(false); $('rsNote').value = ''; msg('rsMsg', '', ''); countAyat();
 }
@@ -2912,10 +2934,12 @@ function ayatSpan(fs, fa, ts, ta){ if (ts >= fs) return Math.abs(absAyah(ts, ta)
 const endSurah = () => rs.multi ? +$('rsTs').value : +$('rsFs').value;
 function countAyat(){
   const fs = +$('rsFs').value, ts = endSurah(), fa = ayahVal('rsFa'), ta = ayahVal('rsTa');
+  $('rsMushaf').classList.add('hidden');
   $('rsFa').disabled = !fs; $('rsTa').disabled = !ts || rs.multi; $('rsTb').disabled = !ts;
   if (!fs){ $('rsCount').textContent = 'اختر السورة ثم آية البداية والنهاية'; return; }
   if (!fa || !ta){ $('rsCount').textContent = 'عدد آيات ' + D.surah[(ts || fs) - 1] + ': ' + D.ayat[(ts || fs) - 1]; return; }
   $('rsCount').textContent = 'المقدار: ' + ayatSpan(fs, fa, ts, ta) + ' آية';
+  $('rsMushaf').classList.remove('hidden');
 }
 $('rsFs').onchange = () => { if (rs.multi) oneSurah(); setAyah('rsFa', ''); setAyah('rsTa', ''); $('rsTs').value = $('rsFs').value; countAyat(); if ($('rsFs').value) openAyah('rsFa'); };
 $('rsTs').onchange = () => { setAyah('rsTa', ''); countAyat(); if ($('rsTs').value) openAyah('rsTa'); };
@@ -2947,6 +2971,65 @@ function openAyah(which){
   if (!isFrom && !rs.multi){ const m = el('button', 'apmore', 'النهاية في سورة أخرى ←'); m.type = 'button'; m.onclick = () => { $('ayahSheet').classList.add('hidden'); goMulti(); }; g.appendChild(m); }
   $('ayahSheet').classList.remove('hidden');
 }
+/* البحث عن السورة بالاسم أو الرقم */
+function sqDraw(){
+  const q = normAr($('rsQ').value).replace(/^سوره\s*/, ''), box = $('rsQList'); box.innerHTML = '';
+  if (!q){ box.classList.add('hidden'); return; }
+  const L = D.surah.map((n, i) => ({ n, i:i + 1 })).filter(x => String(x.i) === q || normAr(x.n).indexOf(q) !== -1 || normAr(x.n).replace(/^ال/, '').indexOf(q.replace(/^ال/, '')) === 0).slice(0, 12);
+  if (!L.length){ box.appendChild(el('div', 'ge', 'لا توجد سورة بهذا الاسم.')); box.classList.remove('hidden'); return; }
+  L.forEach((x, k) => { const b = el('button', k === 0 ? 'on' : ''); b.type = 'button'; b.appendChild(el('span', '', x.n)); b.appendChild(el('small', '', x.i + ' • ' + D.ayat[x.i - 1] + ' آية'));
+    b.onmousedown = e => e.preventDefault(); b.onclick = () => sqPick(x.i); box.appendChild(b); });
+  box.classList.remove('hidden');
+}
+function sqPick(i){ $('rsQ').value = ''; $('rsQList').classList.add('hidden'); $('rsFs').value = i; $('rsFs').onchange(); }
+$('rsQ').oninput = sqDraw;
+$('rsQ').onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); const f = $('rsQList').querySelector('button'); if (f) f.click(); } if (e.key === 'Escape'){ $('rsQ').value = ''; sqDraw(); } };
+$('rsQ').onblur = () => setTimeout(() => $('rsQList').classList.add('hidden'), 150);
+$('rsQ').onfocus = sqDraw;
+
+/* المصحف: يفتح على المقطع المحدد (من آية إلى آية) بالرسم العثماني */
+const MF = { cache:{}, size:+(store.get('hq_mf') || 26) };
+async function surahText(n){
+  if (MF.cache[n]) return MF.cache[n];
+  const r = await fetch('quran/' + n + '.json', { cache:'force-cache' }); if (!r.ok) throw new Error('تعذّر تحميل السورة');
+  return (MF.cache[n] = (await r.json()).ayat);
+}
+function mfSegments(fs, fa, ts, ta){
+  if (ts === fs) return [[fs, Math.min(fa, ta), Math.max(fa, ta)]];
+  const seg = [[fs, fa, D.ayat[fs - 1]]], step = ts > fs ? 1 : -1;
+  for (let x = fs + step; x !== ts; x += step) seg.push([x, 1, D.ayat[x - 1]]);
+  seg.push([ts, 1, ta]); return seg;
+}
+const arNum = n => String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+async function openMushaf(){
+  const fs = +$('rsFs').value, ts = endSurah(), fa = ayahVal('rsFa'), ta = ayahVal('rsTa');
+  if (!fs || !fa || !ta || !ts) return rsWarn('حدد السورة وآية البداية والنهاية أولاً.');
+  if (!document.getElementById('amiriQ')){ const l = document.createElement('link'); l.id = 'amiriQ'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri&display=swap'; document.head.appendChild(l); }
+  const segs = mfSegments(fs, fa, ts, ta), box = $('mfText');
+  $('mfTitle').textContent = '📖 ' + (fs === ts ? 'سورة ' + D.surah[fs - 1] : D.surah[fs - 1] + ' ← ' + D.surah[ts - 1]);
+  $('mfSub').textContent = 'من ' + D.surah[fs - 1] + ' ' + fa + ' إلى ' + D.surah[ts - 1] + ' ' + ta + ' • ' + ayatSpan(fs, fa, ts, ta) + ' آية';
+  box.style.fontSize = MF.size + 'px'; box.innerHTML = '<div class="ge">جاري تحميل المصحف...</div>';
+  $('mushafSheet').classList.remove('hidden');
+  try {
+    const texts = await Promise.all(segs.map(g => surahText(g[0])));
+    box.innerHTML = '';
+    segs.forEach((g, k) => {
+      const A = texts[k]; box.appendChild(el('span', 'sh', 'سورة ' + D.surah[g[0] - 1]));
+      for (let a = g[1]; a <= g[2]; a++){
+        let t = A[a - 1] || '';
+        if (a === 1 && g[0] !== 1 && g[0] !== 9 && /^بِسْمِ/.test(t)){ const w = t.split(' '); box.appendChild(el('span', 'bs', w.slice(0, 4).join(' '))); t = w.slice(4).join(' '); }
+        box.appendChild(document.createTextNode(t + ' ')); box.appendChild(el('span', 'an', '\u06DD' + arNum(a))); box.appendChild(document.createTextNode(' '));
+      }
+    });
+    $('mushafSheet').querySelector('.panel').scrollTop = 0;
+  } catch(e){ box.innerHTML = ''; box.appendChild(el('div', 'msg err', 'تعذّر تحميل المصحف. تحقق من الإنترنت.')); }
+}
+function mfSize(d){ MF.size = Math.max(18, Math.min(44, MF.size + d)); store.set('hq_mf', MF.size); $('mfText').style.fontSize = MF.size + 'px'; }
+$('rsMushaf').onclick = openMushaf;
+$('mfClose').onclick = () => $('mushafSheet').classList.add('hidden');
+$('mushafSheet').onclick = e => { if (e.target === $('mushafSheet')) $('mushafSheet').classList.add('hidden'); };
+$('mfPlus').onclick = () => mfSize(2); $('mfMinus').onclick = () => mfSize(-2);
+
 $('rsFa').onclick = () => openAyah('rsFa');
 $('rsTa').onclick = () => openAyah('rsTa');
 $('apClose').onclick = () => $('ayahSheet').classList.add('hidden');
@@ -3070,15 +3153,15 @@ async function saveCurrent(){
 
 /* ---------- اعتماد التقييمات وفارس الحلقة ---------- */
 /* بعد الاعتماد يُقفل اليوم: لا تعديل للحضور ولا للتقييم ولا للاعتماد (المدير وحده يستطيع التصحيح) */
-const isAdm = () => D && D.roles && D.roles.indexOf('admin') !== -1;
-function lockDay(){ if (isAdm()) return; teachRO = true; $('pTeach').classList.add('ro'); }
+let dayCanFix = false;   // المدير والشؤون التعليمية يصححان بعد الاعتماد
+function lockDay(){ if (dayCanFix) return; teachRO = true; $('pTeach').classList.add('ro'); }
 function renderAppr(){
   const st = $('apprState'); st.innerHTML = '';
   if (approval){
     const d = el('div', 'appr', '✓ تم اعتماد تقييمات هذا اليوم' + (approval.at ? ' الساعة ' + approval.at : ''));
     st.appendChild(d);
     if (approval.starName) st.appendChild(el('div', '', '⭐ فارس الحلقة: ' + approval.starName));
-    $('btnApprove').textContent = 'تعديل الاعتماد (للمدير)';
+    $('btnApprove').textContent = 'تعديل الاعتماد';
   } else {
     st.textContent = studs.some(s => !s.att) ? 'حدد حالة كل طالب (حاضر، متأخر، غائب، مستأذن) قبل الاعتماد.' : '';
     $('btnApprove').textContent = 'اعتماد التقييمات';
