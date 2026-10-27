@@ -17,6 +17,7 @@
 <style>
   .remember{display:flex;align-items:center;gap:8px;margin:10px 0 2px;font-weight:600;cursor:pointer} .remember input{width:20px;height:20px;margin:0;accent-color:#3B5F78}
   .rq{color:#B3261E;font-weight:800}
+  .uitem.fixedrole{opacity:.8;cursor:default} .uitem.fixedrole b{direction:auto}
   .sw.lock{opacity:.55;cursor:not-allowed} small.lockr{display:block;color:#1E8E4E;font-weight:700;font-size:12px}
   @media (max-width:440px){ body.hasRoles .brand small{display:none} body.hasRoles .appbar .iconbtn{min-width:38px;padding:6px 3px;font-size:10px} body.hasRoles .brand b{font-size:16px} }
   #rlGrid .portal.cur{outline:3px solid #F3D9AE;outline-offset:2px} #rlGrid .portal{min-height:100px}
@@ -2288,7 +2289,7 @@ function tile(n, label, cls){ const t = el('div', 'tile ' + (cls || '')); t.appe
 function fill(id, list){ const e = $(id); e.innerHTML = ''; list.forEach(x => e.appendChild(x)); }
 
 /* ---------- الدخول ---------- */
-const PORTAL_UI = [['admin', 'إدارة المجمع', 'مدير المجمع والمشرف العام', 'settings'], ['stu', 'شؤون الطلاب', 'مدير شؤون الطلاب', 'users'], ['edu', 'الشؤون التعليمية', 'مدير الشؤون التعليمية', 'book'],
+const PORTAL_UI = [['admin', 'إدارة المجمع', 'مدير المجمع والمشرف العام على المجمع', 'settings'], ['stu', 'شؤون الطلاب', 'مشرف شؤون الطلاب', 'users'], ['edu', 'الشؤون التعليمية', 'مشرف الشؤون التعليمية', 'book'],
   ['teach', 'المعلمون', 'معلمو الحلقات', 'teach'], ['parent', 'أولياء الأمور', 'متابعة الأبناء وتقاريرهم', 'users'], ['student', 'الطلاب', 'تقريري ونقاطي والمتجر', 'trophy']];
 let portal = '';
 try { const q = new URLSearchParams(location.search).get('p'); if (q && PORTAL_UI.some(x => x[0] === q)) portal = q; } catch(e){}
@@ -3418,13 +3419,13 @@ function renderStaff(){
   list.forEach(s => {
     const w = el('div', 'strow' + (s.st ? ' off' : '')), top = el('div', 'top');
     top.appendChild(el('span', 'seqno', list.indexOf(s) + 1)); const nb = el('b', '', s.name); if (s.emp) nb.appendChild(el('span', 'empno', 'الرقم الوظيفي ' + s.emp)); top.appendChild(nb);
-    top.appendChild(el('span', 'pill ' + (s.title === 'معلم' ? 'p-none' : 'p-ok'), s.title));
+    top.appendChild(el('span', 'pill ' + (s.role === 'معلم' ? 'p-none' : 'p-ok'), s.role || s.title));
     if (s.st) top.appendChild(el('span', 'pill p-red', s.st === 'موقوف' ? 'الحساب موقوف' : 'محذوف من مثاني'));
     w.appendChild(top);
     const m = el('div', 'meta');
     const add = (k, v, href) => { if (!v) return; const d = el('span', '', k + ': '); const i = el(href ? 'a' : 'i', '', v); if (href){ i.href = href; i.style.fontWeight = '600'; } d.appendChild(i); m.appendChild(d); };
     add('رقم الهوية', s.nid); add('الجوال', s.phone, 'tel:' + s.phone); add('الجنسية', s.nat);
-    add('المهمة', s.task && s.task !== s.sifa ? s.task : ''); add('المباشرة', s.start);
+    add('المهمة', s.task && s.task !== s.sifa && s.task !== 'معلم حلقة' && !/مدير|مشرف|إداري/.test(s.task) ? s.task : ''); add('المباشرة', s.start);
     add('الحلقات', s.halaqat.join('، ') || (s.title === 'معلم' ? 'لم تُسند' : ''));
     if (s.pin === 'changed' && /^\d{4}-/.test(s.last)) add('آخر دخول', s.last);
     w.appendChild(m);
@@ -6739,7 +6740,7 @@ function openEdit(s){
   $('edEmp').textContent = 'الرقم الوظيفي: ' + (s.emp || '—') + ' • التعديل يُحفظ في جدول الحضور والانصراف';
   $('edName').value = s.name; $('edNid').value = s.nid; $('edPhone').value = s.phone; $('edTask').value = s.task || ''; $('edStart').value = /^\d{4}-\d{2}-\d{2}$/.test(s.start || '') ? s.start : '';
   const setSel = (id, v) => { const sel = $(id); if (v && ![...sel.options].some(o => o.value === v)){ const o = el('option', '', v); sel.appendChild(o); } sel.value = v || sel.options[0].value; };
-  if (SD && SD.lists) fillSel('edSifa', SD.lists.sifa.concat((SD.lists.all || []).filter(x => SD.lists.sifa.indexOf(x) === -1)).map(x => [x, x]));
+  if (SD && SD.lists) fillSel('edSifa', SD.lists.sifa.map(x => [x, x]));
   setSel('edNat', s.nat); setSel('edSifa', s.sifa);
   $('edSheet').classList.remove('hidden'); $('edName').focus();
 }
@@ -6786,6 +6787,8 @@ async function openSettings(){
 }
 function renderRoles(){
   const box = $('permUsers'); box.innerHTML = '';
+  (PD.fixed || []).forEach(x => { const b = el('div', 'uitem fixedrole'); b.appendChild(el('div', 'avatar', x.role === 'super admin' ? 'S' : x.role.charAt(0)));
+    const g = el('div', 'grow'); g.appendChild(el('b', '', x.role)); g.appendChild(el('small', 'muted', x.n + ' • ' + x.note)); b.appendChild(g); b.appendChild(el('span', 'pill p-none', 'ثابت')); box.appendChild(b); });
   PD.roles.forEach(x => { const b = el('button', 'uitem'); b.appendChild(el('div', 'avatar', x.role.charAt(0)));
     const g = el('div', 'grow'); g.appendChild(el('b', '', x.role)); g.appendChild(el('small', 'muted', x.n + ' موظف')); b.appendChild(g);
     b.appendChild(el('span', 'pill ' + (x.keys.length ? 'p-late' : 'p-none'), x.keys.length ? x.keys.length + ' صلاحية' : 'بلا صلاحيات'));
