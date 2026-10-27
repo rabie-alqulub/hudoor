@@ -1123,6 +1123,14 @@
     </div>
 
     <!-- تعديل حلقة -->
+    <div id="pHalView" class="hidden">
+      <div class="card">
+        <h2>استعراض الحلقات</h2>
+        <div class="stchips" id="hvSum"></div>
+        <input id="hvQ" placeholder="ابحث باسم الحلقة أو المعلم" style="margin-top:8px">
+      </div>
+      <div class="card" id="hvList"></div>
+    </div>
     <div id="pReeval" class="hidden">
       <div class="card"><h2>طلبات إعادة التقييم في حلقة</h2><small>طلبات المعلمين لإعادة فتح تقييم يوم بعد اعتماده. عند الموافقة يستطيع المعلم التعديل ثم الاعتماد مرة أخرى دون إعادة إرسال الرسائل.</small></div>
       <div class="card" id="rvList"></div>
@@ -2417,7 +2425,7 @@ const ICONS = {
   seal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L8 22l4-2 4 2-1-7.5"/></svg>'
 };
 ICONS.tvCfg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'; ICONS.ann = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'; ICONS.preTest = ICONS.exam || ICONS.book; ICONS.assocNom = ICONS.exam || ICONS.book; ICONS.strug = ICONS.book; ICONS.planF = ICONS.plans; ICONS.msgArc = ICONS.chat; ICONS.eduCfg = ICONS.settings; ICONS.cands = ICONS.exam || ICONS.book; ICONS.candsT = ICONS.exam || ICONS.book; ICONS.zoomCfg = ICONS.settings; ICONS.trx = ICONS.exam; ICONS.trxIn = ICONS.exam; ICONS.trxMemo = ICONS.exam; ICONS.mine = ICONS.report; ICONS.shop = ICONS.trophy; ICONS.me = ICONS.settings; ICONS.arc = ICONS.settings; ICONS.accs = ICONS.settings; ICONS.staffFile = ICONS.staff; ICONS.courses = ICONS.book; ICONS.staffAtt = ICONS.staff; ICONS.tchPerf = ICONS.staff; ICONS.repStu = ICONS.report; ICONS.repEdu = ICONS.report; ICONS.repAll = ICONS.report; ICONS.dash = ICONS.report; ICONS.moveMany = ICONS.users; ICONS.absent = ICONS.users; ICONS.stuFile = ICONS.users; ICONS.msgs = ICONS.chat; ICONS.msgsStu = ICONS.chat; ICONS.msgsStaff = ICONS.chat; ICONS.msgCfg = ICONS.settings; ICONS.myStu = ICONS.users; ICONS.refsStu = ICONS.chat; ICONS.refsEdu = ICONS.book; ICONS.refsExam = ICONS.exam || ICONS.book;
-ICONS.studentsList = ICONS.users; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
+ICONS.studentsList = ICONS.users; ICONS.halaqaView = ICONS.halaqa; ICONS.studentNew = ICONS.users; ICONS.apps = ICONS.check || ICONS.users; ICONS.compete = ICONS.trophy || ICONS.seal; ICONS.regLink = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
 const SUN = '<circle cx="78" cy="42" r="18" fill="#F3D9AE" opacity=".95"/><g stroke="#F3D9AE" stroke-width="3" stroke-linecap="round" opacity=".6"><path d="M78 12v8"/><path d="M78 64v8"/><path d="M48 42h8"/><path d="M100 42h8"/><path d="M57 21l5 5"/><path d="M94 58l5 5"/><path d="M57 63l5-5"/><path d="M94 26l5-5"/></g>';
 const MOON = '<path d="M86 22a24 24 0 1 0 18 34A20 20 0 0 1 86 22z" fill="#F3D9AE" opacity=".95"/><circle cx="40" cy="30" r="2" fill="#F3D9AE"/><circle cx="56" cy="16" r="1.5" fill="#F3D9AE"/><circle cx="30" cy="56" r="1.5" fill="#F3D9AE" opacity=".7"/>';
 let TABS = [];
@@ -2458,6 +2466,7 @@ async function loadHome(){
   if (r.roles.indexOf('admin') === -1 && P.indexOf('messages.send') !== -1){ TABS.push(['msgs', 'رسائل أولياء الأمور']); TABS.push(['msgsStaff', 'رسائل الموظفين']); TABS.push(['msgArc', 'أرشيف الرسائل']); }
   if (r.roles.indexOf('admin') === -1 && (P.indexOf('refs.edu') !== -1 || P.indexOf('reports.edu') !== -1)){ TABS.push(['exams', 'اختبارات الجمعية']); TABS.push(['planF', 'متابعة الخطط']); }
   else if (r.roles.indexOf('admin') === -1 && P.indexOf('assoc.nominate') !== -1){ TABS.push(['exams', 'اختبارات الجمعية']); }
+  if (r.roles.indexOf('admin') === -1 && (P.indexOf('halaqat.view') !== -1 || P.indexOf('halaqat.manage') !== -1)) TABS.push(['halaqaView', 'استعراض الحلقات']);
   if (r.roles.indexOf('admin') === -1 && P.indexOf('halaqat.manage') !== -1){ TABS.push(['halaqaNew', 'إضافة حلقة']); TABS.push(['halaqaEdit', 'تعديل حلقة']); }
   if (r.roles.indexOf('admin') !== -1 || (P.indexOf('halaqat.reports_all') !== -1 && r.portal !== 'edu')) TABS.push(['report', 'التقارير']);
   if (r.roles.indexOf('admin') !== -1) TABS.push(['settings', 'الإعدادات']);
@@ -2507,7 +2516,7 @@ function userNavOld(T){
 const ADMIN_NAV = [
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['compete', 'المنافس'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير بصمة الحضور'], ['courses', 'الدورات التدريبية']] },
-  { t:'الحلقات', ic:'halaqa', items:[['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
+  { t:'الحلقات', ic:'halaqa', items:[['halaqaView', 'استعراض الحلقات'], ['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['refsEdu', 'الإحالات التعليمية'], ['planF', 'شاشة عرض متابعة الخطط']] },
   { t:'الاختبارات', ic:'exam', r:'exams' },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
@@ -2594,6 +2603,7 @@ function openRole(r, title, group){
   if (r === 'halaqaNew') openHalNew();
   $('pRemote').classList.toggle('hidden', r !== 'remote'); if (r === 'remote') openRemote();
   $('pReeval').classList.toggle('hidden', r !== 'reeval'); if (r === 'reeval') openReeval();
+  $('pHalView').classList.toggle('hidden', r !== 'halaqaView'); if (r === 'halaqaView') openHalView();
   $('pHalEdit').classList.toggle('hidden', r !== 'halaqaEdit');
   if (r === 'halaqaEdit') openHalEdit();
   if (r === 'cands' || r === 'preT' || r === 'assocT' || r === 'assocNom' || r === 'exGrp') r = role = 'exams';
@@ -3240,6 +3250,25 @@ $('btnReeval').onclick = () => confirmOp('طلب إعادة تقييم', 'يُر
   try { const r = await api({ action:'reevalReq', hid:hal, date:day }); toast(r.msg); if (r.ok){ reeval = r.reeval; renderAppr(); } else $('btnReeval').disabled = !!reeval; }
   catch(e){ $('btnReeval').disabled = false; if (e.message !== 'expired') toast('تعذّر الاتصال بالخادم'); }
 });
+/* استعراض الحلقات: اطلاع فقط بلا أي إجراء */
+let HV = null, hvF = 'on';
+async function openHalView(){ $('hvList').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'halaqaView' }, 'hvList'); if (r && r.ok){ HV = r.halaqat; renderHalView(); } }
+function renderHalView(){
+  const on = HV.filter(h => h.active).length, off = HV.length - on, st = HV.filter(h => h.active).reduce((a, h) => a + h.students, 0), sum = $('hvSum'); sum.innerHTML = '';
+  if (hvF === 'off' && !off) hvF = 'on';
+  [['on', 'النشطة', on]].concat(off ? [['off', 'الموقوفة', off]] : []).forEach(x => { const b = el('button', hvF === x[0] ? 'on' : '', x[1] + ' (' + x[2] + ')'); b.onclick = () => { hvF = x[0]; renderHalView(); }; sum.appendChild(b); });
+  sum.appendChild(el('span', 'pill p-none', 'إجمالي الطلاب: ' + st));
+  const q = normAr($('hvQ').value), box = $('hvList'); box.innerHTML = '';
+  const list = HV.filter(h => (hvF === 'on' ? h.active : !h.active) && (!q || normAr(h.name + ' ' + h.teacher).indexOf(q) !== -1));
+  if (!list.length) return box.appendChild(el('small', '', HV.length ? 'لا توجد نتائج.' : 'لا توجد حلقات.'));
+  list.forEach((h, i) => { const w = el('div', 'strow' + (h.active ? '' : ' off')), top = el('div', 'top');
+    top.appendChild(el('span', 'snum', i + 1)); top.appendChild(el('b', '', h.name + (h.remote ? ' 🖥️' : '')));
+    top.appendChild(el('span', 'pill ' + (h.cap && h.students >= h.cap ? 'p-red' : 'p-none'), h.cap ? h.students + ' / ' + h.cap + ' طالب' : h.students + ' طالب'));
+    top.appendChild(el('span', 'pill ' + (h.active ? 'p-ok' : 'p-red'), h.active ? 'نشطة' : 'موقوفة')); w.appendChild(top);
+    const m = el('div', 'meta'); [['المعلم', h.teacher || 'لم تُسند'], ['رقم الحلقة', h.hid], ['ملاحظات', h.notes]].forEach(x => { if (x[1]){ const d = el('span', '', x[0] + ': '); d.appendChild(el('i', '', x[1])); m.appendChild(d); } }); w.appendChild(m);
+    box.appendChild(w); });
+}
+$('hvQ').oninput = () => HV && renderHalView();
 /* طلبات إعادة التقييم (مدير المجمع والشؤون التعليمية) */
 async function openReeval(){ $('rvList').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'reevalList' }, 'rvList'); if (r && r.ok) renderReeval(r.list); }
 function renderReeval(list){
