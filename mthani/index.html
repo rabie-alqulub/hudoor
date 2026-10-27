@@ -17,6 +17,8 @@
 <style>
   .remember{display:flex;align-items:center;gap:8px;margin:10px 0 2px;font-weight:600;cursor:pointer} .remember input{width:20px;height:20px;margin:0;accent-color:#3B5F78}
   .rq{color:#B3261E;font-weight:800}
+  @media (max-width:440px){ body.hasRoles .brand small{display:none} body.hasRoles .appbar .iconbtn{min-width:38px;padding:6px 3px;font-size:10px} body.hasRoles .brand b{font-size:16px} }
+  #rlGrid .portal.cur{outline:3px solid #F3D9AE;outline-offset:2px} #rlGrid .portal{min-height:100px}
   .strow .snum{min-width:38px;text-align:center;font-weight:800;font-size:12px;background:var(--light);color:var(--navy2,#2C4A60);border-radius:8px;padding:3px 6px}
   .txacts{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap} .txacts .mini{margin:0}
   .txadd{width:100%;margin:4px 0;background:var(--light);color:var(--text);border:1px dashed var(--line);border-radius:12px;padding:12px;font-weight:700;box-shadow:none}
@@ -944,6 +946,7 @@
   <button class="brand" id="brandHome" aria-label="الرئيسية"><img class="mark" src="mthani-192.png" alt="مثاني"><span><b>مثاني</b><small>لحلقات تحفيظ القرآن</small></span></button>
   <span class="grow"></span>
   <button class="iconbtn" id="btnHome" aria-label="الشاشة الرئيسية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>الرئيسية</button>
+  <button class="iconbtn hidden" id="btnRoles" aria-label="الأدوار"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 4.5l3 3-3 3"/><path d="M19 7.5h-5"/><path d="M14.5 13.5l-3 3 3 3"/></svg>الأدوار</button>
   <div class="bellwrap"><button class="iconbtn" id="btnBell" aria-label="التنبيهات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>التنبيهات<span class="bdg hidden" id="bellN"></span></button><div class="bellpop hidden" id="bellPop"></div></div>
   <button class="iconbtn menubtn" id="btnMenu" aria-label="القائمة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>القائمة</button>
   <button class="iconbtn" style="display:none" id="btnPin" aria-label="تغيير الرمز السري"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2"/><path d="M16 7l3 3"/></svg>الرمز</button>
@@ -1958,6 +1961,14 @@
 </div>
 
 <!-- تغيير الرمز السري -->
+<div class="sheet hidden" id="rolesSheet">
+  <div class="panel">
+    <div class="head"><h2>الأدوار</h2><button class="iconbtn" id="rlClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
+    <small>انتقل إلى أي بوابة لتجربتها بصلاحيات صاحبها دون تسجيل الخروج. ما تحفظه في التجربة يُسجَّل فعلياً، ورسائل الواتساب لا تُرسل.</small>
+    <div class="portals" id="rlGrid" style="margin-top:12px"></div>
+    <div id="rlMsg"></div>
+  </div>
+</div>
 <div class="sheet hidden" id="peekSheet">
   <div class="panel">
     <div class="head"><h2 id="pkT">معاينة البوابة</h2><button class="iconbtn" id="pkClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
@@ -2343,7 +2354,7 @@ const PK_WHO = { teach:'المعلم', stu:'موظف شؤون الطلاب', edu
 const PK_PORTAL = { teach:'المعلمين', stu:'شؤون الطلاب', edu:'الشؤون التعليمية', parent:'ولي الأمر', student:'الطالب' };
 async function peekOpen(pt, must){
   pkMust = !!must; $('pkT').textContent = 'اختر ' + (PK_WHO[pt] || 'المستخدم') + ' لتجربة بوابته';
-  $('pkSub').textContent = ''; $('pkClose').textContent = pkMust ? 'خروج' : '✕';
+  $('pkSub').textContent = ''; $('pkClose').textContent = '✕';
   $('pkQ').value = ''; $('pkList').innerHTML = '<div class="ge">جاري التحميل...</div>'; $('peekSheet').classList.remove('hidden');
   let r; try { r = await api({ action:'peekList' }); } catch(e){ return; } if (!r.ok){ $('pkList').innerHTML = ''; $('pkList').appendChild(el('div', 'ge', r.msg)); return; }
   PK = r; $('pkSub').textContent = r.ro ? 'تدخل بوابته للاطلاع فقط، ولا يُسجَّل أي تعديل.' : 'تدخل بصلاحياته كاملة: ما تحفظه يُسجَّل فعلياً، أما رسائل الواتساب فلا تُرسل أثناء التجربة.';
@@ -2358,7 +2369,21 @@ function peekDraw(){
     box.appendChild(b); });
 }
 $('pkQ').oninput = () => PK && peekDraw();
-$('pkClose').onclick = () => { $('peekSheet').classList.add('hidden'); if (pkMust) $('btnLogout').onclick(); };
+$('pkClose').onclick = () => { $('peekSheet').classList.add('hidden'); if (pkMust) switchRole('admin'); };
+/* الأدوار: مدير المجمع ينتقل بين البوابات الست دون خروج */
+function openRoles(){
+  const g = $('rlGrid'), cur = (D && D.portal) || portal || 'admin'; g.innerHTML = ''; msg('rlMsg', '', '');
+  PORTAL_UI.forEach(p => { const b = el('button', 'portal pc-' + p[0] + (p[0] === cur ? ' cur' : '')); b.innerHTML = ICONS[p[3]] || ''; b.appendChild(el('b', '', p[1])); b.appendChild(el('small', '', p[0] === cur ? '✓ أنت هنا الآن' : p[0] === 'admin' ? 'صفحتك كمدير المجمع' : 'تجربة بصلاحيات ' + (PK_WHO[p[0]] || '')));
+    b.onclick = () => switchRole(p[0]); g.appendChild(b); });
+  $('rolesSheet').classList.remove('hidden');
+}
+async function switchRole(k){
+  msg('rlMsg', 'جاري الانتقال...', 'info');
+  try { const r = await api({ action:'roleSwitch', portal:k }); if (!r.ok){ msg('rlMsg', needSrv(r), 'err'); if (!D) $('btnLogout').onclick(); return; }
+    $('rolesSheet').classList.add('hidden'); portal = k; store.set('hq_portal', k); ss.del('hq_route'); closeMenu(); window.scrollTo(0, 0); await loadHome(); }
+  catch(e){ if (e.message !== 'expired') msg('rlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+}
+$('btnRoles').onclick = openRoles; $('rlClose').onclick = () => $('rolesSheet').classList.add('hidden');
 $('peekChg').onclick = () => peekOpen(D && D.portal);
 document.querySelector('main').insertBefore($('peekBar'), document.querySelector('main').firstChild);
 
@@ -2391,6 +2416,7 @@ async function loadHome(){
   let r;
   try { r = await api({ action:'home' }); } catch(e){ if (e.message !== 'expired') showLogin('تعذّر الاتصال بالخادم. ' + e.message); return; }
   if (!r.ok) return showLogin(r.msg);
+  $('btnRoles').classList.toggle('hidden', !r.canRoles); document.body.classList.toggle('hasRoles', !!r.canRoles);
   if (r.peekPick){ D = null; return peekOpen(r.portal, true); }
   $('peekBar').classList.toggle('hidden', !r.peek); if (r.peek) $('peekTxt').textContent = r.imp ? 'تجربة المدير لبوابة ' + PK_PORTAL[r.portal] + ' بصلاحيات: ' + r.name + ' — التعديلات تُحفظ فعلياً، والواتساب لا يُرسل'
     : 'معاينة ' + r.peek + ' لبوابة ' + (PK_PORTAL[r.portal] || '') + ': ' + r.name + ' — للاطلاع فقط';
