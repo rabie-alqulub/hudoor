@@ -105,6 +105,18 @@
   @media (prefers-color-scheme: dark){ .geo.ok{color:#8FD9AE} .geo.out{color:#F2B8B5} }
   .punch button.locked{background:#A9B1B7;color:#F4F6F7;box-shadow:none;opacity:1;cursor:not-allowed}
   @media (prefers-color-scheme: dark){ .punch button.locked{background:#323C44;color:#7F8B94} }
+  .punch button.done{background:#A9B1B7;color:#F4F6F7;box-shadow:none;cursor:default}
+  .punch button.done small{font-size:12px;font-weight:600;opacity:.95}
+  @media (prefers-color-scheme: dark){ .punch button.done{background:#323C44;color:#9AA5AE} }
+  .stay{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(14,124,102,.08)}
+  .stay .sh{display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-bottom:8px}
+  .stay .sh b{font-size:20px;font-variant-numeric:tabular-nums}
+  .stay .bar{height:10px;border-radius:6px;background:rgba(0,0,0,.08);overflow:hidden}
+  .stay .bar i{display:block;height:100%;width:0;background:#0E7C66;border-radius:6px;transition:width .6s}
+  .stay.full .bar i{background:#1E9E5A}
+  .stay small{display:block;margin-top:6px;font-size:12px;opacity:.75}
+  #mainId{direction:rtl;unicode-bidi:isolate}
+  #mainId span{unicode-bidi:isolate}
   .who{flex:1;min-width:0}
   .logout{flex:none;width:auto;margin:0;padding:8px 10px;border-radius:12px;background:var(--light);color:var(--muted);font-size:12px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:3px}
   .logout svg{width:22px;height:22px}
@@ -255,8 +267,13 @@
       <div class="geo wait" id="geo"><span class="dot"></span><span id="geoText">جاري تحديد موقعك...</span></div>
       <div class="geo idle" id="win"><span class="dot"></span><span id="winText"></span></div>
       <div class="punch">
-        <button class="in locked" id="btnIn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>تسجيل حضور</button>
+        <button class="in locked" id="btnIn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg><span id="inLbl">تسجيل حضور</span><small id="inAt"></small></button>
         <button class="out locked" id="btnOut" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>تسجيل انصراف</button>
+      </div>
+      <div class="stay hidden" id="stay">
+        <div class="sh"><span>مدة الحضور</span><b id="stayTime" dir="ltr">0:00:00</b><span id="stayPct">0%</span></div>
+        <div class="bar"><i id="stayBar"></i></div>
+        <small id="stayNote"></small>
       </div>
       <div id="mainMsg"></div>
     </div>
@@ -369,6 +386,7 @@ const store = {
   set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
   del(k){ try { localStorage.removeItem(k); } catch(e){} }
 };
+let todayP = { date:'', in:'', out:'' };
 let geoWatch = null, lastLoc = null, inRange = false, enrollData = null;
 let gateMode = false, empName = '', cfg = null, empId = null, stream = null, modelsReady = null, punching = false, faceFails = 0;
 
@@ -500,6 +518,31 @@ function lockPunch(geoLock){
   const t = timeState(), lock = geoLock || !t.ok;
   $('win').className = 'geo ' + t.st; $('winText').textContent = t.text;
   ['btnIn','btnOut','btnPinGo'].forEach(id => { $(id).disabled = lock || punching; $(id).classList.toggle('locked', lock); });
+  const done = !!todayIn();
+  $('btnIn').classList.toggle('done', done);
+  if (done){ $('btnIn').disabled = true; $('btnIn').classList.remove('locked'); }
+  $('inLbl').textContent = done ? 'تم تسجيل الحضور' : 'تسجيل حضور';
+  $('inAt').textContent = done ? ampm(todayIn()) : '';
+}
+/* ---------- حضور اليوم ومؤقت مدة الحضور (ساعة ونصف = 100%) ---------- */
+const STAY_MIN = 90;
+function todayIn(){ return todayP.date === riyadhNow().date ? todayP.in : ''; }
+function todayOut(){ return todayP.date === riyadhNow().date ? todayP.out : ''; }
+function setToday(t){ todayP = { date:riyadhNow().date, in:(t && t.in) || '', out:(t && t.out) || '' }; lockPunch(!inRange); drawStay(); }
+function nowHM(){ const n = riyadhNow(); return ('0' + Math.floor(n.min / 60)).slice(-2) + ':' + ('0' + n.min % 60).slice(-2); }
+function drawStay(){
+  const tin = todayIn(), box = $('stay');
+  if (!tin){ box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  const p = {}; new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23' })
+    .formatToParts(new Date()).forEach(x => p[x.type] = x.value);
+  const nowS = +p.hour * 3600 + +p.minute * 60 + +p.second, tout = todayOut();
+  const endS = tout ? hm(tout) * 60 : nowS;
+  const sec = Math.max(0, endS - hm(tin) * 60), pct = Math.min(100, Math.floor(sec / (STAY_MIN * 60) * 100));
+  $('stayTime').textContent = Math.floor(sec / 3600) + ':' + ('0' + Math.floor(sec % 3600 / 60)).slice(-2) + ':' + ('0' + sec % 60).slice(-2);
+  $('stayPct').textContent = pct + '%'; $('stayBar').style.width = pct + '%';
+  box.classList.toggle('full', pct >= 100);
+  $('stayNote').textContent = 'الحضور ' + ampm(tin) + (tout ? ' • الانصراف ' + ampm(tout) : '') + (pct >= 100 ? ' • أكملت ساعة ونصف ✔' : '');
 }
 function startGeo(){
   if (!navigator.geolocation){ setGeo('out', 'جهازك لا يدعم تحديد الموقع'); return lockPunch(true); }
@@ -555,7 +598,8 @@ async function route(){
   } else {
     empName = st.name || '';
     $('mainName').textContent = st.name || ''; $('mainAvatar').textContent = (st.name || '؟').trim().charAt(0);
-    $('mainId').textContent = 'رقم الهوية: ' + empId.slice(0,2) + '••••••' + empId.slice(-2);
+    $('mainId').innerHTML = 'رقم الهوية: <span dir="ltr">' + empId.slice(0,2) + '</span><span>••••••</span><span dir="ltr">' + empId.slice(-2) + '</span>';
+    setToday(st.today);
     if (st.otherDevice){ show('vLogin'); rbMode(true); $('rbPin').value = ''; msg('loginMsg', 'هذا ليس جوالك المسجل. يمكنك نقل بصمتك إلى هذا الجوال برمزك في برنامج مثاني.', 'info'); return; }
     rbMode(false);
     loadModels();
@@ -744,13 +788,20 @@ async function punch(type){
     $('ring').classList.add('found'); $('hintPunch').textContent = 'جاري مطابقة الوجه...';
     const r = await api({ action:'punch', type, method:'face', id:empId, device:deviceId(),
                           lat:loc.lat, lng:loc.lng, accuracy:loc.accuracy, descriptor:face.descriptor, photo:face.photo });
-    if (r.ok){ faceFails = 0; showResult(true, 'تم التحقق وتسجيل ' + label, r.msg); }
+    if (r.ok){ faceFails = 0; markPunch(type); showResult(true, 'تم التحقق وتسجيل ' + label, r.msg); }
     else { faceFails++; showResult(false, 'لم يتم التحقق', r.msg, true); }
   } catch(e){
     showResult(false, 'تعذّر التحقق', e.message, !/الكاميرا|Permission|NotAllowed|NotFound/i.test(e.message + e.name));
   } finally {
     punching = false; lockPunch(!inRange);
   }
+}
+
+function markPunch(type){
+  const t = { in:todayIn(), out:todayOut() };
+  if (type === 'in' && !t.in) t.in = nowHM();
+  if (type === 'out') t.out = nowHM();
+  setToday(t);
 }
 
 /* ---------- اختيار طريقة التحقق بعد الضغط على حضور أو انصراف ---------- */
@@ -784,7 +835,7 @@ async function pinPunch(pinType){
     stopCam();
     const r = await api({ action:'punch', type:pinType, method:'pin', pin, id:empId, device:deviceId(),
                           lat:loc.lat, lng:loc.lng, accuracy:loc.accuracy, photo });
-    if (r.ok){ closeChoice(); showResult(true, 'تم تسجيل ' + (pinType === 'in' ? 'الحضور' : 'الانصراف') + ' بالرمز', r.msg + (r.review ? ' (سيُراجع من الإدارة)' : '')); }
+    if (r.ok){ closeChoice(); markPunch(pinType); showResult(true, 'تم تسجيل ' + (pinType === 'in' ? 'الحضور' : 'الانصراف') + ' بالرمز', r.msg + (r.review ? ' (سيُراجع من الإدارة)' : '')); }
     else msg('pinMsg', r.msg, 'err');
   } catch(e){ msg('pinMsg', e.message, 'err'); }
   lockPunch(!inRange);
@@ -964,7 +1015,7 @@ function tick(){
   $('todayG').textContent = now.toLocaleDateString('ar-SA-u-ca-gregory', { ...tz, day:'numeric', month:'long', year:'numeric' }) + ' م';
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden){ if (geoWatch !== null){ navigator.geolocation.clearWatch(geoWatch); geoWatch = null; } } else if (!$('vMain').classList.contains('hidden')) startGeo(); });
-tick(); setInterval(() => { tick(); if (!$('vMain').classList.contains('hidden') && !punching) lockPunch(!inRange); }, 1000);
+tick(); setInterval(() => { tick(); if (!$('vMain').classList.contains('hidden')){ if (!punching) lockPunch(!inRange); drawStay(); } }, 1000);
 
 boot();
 </script>
