@@ -431,6 +431,7 @@
   .nbdg{background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;min-width:18px;line-height:18px;margin-inline-start:auto;text-align:center}
   .welcome .role{font-size:14px;color:#F3D9AE;margin:-2px 0 6px;font-weight:700}
   #pTeach.ro .att button,#pTeach.ro .trow button{pointer-events:none} #pTeach.ro #btnAllPresent,#pTeach.ro #btnApprove{display:none!important}
+  nav.groups .navlogo{position:sticky;top:0;z-index:3;box-shadow:0 -24px 0 var(--bg),0 6px 14px rgba(0,0,0,.06)}
   .navlogo{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px 14px;margin-bottom:6px;background:var(--card);border:1px solid var(--line);border-radius:18px;text-align:center}
   .navlogo img{width:92px;height:92px;border-radius:50%;background:#fff;padding:5px;border:3px solid var(--gold);object-fit:contain;box-shadow:0 6px 16px rgba(0,0,0,.12)}
   .navlogo b{font-size:15px;color:var(--navy);line-height:1.4} .navlogo small{font-size:11.5px;color:var(--muted);line-height:1.5}
@@ -2522,7 +2523,7 @@ const ADMIN_NAV = [
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'المعاملات', ic:'exam', items:[['trxS', 'المعاملات الصادرة'], ['trxR', 'المعاملات الواردة']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'Dashboard'], ['repAll', 'التقرير الشامل للطلاب'], ['report', 'التقرير الشامل للحلقات'], ['staffFile', 'تقرير الموظف الشامل'], ['tvCfg', 'شاشة عرض المجمع']] },
-  { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['zoomCfg', 'ربط الحلقات عن بعد'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['perms', 'الصلاحيات'], ['arc', 'الأرشفة السنوية']] }
+  { t:'الإعدادات', ic:'settings', items:[['me', 'تعديل البيانات'], ['general', 'الإعدادات العامة'], ['zoomCfg', 'ربط الحلقات عن بعد'], ['ann', 'الإعلانات'], ['accs', 'بيانات دخول المستخدمين'], ['arc', 'الأرشفة السنوية']] }
 ];
 function navLogo(){
   const lg = el('div', 'navlogo'), im = el('img'); im.src = '../logo.jpg'; im.alt = 'شعار مجمع ربيع القلوب';
@@ -4397,7 +4398,7 @@ function ptForm(x, a){
   save.onclick = async () => { const score = calc(), sheet = { n:rows.length, w:PT_W, range: rF.value && rT.value ? D.surah[rF.value - 1] + ' — ' + D.surah[rT.value - 1] : '', q:rows.map(r => ({ p:r.p.value, h:+r.h.value || 0, t:+r.t.value || 0, j:+r.j.value || 0, s:Math.round(r.sc * 2) / 2 })) };
     if (!rows.some(r => r.p.value)) return msg('ptMsg', 'حدد موضع سؤال واحد على الأقل، أو اضغط «توليد الأسئلة تلقائياً».', 'err');
     save.disabled = true; const r = await cpCall({ action:'assocSave', op:'pre', id:a.id, data:{ score:score, date:dt.value, examiner:ex.value.trim(), notes:nt.value.trim(), sheet:sheet } }, 'ptMsg'); save.disabled = false; if (!r || !r.ok) return;
-    AX = r; $('ptSheet').classList.add('hidden'); toast(r.msg); renderCands(); };
+    AX = r; $('ptSheet').classList.add('hidden'); toast(r.msg); if (r.passed && role === 'exams'){ exS = 3; exSub = ''; } renderCands(); };
   $('ptSheet').classList.remove('hidden');
 }
 function ptView(x){
