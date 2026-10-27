@@ -2420,7 +2420,7 @@ function navLogo(){
   return lg;
 }
 /* المشرف العام: بياناته والتقارير العامة وتغيير الرمز فقط */
-const RO_NAV = [{ t:'بياناتي الشخصية', ic:'users', r:'me' }, { t:'تقارير عامة', ic:'report', items:[['dash', 'Dashboard'], ['repAll', 'التقرير الشامل للطلاب'], ['report', 'التقرير الشامل للحلقات'], ['staffFile', 'تقرير الموظف الشامل']] }, { t:'الإعدادات', ic:'settings', r:'mePin' }];
+const RO_NAV = [{ t:'بياناتي الشخصية', ic:'users', r:'me' }, { t:'تقارير عامة', ic:'report', items:[['dash', 'Dashboard'], ['repAll', 'التقرير الشامل للطلاب'], ['report', 'التقرير الشامل للحلقات'], ['staffFile', 'تقرير الموظف الشامل']] }, { t:'المعاملات', ic:'exam', items:[['trxS', 'المعاملات الصادرة'], ['trxR', 'المعاملات الواردة']] }, { t:'الإعدادات', ic:'settings', r:'mePin' }];
 function buildAdminNav(n, list){
   n.appendChild(navLogo());
   (list || ADMIN_NAV).forEach((g, gi) => {
@@ -2628,7 +2628,7 @@ function renderWelcome(){
     exams:['اختبارات الجمعية', 'من ترشيح المعلم حتى نتيجة الجمعية في شاشة واحدة', 'gold'], trxR:['المعاملات الواردة', 'التعاميم والمعاملات الواردة إليك', ''], trxS:['المعاملات الصادرة', 'إضافة معاملة ومتابعة معاملاتك', ''],
     exGrp:['المختبرون', 'مجموعات اختبار الجمعية ومشرفوها', 'gold'], assocNom:['ترشيح طالب لاختبار الجمعية', 'المرشحون ومواعيد اختبارهم ونتائجهم', 'gold'],
     halaqaNew:['إضافة حلقة', 'إضافة حلقة جديدة', ''], halaqaEdit:['تعديل حلقة', 'تعديل الحلقات وعدد طلابها', ''] };
-  const acts = document.body.classList.contains('suro') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['me']] : document.body.classList.contains('admin') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['plans'], ['planF'], ['trxMemo'], ['trxIn'], ['exams'], ['ann'], ['settings']] : TABS;
+  const acts = document.body.classList.contains('suro') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['trxS'], ['trxR'], ['me']] : document.body.classList.contains('admin') ? [['dash'], ['repAll'], ['report'], ['staffFile'], ['plans'], ['planF'], ['trxMemo'], ['trxIn'], ['exams'], ['ann'], ['settings']] : TABS;
   ac.classList.toggle('one', acts.length === 1);
   acts.filter(t => DESC[t[0]]).forEach(t => { const d = DESC[t[0]], b = el('button', 'action ' + d[2]); const ic = el('div', 'ic'); ic.innerHTML = ICONS[t[0]] || ICONS[{ preT:'exam', assocT:'exam', exams:'exam', trxR:'exam', trxS:'exam', dash:'report', repAll:'report', staffFile:'staff', remote:'halaqa', trxIn:'exam', trxMemo:'exam', cands:'exam', exGrp:'exam', ann:'chat', assocNom:'exam', trx:'exam' }[t[0]]] || ''; b.appendChild(ic); b.appendChild(el('b', '', d[0])); b.appendChild(el('small', 'muted', d[1])); b.onclick = () => openRole(t[0] === 'settings' ? 'perms' : t[0]); ac.appendChild(b); });
 }
