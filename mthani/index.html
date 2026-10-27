@@ -2327,7 +2327,7 @@ $('btnSetPin').onclick = () => {
 };
 $('btnLogout').onclick = async () => {
   try { await api({ action:'logout' }); } catch(e){}
-  store.del('hq_token'); D = null; document.body.classList.remove('ro'); $('peekBar').classList.add('hidden'); portal = ''; store.del('hq_portal'); showLogin('تم تسجيل الخروج.');
+  ss.del('hq_route'); store.del('hq_token'); D = null; document.body.classList.remove('ro'); $('peekBar').classList.add('hidden'); portal = ''; store.del('hq_portal'); showLogin('تم تسجيل الخروج.');
 };
 
 /* ---------- معاينة المدير لبوابتي أولياء الأمور والطلاب ---------- */
@@ -2435,7 +2435,7 @@ async function loadHome(){
   if (supRO){ $('gsWrap').classList.add('hidden'); buildAdminNav(n, RO_NAV); }
   else if (admin) buildAdminNav(n); else buildAdminNav(n, userNav(TABS));
   show('vHome');
-  openRole('welcome'); updBell(); clearInterval(window._bellT); window._bellT = setInterval(() => { if (!document.hidden) refreshCounts(); }, 300000);
+  restoreRoute(); updBell(); clearInterval(window._bellT); window._bellT = setInterval(() => { if (!document.hidden) refreshCounts(); }, 300000);
   if (r.ro && !r.peek && !$('roBar')){ const b = el('div', 'robar', 'حساب المشرف العام: للاطلاع فقط، ولا يمكن التعديل.'); b.id = 'roBar'; $('vHome').insertBefore(b, $('vHome').firstChild); }   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
 }
 /* قائمة بقية المستخدمين بنفس أسلوب المدير: الاختبارات والمعاملات مجموعتان، والباقي تبويبات مباشرة */
@@ -2508,9 +2508,20 @@ $('btnMenu').onclick = () => {
   if ($('nav').classList.contains('open')) return closeMenu();
   $('nav').classList.add('open'); const sc = el('div', 'scrim'); sc.onclick = closeMenu; document.body.appendChild(sc); setTimeout(navRail, 300);
 };
+/* تحديث الصفحة يبقي المستخدم في الصفحة نفسها (في هذه النافذة) بدل العودة للرئيسية */
+const ss = { get:k => { try { return sessionStorage.getItem(k); } catch(e){ return null; } }, set:(k, v) => { try { sessionStorage.setItem(k, v); } catch(e){} }, del:k => { try { sessionStorage.removeItem(k); } catch(e){} } };
+let routeRestored = false;
+function restoreRoute(){
+  let sr = null; try { sr = JSON.parse(ss.get('hq_route') || 'null'); } catch(e){}
+  const okR = sr && sr.u === (D.name + '|' + (D.portal || '')) && (['welcome', 'me'].indexOf(sr.r) !== -1 || document.querySelector('#nav [data-r="' + sr.r + '"]') || (TABS || []).some(x => x[0] === sr.r));
+  if (!routeRestored && okR){ routeRestored = true; if (sr.day && sr.r === 'teach') day = sr.day; openRole(sr.r, sr.t); if (sr.y) setTimeout(() => window.scrollTo(0, sr.y), 400); return; }
+  routeRestored = true; openRole('welcome');
+}
+function saveRoute(r, t){ if (D && r !== 'soon') ss.set('hq_route', JSON.stringify({ r, t:t || '', u:D.name + '|' + (D.portal || ''), day:r === 'teach' ? day : '' })); }
+window.addEventListener('pagehide', () => { try { const sr = JSON.parse(ss.get('hq_route') || 'null'); if (sr){ sr.y = window.scrollY; if (sr.r === 'teach') sr.day = day; ss.set('hq_route', JSON.stringify(sr)); } } catch(e){} });
 function openRole(r, title, group){
   if (r === 'mePin'){ setTimeout(openPin, 50); r = 'me'; }
-  role = r;
+  role = r; saveRoute(r, title);
   const key = r === 'soon' ? 'soon:' + title : r;
   document.querySelectorAll('#nav .gitems button, #nav > button').forEach(b => b.classList.toggle('on', (b.dataset.r === 'soon' ? 'soon:' + b.dataset.t : b.dataset.r) === key));
   document.querySelectorAll('#nav .ngroup').forEach(w => { const d = w.classList.contains('direct'), has = d ? w.querySelector('.ghead').dataset.r === key : !!w.querySelector('.gitems button.on'); w.classList.toggle('cur', has); if (has && !d) w.classList.add('open'); });
