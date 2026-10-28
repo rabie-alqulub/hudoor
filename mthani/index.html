@@ -533,7 +533,15 @@
   .lvchips button::before{content:'';width:14px;height:14px;border-radius:4px;border:1.5px solid currentColor;flex:none}
   .lvchips button.on{background:var(--navy);border-color:var(--navy);color:#fff}
   .lvchips button.on::before{background:#fff;border-color:#fff;box-shadow:inset 0 0 0 2px var(--navy)}
-  .lvchips button.lock{opacity:.6;cursor:not-allowed}
+  .lvchips button.role{background:#E4ECF2;border-color:#C9D7E2;color:var(--navy)}
+  .lvchips button.role::before{background:var(--navy);border-color:var(--navy);box-shadow:inset 0 0 0 2px #E4ECF2}
+  .lvchips button.rem{background:#FDEDEB;border-color:#F2B8B0;color:#B23A2B;text-decoration:line-through}
+  .lvchips button.rem::before{border-color:#B23A2B}
+  @media (prefers-color-scheme: dark){ .lvchips button.role{background:#22323D;border-color:#34495A;color:#C9DCEA} .lvchips button.rem{background:rgba(178,58,43,.18);border-color:#7A2E25;color:#F0A196} }
+  .pelegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);margin:2px 4px 10px} .pelegend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-inline-end:5px;vertical-align:-1px}
+  .xroles{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px} .xroles button{width:auto;min-height:38px;padding:7px 14px;border-radius:999px;font-weight:700;font-size:14px;background:var(--card);border:1.5px solid var(--line);color:var(--muted)}
+  .xroles button.on{background:var(--navy);border-color:var(--navy);color:#fff} .xroles button.base{background:#E4ECF2;border-color:#C9D7E2;color:var(--navy);cursor:default}
+  h2.pmh{margin:0 0 2px}
   .prow .grow{flex:1;min-width:0} .prow b{display:block;font-size:15px} .prow small{font-size:12px}
   .badge2{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--light);color:var(--muted);font-weight:700;margin-inline-start:6px}
   .sw{flex:none;position:relative;width:46px;height:27px;border-radius:999px;background:var(--line);padding:0;transition:background .2s}
@@ -1827,13 +1835,13 @@
     <div id="pSettings" class="hidden">
       <div class="card">
         <h2>الإعدادات</h2>
-        <div class="tabs" id="setTabs" style="margin-top:6px"><button data-s="roles" class="on">الأدوار</button><button data-s="perms">صلاحيات موظف</button><button data-s="general">الإعدادات العامة</button></div>
+        <div class="tabs" id="setTabs" style="margin-top:6px"><button data-s="roles" class="on">الأدوار والصلاحيات</button><button data-s="general">الإعدادات العامة</button></div>
       </div>
       <div id="sPerms">
-        <div class="card" id="permUsersCard">
-          <small id="permHint">اختر الموظف لتحديد صلاحياته. الصلاحية تظهر في صفحته فور الحفظ.</small>
-          <input id="permSearch" placeholder="ابحث بالاسم أو رقم الهوية" style="margin-top:10px">
-          <div id="permUsers"></div>
+        <div id="permUsersCard">
+          <div class="card"><h2 class="pmh">الأدوار</h2><small>قالب صلاحيات لكل دور، والتعديل فيه يسري فوراً على كل من يحمل الدور (إلا ما عدّلته لموظف بعينه).</small><div id="permRoles"></div></div>
+          <div class="card"><h2 class="pmh">الموظفون</h2><small id="permHint">اختر الموظف لتكليفه بأدوار إضافية، أو لإضافة صلاحية له أو نزعها منه وحده.</small>
+            <input id="permSearch" placeholder="ابحث بالاسم أو رقم الهوية أو الدور" style="margin-top:10px"><div id="permUsers"></div></div>
         </div>
         <div class="hidden" id="permEdit">
           <div class="card">
@@ -1843,6 +1851,8 @@
               <button class="iconbtn" id="peBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>رجوع</button>
             </div>
           </div>
+          <div class="card hidden" id="peRolesBox"></div>
+          <div class="pelegend" id="peLegend"></div>
           <div id="permCats"></div>
           <div class="savebar"><button class="btn" id="peSave">حفظ الصلاحيات</button></div>
         </div>
@@ -2812,8 +2822,9 @@ function roleText(){
   if (D.roles.indexOf('student') !== -1) return 'طالب' + (D.self && D.self.halaqa ? ' في ' + D.self.halaqa : '');
   if (D.roles.indexOf('parent') !== -1 && D.roles.length === 1) return 'ولي أمر الطالب' + (kids.length > 1 ? 'ين' : '') + ': ' + kids.join(' و');
   if (D.roles.indexOf('admin') !== -1) return D.title || 'مدير المجمع';
-  if (D.title && D.title !== 'معلم') return D.title;
-  if (mine.length) return 'معلم ' + mine.join(' و');
+  const xr = (D.xroles || []).length ? ' • ' + D.xroles.join(' • ') : '';   // الأدوار الإضافية
+  if (D.title && D.title !== 'معلم') return D.title + xr;
+  if (mine.length) return 'معلم ' + mine.join(' و') + xr;
   if (D.roles.indexOf('teacher') !== -1) return D.title || 'موظف';
   if (kids.length) return 'ولي أمر الطالب' + (kids.length > 1 ? 'ين' : '') + ': ' + kids.join(' و');
   return '';
@@ -6939,84 +6950,101 @@ $('stSearch').oninput = () => SD && SD.ok && renderStaff();
 
 /* ---------- الإعدادات والصلاحيات (للمدير) ---------- */
 const CAT_ICON = { 'نافس':'trophy', 'شؤون الطلاب':'users', 'شؤون الموظفين':'staff', 'الحلقات':'halaqa', 'الشؤون التعليمية':'book', 'الاختبارات':'exam', 'الاتصالات والرسائل':'chat', 'تقارير عامة':'report', 'الإعدادات':'settings' };
-let PD = null, peUser = null, peKeys = new Set();
+let PD = null, RD = null, peUser = null, peKeys = new Set();
 let setSubNow = 'roles';
 function setSub(sub){
+  if (sub === 'perms') sub = 'roles';
   setSubNow = sub;
   document.querySelectorAll('#setTabs button').forEach(x => x.classList.toggle('on', x.dataset.s === sub));
   $('sPerms').classList.toggle('hidden', sub === 'general'); $('sGeneral').classList.toggle('hidden', sub !== 'general');
 }
 document.querySelectorAll('#setTabs button').forEach(b => b.onclick = () => { setSub(b.dataset.s); if (b.dataset.s !== 'general') openSettings(); });
-/* الأدوار: قالب صلاحيات لكل صفة (معلم، مدير شؤون الطلاب...)؛ وصلاحيات الموظف: إضافات شخصية فوق دوره */
-let pmMode = 'roles', peLock = new Set();
+/* الأدوار والصلاحيات في شاشة واحدة:
+   - الدور قالب صلاحيات يسري على كل من يحمله.
+   - الموظف: دوره الأساسي (من جدول الموظفين) + أدوار إضافية يكلّفه بها المدير، ثم تعديل شخصي: إضافة صلاحية أو نزعها منه وحده. */
+let peRoleSet = new Set(), peAdd = new Set(), peRem = new Set(), peX = [];
 async function openSettings(){
-  pmMode = setSubNow === 'perms' ? 'users' : 'roles';
   $('permEdit').classList.add('hidden'); $('permUsersCard').classList.remove('hidden');
-  $('permSearch').classList.toggle('hidden', pmMode === 'roles');
-  $('permHint').textContent = pmMode === 'roles' ? 'اختر الدور لتحديد صلاحياته. كل موظف يأخذ صلاحيات دوره (صفته في جدول الموظفين) تلقائياً، وأي تعديل هنا يسري على الجميع فوراً.'
-    : 'اختر الموظف لإضافة صلاحيات خاصة به فوق صلاحيات دوره. صلاحيات الدور تظهر مؤشَّرة ولا تُعدَّل من هنا.';
-  $('permUsers').innerHTML = '<div class="msg info">جاري التحميل...</div>';
-  try { PD = await api({ action:pmMode === 'roles' ? 'rolesData' : 'perms' }); } catch(e){ if (e.message !== 'expired') msg('permUsers', 'تعذّر الاتصال بالخادم.', 'err'); return; }
-  if (!PD.ok) return msg('permUsers', PD.msg === 'إجراء غير معروف' ? 'الصلاحيات تحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : PD.msg, 'err');
-  if (pmMode === 'roles') return renderRoles();
-  renderUsers();
+  $('permRoles').innerHTML = '<div class="msg info">جاري التحميل...</div>'; $('permUsers').innerHTML = '';
+  let a, b; try { [a, b] = await Promise.all([api({ action:'rolesData' }), api({ action:'perms' })]); } catch(e){ if (e.message !== 'expired') msg('permRoles', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  if (!a.ok) return msg('permRoles', a.msg === 'إجراء غير معروف' ? 'الصلاحيات تحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : a.msg, 'err');
+  RD = a; PD = b.ok ? b : null; renderRoles(); renderUsers();
 }
+const nBase = a => (a || []).filter(k => k.indexOf(':') === -1).length;
 function renderRoles(){
-  const box = $('permUsers'); box.innerHTML = '';
-  (PD.fixed || []).forEach(x => { const b = el('div', 'uitem fixedrole'); b.appendChild(el('div', 'avatar', x.role === 'super admin' ? 'S' : x.role.charAt(0)));
+  const box = $('permRoles'); box.innerHTML = '';
+  (RD.fixed || []).forEach(x => { const b = el('div', 'uitem fixedrole'); b.appendChild(el('div', 'avatar', x.role === 'super admin' ? 'S' : x.role.charAt(0)));
     const g = el('div', 'grow'); g.appendChild(el('b', '', x.role)); g.appendChild(el('small', 'muted', x.n + ' • ' + x.note)); b.appendChild(g); b.appendChild(el('span', 'pill p-none', 'ثابت')); box.appendChild(b); });
-  PD.roles.forEach(x => { const b = el('button', 'uitem'); b.appendChild(el('div', 'avatar', x.role.charAt(0)));
+  RD.roles.forEach(x => { const b = el('button', 'uitem'); b.appendChild(el('div', 'avatar', x.role.charAt(0)));
     const g = el('div', 'grow'); g.appendChild(el('b', '', x.role)); g.appendChild(el('small', 'muted', x.n + ' موظف')); b.appendChild(g);
-    const nk = x.keys.filter(k => k.indexOf(':') === -1).length; b.appendChild(el('span', 'pill ' + (nk ? 'p-late' : 'p-none'), nk ? nk + ' صلاحية' : 'بلا صلاحيات'));
-    b.onclick = () => { peUser = { role:x.role, isRole:true, rk:x }; peKeys = new Set(x.keys); peLock = new Set();
-      $('peName').textContent = 'دور: ' + x.role; $('peAvatar').textContent = x.role.charAt(0); $('peSub').textContent = x.n + ' موظف بهذه الصفة • التعديل يسري عليهم جميعاً';
-      $('peSave').textContent = 'حفظ صلاحيات الدور'; $('permUsersCard').classList.add('hidden'); $('permEdit').classList.remove('hidden'); renderCats(); window.scrollTo(0, 0); };
+    const nk = nBase(x.keys); b.appendChild(el('span', 'pill ' + (nk ? 'p-late' : 'p-none'), nk ? nk + ' صلاحية' : 'بلا صلاحيات'));
+    b.onclick = () => { peUser = { role:x.role, isRole:true }; peRoleSet = new Set(); peAdd = new Set(x.keys); peRem = new Set(); peX = [];
+      $('peName').textContent = 'دور: ' + x.role; $('peAvatar').textContent = x.role.charAt(0); $('peSub').textContent = x.n + ' موظف بهذا الدور • التعديل يسري عليهم جميعاً';
+      $('peSave').textContent = 'حفظ صلاحيات الدور'; openPe(); };
     box.appendChild(b); });
 }
 function renderUsers(){
-  const q = $('permSearch').value.trim(), box = $('permUsers'); box.innerHTML = '';
-  const list = PD.users.filter(u => !q || u.name.indexOf(q) !== -1 || u.nid.indexOf(digits(q) || '#') !== -1);
+  const box = $('permUsers'); box.innerHTML = '';
+  if (!PD){ box.appendChild(el('small', '', 'تعذّر تحميل الموظفين.')); return; }
+  const q = normAr($('permSearch').value.trim());
+  const list = PD.users.filter(u => !q || normAr(u.name + ' ' + u.role + ' ' + (u.xroles || []).join(' ')).indexOf(q) !== -1 || u.nid.indexOf(digits($('permSearch').value) || '#') !== -1);
   if (!list.length) box.appendChild(el('small', '', 'لا توجد نتائج.'));
   list.forEach(u => {
     const b = el('button', 'uitem'); b.appendChild(el('div', 'avatar', u.name.charAt(0)));
-    const g = el('div', 'grow'); g.appendChild(el('b', '', u.name)); g.appendChild(el('small', 'muted', [u.halaqat.join('، '), u.role].filter(Boolean).join(' • '))); b.appendChild(g);
-    const nb = a => (a || []).filter(k => k.indexOf(':') === -1).length, nx = u.keys.length; b.appendChild(el('span', 'pill ' + (nx ? 'p-late' : 'p-none'), nb(u.roleKeys) + ' من الدور' + (nx ? ' + إضافات' : '')));
+    const g = el('div', 'grow'); g.appendChild(el('b', '', u.name)); g.appendChild(el('small', 'muted', [[u.role].concat(u.xroles || []).join(' + '), u.halaqat.join('، ')].filter(Boolean).join(' • '))); b.appendChild(g);
+    const na = nBase(u.keys), nr = nBase(u.rem); if (na || nr || (u.xroles || []).length) b.appendChild(el('span', 'pill p-late', [(u.xroles || []).length ? '+' + u.xroles.length + ' دور' : '', na ? '+' + na + ' صلاحية' : '', nr ? '−' + nr : ''].filter(Boolean).join(' ')));
     b.onclick = () => openPermUser(u); box.appendChild(b);
   });
 }
-$('permSearch').oninput = () => PD && PD.ok && renderUsers();
+$('permSearch').oninput = () => PD && renderUsers();
+function roleUnion(roles){ const o = new Set(); roles.forEach(r => ((PD.rolesKeys || {})[r] || []).forEach(k => o.add(k))); return o; }
 function openPermUser(u){
-  peUser = u; peLock = new Set(u.roleKeys || []); peKeys = new Set((u.keys || []).concat(u.roleKeys || [])); $('peSave').textContent = 'حفظ الصلاحيات الإضافية';
+  peUser = u; peX = (u.xroles || []).slice(); peRoleSet = roleUnion([u.role].concat(peX)); peAdd = new Set(u.keys || []); peRem = new Set(u.rem || []);
+  $('peSave').textContent = 'حفظ أدوار الموظف وصلاحياته';
   $('peName').textContent = u.name; $('peAvatar').textContent = u.name.charAt(0);
-  $('peSub').textContent = ['الدور: ' + u.role, u.halaqat.join('، '), 'هوية: \u2066' + u.nid.slice(0, 2) + '••••••' + u.nid.slice(-2) + '\u2069'].filter(Boolean).join(' • ');
-  $('permUsersCard').classList.add('hidden'); $('permEdit').classList.remove('hidden'); renderCats(); window.scrollTo(0, 0);
+  $('peSub').textContent = [u.halaqat.join('، '), 'هوية: ⁦' + u.nid.slice(0, 2) + '••••••' + u.nid.slice(-2) + '⁩'].filter(Boolean).join(' • ');
+  openPe();
 }
+function openPe(){ $('permUsersCard').classList.add('hidden'); $('permEdit').classList.remove('hidden'); renderPeRoles(); renderCats(); window.scrollTo(0, 0); }
+function renderPeRoles(){
+  const box = $('peRolesBox'), lg = $('peLegend'); box.innerHTML = ''; lg.innerHTML = '';
+  if (peUser.isRole){ box.classList.add('hidden'); lg.innerHTML = '<span><i style="background:var(--navy)"></i>ممنوحة للدور</span>'; return; }
+  box.classList.remove('hidden');
+  box.appendChild(el('b', '', 'أدوار الموظف')); box.appendChild(el('small', 'muted', ' — دوره الأساسي من جدول الموظفين، ويمكنك تكليفه بأدوار إضافية تجمع صلاحياتها'));
+  const w = el('div', 'xroles'); const base = el('button', 'base', peUser.role + ' (الأساسي)'); base.type = 'button'; w.appendChild(base);
+  (PD.roles || []).filter(r => r !== peUser.role).forEach(r => { const b = el('button', peX.indexOf(r) !== -1 ? 'on' : '', r); b.type = 'button';
+    b.onclick = () => { const was = peRoleSet; peX = peX.indexOf(r) !== -1 ? peX.filter(x => x !== r) : peX.concat([r]); peRoleSet = roleUnion([peUser.role].concat(peX));
+      // ما أُضيف شخصياً وصار من الأدوار لا يحتاج إضافة، وما نُزع ولم يعد من الأدوار يُلغى نزعه
+      [...peAdd].forEach(k => { if (peRoleSet.has(k)) peAdd.delete(k); }); [...peRem].forEach(k => { if (!peRoleSet.has(k)) peRem.delete(k); });
+      renderPeRoles(); renderCats(); };
+    w.appendChild(b); });
+  box.appendChild(w);
+  lg.innerHTML = '<span><i style="background:#E4ECF2;border:1px solid #C9D7E2"></i>من أدواره</span><span><i style="background:var(--navy)"></i>مضافة له وحده</span><span><i style="background:#FDEDEB;border:1px solid #F2B8B0"></i>منزوعة منه وحده (اضغط لإرجاعها)</span>';
+}
+const peHas = k => (peRoleSet.has(k) && !peRem.has(k) && !(k.indexOf(':') !== -1 && peRem.has(k.split(':')[0]))) || peAdd.has(k);
+function peSet(k, on){ if (on){ if (peRoleSet.has(k)) peRem.delete(k); else peAdd.add(k); } else { if (peRoleSet.has(k)) peRem.add(k); peAdd.delete(k); } }
 function renderCats(){
   const box = $('permCats'), open = new Set([...box.querySelectorAll('.pcat.open')].map(x => x.dataset.c)); box.innerHTML = '';
-  PD.cats.forEach(c => {
-    const defs = PD.defs.filter(d => d.cat === c), on = defs.filter(d => peKeys.has(d.key)).length;
+  const D0 = (RD || PD); D0.cats.forEach(c => {
+    const defs = D0.defs.filter(d => d.cat === c), on = defs.filter(d => peHas(d.key)).length;
     const w = el('div', 'pcat' + (open.has(c) ? ' open' : '')); w.dataset.c = c;
     const h = el('button', 'ph'); const ic = el('span', 'ic'); ic.innerHTML = ICONS[CAT_ICON[c]] || ICONS.settings; h.appendChild(ic);
     h.appendChild(el('span', '', c)); h.appendChild(el('span', 'cnt' + (on ? ' some' : ''), on + ' من ' + defs.length));
     h.insertAdjacentHTML('beforeend', ICONS.chev); h.onclick = () => w.classList.toggle('open'); w.appendChild(h);
     const body = el('div', 'pb');
-    if (!defs.length) body.appendChild(el('small', '', 'لا توجد صلاحيات في هذا التبويب بعد. تُضاف من تبويب "الصلاحيات المتاحة" في جدول البيانات.'));
-    else {
-      const all = el('button', 'allbtn', on === defs.length ? 'إلغاء الكل' : 'تحديد الكل');
-      all.onclick = () => { const full = on === defs.length; defs.forEach(d => [d.key].concat((d.lv || []).map(l => d.key + ':' + l[0])).forEach(k => full ? (!peLock.has(k) && peKeys.delete(k)) : peKeys.add(k))); renderCats(); };
-      body.appendChild(all);
-    }
+    const all = el('button', 'allbtn', on === defs.length ? 'إلغاء الكل' : 'تحديد الكل');
+    all.onclick = () => { const full = on === defs.length; defs.forEach(d => [d.key].concat((d.lv || []).map(l => d.key + ':' + l[0])).forEach(k => peSet(k, !full))); renderCats(); };
+    body.appendChild(all);
     defs.forEach(d => {
       const r = el('div', 'prow lvrow'), g = el('div', 'grow'), t = el('b', '', d.name);
-      if (d.status && d.status !== 'مفعّلة') t.appendChild(el('span', 'badge2', d.status));
-      g.appendChild(t); if (d.desc) g.appendChild(el('small', 'muted', d.desc)); if (peLock.has(d.key)) g.appendChild(el('small', 'lockr', 'المؤشَّر بالرمادي من صلاحيات الدور'));
-      r.appendChild(g);
-      // «عرض» = البند نفسه، وبقية المستويات حسب طبيعة البند؛ اختيار أي مستوى يفعّل «عرض» تلقائياً
+      g.appendChild(t); if (d.desc) g.appendChild(el('small', 'muted', d.desc)); r.appendChild(g);
       const ch = el('div', 'lvchips'), lv = [['', (d.lv || []).length ? 'عرض' : 'منح الصلاحية']].concat(d.lv || []);
-      lv.forEach(l => { const k = l[0] ? d.key + ':' + l[0] : d.key, lk = peLock.has(k), b = el('button', (peKeys.has(k) ? 'on' : '') + (lk ? ' lock' : ''), l[1]); b.type = 'button';
-        b.onclick = () => { if (lk) return toast('هذه من صلاحيات الدور، وتُعدَّل من تبويب «الأدوار».');
-          if (peKeys.has(k)){ peKeys.delete(k); if (!l[0]) (d.lv || []).forEach(x => { if (!peLock.has(d.key + ':' + x[0])) peKeys.delete(d.key + ':' + x[0]); }); }
-          else { peKeys.add(k); peKeys.add(d.key); }
+      lv.forEach(l => { const k = l[0] ? d.key + ':' + l[0] : d.key, has = peHas(k), fromRole = peRoleSet.has(k) && has && !peAdd.has(k), removed = peRoleSet.has(k) && !has;
+        const b = el('button', (has ? 'on' : '') + (fromRole ? ' role' : '') + (removed ? ' rem' : ''), l[1]); b.type = 'button';
+        b.title = fromRole ? 'من أدواره — اضغط لنزعها منه وحده' : removed ? 'منزوعة منه وحده — اضغط لإرجاعها' : has ? 'مضافة له' : '';
+        b.onclick = () => { const to = !has; peSet(k, to);
+          if (to && l[0]) peSet(d.key, true);                                   // أي مستوى يفعّل «عرض»
+          if (!to && !l[0]) (d.lv || []).forEach(x => peSet(d.key + ':' + x[0], false));   // نزع «عرض» ينزع المستويات
           renderCats(); };
         ch.appendChild(b); });
       r.appendChild(ch); body.appendChild(r);
@@ -7024,14 +7052,14 @@ function renderCats(){
     w.appendChild(body); box.appendChild(w);
   });
 }
-$('peBack').onclick = () => { $('permEdit').classList.add('hidden'); $('permUsersCard').classList.remove('hidden'); if (pmMode === 'roles') renderRoles(); else renderUsers(); };
+$('peBack').onclick = () => { $('permEdit').classList.add('hidden'); $('permUsersCard').classList.remove('hidden'); renderRoles(); renderUsers(); };
 $('peSave').onclick = async () => {
   $('peSave').disabled = true;
   try {
-    if (peUser.isRole){ const r = await api({ action:'roleSave', role:peUser.role, keys:[...peKeys] }); if (!r.ok) return toast(r.msg); PD = r; toast(r.msg); $('peBack').click(); return; }
-    const r = await api({ action:'savePerms', nid:peUser.nid, keys:[...peKeys].filter(k => !peLock.has(k)) });
+    if (peUser.isRole){ const r = await api({ action:'roleSave', role:peUser.role, keys:[...peAdd] }); if (!r.ok) return toast(r.msg); toast(r.msg); await openSettings(); return; }
+    const r = await api({ action:'savePerms', nid:peUser.nid, keys:[...peAdd].filter(k => !peRoleSet.has(k)), rem:[...peRem].filter(k => peRoleSet.has(k)), xroles:peX });
     if (!r.ok) return toast(r.msg);
-    peUser.keys = r.keys; toast(r.msg); $('peBack').click();
+    toast(r.msg); await openSettings();
   } catch(e){ toast('تعذّر الاتصال بالخادم'); }
   finally { $('peSave').disabled = false; }
 };
