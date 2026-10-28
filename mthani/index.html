@@ -4347,7 +4347,7 @@ function renderExam(){
   EX_STEPS.forEach(t => { const b = el('button', 'exstep' + (exS === t[0] ? ' on' : '') + (cnt[t[0]] ? ' has' : '')); b.type = 'button';
     const tx = el('span'); tx.appendChild(el('b', '', t[1])); tx.appendChild(el('small', '', cnt[t[0]] + (t[0] === 4 ? ' مجموعة' : ' طالب'))); b.appendChild(tx);
     b.onclick = () => { exS = t[0]; exSub = ''; renderExam(); }; sb.appendChild(b); });
-  $('exAdd').classList.toggle('hidden', !can || exS !== 1); $('exSupBtn').classList.toggle('hidden', !can || !AX.supEdit);
+  $('exAdd').classList.toggle('hidden', !can || exS !== 1 || AX.canPre === false); $('exSupBtn').classList.toggle('hidden', !can || !AX.supEdit);
   const sup = $('exSupBox'); sup.classList.toggle('hidden', !exSupOpen || !AX.supEdit); if (exSupOpen && AX.supEdit){ sup.innerHTML = ''; const c = el('div', 'card'); supCard(c); sup.appendChild(c); }
   const sub = $('exSub'); sub.innerHTML = ''; const chips = list => { list.forEach(x => { const b = el('button', exSub === x[0] ? 'on' : '', x[1]); b.onclick = () => { exSub = x[0]; renderExam(); }; sub.appendChild(b); }); };
   const box = $('exBox'); box.innerHTML = ''; const wrap = el('div', 'card'); box.appendChild(wrap);
@@ -4427,7 +4427,7 @@ function renderCands(){
   if (role === 'exams') return renderExam();
   CD_F = CD_F_ALL.filter(f => f[0] === 'new' || f[0] === 'fail' || (f[0] === 'pass' && cdItems().some(x => x.k === 'pass'))); if (!CD_F.some(f => f[0] === cdF)) cdF = 'new';
   $('cdTitle').textContent = 'الطلاب المرشحون للاختبار القبلي';
-  const all = cdItems(), sum = $('cdSum'); sum.innerHTML = ''; $('cdAdd').classList.toggle('hidden', !AX.canNom);
+  const all = cdItems(), sum = $('cdSum'); sum.innerHTML = ''; $('cdAdd').classList.toggle('hidden', !AX.canNom || AX.canPre === false);
   CD_F.forEach(f => { const n = all.filter(x => f[0] === 'all' || x.k === f[0]).length; const b = el('button', cdF === f[0] ? 'on' : '', f[1] + ' (' + n + ')'); b.onclick = () => { cdF = f[0]; renderCands(); }; sum.appendChild(b); });
   const q = normAr($('cdQ').value), box = $('cdBox'); box.innerHTML = '';
   const list = all.filter(x => (cdF === 'all' || x.k === cdF) && (!q || normAr(x.name + ' ' + x.hname + ' ' + x.teacher).indexOf(q) !== -1));
