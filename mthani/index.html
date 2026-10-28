@@ -6240,8 +6240,9 @@ async function refreshCounts(){ try { if (!D || !store.get('hq_token')) return; 
 
 async function openMyStu(){
   const box = $('msTabs'); box.innerHTML = ''; const cT = role === 'candsT'; if (cT) msSec = 'exam'; else if (msSec === 'exam') msSec = 'stu'; box.classList.toggle('hidden', cT); $('msHead').classList.toggle('hidden', cT);
-  const c = refUnread();
-  MS_TABS.forEach(t => { const b = el('button', msSec === t[0] ? 'on' : ''); b.innerHTML = MSI[t[0]]; b.appendChild(el('span', '', t[1])); b.dataset.k = t[0];
+  const c = refUnread(), TB = MS_TABS.filter(t => (t[0] !== 'stu' && t[0] !== 'edu') || hasL('refs.send', t[0]));   // الإحالة حسب صلاحية «إحالة طالب من الحلقة»
+  if (!cT && !TB.some(t => t[0] === msSec)) msSec = TB[0][0];
+  TB.forEach(t => { const b = el('button', msSec === t[0] ? 'on' : ''); b.innerHTML = MSI[t[0]]; b.appendChild(el('span', '', t[1])); b.dataset.k = t[0];
     if (t[0] === 'track' && c.mine) b.appendChild(el('span', 'bdg', c.mine));
     b.onclick = () => { msSec = t[0]; openMyStu(); }; box.appendChild(b); });
   $('msForm').classList.toggle('hidden', msSec === 'track'); $('msTrack').classList.toggle('hidden', msSec !== 'track');
