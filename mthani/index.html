@@ -507,6 +507,15 @@
   .pcat.open .pb{display:block}
   .prow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px dashed var(--line)}
   .prow:last-of-type{border-bottom:0}
+  .lvappr .aph{display:flex;align-items:center;gap:12px;flex-wrap:wrap} .lvappr .aph h2{margin:0} .lvappr .aph .grow{flex:1}
+  .lvappr .apn{font-size:30px;font-weight:800;color:var(--navy3)} .lvappr .apn small{font-size:15px;color:var(--muted);font-weight:700}
+  .lvappr .apbar{height:10px;border-radius:999px;background:var(--light);overflow:hidden;margin:10px 0 12px} .lvappr .apbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#1E8E4E,#3FB37A);transition:width .5s}
+  .lvappr .apsec{font-size:13px;font-weight:800;color:var(--muted);margin:10px 0 6px}
+  .lvappr .apgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+  .lvappr .api{display:flex;align-items:center;gap:10px;text-align:right;width:100%;padding:10px 12px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--text)}
+  .lvappr .api i{width:12px;height:12px;border-radius:50%;flex:none;background:#E0A030} .lvappr .api.ok i{background:#1E8E4E}
+  .lvappr .api.no{border-color:#F0C98A;background:#FFF8EC} .lvappr .api b{display:block;font-size:14px} .lvappr .api small{display:block;color:var(--muted);font-size:12px}
+  @media (prefers-color-scheme: dark){ .lvappr .api.no{background:rgba(224,160,48,.12)} }
   .prow.lvrow{flex-direction:column;align-items:stretch;gap:8px}
   .lvchips{display:flex;flex-wrap:wrap;gap:6px}
   .lvchips button{width:auto;min-height:34px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--card);color:var(--muted);border:1.5px solid var(--line);display:inline-flex;align-items:center;gap:5px}
@@ -1448,6 +1457,7 @@
     <div id="pDash" class="hidden">
       <div id="lvWrap">
         <div class="card lvhead"><div class="lvtop"><h2>Dashboard</h2><span class="lvlive"><i></i>مباشر</span><span class="grow"></span><small id="lvTime"></small><button class="mini" id="lvRef" type="button">تحديث الآن</button><button class="mini" id="lvFull" type="button">ملء الشاشة</button></div><small id="lvDay"></small></div>
+        <div class="card lvappr" id="lvAppr"></div>
         <div class="lvkpis" id="lvKpi"></div>
         <div class="chgrid" id="lvRow1"></div>
         <div class="chgrid" id="lvRow2"></div>
@@ -2615,7 +2625,7 @@ function buildAdminNav(n, list){
       h.onclick = () => { openRole(g.r); closeMenu(); }; w.appendChild(h); w.classList.add('direct'); n.appendChild(w); return;
     }
     const h = el('button', 'ghead'); const ic = el('span', 'ic'); ic.innerHTML = ICONS[g.ic] || ICONS.exam; h.appendChild(ic); h.appendChild(el('span', '', g.t));
-    h.insertAdjacentHTML('beforeend', ICONS.chev); h.onclick = () => w.classList.toggle('open'); w.appendChild(h);
+    h.insertAdjacentHTML('beforeend', ICONS.chev); h.onclick = () => { const was = w.classList.contains('open'); n.querySelectorAll('.ngroup.open').forEach(x => x.classList.remove('open')); w.classList.toggle('open', !was); }; w.appendChild(h);
     const box = el('div', 'gitems');
     g.items.forEach(it => {
       const b = el('button', '', it[1]); b.dataset.r = it[0]; b.dataset.t = it[1];
@@ -2664,7 +2674,7 @@ function openRole(r, title, group){
   role = r; saveRoute(r, title);
   const key = r === 'soon' ? 'soon:' + title : r;
   document.querySelectorAll('#nav .gitems button, #nav > button').forEach(b => b.classList.toggle('on', (b.dataset.r === 'soon' ? 'soon:' + b.dataset.t : b.dataset.r) === key));
-  document.querySelectorAll('#nav .ngroup').forEach(w => { const d = w.classList.contains('direct'), has = d ? w.querySelector('.ghead').dataset.r === key : !!w.querySelector('.gitems button.on'); w.classList.toggle('cur', has); if (has && !d) w.classList.add('open'); });
+  document.querySelectorAll('#nav .ngroup').forEach(w => { const d = w.classList.contains('direct'), has = d ? w.querySelector('.ghead').dataset.r === key : !!w.querySelector('.gitems button.on'); w.classList.toggle('cur', has); w.classList.toggle('open', has && !d); });   // تبقى قائمة التبويب الحالي مفتوحة فقط
   $('pSoon').classList.toggle('hidden', r !== 'soon');
   $('pAssign').classList.toggle('hidden', r !== 'assign');
   if (r === 'assign') openAssign();
@@ -5300,15 +5310,30 @@ async function loadLive(){
   lvBusy = false;
 }
 function lvTile(v, l, sub, cls, go){ const d = el('button', 'lvk ' + (cls || '')); d.type = 'button'; d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', nLbl(v, l))); if (sub) d.appendChild(el('small', '', sub)); if (go) d.onclick = go; else d.disabled = true; return d; }
+/* الاعتمادات أول الـ Dashboard: نسبة الحلقات المعتمدة اليوم، ثم غير المعتمدة أولاً؛ الضغط يفتح تقييم الحلقة */
+function renderLvAppr(H, apN, R){
+  const b = $('lvAppr'); b.innerHTML = ''; const n = H.length, pct = n ? Math.round(apN * 100 / n) : 0;
+  const hd = el('div', 'aph'); hd.appendChild(el('h2', '', 'اعتمادات اليوم')); hd.appendChild(el('span', 'grow'));
+  const big = el('div', 'apn', apN + ' '); big.appendChild(el('small', '', 'من ' + n + ' • ' + pct + '%')); hd.appendChild(big); b.appendChild(hd);
+  if (R.studyToday === false) b.appendChild(el('small', 'muted', 'اليوم ليس يوم دراسة، والمعروض آخر يوم دراسي.'));
+  const bar = el('div', 'apbar'), fi = el('i'); fi.style.width = pct + '%'; bar.appendChild(fi); b.appendChild(bar);
+  const go = h => { const L = (D && D.halaqat) || []; if (L.some(x => x.hid === h.hid)){ hal = h.hid; store.set('hq_hal', h.hid); day = null; openRole('teach'); } else openRole('report'); };
+  const sec = (t, list, ok) => { if (!list.length) return; b.appendChild(el('div', 'apsec', t + ' (' + list.length + ')')); const g = el('div', 'apgrid');
+    list.forEach(h => { const x = el('button', 'api ' + (ok ? 'ok' : 'no')); x.type = 'button'; x.appendChild(el('i')); const t2 = el('div'); t2.appendChild(el('b', '', h.name + (h.remote ? ' (عن بُعد)' : '')));
+      t2.appendChild(el('small', '', ok ? 'اعتُمدت' + (h.apprAt ? ' الساعة ' + h.apprAt : '') + (h.apprBy ? ' • ' + h.apprBy : '') : (h.teacher || 'بلا معلم') + ' • حضّر ' + (h.present + h.late + h.absent + h.excused) + ' من ' + h.students));
+      x.appendChild(t2); x.onclick = () => go(h); g.appendChild(x); }); b.appendChild(g); };
+  if (!n) return b.appendChild(el('small', 'muted', 'لا توجد حلقات نشطة.'));
+  sec('لم تُعتمد بعد', H.filter(h => !h.approved), false); sec('معتمدة', H.filter(h => h.approved), true);
+}
 function renderLive(){
   const R = LV, K = R.kpi, at = K.present + K.late, mk = at + K.absent + K.excused;
   $('lvTime').textContent = 'آخر تحديث ' + R.now.slice(11, 16);
   $('lvDay').textContent = (R.day === R.today ? 'اليوم: ' : 'آخر يوم دراسي: ') + fmtD(R.day, { weekday:'long', day:'numeric', month:'long' }) + (R.studyToday ? '' : ' • اليوم ليس يوم دراسة');
   const k = $('lvKpi'); k.innerHTML = ''; const H = R.halaqat, apN = H.filter(h => h.approved).length, S0 = R.staff, P = R.pend;
+  renderLvAppr(H, apN, R);
   [lvTile(at + '/' + K.students, 'طلاب حاضرون', mk ? Math.round(at * 100 / mk) + '% من المحضَّرين' : 'لم يُحضَّر أحد بعد', 'hero', () => openRole('report')),
    lvTile(K.absent, 'غائبون', K.excused ? 'مستأذنون ' + K.excused : '', K.absent ? 'r' : '', () => openRole('report')),
    lvTile(K.recs, 'مرات التسميع', K.ayat + ' آية', 'g', () => openRole('repAll')),
-   lvTile(apN + '/' + H.length, 'حلقات معتمدة', '', apN === H.length ? 'g' : 'y', () => openRole('report')),
    lvTile(S0 ? S0.present + '/' + S0.due : null, 'موظفون حاضرون', S0 ? 'متأخرون ' + S0.late : 'جدول البصمة غير مربوط', S0 && S0.present < S0.due ? 'y' : 'g', () => openRole('staffAtt')),
    lvTile(P.refs, 'إحالات مفتوحة', P.urgent ? 'عاجلة ' + P.urgent : '', P.urgent ? 'r' : '', () => openRole('refsStu')),
    lvTile(P.exam, 'ترشيحات مفتوحة', '', '', () => openRole('exams')),
