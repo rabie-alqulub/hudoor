@@ -2457,11 +2457,15 @@ $('btnLogout').onclick = async () => {
 let PK = null, pkMust = false;
 const PK_WHO = { teach:'المعلم', stu:'موظف شؤون الطلاب', edu:'موظف الشؤون التعليمية', parent:'ولي الأمر', student:'الطالب' };
 const PK_PORTAL = { teach:'المعلمين', stu:'شؤون الطلاب', edu:'الشؤون التعليمية', parent:'ولي الأمر', student:'الطالب' };
+const PK_CACHE = {}, PK_PRE = {};
 async function peekOpen(pt, must){
   pkMust = !!must; $('pkT').textContent = 'اختر ' + (PK_WHO[pt] || 'المستخدم') + ' لتجربة بوابته';
   $('pkSub').textContent = ''; $('pkClose').textContent = '✕';
-  $('pkQ').value = ''; $('pkList').innerHTML = '<div class="ge">جاري التحميل...</div>'; $('peekSheet').classList.remove('hidden');
-  let r; try { r = await api({ action:'peekList' }); } catch(e){ return; } if (!r.ok){ $('pkList').innerHTML = ''; $('pkList').appendChild(el('div', 'ge', r.msg)); return; }
+  $('pkQ').value = ''; $('peekSheet').classList.remove('hidden');
+  // القائمة تظهر فوراً من آخر تحميل لهذه البوابة، ثم تُحدَّث من الخادم في الخلفية
+  const cached = PK_CACHE[pt]; if (cached){ PK = cached; peekDraw(); } else $('pkList').innerHTML = '<div class="ge">جاري التحميل...</div>';
+  let r; try { r = await (PK_PRE[pt] || null); delete PK_PRE[pt]; if (!r || !r.ok || (r.portal && r.portal !== pt)) r = await api({ action:'peekList' }); } catch(e){ return; }
+  if (r.ok) PK_CACHE[pt] = r; if (!r.ok){ $('pkList').innerHTML = ''; $('pkList').appendChild(el('div', 'ge', r.msg)); return; }
   PK = r; $('pkSub').textContent = r.ro ? 'تدخل بوابته للاطلاع فقط، ولا يُسجَّل أي تعديل.' : 'تدخل بصلاحياته كاملة: ما تحفظه يُسجَّل فعلياً، أما رسائل الواتساب فلا تُرسل أثناء التجربة.';
   peekDraw(); $('pkQ').focus();
 }
@@ -2485,7 +2489,9 @@ function openRoles(){
 async function switchRole(k){
   msg('rlMsg', 'جاري الانتقال...', 'info');
   try { const r = await api({ action:'roleSwitch', portal:k }); if (!r.ok){ msg('rlMsg', needSrv(r), 'err'); if (!D) $('btnLogout').onclick(); return; }
-    $('rolesSheet').classList.add('hidden'); portal = k; store.set('hq_portal', k); ss.del('hq_route'); closeMenu(); window.scrollTo(0, 0); await loadHome(); }
+    $('rolesSheet').classList.add('hidden'); portal = k; store.set('hq_portal', k); ss.del('hq_route'); closeMenu(); window.scrollTo(0, 0);
+    if (k !== 'admin') PK_PRE[k] = api({ action:'peekList' }).catch(() => null);   // تحميل قائمة الموظفين بالتوازي مع الصفحة
+    await loadHome(); }
   catch(e){ if (e.message !== 'expired') msg('rlMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
 }
 $('btnRoles').onclick = openRoles; $('rlClose').onclick = () => $('rolesSheet').classList.add('hidden');
