@@ -2979,7 +2979,7 @@ function renderStuds(){
   const box = $('stuList'); box.innerHTML = '';
   if (!studs.length && !exStuds.length){ msg('stuList', 'لا يوجد طلاب في هذه الحلقة.', 'info'); return; }
   studs.forEach(s => {
-    const w = el('div', 'stu' + (s._flag && !s.att ? ' unset' : '')), top = el('div', 'top'); w.dataset.sid = s.sid;
+    const w = el('div', 'stu' + ((s._flag && !s.att) || (s._norec && isPresent(s) && !s.today.length) ? ' unset' : '')), top = el('div', 'top'); w.dataset.sid = s.sid;
     const nm = el('button', 'nm'); nm.appendChild(el('b', '', (approval && approval.star === s.sid ? '(فارس الحلقة) ' : '') + s.name)); nm.appendChild(el('small', '', lastText(s)));
     nm.onclick = () => openStudent(s.sid);
     top.appendChild(nm); w.appendChild(top);
@@ -3395,6 +3395,11 @@ $('btnApprove').onclick = async () => {
   const un = studs.filter(s => !s.att);
   if (un.length){ un.forEach(s => s._flag = true); renderStuds(); const st = $('apprState'); st.innerHTML = '';
     st.appendChild(el('div', 'msg err', 'لديك ' + (un.length === 1 ? 'الطالب ' + un[0].name + ' لم تقيّمه' : un.length + ' طلاب لم تقيّمهم: ' + un.map(s => s.name).join('، ')) + '. حدد حالتهم ثم اعتمد.'));
+    const f = document.querySelector('#stuList .stu.unset'); if (f) f.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
+  // الحاضر والمتأخر لا يُعتمد يومه حتى يُسجَّل له تقييم في أحد الأنواع أو «لم يسمّع»
+  const nr = studs.filter(s => isPresent(s) && !s.today.length);
+  if (nr.length && !teachVO){ nr.forEach(s => s._norec = true); renderStuds(); const st = $('apprState'); st.innerHTML = '';
+    st.appendChild(el('div', 'msg err', (nr.length === 1 ? 'الطالب ' + nr[0].name + ' حاضر ولم يُسجَّل له تقييم' : nr.length + ' طلاب حاضرون لم يُسجَّل لهم تقييم: ' + nr.map(s => s.name).join('، ')) + '. سجّل لكل طالب درجة في الحفظ أو المراجعة القريبة أو البعيدة أو التلاوة، أو اختر «لم يسمّع»، ثم اعتمد.'));
     const f = document.querySelector('#stuList .stu.unset'); if (f) f.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
   await flushAtt();
   apprStar = approval ? approval.star : '';
