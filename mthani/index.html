@@ -1694,6 +1694,15 @@
       </div>
 
       <div id="cpStars" class="cpsec hidden">
+        <div class="card hidden" id="saCard">
+          <h3 class="cph">إضافة فارس الحلقة لطالب</h3>
+          <small>لحالات نادرة، كغياب المعلم. الإضافة لليوم نفسه فقط، ولا تُقبل لحلقة لها فارس اليوم.</small>
+          <div class="fgrid" style="grid-template-columns:1fr 1fr">
+            <div><label for="saHal">بحث بالحلقة</label><select id="saHal"></select></div>
+            <div><label for="saQ">بحث باسم الطالب</label><input id="saQ" autocomplete="off" placeholder="اكتب اسم الطالب"></div>
+          </div>
+          <div id="saList"></div>
+        </div>
         <div class="card">
           <h3 class="cph">فرسان الحلقات</h3>
           <small>كل اختيار لفارس الحلقة يضيف للطالب نقطة في رصيده تلقائياً.</small>
@@ -2617,7 +2626,7 @@ const hasL = (k, lv) => { const P = (D && D.perms) || []; return P.indexOf('*') 
 const NAV_LV = { halaqaNew:['halaqat.manage:add'], halaqaEdit:['halaqat.manage:edit', 'halaqat.manage:del'] };
 const STAFF_EXTRA = [['repStu', 'تقارير شؤون الطلاب', 'reports.students'], ['repEdu', 'تقارير الشؤون التعليمية', 'reports.edu']];
 const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
-  nafStars:'competition.manage', nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
+  nafStars:['competition.manage', 'competition.star'], nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
   moveMany:'students.move', absent:'students.absent', staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
   teach:'halaqat.evaluate_all', halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', remote:'halaqat.remote', reeval:'halaqat.reeval',
   plans:'students.plans_all', refsEdu:'refs.edu', planF:'plans.follow', exams:'assoc.nominate',
@@ -6466,7 +6475,31 @@ async function cpCall(data, box){
 
 /* فارس الحلقة: عدد مرات اختيار الطالب فارساً ونقاطها */
 let FS = null, fsP = 'month';
+/* إضافة فارس الحلقة يدوياً: لمدير المجمع ومن يمنحه «إضافة فارس الحلقة لطالب» */
+let STA = null;
+const canStarAdd = () => { const P = (D && D.perms) || []; return P.indexOf('*') !== -1 || P.indexOf('competition.star') !== -1; };
+async function loadStarAdd(){
+  $('saCard').classList.toggle('hidden', !canStarAdd()); if (!canStarAdd()) return;
+  const r = await cpCall({ action:'starToday' }, 'saList'); if (!r || !r.ok) return; STA = r;
+  const cur = $('saHal').value; fillSel('saHal', STA.halaqat.map(h => [h.hid, h.name + (h.star ? ' (فارس اليوم: ' + h.star.name + ')' : '')]), '— اختر الحلقة —'); $('saHal').value = STA.halaqat.some(h => h.hid === cur) ? cur : '';
+  renderStarAdd();
+}
+function renderStarAdd(){
+  const box = $('saList'); box.innerHTML = ''; if (!STA) return;
+  const hid = $('saHal').value, q = normAr($('saQ').value.trim()), H = {}; STA.halaqat.forEach(h => H[h.hid] = h);
+  if (!hid && !q){ box.appendChild(el('small', 'muted', 'اختر الحلقة أو اكتب اسم الطالب.')); return; }
+  const L = STA.students.filter(x => (!hid || x.hid === hid) && (!q || normAr(x.name).indexOf(q) !== -1)).slice(0, 40);
+  if (hid && H[hid] && H[hid].star) box.appendChild(el('div', 'msg info', 'لـ«' + H[hid].name + '» فارس اليوم: ' + H[hid].star.name + (H[hid].star.manual ? ' (أُضيف يدوياً)' : '') + '.'));
+  if (!L.length) return box.appendChild(el('small', '', 'لا توجد نتائج.'));
+  L.forEach(x => { const h = H[x.hid] || {}, w = el('div', 'row'), g = el('div', 'grow'); g.appendChild(el('b', '', x.name)); g.appendChild(el('small', 'muted', h.name || '')); w.appendChild(g);
+    const b = el('button', 'mini good', h.star ? 'للحلقة فارس اليوم' : 'اجعله فارس اليوم'); b.disabled = !!h.star;
+    b.onclick = () => confirmOp('فارس الحلقة: ' + x.name, 'يُسجَّل فارساً لـ«' + (h.name || '') + '» اليوم، ويُضاف له نقطة في رصيده. لا يمكن إضافة فارس آخر لهذه الحلقة اليوم.', 'تأكيد الإضافة', async () => {
+      const r = await cpCall({ action:'starAdd', sid:x.sid }, 'saList'); if (r && r.ok){ STA = r; toast(r.msg); loadStarAdd(); openStars(); } });
+    w.appendChild(b); box.appendChild(w); });
+}
+$('saHal').onchange = () => STA && renderStarAdd(); $('saQ').oninput = () => STA && renderStarAdd();
 async function openStars(){
+  loadStarAdd();
   const per = $('fsPeriod'); per.innerHTML = '';
   [['all', 'منذ آخر تصفير'], ['month', 'هذا الشهر'], ['week', 'هذا الأسبوع']].forEach(x => { const b = el('button', fsP === x[0] ? 'on' : '', x[1]); b.onclick = () => { fsP = x[0]; openStars(); }; per.appendChild(b); });
   $('fsList').innerHTML = '<div class="msg info">جاري التحميل...</div>';
