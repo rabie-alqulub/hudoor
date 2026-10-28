@@ -530,6 +530,36 @@
   body.subm #btnRoles, body.subm #btnBell, body.subm #gsWrap, body.subm #btnHome, body.subm #backBar, body.subm #btnPin, body.subm #halChips, body.subm #dPrev, body.subm #dNext{display:none!important}
   .subform .fgrid{grid-template-columns:1fr 1fr} @media (max-width:520px){ .subform .fgrid{grid-template-columns:1fr} }
   .sblink{margin-top:12px;padding:12px;border-radius:14px;border:1.5px dashed var(--navy);background:var(--light);word-break:break-all;font-size:13px;direction:ltr;text-align:left}
+  .dwhero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);color:#fff;border-radius:22px;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:center;margin-bottom:12px}
+  .dwhero h2{color:#fff;margin:0;font-size:26px} .dwhero p{margin:2px 0 0;font-size:14px;opacity:.88}
+  .dwnow{display:flex;gap:10px;flex-wrap:wrap} .dwnow div{background:rgba(255,255,255,.12);border-radius:14px;padding:8px 14px;min-width:170px} .dwnow small{display:block;font-size:12px;color:#F3D9AE;font-weight:700} .dwnow b{font-size:16px}
+  .dwbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+  .dwtabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;flex-wrap:wrap}
+  .dwtabs button{width:auto;min-height:36px;font-weight:700;font-size:14px;border:0;border-radius:999px;padding:6px 16px;background:none;color:var(--muted)} .dwtabs button.on{background:var(--navy);color:#fff}
+  .dwfor{display:flex;align-items:center;gap:8px} .dwfor label{margin:0;white-space:nowrap} .dwfor select{min-width:200px}
+  .dwleg{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted);margin-inline-start:auto} .dwleg i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-inline-end:5px;vertical-align:-1px}
+  .l-free{background:#E5F4EB;border:1px solid #9FD3B3} .l-bk{background:#3B5F78} .l-mine{background:#C98A2B} .l-off{background:var(--light);border:1px dashed var(--muted)}
+  .dwmonth{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px}
+  .dwmh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px} .dwmh h3{margin:0;font-size:22px;color:var(--navy3)} .dwmh span{font-size:13px;color:var(--muted)}
+  .dwmh .rule{margin-inline-start:auto;font-size:12.5px;background:var(--goldlight);color:var(--gold2);font-weight:700;border-radius:999px;padding:3px 10px}
+  .dwdow,.dwwk{display:grid;grid-template-columns:96px repeat(4,1fr);gap:8px} .dwdow{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;text-align:center} .dwwk{margin-bottom:8px}
+  .dwwl{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--muted);background:var(--light);border-radius:14px;padding:6px}
+  .dwd{position:relative;min-height:112px;border-radius:16px;border:2px solid var(--line);background:var(--card);padding:10px 10px 8px;display:flex;flex-direction:column;gap:3px;text-align:right;width:auto;color:var(--text);font-weight:400}
+  .dwd .hd{font-size:26px;font-weight:800;line-height:1;color:var(--navy3)} .dwd .gd{font-size:12px;color:var(--muted)} .dwd .st{margin-top:auto;font-size:13.5px;font-weight:800}
+  .dwd.free{border-color:#9FD3B3;background:#E5F4EB;cursor:pointer;transition:transform .15s,box-shadow .15s} .dwd.free .st{color:#1E8E4E}
+  .dwd.free:hover,.dwd.free:focus-visible{transform:translateY(-2px);box-shadow:0 10px 22px rgba(30,142,78,.18)}
+  .dwd.bk{border-color:transparent;color:#fff} .dwd.bk .hd,.dwd.bk .gd{color:#fff} .dwd.bk .gd{opacity:.85}
+  .dwd.mine{box-shadow:0 0 0 3px #C98A2B inset} .dwd.mine::after{content:'حلقتك';position:absolute;top:8px;left:8px;font-size:11px;font-weight:800;background:#C98A2B;color:#fff;border-radius:999px;padding:1px 8px}
+  .dwd.off{background:var(--light);border-style:dashed;color:var(--muted)} .dwd.off .hd{color:var(--muted)} .dwd.past{opacity:.45} .dwd.today{outline:3px solid #C98A2B;outline-offset:2px}
+  .dwd .acts{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px} .dwd .acts button{width:auto;min-height:26px;font-size:11.5px;font-weight:700;border:0;border-radius:8px;padding:3px 8px;background:rgba(255,255,255,.9);color:#1F3546}
+  .dwd.free .acts button,.dwd.off .acts button{background:var(--card);border:1px solid var(--line);color:var(--muted)}
+  @media (prefers-color-scheme: dark){ .dwd.free{background:#163325;border-color:#2E6B48} .dwd.free .st{color:#4CC27F} }
+  .dwside{display:grid;grid-template-columns:1.4fr 1fr;gap:12px} .dwhl{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px} .dwhl span{font-size:13px;border-radius:999px;padding:4px 12px;font-weight:700;color:#fff} .dwhl span.wait{background:var(--light);color:var(--muted)}
+  .diwstrip{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin-bottom:12px;cursor:pointer}
+  .diwstrip b{color:var(--gold2)} .diwstrip i{font-style:normal;font-weight:700;color:var(--navy3)}
+  .diwday{border:1.5px solid #F0C98A;background:#FFF8EC;color:#7A4D0F;border-radius:14px;padding:12px 14px;font-weight:700;margin-bottom:10px}
+  @media (prefers-color-scheme: dark){ .diwday{background:rgba(224,160,48,.12);color:#F0C98A} }
+  @media (max-width:760px){ .dwhero{grid-template-columns:1fr} .dwside{grid-template-columns:1fr} .dwdow,.dwwk{grid-template-columns:repeat(4,1fr)} .dwdow span:first-child{display:none} .dwwl{grid-column:1 / -1;justify-content:flex-start;padding:4px 10px} .dwd{min-height:92px;padding:8px} .dwd .hd{font-size:21px} .dwd .st{font-size:12px} .dwleg{margin-inline-start:0} }
   .prow.lvrow{flex-direction:column;align-items:stretch;gap:8px}
   .lvchips{display:flex;flex-wrap:wrap;gap:6px}
   .lvchips button{width:auto;min-height:34px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--card);color:var(--muted);border:1.5px solid var(--line);display:inline-flex;align-items:center;gap:5px}
@@ -1068,6 +1098,7 @@
         <div class="when" id="when"></div>
         <div class="hals" id="myHals"></div>
       </div>
+      <div id="diwStrip" class="hidden"></div>
       <div id="zmCards"></div>
       <div class="stats" id="stats"></div>
       <div class="card g2only hidden" id="weekCard"><div class="wkhead"><h2>الحضور والتسميع — آخر 7 أيام دراسية</h2><div class="wklg"><span><i style="background:#3B5F78"></i>الحاضرون</span><span><i style="background:#D08E2C"></i>مرات التسميع</span></div></div><div class="wksum" id="weekSum"></div><div id="weekChart"></div></div>
@@ -1084,6 +1115,7 @@
         <div class="chips" id="halChips"></div>
         <div class="msg info hidden" id="roNote">عرض فقط: التقييم يسجّله معلم الحلقة.</div>
         <div class="msg info hidden" id="subNote"></div>
+        <div class="diwday hidden" id="diwNote"></div>
         <div class="zmbar hidden" id="zmBar"><button class="zmgo" id="zmGo">بدء الحلقة عن بعد</button><button class="link" id="zmCopy">نسخ الرابط</button><span class="grow"></span><span class="pill p-red hidden" id="zmLiveP">● مباشر</span></div>
         <div id="zmMsg"></div>
         <div class="pnav"><button id="dPrev">السابق</button><b id="dLabel"></b><button id="dNext">التالي</button></div>
@@ -1111,6 +1143,17 @@
     </div>
 
     <!-- إسناد حلقة لمعلم -->
+    <!-- الديوانية -->
+    <div id="pDiw" class="hidden">
+      <div class="dwhero"><div><h2>الديوانية</h2><p>يوم مفتوح لحلقة واحدة في اليوم. لكل حلقة يوم واحد في كل شهر هجري، والحجز لمن يسبق.</p></div>
+        <div class="dwnow"><div><small>في الديوانية اليوم</small><b id="dwToday">—</b></div><div><small>الحلقة القادمة</small><b id="dwNext">—</b></div></div></div>
+      <div class="dwbar"><div class="dwtabs" id="dwTabs"></div><div class="dwfor hidden" id="dwForW"><label for="dwFor">الحجز لـ</label><select id="dwFor"></select></div>
+        <div class="dwleg"><span><i class="l-free"></i>متاح</span><span><i class="l-bk"></i>محجوز</span><span><i class="l-mine"></i>حلقتك</span><span><i class="l-off"></i>مغلق</span></div></div>
+      <div id="dwCal"></div>
+      <div class="dwside"><div class="card"><h3 class="cph" id="dwSumT">الحلقات</h3><div class="dwhl" id="dwHl"></div><small id="dwRule"></small></div>
+        <div class="card hidden" id="dwAdm"><h3 class="cph">إضافة يوم ديوانية</h3><small>للفصول القادمة: أضف أيام الدراسة (الأحد–الأربعاء)، ويُحسب الشهر الهجري تلقائياً.</small>
+          <div class="fgrid" style="grid-template-columns:1fr auto;align-items:end"><div><label for="dwAddD">التاريخ</label><input type="date" id="dwAddD"></div><button class="btn" id="dwAdd" type="button" style="width:auto">إضافة</button></div><div id="dwAddMsg"></div></div></div>
+    </div>
     <!-- تكليف معلم بديل -->
     <div id="pSubst" class="hidden">
       <div class="card subform">
@@ -2445,6 +2488,65 @@ function pickPortal(k){
 /* حفظ بيانات الدخول (باختيار المستخدم): على هذا الجهاز فقط */
 function savedPin(k){ try { const v = store.get('hq_pin_' + k); return v ? atob(v) : ''; } catch(e){ return ''; } }
 function savePin(k, pin){ if (pin) store.set('hq_pin_' + k, btoa(pin)); else store.del('hq_pin_' + k); }
+/* ---------- الديوانية: حجز يوم لكل حلقة في الشهر الهجري (من يسبق) ---------- */
+let DW = null, dwM = '';
+const DW_COL = ['#3B5F78','#7A5BA6','#2E8B7A','#B5562F','#4E7A3A','#A0436A','#3E6FB0','#8A6D2E','#5B6B8C','#2F7F9A','#9A4A4A','#567D5A','#6D5BA6','#B07A2F','#3F5A7A','#7F4F8F','#2F8F6F','#8F5A3F','#4A6B8A','#8A4F6B'];
+async function openDiw(){ const r = await cpCall({ action:'diwData' }, 'dwCal'); if (!r || !r.ok) return; DW = r; renderDiw(); }
+const dwColor = hid => DW_COL[Math.max(0, DW.halaqat.findIndex(h => h.hid === hid)) % DW_COL.length];
+const dwName = hid => (DW.halaqat.find(h => h.hid === hid) || {}).name || '';
+function renderDiw(){
+  const months = [...new Set(DW.days.filter(d => d.date >= DW.today.slice(0, 8) + '01' || DW.books.some(b => b.date === d.date)).map(d => d.hm))];
+  const futM = [...new Set(DW.days.filter(d => d.date >= DW.today).map(d => d.hm))];
+  if (!dwM || months.indexOf(dwM) === -1) dwM = futM[0] || months[months.length - 1] || '';
+  const T = $('dwTabs'); T.innerHTML = ''; months.forEach(m => { const b = el('button', m === dwM ? 'on' : '', m); b.type = 'button'; b.onclick = () => { dwM = m; renderDiw(); }; T.appendChild(b); });
+  const B = {}; DW.books.forEach(b => B[b.date] = b);
+  const t = B[DW.today], nx = DW.books.filter(b => b.date > DW.today).sort((a, b) => a.date.localeCompare(b.date))[0];
+  $('dwToday').textContent = t ? t.hname : 'لا توجد حلقة اليوم'; $('dwNext').textContent = nx ? nx.hname + ' — ' + fmtD(nx.date, { weekday:'long', day:'numeric', month:'short' }) : 'لم تُحجز بعد';
+  // لمن يحجز لأكثر من حلقة (المدير أو معلم بحلقتين): اختيار الحلقة
+  const forList = DW.manage ? DW.halaqat : DW.halaqat.filter(h => DW.mine.indexOf(h.hid) !== -1);
+  $('dwForW').classList.toggle('hidden', forList.length < 2);
+  const cur = $('dwFor').value; fillSel('dwFor', forList.map(h => [h.hid, h.name]), forList.length > 1 ? '— اختر الحلقة —' : ''); $('dwFor').value = forList.some(h => h.hid === cur) ? cur : (forList.length === 1 ? forList[0].hid : '');
+  const box = $('dwCal'); box.innerHTML = '';
+  const D0 = DW.days.filter(d => d.hm === dwM), sec = el('div', 'dwmonth'), nFree = D0.filter(d => d.status === 'متاح' && !B[d.date] && d.date > DW.today).length;
+  const mh = el('div', 'dwmh'); mh.appendChild(el('h3', '', dwM)); mh.appendChild(el('span', '', nFree + ' يوماً متاحاً للحجز')); mh.appendChild(el('span', 'rule', 'يوم واحد لكل حلقة في الشهر')); sec.appendChild(mh);
+  const dw = el('div', 'dwdow'); ['الأسبوع', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء'].forEach(x => dw.appendChild(el('span', '', x))); sec.appendChild(dw);
+  // تجميع الأيام في أسابيع (الأحد أول الأسبوع)
+  const wkOf = d => { const x = ud(d); x.setUTCDate(x.getUTCDate() - x.getUTCDay()); return iso(x); }, W = {};
+  D0.forEach(d => (W[wkOf(d.date)] = W[wkOf(d.date)] || []).push(d));
+  Object.keys(W).sort().forEach(wk => {
+    const row = el('div', 'dwwk'), wn = W[wk].find(x => x.week) ; row.appendChild(el('div', 'dwwl', wn ? 'الأسبوع ' + wn.week : fmtD(wk, { day:'numeric', month:'short' })));
+    [0, 1, 2, 3].forEach(i => {
+      const d = W[wk].find(x => ud(x.date).getUTCDay() === i); if (!d){ row.appendChild(el('div')); return; }
+      const b = B[d.date], off = d.status !== 'متاح', past = d.date < DW.today, mine = b && DW.mine.indexOf(b.hid) !== -1, canBook = !off && !b && (d.date > DW.today || (DW.manage && d.date >= DW.today));
+      const c = el(canBook ? 'button' : 'div', 'dwd ' + (off ? 'off' : b ? 'bk' : 'free') + (mine ? ' mine' : '') + (past ? ' past' : '') + (d.date === DW.today ? ' today' : ''));
+      if (b && !off) c.style.background = dwColor(b.hid);
+      c.appendChild(el('span', 'hd', d.hd || '')); c.appendChild(el('span', 'gd', fmtD(d.date, { day:'numeric', month:'numeric' }) + ' م'));
+      c.appendChild(el('span', 'st', off ? (d.note || 'مغلق') : b ? b.hname : past ? '—' : canBook ? 'متاح • احجز' : 'متاح'));
+      if (canBook){ c.type = 'button'; c.onclick = () => dwBook(d); }
+      const acts = el('div', 'acts'), add = (t, fn) => { const x = el('button', '', t); x.type = 'button'; x.onclick = e => { e.stopPropagation(); fn(); }; acts.appendChild(x); };
+      const days = Math.round((ud(d.date) - ud(DW.today)) / 864e5);
+      if (b && (DW.manage || (mine && days >= DW.cancelDays))) add(DW.manage ? 'إلغاء' : 'إلغاء حجزي', () => confirmOp('إلغاء حجز ' + b.hname, 'يعود اليوم ' + d.hd + ' ' + d.hm + ' متاحاً للجميع.', 'إلغاء الحجز', () => dwAct({ action:'diwCancel', date:d.date })));
+      if (DW.manage && !past){ if (off) add('فتح اليوم', () => dwAct({ action:'diwDay', op:'open', date:d.date })); else add('إغلاق اليوم', () => confirmOp('إغلاق يوم ' + d.hd + ' ' + d.hm, b ? 'يُلغى حجز ' + b.hname + ' ولا يُحجز هذا اليوم.' : 'لا يُحجز هذا اليوم.', 'إغلاق اليوم', () => dwAct({ action:'diwDay', op:'close', date:d.date }))); }
+      if (acts.children.length) c.appendChild(acts);
+      row.appendChild(c);
+    });
+    sec.appendChild(row);
+  });
+  if (!D0.length) sec.appendChild(el('small', '', 'لا توجد أيام ديوانية بعد.'));
+  box.appendChild(sec);
+  $('dwSumT').textContent = 'الحلقات في ' + (dwM || 'الشهر'); const hl = $('dwHl'); hl.innerHTML = '';
+  DW.halaqat.forEach(h => { const bk = DW.books.find(b => b.hid === h.hid && b.hm === dwM), sp = el('span', bk ? '' : 'wait', h.name + (bk ? ' ✓ ' + fmtD(bk.date, { day:'numeric', month:'numeric' }) : '')); if (bk) sp.style.background = dwColor(h.hid); hl.appendChild(sp); });
+  $('dwRule').textContent = 'يحجز المعلم لحلقته بضغطة، ويلغي حجزه قبل موعده بيومين على الأقل فيعود اليوم متاحاً للجميع. يوم الديوانية لا تحضير فيه ولا تقييم، ولا يُحسب غياباً.' + (DW.manage ? ' الإدارة تحجز لأي حلقة، وتلغي، وتغلق الأيام.' : '');
+  $('dwAdm').classList.toggle('hidden', !DW.manage);
+}
+async function dwAct(q){ const r = await cpCall(q, null); if (!r) return toast('تعذّر الاتصال بالخادم.'); if (r.days) DW = Object.assign({}, r, { ok:true }); toast(needSrv(r) || r.msg || ''); renderDiw(); }
+function dwBook(d){
+  const hid = $('dwFor').value; if (!hid) return toast('اختر الحلقة أولاً من «الحجز لـ».');
+  confirmOp('حجز الديوانية لـ' + dwName(hid), d.hd + ' ' + d.hm + ' (' + fmtD(d.date, { weekday:'long', day:'numeric', month:'long' }) + '): يوم ديوانية للحلقة، بلا تحضير ولا تقييم.', 'تأكيد الحجز', () => dwAct({ action:'diwBook', date:d.date, hid:hid }));
+}
+$('dwFor').onchange = () => DW && renderDiw();
+$('dwAdd').onclick = async () => { const d = $('dwAddD').value; if (!d) return msg('dwAddMsg', 'اختر التاريخ.', 'err'); const r = await cpCall({ action:'diwDay', op:'add', date:d }, 'dwAddMsg'); if (r && r.ok){ DW = r; msg('dwAddMsg', r.msg, 'ok'); renderDiw(); } };
+
 /* ---------- تكليف معلم بديل (للمدير ومن يمنحه الصلاحية) ---------- */
 let SB2 = null, sbDur = '1', sbLast = null;
 async function openSubst(){
@@ -2651,7 +2753,8 @@ async function loadHome(){
     if (mineH){ TABS.push(['teach', 'التقييم', 'own']); TABS.push(['myStu', 'طلاب الحلقة', 'own']); TABS.push(['candsT', 'ترشيح طالب لاختبار المرحلية', 'own']);
       if (!has('students.plans_all')) TABS.push(['plans', 'خطط طلاب الحلقة', 'own']);
       if (!has('plans.follow')) TABS.push(['planF', 'متابعة سير الخطط', 'own']);
-      if (!has('halaqat.reports_all')) TABS.push(['report', 'تقارير الحلقة', 'own']); }
+      if (!has('halaqat.reports_all')) TABS.push(['report', 'تقارير الحلقة', 'own']);
+      if (!r.sub) TABS.push(['diw', 'الديوانية']); }
     // ٢) كل خانة من قائمة المدير منحها دور الموظف أو صلاحياته الإضافية، بنفس اسمها
     ADMIN_NAV.forEach(g => (g.items || [[g.r, g.t]]).forEach(it => { if (NAV_PERM[it[0]] && has(NAV_PERM[it[0]]) && (!NAV_LV[it[0]] || NAV_LV[it[0]].some(l => has(l))) && !TABS.some(x => x[0] === it[0])) TABS.push([it[0], it[1]]); }));
     STAFF_EXTRA.forEach(it => { if (has(it[2]) && !TABS.some(x => x[0] === it[0])) TABS.push([it[0], it[1]]); });
@@ -2712,7 +2815,7 @@ const STAFF_EXTRA = [['repStu', 'تقارير شؤون الطلاب', 'reports.s
 const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
   nafStars:['competition.manage', 'competition.star'], nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
   moveMany:'students.move', absent:'students.absent', staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
-  teach:'halaqat.evaluate_all', halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', subst:'halaqat.substitute', remote:'halaqat.remote', reeval:'halaqat.reeval',
+  teach:'halaqat.evaluate_all', halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', subst:'halaqat.substitute', diw:'diw.manage', remote:'halaqat.remote', reeval:'halaqat.reeval',
   plans:'students.plans_all', refsEdu:'refs.edu', planF:'plans.follow', exams:'assoc.nominate',
   msgs:'messages.send', msgsStaff:'messages.send', msgArc:'messages.send', dash:'reports.dashboard', repAll:'reports.all', report:'halaqat.reports_all',
   staffFile:'reports.teachers', tvCfg:'tv.manage', ann:'ann.manage' };
@@ -2723,7 +2826,7 @@ const ADMIN_NAV = [
   { t:'الاختبارات', ic:'exam', r:'exams' },
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
   { t:'الحلقات', ic:'halaqa', items:[['teach', 'التقييم'], ['halaqaView', 'استعراض الحلقات'], ['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['subst', 'تكليف معلم بديل (من خارج المجمع)'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
-  { t:'نافس', ic:'trophy', items:[['nafStars', 'فارس الحلقة'], ['nafPts', 'نقاطي'], ['nafStore', 'المتجر']] },
+  { t:'نافس', ic:'trophy', items:[['nafStars', 'فارس الحلقة'], ['nafPts', 'نقاطي'], ['nafStore', 'المتجر'], ['diw', 'الديوانية']] },
   { t:'المعاملات', ic:'exam', items:[['trxS', 'المعاملات الصادرة'], ['trxR', 'المعاملات الواردة']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
   { t:'تقارير عامة', ic:'report', items:[['dash', 'Dashboard'], ['repAll', 'تقرير الطلاب الشامل'], ['report', 'تقرير الحلقات الشامل'], ['staffFile', 'تقرير الموظف الشامل'], ['tvCfg', 'شاشة عرض المجمع']] },
@@ -2811,6 +2914,7 @@ function openRole(r, title, group){
   $('pSoon').classList.toggle('hidden', r !== 'soon');
   $('pAssign').classList.toggle('hidden', r !== 'assign');
   $('pSubst').classList.toggle('hidden', r !== 'subst'); if (r === 'subst') openSubst();
+  $('pDiw').classList.toggle('hidden', r !== 'diw'); if (r === 'diw') openDiw();
   if (r === 'assign') openAssign();
   $('pStaff').classList.toggle('hidden', r !== 'staff');
   if (r === 'staff') openStaff();
@@ -2925,6 +3029,10 @@ function roleText(){
 }
 function renderWelcome(){
   renderAnnFor('annWelcome'); zmCards();
+  const dw = D.diw || {}, ds = $('diwStrip'); ds.classList.toggle('hidden', !(dw.today || dw.next)); ds.innerHTML = '';
+  if (dw.today || dw.next){ ds.className = 'diwstrip'; ds.appendChild(el('b', '', 'الديوانية')); if (dw.today){ const a = el('span'); a.appendChild(document.createTextNode('اليوم: ')); a.appendChild(el('i', '', dw.today)); ds.appendChild(a); }
+    if (dw.next){ const a = el('span'); a.appendChild(document.createTextNode('القادمة: ')); a.appendChild(el('i', '', dw.next.hname + ' — ' + fmtD(dw.next.date, { weekday:'long', day:'numeric', month:'short' }))); ds.appendChild(a); }
+    ds.onclick = () => (TABS.some(x => x[0] === 'diw') || document.body.classList.contains('admin')) && openRole('diw'); }
   $('annHead').classList.toggle('hidden', !(D.ann || []).length);
   const hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'2-digit', hourCycle:'h23' }).format(new Date());
   const morning = hr >= 4 && hr < 12;
@@ -3091,6 +3199,7 @@ async function loadAtt(){
   if (!r.ok) return msg('stuList', r.msg, 'err');
   dayCanFix = !!r.canFix; teachVO = !!r.ro; teachRO = !!r.ro || !!r.locked; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !r.ro); zmTeachBar();
   studs = r.students; exStuds = r.excluded || []; approval = r.approval; reeval = r.reeval || null; renderStuds(); renderAppr();
+  $('diwNote').classList.toggle('hidden', !r.diw); if (r.diw){ teachRO = true; $('pTeach').classList.add('ro'); $('diwNote').textContent = 'اليوم يوم ديوانية لهذه الحلقة: لا تحضير ولا تقييم ولا اعتماد، ولا يُحسب غياب.'; }
   const sb = r.subBy && !(D && D.sub); $('subNote').classList.toggle('hidden', !sb && !(D && D.sub));
   if (sb) $('subNote').textContent = 'معلم بديل لهذا اليوم: ' + r.subBy.name + ' (جوال ' + r.subBy.phone + ')' + (r.subBy.done ? ' — اعتمد التقييم.' : ' — لم يعتمد بعد.');
   else if (D && D.sub) $('subNote').textContent = 'أهلاً ' + D.sub.name + '، أنت معلم بديل لـ«' + D.sub.hname + '» اليوم. سجّل الحضور وتقييم كل طالب حاضر، ثم اعتمد واختر فارس الحلقة. بعد الاعتماد يُقفل الرابط لهذا اليوم.';
@@ -5457,7 +5566,8 @@ async function loadLive(){
 }
 function lvTile(v, l, sub, cls, go){ const d = el('button', 'lvk ' + (cls || '')); d.type = 'button'; d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', nLbl(v, l))); if (sub) d.appendChild(el('small', '', sub)); if (go) d.onclick = go; else d.disabled = true; return d; }
 /* الاعتمادات أول الـ Dashboard: نسبة الحلقات المعتمدة اليوم، ثم غير المعتمدة أولاً؛ الضغط يفتح تقييم الحلقة */
-function renderLvAppr(H, apN, R){
+function renderLvAppr(H0, apN, R){
+  const H = H0.filter(h => !h.diw), DWH = H0.filter(h => h.diw);
   const b = $('lvAppr'); b.innerHTML = ''; const n = H.length, pct = n ? Math.round(apN * 100 / n) : 0;
   const hd = el('div', 'aph'); hd.appendChild(el('h2', '', 'اعتمادات اليوم')); hd.appendChild(el('span', 'grow'));
   const big = el('div', 'apn', apN + ' '); big.appendChild(el('small', '', 'من ' + n + ' • ' + pct + '%')); hd.appendChild(big); b.appendChild(hd);
@@ -5470,6 +5580,7 @@ function renderLvAppr(H, apN, R){
       x.appendChild(t2); x.onclick = () => go(h); g.appendChild(x); }); b.appendChild(g); };
   if (!n) return b.appendChild(el('small', 'muted', 'لا توجد حلقات نشطة.'));
   sec('لم تُعتمد بعد', H.filter(h => !h.approved), false); sec('معتمدة', H.filter(h => h.approved), true);
+  if (DWH.length){ b.appendChild(el('div', 'apsec', 'في الديوانية اليوم (لا تحتاج اعتماداً)')); const g = el('div', 'apgrid'); DWH.forEach(h => { const x = el('div', 'api ok'); x.appendChild(el('i')); const t2 = el('div'); t2.appendChild(el('b', '', h.name)); t2.appendChild(el('small', '', 'يوم ديوانية')); x.appendChild(t2); g.appendChild(x); }); b.appendChild(g); }
 }
 function renderLive(){
   const R = LV, K = R.kpi, at = K.present + K.late, mk = at + K.absent + K.excused;

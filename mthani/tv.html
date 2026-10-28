@@ -43,6 +43,9 @@
   .pd .medal{font-size:6vh;line-height:1} .pd .n{font-size:3.2vh;font-weight:800;margin-top:1vh} .pd .h{font-size:2vh;color:var(--gold2)} .pd .val{font-size:4.4vh;margin-top:1vh}
   .pd.p1{min-height:30vh;background:linear-gradient(180deg,rgba(208,142,44,.35),rgba(208,142,44,.08))} .pd.p2{min-height:25vh} .pd.p3{min-height:22vh}
   /* الحضور الكامل */
+  .diwtv{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vh;text-align:center;flex:1}
+  .diwtv .dl{font-size:4vh;font-weight:700;color:var(--gold2)} .diwtv .dn{font-size:11vh;font-weight:800;line-height:1.1}
+  .diwtv .dx{font-size:4vh;background:rgba(255,255,255,.08);border-radius:2vh;padding:2vh 3vw} .diwtv .dx b{color:var(--gold2)}
   .big{display:flex;align-items:center;gap:2.4vw;margin-bottom:2.6vh}
   .big b{font-size:14vh;font-weight:800;line-height:.9;color:var(--gold2)} .big span{font-size:3.4vh;font-weight:700}
   .chips{display:flex;flex-wrap:wrap;gap:1.2vh .8vw}
@@ -109,6 +112,13 @@ const fmtDay = d => d ? new Date(d + 'T12:00:00Z').toLocaleDateString('ar-SA-u-c
 function build(){
   const box = $('slides'); box.innerHTML = ''; slides = [];
   const on = k => T.parts.indexOf(k) !== -1;
+  if (T.diw && (T.diw.today || T.diw.next)){   // الديوانية: الحلقة النازلة اليوم والحلقة القادمة
+    const s = slide('', 'الديوانية', T.diw.today ? 'يوم مفتوح لحلقة واحدة' : 'الحلقة القادمة في الديوانية');
+    const w = el('div', 'diwtv');
+    if (T.diw.today){ w.appendChild(el('div', 'dl', 'في الديوانية اليوم')); w.appendChild(el('div', 'dn', T.diw.today)); }
+    if (T.diw.next){ const n = el('div', 'dx'); n.appendChild(el('span', '', 'الحلقة القادمة: ')); n.appendChild(el('b', '', T.diw.next.hname)); n.appendChild(el('span', '', ' — ' + fmtDay(T.diw.next.date))); w.appendChild(n); }
+    s.appendChild(w); slides.push(s);
+  }
   if (on('stars') && T.stars.length){
     const s = slide('', 'فرسان الحلقات', T.starDay === T.today ? 'فرسان اليوم — بارك الله فيهم' : 'فرسان ' + fmtDay(T.starDay));
     const g = el('div', 'grid'), n = T.stars.length; g.style.gridTemplateColumns = 'repeat(' + (n <= 4 ? n : n <= 9 ? 3 : 4) + ',1fr)';
