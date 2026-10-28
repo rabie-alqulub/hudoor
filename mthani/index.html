@@ -507,6 +507,13 @@
   .pcat.open .pb{display:block}
   .prow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px dashed var(--line)}
   .prow:last-of-type{border-bottom:0}
+  .prow.lvrow{flex-direction:column;align-items:stretch;gap:8px}
+  .lvchips{display:flex;flex-wrap:wrap;gap:6px}
+  .lvchips button{width:auto;min-height:34px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--card);color:var(--muted);border:1.5px solid var(--line);display:inline-flex;align-items:center;gap:5px}
+  .lvchips button::before{content:'';width:14px;height:14px;border-radius:4px;border:1.5px solid currentColor;flex:none}
+  .lvchips button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .lvchips button.on::before{background:#fff;border-color:#fff;box-shadow:inset 0 0 0 2px var(--navy)}
+  .lvchips button.lock{opacity:.6;cursor:not-allowed}
   .prow .grow{flex:1;min-width:0} .prow b{display:block;font-size:15px} .prow small{font-size:12px}
   .badge2{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--light);color:var(--muted);font-weight:700;margin-inline-start:6px}
   .sw{flex:none;position:relative;width:46px;height:27px;border-radius:999px;background:var(--line);padding:0;transition:background .2s}
@@ -2548,6 +2555,9 @@ function userNavOld(T){
 }
 /* كل خانة في قائمة المدير وصلاحيتها (الخانات الحساسة ليست هنا فلا تُمنح لأحد) */
 /* خانات تقارير خاصة بالموظفين (تظهر داخل «تقارير عامة») */
+/** مستوى الصلاحية داخل البند (تعديل/حذف/إضافة...): المدير دائماً، وغيره حسب ما منحه المدير */
+const isAdm = () => !!(D && D.roles && D.roles.indexOf('admin') !== -1);
+const hasL = (k, lv) => { const P = (D && D.perms) || []; return P.indexOf('*') !== -1 || P.indexOf(k + ':' + lv) !== -1; };
 const STAFF_EXTRA = [['repStu', 'تقارير شؤون الطلاب', 'reports.students'], ['repEdu', 'تقارير الشؤون التعليمية', 'reports.edu']];
 const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
   nafStars:'competition.manage', nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
@@ -2801,7 +2811,7 @@ function renderWelcome(){
 }
 
 /* ---------- الواجهة الزجاجية (معاينة): ?ui=2 لتفعيلها و ?ui=1 للعودة ---------- */
-const UI2 = (() => { let q = null; try { q = new URLSearchParams(location.search).get('ui'); } catch(e){} if (q === '1' || q === '2') store.set('hq_ui', q); return (q || store.get('hq_ui')) === '2'; })();
+const UI2 = false; try { store.set('hq_ui', '1'); } catch(e){}   // واجهة واحدة للجميع (الواجهة الزجاجية التجريبية أُلغيت)
 document.body.classList.toggle('g2', UI2);
 const g2Desk = () => UI2 && innerWidth >= 860;
 function g2Place(){   // البحث داخل الشريط العلوي على الكمبيوتر
@@ -3473,13 +3483,14 @@ function renderStaff(){
     if (s.pin === 'changed' && /^\d{4}-/.test(s.last)) add('آخر دخول', s.last);
     w.appendChild(m);
     const ac = el('div', 'stact'), btn = (cls, ic, t, fn) => { const b = el('button', cls); b.title = t; b.setAttribute('aria-label', t); b.innerHTML = ST_IC[ic]; b.appendChild(el('span', '', t)); b.onclick = fn; ac.appendChild(b); };
-    if (s.st === 'محذوف') btn('good', 'restore', 'استعادة', () => staffOp(s, 'restore'));
+    const fE = hasL('staff.view', 'edit') && (!s.admin || isAdm()), fX = hasL('staff.view', 'del') && (isAdm() || !/المشرف العام|مدير المجمع/.test(s.title || ''));
+    if (s.st === 'محذوف'){ if (fE) btn('good', 'restore', 'استعادة', () => staffOp(s, 'restore')); }
     else {
-      btn('', 'edit', 'تعديل', () => openEdit(s));
+      if (fE) btn('', 'edit', 'تعديل', () => openEdit(s));
       if (!s.admin){
-        if (s.st === 'موقوف') btn('good', 'restore', 'رفع الإيقاف', () => staffOp(s, 'restore'));
-        else btn('warn', 'pause', 'إيقاف الحساب', () => confirmOp('إيقاف حساب ' + s.name, 'لن يستطيع الدخول على مثاني حتى ترفع الإيقاف، ويخرج فوراً إن كان داخلاً. بياناته وحلقاته تبقى كما هي.', 'إيقاف الحساب', () => staffOp(s, 'suspend')));
-        btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + s.name + ' من النظام', 'حذف نهائي من مثاني ومن نظام البصمة: يُمنع من الدخول والبصم، وتُلغى إسنادات حلقاته وصلاحياته ورمزه السري، ويُمسح صفه وبصمة وجهه وسجل حضوره وإجازاته من جدول البصمة. لا يمكن التراجع (تُحفظ نسخة نصية في تبويب «أرشيف المحذوفين من البصمة» بجدول مثاني).', 'حذف نهائي', () => staffOp(s, 'delete')));
+        if (s.st === 'موقوف'){ if (fE) btn('good', 'restore', 'رفع الإيقاف', () => staffOp(s, 'restore')); }
+        else if (fX) btn('warn', 'pause', 'إيقاف الحساب', () => confirmOp('إيقاف حساب ' + s.name, 'لن يستطيع الدخول على مثاني حتى ترفع الإيقاف، ويخرج فوراً إن كان داخلاً. بياناته وحلقاته تبقى كما هي.', 'إيقاف الحساب', () => staffOp(s, 'suspend')));
+        if (fX) btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + s.name + ' من النظام', 'حذف نهائي من مثاني ومن نظام البصمة: يُمنع من الدخول والبصم، وتُلغى إسنادات حلقاته وصلاحياته ورمزه السري، ويُمسح صفه وبصمة وجهه وسجل حضوره وإجازاته من جدول البصمة. لا يمكن التراجع (تُحفظ نسخة نصية في تبويب «أرشيف المحذوفين من البصمة» بجدول مثاني).', 'حذف نهائي', () => staffOp(s, 'delete')));
       }
     }
     w.appendChild(ac); box.appendChild(w);
@@ -3673,10 +3684,11 @@ function renderHalEdit(){
     const m = el('div', 'meta'); [['رقم الحلقة', h.hid], ['المعلم', h.teacher || (h.tnid ? h.tnid : 'لم تُسند')], ['ملاحظات', h.notes]].forEach(x => { if (x[1]){ const d = el('span', '', x[0] + ': '); d.appendChild(el('i', '', x[1])); m.appendChild(d); } });
     w.appendChild(m);
     const ac = el('div', 'stact lbl'), mk = (ic, t, cls, fn) => { const x = el('button', cls || ''); x.innerHTML = ST_IC[ic]; x.appendChild(el('span', '', t)); x.onclick = fn; ac.appendChild(x); };
-    mk('edit', 'تعديل', '', () => openHl(h));
-    if (h.active) mk('pause', 'إيقاف', '', () => confirmOp('إيقاف ' + h.name, h.students ? 'في الحلقة ' + h.students + ' طالب. إيقافها يخفيها من التقييم ويبقى طلابها مسجلين عليها.' : 'تختفي الحلقة من التقييم حتى تعيد تنشيطها.', 'إيقاف', () => halOp(h, 'stop')));
+    const hE = hasL('halaqat.manage', 'edit');
+    if (hE) mk('edit', 'تعديل', '', () => openHl(h));
+    if (!hE) {} else if (h.active) mk('pause', 'إيقاف', '', () => confirmOp('إيقاف ' + h.name, h.students ? 'في الحلقة ' + h.students + ' طالب. إيقافها يخفيها من التقييم ويبقى طلابها مسجلين عليها.' : 'تختفي الحلقة من التقييم حتى تعيد تنشيطها.', 'إيقاف', () => halOp(h, 'stop')));
     else mk('restore', 'إعادة تنشيط', 'good', () => halOp(h, 'on'));
-    mk('trash', 'حذف', 'danger', () => confirmOp('حذف ' + h.name, h.students ? 'في الحلقة ' + h.students + ' طالب (نشطون)، فلا يمكن حذفها حتى تنقلهم إلى حلقة أخرى.' : 'تُحذف الحلقة من القوائم ويبقى سجلها السابق محفوظاً في التقارير.', 'حذف', () => halOp(h, 'del')));
+    if (hasL('halaqat.manage', 'del')) mk('trash', 'حذف', 'danger', () => confirmOp('حذف ' + h.name, h.students ? 'في الحلقة ' + h.students + ' طالب (نشطون)، فلا يمكن حذفها حتى تنقلهم إلى حلقة أخرى.' : 'تُحذف الحلقة من القوائم ويبقى سجلها السابق محفوظاً في التقارير.', 'حذف', () => halOp(h, 'del')));
     w.appendChild(ac); box.appendChild(w);
   });
 }
@@ -5612,7 +5624,7 @@ function renderAbsent(fill){
     list.forEach(x => { const w = el('div', 'strow abrow'), tp = el('div', 'top'); tp.appendChild(el('b', '', x.name)); tp.appendChild(el('span', 'pill p-red', 'منقطع')); w.appendChild(tp);
       const m = el('div', 'meta'); [['الحلقة', x.hname], ['المعلم', x.teacher], ['تاريخ الانقطاع', x.at], ['السبب', x.why], ['ولي الأمر', x.pname], ['الجوال', x.pphone]].forEach(p => { if (p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } }); w.appendChild(m);
       if (x.dates.length){ const ds = el('div', 'dates'); x.dates.forEach(d => ds.appendChild(el('span', '', fmtD(d, { weekday:'short', day:'numeric', month:'short' })))); w.appendChild(ds); }
-      const ac = el('div', 'stact'), on = el('button', 'good', '✓ تفعيل الطالب'), fb = el('button', '', 'الملف');
+      const ac = el('div', 'stact'), on = el('button', 'good' + (hasL('students.absent', 'edit') || hasL('refs.students', 'edit') || (D.perms || []).indexOf('students.add') !== -1 ? '' : ' hidden'), '✓ تفعيل الطالب'), fb = el('button', '', 'الملف');
       on.onclick = async () => { if (!confirm('تفعيل ' + x.name + '؟ سيعود نشطاً في حلقته وكل الخانات، ويبدأ احتساب غيابه من جديد.')) return; on.disabled = true; const r = await cpCall({ action:'stuReactivate', sid:x.sid }, 'abList'); on.disabled = false; if (r && r.ok){ toast(r.msg); AB = r; renderAbsent(); } };
       fb.onclick = () => goFile(x.sid); ac.appendChild(on); ac.appendChild(fb); w.appendChild(ac); box.appendChild(w); });
   } else if (abT === 'risk'){
@@ -6345,7 +6357,7 @@ let cpGroup = 'nafPts';
 function openCompete(){
   const P = (D && D.perms) || [], adm = P.indexOf('*') !== -1, mng = adm || P.indexOf('competition.manage') !== -1, sto = adm || P.indexOf('competition.store') !== -1;
   $('cpTitle').textContent = NAF_T[cpGroup] || 'نافس';
-  const tabs = CP_TABS.filter(t => NAF[cpGroup].indexOf(t[0]) !== -1 && (t[0] === 'store' ? (mng || sto) : mng));
+  const tabs = CP_TABS.filter(t => NAF[cpGroup].indexOf(t[0]) !== -1 && (NAF.nafStore.indexOf(t[0]) !== -1 ? (mng || sto) : t[0] === 'add' ? hasL('competition.manage', 'add') : t[0] === 'del' ? hasL('competition.manage', 'del') : mng));
   if (!tabs.some(t => t[0] === cpSec)) cpSec = tabs.length ? tabs[0][0] : 'bank';
   const box = $('cpTabs'); box.innerHTML = '';
   tabs.forEach(t => { const b = el('button', cpSec === t[0] ? 'on' : ''); b.innerHTML = CPI[t[0]]; b.appendChild(el('span', '', t[1])); b.dataset.k = t[0]; b.onclick = () => { cpSec = t[0]; openCompete(); }; box.appendChild(b); });
@@ -6709,16 +6721,17 @@ function renderStudents(){
     const add = (k, v, href) => { if (!v) return; const d = el('span', '', k + ': '); const i = el(href ? 'a' : 'i', '', v); if (href){ i.href = href; i.style.fontWeight = '600'; } d.appendChild(i); m.appendChild(d); };
     add('رقم الطالب', x.sid); add('الهوية', x.nid); add('المرحلة', x.stage); add('ولي الأمر', x.pname); add('الجوال', x.pphone, 'tel:' + x.pphone); add('هوية ولي الأمر', x.pnid); add('جوال الطالب', x.sphone, 'tel:' + x.sphone); add('الميلاد', bFmt(x.birth, x.birthH)); add('مقدار الحفظ', x.level); add('الالتحاق', x.joined);
     w.appendChild(m);
-    if (SB.admin){
+    const sE = hasL('students.view_all', 'edit'), sX = hasL('students.view_all', 'del');
+    if (sE || sX){
       const ac = el('div', 'stact'), btn = (cls, ic, t, fn) => { const b = el('button', cls); b.title = t; b.setAttribute('aria-label', t); b.innerHTML = ST_IC[ic]; b.appendChild(el('span', '', t)); b.onclick = fn; ac.appendChild(b); };
-      if (x.st === 'محذوف') btn('good', 'restore', 'استعادة', () => studentOp(x, 'restore'));
+      if (x.st === 'محذوف'){ if (sE) btn('good', 'restore', 'استعادة', () => studentOp(x, 'restore')); }
       else {
-        btn('', 'edit', 'تعديل', () => openStudentEdit(x));
-        btn('', 'move', 'نقل', () => openMove(x));
-        if (x.st === 'موقوف') btn('good', 'restore', 'رفع الإيقاف', () => studentOp(x, 'restore'));
+        if (sE) btn('', 'edit', 'تعديل', () => openStudentEdit(x));
+        if (sE) btn('', 'move', 'نقل', () => openMove(x));
+        if (x.st === 'موقوف'){ if (sE) btn('good', 'restore', 'رفع الإيقاف', () => studentOp(x, 'restore')); }
         else if (x.st === 'منقطع') {}   // التفعيل من خانة «الطلاب المنقطعون» فقط
-        else btn('warn', 'pause', 'إيقاف', () => confirmOp('إيقاف الطالب ' + x.name, 'يختفي من كشف حلقته في التقييم حتى ترفع الإيقاف. سجلاته وبياناته تبقى كما هي.', 'إيقاف الطالب', () => studentOp(x, 'suspend')));
-        btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + x.name + ' من النظام', 'يُحذف من حلقته ومن قاعدة أولياء الأمور. سجلاته السابقة تبقى محفوظة، ويمكنك استعادته من «المحذوفون».', 'حذف من النظام', () => studentOp(x, 'delete')));
+        else if (sX) btn('warn', 'pause', 'إيقاف', () => confirmOp('إيقاف الطالب ' + x.name, 'يختفي من كشف حلقته في التقييم حتى ترفع الإيقاف. سجلاته وبياناته تبقى كما هي.', 'إيقاف الطالب', () => studentOp(x, 'suspend')));
+        if (sX) btn('danger', 'trash', 'حذف', () => confirmOp('حذف ' + x.name + ' من النظام', 'يُحذف من حلقته ومن قاعدة أولياء الأمور. سجلاته السابقة تبقى محفوظة، ويمكنك استعادته من «المحذوفون».', 'حذف من النظام', () => studentOp(x, 'delete')));
       }
       w.appendChild(ac);
     }
@@ -6822,7 +6835,7 @@ function openEdit(s){
   $('edName').value = s.name; $('edNid').value = s.nid; $('edPhone').value = s.phone; $('edTask').value = s.task || ''; $('edStart').value = /^\d{4}-\d{2}-\d{2}$/.test(s.start || '') ? s.start : '';
   const setSel = (id, v) => { const sel = $(id); if (v && ![...sel.options].some(o => o.value === v)){ const o = el('option', '', v); sel.appendChild(o); } sel.value = v || sel.options[0].value; };
   if (SD && SD.lists) fillSel('edSifa', SD.lists.sifa.map(x => [x, x]));
-  setSel('edNat', s.nat); setSel('edSifa', s.sifa);
+  setSel('edNat', s.nat); setSel('edSifa', s.sifa); $('edSifa').disabled = !isAdm(); $('edTask').disabled = !isAdm();   // تغيير الدور لمدير المجمع فقط
   $('edSheet').classList.remove('hidden'); $('edName').focus();
 }
 $('edClose').onclick = () => $('edSheet').classList.add('hidden');
@@ -6872,7 +6885,7 @@ function renderRoles(){
     const g = el('div', 'grow'); g.appendChild(el('b', '', x.role)); g.appendChild(el('small', 'muted', x.n + ' • ' + x.note)); b.appendChild(g); b.appendChild(el('span', 'pill p-none', 'ثابت')); box.appendChild(b); });
   PD.roles.forEach(x => { const b = el('button', 'uitem'); b.appendChild(el('div', 'avatar', x.role.charAt(0)));
     const g = el('div', 'grow'); g.appendChild(el('b', '', x.role)); g.appendChild(el('small', 'muted', x.n + ' موظف')); b.appendChild(g);
-    b.appendChild(el('span', 'pill ' + (x.keys.length ? 'p-late' : 'p-none'), x.keys.length ? x.keys.length + ' صلاحية' : 'بلا صلاحيات'));
+    const nk = x.keys.filter(k => k.indexOf(':') === -1).length; b.appendChild(el('span', 'pill ' + (nk ? 'p-late' : 'p-none'), nk ? nk + ' صلاحية' : 'بلا صلاحيات'));
     b.onclick = () => { peUser = { role:x.role, isRole:true, rk:x }; peKeys = new Set(x.keys); peLock = new Set();
       $('peName').textContent = 'دور: ' + x.role; $('peAvatar').textContent = x.role.charAt(0); $('peSub').textContent = x.n + ' موظف بهذه الصفة • التعديل يسري عليهم جميعاً';
       $('peSave').textContent = 'حفظ صلاحيات الدور'; $('permUsersCard').classList.add('hidden'); $('permEdit').classList.remove('hidden'); renderCats(); window.scrollTo(0, 0); };
@@ -6885,7 +6898,7 @@ function renderUsers(){
   list.forEach(u => {
     const b = el('button', 'uitem'); b.appendChild(el('div', 'avatar', u.name.charAt(0)));
     const g = el('div', 'grow'); g.appendChild(el('b', '', u.name)); g.appendChild(el('small', 'muted', [u.halaqat.join('، '), u.role].filter(Boolean).join(' • '))); b.appendChild(g);
-    b.appendChild(el('span', 'pill ' + (u.keys.length ? 'p-late' : 'p-none'), (u.roleKeys || []).length + ' من الدور' + (u.keys.length ? ' + ' + u.keys.length + ' إضافية' : '')));
+    const nb = a => (a || []).filter(k => k.indexOf(':') === -1).length, nx = u.keys.length; b.appendChild(el('span', 'pill ' + (nx ? 'p-late' : 'p-none'), nb(u.roleKeys) + ' من الدور' + (nx ? ' + إضافات' : '')));
     b.onclick = () => openPermUser(u); box.appendChild(b);
   });
 }
@@ -6908,16 +6921,23 @@ function renderCats(){
     if (!defs.length) body.appendChild(el('small', '', 'لا توجد صلاحيات في هذا التبويب بعد. تُضاف من تبويب "الصلاحيات المتاحة" في جدول البيانات.'));
     else {
       const all = el('button', 'allbtn', on === defs.length ? 'إلغاء الكل' : 'تحديد الكل');
-      all.onclick = () => { const full = on === defs.length; defs.forEach(d => full ? (!peLock.has(d.key) && peKeys.delete(d.key)) : peKeys.add(d.key)); renderCats(); };
+      all.onclick = () => { const full = on === defs.length; defs.forEach(d => [d.key].concat((d.lv || []).map(l => d.key + ':' + l[0])).forEach(k => full ? (!peLock.has(k) && peKeys.delete(k)) : peKeys.add(k))); renderCats(); };
       body.appendChild(all);
     }
     defs.forEach(d => {
-      const r = el('div', 'prow'), g = el('div', 'grow'), t = el('b', '', d.name);
+      const r = el('div', 'prow lvrow'), g = el('div', 'grow'), t = el('b', '', d.name);
       if (d.status && d.status !== 'مفعّلة') t.appendChild(el('span', 'badge2', d.status));
-      g.appendChild(t); if (d.desc) g.appendChild(el('small', 'muted', d.desc)); if (peLock.has(d.key)) g.appendChild(el('small', 'lockr', '✓ من صلاحيات الدور'));
-      const sw = el('button', 'sw' + (peKeys.has(d.key) ? ' on' : '') + (peLock.has(d.key) ? ' lock' : '')); sw.setAttribute('aria-label', d.name);
-      sw.onclick = () => { if (peLock.has(d.key)) return toast('هذه من صلاحيات الدور، وتُعدَّل من تبويب «الأدوار».'); peKeys.has(d.key) ? peKeys.delete(d.key) : peKeys.add(d.key); renderCats(); };
-      r.appendChild(g); r.appendChild(sw); body.appendChild(r);
+      g.appendChild(t); if (d.desc) g.appendChild(el('small', 'muted', d.desc)); if (peLock.has(d.key)) g.appendChild(el('small', 'lockr', 'المؤشَّر بالرمادي من صلاحيات الدور'));
+      r.appendChild(g);
+      // «عرض» = البند نفسه، وبقية المستويات حسب طبيعة البند؛ اختيار أي مستوى يفعّل «عرض» تلقائياً
+      const ch = el('div', 'lvchips'), lv = [['', (d.lv || []).length ? 'عرض' : 'منح الصلاحية']].concat(d.lv || []);
+      lv.forEach(l => { const k = l[0] ? d.key + ':' + l[0] : d.key, lk = peLock.has(k), b = el('button', (peKeys.has(k) ? 'on' : '') + (lk ? ' lock' : ''), l[1]); b.type = 'button';
+        b.onclick = () => { if (lk) return toast('هذه من صلاحيات الدور، وتُعدَّل من تبويب «الأدوار».');
+          if (peKeys.has(k)){ peKeys.delete(k); if (!l[0]) (d.lv || []).forEach(x => { if (!peLock.has(d.key + ':' + x[0])) peKeys.delete(d.key + ':' + x[0]); }); }
+          else { peKeys.add(k); peKeys.add(d.key); }
+          renderCats(); };
+        ch.appendChild(b); });
+      r.appendChild(ch); body.appendChild(r);
     });
     w.appendChild(body); box.appendChild(w);
   });
