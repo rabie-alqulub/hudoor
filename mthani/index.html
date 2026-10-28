@@ -2508,7 +2508,7 @@ async function loadHome(){
       if (!has('halaqat.reports_all')) TABS.push(['report', 'تقارير الحلقة', 'own']); }
     else if (has('halaqat.evaluate_all')) TABS.push(['teach', 'تقييم الحلقات']);
     // ٢) كل خانة من قائمة المدير منحها دور الموظف أو صلاحياته الإضافية، بنفس اسمها
-    ADMIN_NAV.forEach(g => (g.items || [[g.r, g.t]]).forEach(it => { if (NAV_PERM[it[0]] && has(NAV_PERM[it[0]]) && !TABS.some(x => x[0] === it[0])) TABS.push([it[0], it[1]]); }));
+    ADMIN_NAV.forEach(g => (g.items || [[g.r, g.t]]).forEach(it => { if (NAV_PERM[it[0]] && has(NAV_PERM[it[0]]) && (!NAV_LV[it[0]] || NAV_LV[it[0]].some(l => has(l))) && !TABS.some(x => x[0] === it[0])) TABS.push([it[0], it[1]]); }));
     STAFF_EXTRA.forEach(it => { if (has(it[2]) && !TABS.some(x => x[0] === it[0])) TABS.push([it[0], it[1]]); });
     if (r.canFix && !TABS.some(x => x[0] === 'reeval')) TABS.push(['reeval', 'طلبات إعادة التقييم في حلقة']);
     TABS.push(['trxS', 'المعاملات الصادرة']); TABS.push(['trxR', 'المعاملات الواردة']);
@@ -2558,11 +2558,13 @@ function userNavOld(T){
 /** مستوى الصلاحية داخل البند (تعديل/حذف/إضافة...): المدير دائماً، وغيره حسب ما منحه المدير */
 const isAdm = () => !!(D && D.roles && D.roles.indexOf('admin') !== -1);
 const hasL = (k, lv) => { const P = (D && D.perms) || []; return P.indexOf('*') !== -1 || P.indexOf(k + ':' + lv) !== -1; };
+// خانات تظهر فقط لمن عنده مستوى معيّن داخل البند (لا يكفيها «عرض»)
+const NAV_LV = { halaqaNew:['halaqat.manage:add'], halaqaEdit:['halaqat.manage:edit', 'halaqat.manage:del'] };
 const STAFF_EXTRA = [['repStu', 'تقارير شؤون الطلاب', 'reports.students'], ['repEdu', 'تقارير الشؤون التعليمية', 'reports.edu']];
 const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
   nafStars:'competition.manage', nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
   moveMany:'students.move', absent:'students.absent', staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
-  halaqaView:'halaqat.view', halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', remote:'halaqat.remote', reeval:'halaqat.reeval',
+  halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', remote:'halaqat.remote', reeval:'halaqat.reeval',
   plans:'students.plans_all', refsEdu:'refs.edu', planF:'plans.follow', exams:'assoc.nominate',
   msgs:'messages.send', msgsStaff:'messages.send', msgArc:'messages.send', dash:'reports.dashboard', repAll:'reports.all', report:'halaqat.reports_all',
   staffFile:'reports.teachers', tvCfg:'tv.manage', ann:'ann.manage' };
@@ -5682,7 +5684,7 @@ function gsRender(q, r){
   if (navs.length){ box.appendChild(el('div', 'gh', 'الخانات')); navs.forEach(x => item(x.label, x.path, x.fn)); }
   if (r && r.students && r.students.length){ box.appendChild(el('div', 'gh', 'الطلاب')); r.students.forEach(x => item(x.name, [x.hname, x.st].filter(Boolean).join(' • ') || x.sid, () => goFile(x.sid))); }
   if (r && r.halaqat && r.halaqat.length){ box.appendChild(el('div', 'gh', 'الحلقات')); r.halaqat.forEach(x => item(x.name, x.teacher, () => {
-    if (document.body.classList.contains('admin') || (D.perms || []).indexOf('halaqat.manage') !== -1){ openRole('halaqaEdit'); $('heQ').value = x.name; setTimeout(() => HL && renderHalEdit(), 600); }
+    if (hasL('halaqat.manage', 'edit') || hasL('halaqat.manage', 'del')){ openRole('halaqaEdit'); $('heQ').value = x.name; setTimeout(() => HL && renderHalEdit(), 600); }
     else openRole('teach'); })); }
   if (r && r.staff && r.staff.length){ box.appendChild(el('div', 'gh', 'الموظفون')); r.staff.forEach(x => item(x.name, x.title, () => { openRole('staff'); $('stSearch').value = x.name; setTimeout(() => { const e = $('stSearch'); e.dispatchEvent(new Event('input')); }, 700); })); }
   if (!box.children.length) box.appendChild(el('div', 'ge', r ? 'لا توجد نتائج لـ «' + q + '».' : 'جاري البحث...'));
