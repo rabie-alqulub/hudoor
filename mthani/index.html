@@ -522,6 +522,11 @@
   #backBar{margin:0 0 10px} #btnPgBack{display:inline-flex;align-items:center;gap:6px;width:auto;min-height:40px;padding:8px 16px 8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--navy);font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(30,52,70,.08)}
   #btnPgBack svg{width:18px;height:18px} #btnPgBack small{color:var(--muted);font-weight:600;font-size:12.5px;max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #btnPgBack:hover{border-color:var(--navy)} body.g2 #btnPgBack{background:var(--gl,var(--card));-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  .errbox{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 4px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+  .errbox label{margin:0;font-weight:700} .errbox label small{color:var(--muted);font-weight:600}
+  .stepper{display:flex;align-items:center;gap:6px} .stepper button{width:40px;height:40px;min-height:40px;padding:0;border-radius:12px;font-size:22px;font-weight:800;background:var(--light);color:var(--navy);border:1px solid var(--line)}
+  .stepper output{min-width:42px;text-align:center;font-size:22px;font-weight:800;color:var(--navy3);font-variant-numeric:tabular-nums}
+  .stepper output.has{color:#C0392B}
   .prow.lvrow{flex-direction:column;align-items:stretch;gap:8px}
   .lvchips{display:flex;flex-wrap:wrap;gap:6px}
   .lvchips button{width:auto;min-height:34px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--card);color:var(--muted);border:1.5px solid var(--line);display:inline-flex;align-items:center;gap:5px}
@@ -1919,6 +1924,7 @@
     </div>
     <div class="count" id="rsCount"></div>
     <button class="btn soft mushaf-btn hidden" id="rsMushaf" type="button">فتح المصحف على المقطع المحدد</button>
+    <div class="errbox"><label for="rsErrN">عدد الأخطاء <small>(اختياري)</small></label><div class="stepper"><button type="button" id="rsErrM" aria-label="إنقاص">−</button><output id="rsErrN">0</output><button type="button" id="rsErrP" aria-label="زيادة">+</button></div></div>
     <label id="rsScoreL">قيّم الطالب من 10 <b class="rq">*</b></label>
     <div class="scores" id="rsScores"></div>
     <div class="slabel" id="rsLabel"></div>
@@ -2367,7 +2373,7 @@ const isStudy = d => (D ? D.studyDays : [0,1,2,3]).indexOf(ud(d).getUTCDay()) !=
 const fmtD = (d, o) => ud(d).toLocaleDateString('ar-SA-u-ca-gregory', Object.assign({ timeZone:'UTC' }, o));
 const PILL = { 'حاضر':'p-ok', 'متأخر':'p-late', 'غائب':'p-abs', 'مستأذن':'p-none', 'ممتاز':'p-ok', 'جيد جداً':'p-ok', 'جيد':'p-late', 'مقبول':'p-late', 'ضعيف':'p-abs' };
 const scoreLabel = n => { const t = (D && D.gradeCuts) || [9, 8, 7, 5]; return n >= t[0] ? 'ممتاز' : n >= t[1] ? 'جيد جداً' : n >= t[2] ? 'جيد' : n >= t[3] ? 'مقبول' : 'ضعيف'; };
-const scoreTxt = x => x.score != null ? x.score + '/' + (D ? D.maxScore : 10) + ' ' + x.grade : x.grade;
+const scoreTxt = x => (x.score != null ? x.score + '/' + (D ? D.maxScore : 10) + ' ' + x.grade : x.grade) + (x.errs > 0 ? ' • الأخطاء ' + x.errs : '');
 const pillCls = s => 'pill ' + (PILL[s] || 'p-none');
 function tile(n, label, cls){ const t = el('div', 'tile ' + (cls || '')); t.appendChild(el('b', '', n)); t.appendChild(el('span', '', label)); return t; }
 function fill(id, list){ const e = $(id); e.innerHTML = ''; list.forEach(x => e.appendChild(x)); }
@@ -3095,6 +3101,8 @@ function fillSurahs(){
   const g = $('rsScores'); g.innerHTML = '';
   for (let n = D.maxScore; n >= 0; n--){ const b = el('button', '', n); b.dataset.n = n; b.onclick = () => setScore(n); g.appendChild(b); }
 }
+function setErrs(n){ rs.errs = Math.max(0, Math.min(99, n)); const o = $('rsErrN'); o.textContent = rs.errs; o.classList.toggle('has', rs.errs > 0); }
+$('rsErrM').onclick = () => setErrs((rs.errs || 0) - 1); $('rsErrP').onclick = () => setErrs((rs.errs || 0) + 1);
 function setScore(n){
   rs.score = n; if (n !== null) setNone(false); msg('rsMsg', '', '');
   $('rsScores').querySelectorAll('button').forEach(b => b.classList.toggle('on', n !== null && +b.dataset.n === n));
@@ -3124,7 +3132,7 @@ function summary(){
 function clearForm(){
   $('rsFs').value = ''; $('rsTs').value = ''; setAyah('rsFa', ''); setAyah('rsTa', ''); $('rsQ').value = ''; $('rsQList').classList.add('hidden');
   rs.multi = false; $('rsToWrap').classList.add('hidden'); $('rsTa').classList.remove('off');
-  setScore(null); setNone(false); $('rsNote').value = ''; msg('rsMsg', '', ''); countAyat();
+  setScore(null); setNone(false); setErrs(0); $('rsNote').value = ''; msg('rsMsg', '', ''); countAyat();
 }
 function absAyah(s, a){ let n = 0; for (let i = 0; i < s - 1; i++) n += D.ayat[i]; return n + a; }
 function ayatSpan(fs, fa, ts, ta){ if (ts >= fs) return Math.abs(absAyah(ts, ta) - absAyah(fs, fa)) + 1; let n = D.ayat[fs - 1] - fa + 1; for (let x = fs - 1; x > ts; x--) n += D.ayat[x - 1]; return n + ta; }
@@ -3336,12 +3344,12 @@ async function saveNone(){
 }
 async function saveCurrent(){
   const fs = +$('rsFs').value, ts = endSurah();
-  const p = { action:'saveRecord', sid:rs.s.sid, date:day, type:rs.type, fs, fa:ayahVal('rsFa'), ts, ta:ayahVal('rsTa'), score:rs.score, note:$('rsNote').value.trim() };
+  const p = { action:'saveRecord', sid:rs.s.sid, date:day, type:rs.type, fs, fa:ayahVal('rsFa'), ts, ta:ayahVal('rsTa'), score:rs.score, errs:rs.errs || 0, note:$('rsNote').value.trim() };
   $('rsNext').disabled = true; msg('rsMsg', 'جاري الحفظ...', 'info');
   try {
     const r = await api(p);
     if (!r.ok){ msg('rsMsg', r.msg, 'err'); return false; }
-    const rec = { id:r.id, date:day, type:p.type, from:D.surah[fs - 1] + ' ' + p.fa, to:D.surah[ts - 1] + ' ' + p.ta, fs, fa:p.fa, ts, ta:p.ta, ayat:r.ayat, score:p.score, grade:r.grade || scoreLabel(p.score), note:p.note };
+    const rec = { id:r.id, date:day, type:p.type, from:D.surah[fs - 1] + ' ' + p.fa, to:D.surah[ts - 1] + ' ' + p.ta, fs, fa:p.fa, ts, ta:p.ta, ayat:r.ayat, score:p.score, grade:r.grade || scoreLabel(p.score), note:p.note, errs:p.errs };
     rs.s.today.push(rec); rs.s.last[p.type] = rec; markPresent();
     toast(r.msg); return true;
   } catch(e){ msg('rsMsg', 'تعذّر الاتصال بالخادم.', 'err'); return false; }
