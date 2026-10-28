@@ -2295,6 +2295,23 @@ function arCount(t){
     const form = n === 2 ? f[1] : (r >= 3 && r <= 10) ? f[2] : (r >= 11 && r <= 99) ? f[3] : f[0];
     return pre + (n === 2 ? form : num + ' ' + form); });
 }
+/* عنوان المؤشر تحت العدد يتبع العدد نحوياً: ١ طالب، طالبان، ٣ طلاب، ١١ طالباً، ٢٠٦ طلاب */
+const ST_F = ['طالب', 'طالبان', 'طلاب', 'طالباً'], NL = { 'طلابي':ST_F, 'الطلاب':ST_F, 'طلابه':ST_F,
+  'المعلمون':['معلم', 'معلمان', 'معلمين', 'معلماً'], 'الموظفون':['موظف', 'موظفان', 'موظفين', 'موظفاً'],
+  'حاضرون اليوم':['حاضر اليوم', 'حاضران اليوم', 'حاضرين اليوم', 'حاضراً اليوم'], 'غائبون':['غائب', 'غائبان', 'غائبين', 'غائباً'], 'متأخرون':['متأخر', 'متأخران', 'متأخرين', 'متأخراً'],
+  'مرات التسميع':['مرة تسميع', 'مرتا تسميع', 'مرات تسميع', 'مرة تسميع'], 'مرات التأخير':['مرة تأخير', 'مرتا تأخير', 'مرات تأخير', 'مرة تأخير'],
+  'إحالات مفتوحة':['إحالة مفتوحة', 'إحالتان مفتوحتان', 'إحالات مفتوحة', 'إحالة مفتوحة'], 'الإحالات':['إحالة', 'إحالتان', 'إحالات', 'إحالة'],
+  'ترشيحات مفتوحة':['ترشيح مفتوح', 'ترشيحان مفتوحان', 'ترشيحات مفتوحة', 'ترشيحاً مفتوحاً'], 'معاملات بانتظار':['معاملة بانتظار', 'معاملتان بانتظار', 'معاملات بانتظار', 'معاملة بانتظار'],
+  'طلبات تسجيل':['طلب تسجيل', 'طلبا تسجيل', 'طلبات تسجيل', 'طلب تسجيل'], 'طلبات جوائز':['طلب جائزة', 'طلبا جائزة', 'طلبات جوائز', 'طلب جائزة'],
+  'رسائل اليوم':['رسالة اليوم', 'رسالتا اليوم', 'رسائل اليوم', 'رسالة اليوم'], 'طلبات تعديل خطط':['طلب تعديل خطة', 'طلبا تعديل خطة', 'طلبات تعديل خطط', 'طلب تعديل خطة'],
+  'حالات الغياب':['حالة غياب', 'حالتا غياب', 'حالات غياب', 'حالة غياب'], 'آيات الحفظ':['آية حفظ', 'آيتا حفظ', 'آيات حفظ', 'آية حفظ'], 'آيات المراجعة':['آية مراجعة', 'آيتا مراجعة', 'آيات مراجعة', 'آية مراجعة'],
+  'أيام الغياب':['يوم غياب', 'يوما غياب', 'أيام غياب', 'يوماً غياب'], 'خطة متأخرة':['خطة متأخرة', 'خطتان متأخرتان', 'خطط متأخرة', 'خطة متأخرة'],
+  'طالب لهم خطة':['طالب له خطة', 'طالبان لهما خطة', 'طلاب لهم خطة', 'طالباً لهم خطة'] };
+function nLbl(v, l){
+  const f = NL[l], t = String(v == null ? '' : v).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+  if (!f || !/^\d+$/.test(t)) return l;
+  const n = +t, r = n % 100; return n === 2 ? f[1] : (r >= 3 && r <= 10) ? f[2] : (r >= 11 && r <= 99) ? f[3] : f[0];
+}
 function arFix(node){
   if (node.nodeType === 3){ const v = node.nodeValue; if (v && /[0-9٠-٩] /.test(v)){ const f = arCount(v); if (f !== v) node.nodeValue = f; } return; }
   if (node.nodeType !== 1 || /^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|svg)$/i.test(node.nodeName)) return;
@@ -2776,8 +2793,8 @@ function renderWelcome(){
   $('pinNotice').classList.toggle('hidden', store.get('hq_must') !== '1' || !!D.peek);
   const st = D.stats;
   const box = $('stats'); box.innerHTML = ''; box.classList.toggle('hidden', !st);
-  if (st) [['users', st.students, 'طلابي'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
-    .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', x[2])); box.appendChild(d); });
+  if (st) [['users', st.students, 'الطلاب'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
+    .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', nLbl(x[1], x[2]))); box.appendChild(d); });
   renderWeek();
   const ac = $('actions'); ac.innerHTML = '';
   const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['بناء الخطط التعليمية', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['تقرير الحلقات الشامل', 'حضور الحلقات وتسميعها وطلابها', 'gold'], repAll:['تقرير الطلاب الشامل', 'الحضور والحفظ والدرجات والخطط لكل طالب', 'gold'], tvCfg:['شاشة عرض المجمع', 'شاشة العرض العامة في الجامع', ''], remote:['تفعيل حلقة عن بعد', 'تحويل الحلقات بين الحضوري وعن بعد', ''], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''],
@@ -3996,7 +4013,7 @@ function renderPlanF(){
   const ty = $('pfType').value, q = normAr($('pfQ').value), base = PF.list.filter(x => (!ty || x.type === ty) && (!q || normAr(x.name).indexOf(q) !== -1)), live = base.filter(x => !x.legacy);
   $('pfCal').textContent = 'أيام الدوام الفعلي في تقويم الخطط: ' + fmtDays(PF.cal.total) + ' • المتبقي: ' + fmtDays(PF.cal.left) + ' • ' + PF.cal.from + ' ← ' + PF.cal.to;
   const pg = (x, k) => x.unit === 'سطر' ? (x[k] || 0) / LPP : (x[k] || 0), sum = (L, k) => L.reduce((n, x) => n + pg(x, k), 0), avg = L => L.length ? Math.round(L.reduce((n, x) => n + (x.pct || 0), 0) / L.length) : 0;
-  const k = $('pfKpi'); k.innerHTML = ''; const kp = (v, l, c, sm) => { const d = el('div', 'kpi ' + (c || '')); d.appendChild(el('b', '', v)); d.appendChild(el('span', '', l)); if (sm) d.appendChild(el('small', '', sm)); k.appendChild(d); };
+  const k = $('pfKpi'); k.innerHTML = ''; const kp = (v, l, c, sm) => { const d = el('div', 'kpi ' + (c || '')); d.appendChild(el('b', '', v)); d.appendChild(el('span', '', nLbl(v, l))); if (sm) d.appendChild(el('small', '', sm)); k.appendChild(d); };
   const sid = new Set(base.map(x => x.sid)), tg = sum(live, 'target'), dn = sum(live, 'done'), ex = sum(live, 'expect'), behind = live.filter(x => /متأخر/.test(x.state)).length;
   kp(sid.size, 'طالب لهم خطة', '', PF.noPlan.length ? PF.noPlan.length + ' بلا خطة' : 'كل الطلاب لهم خطط');
   kp(tg ? Math.round(dn / tg * 100) + '%' : '—', 'نسبة الإنجاز', tg && dn / tg * 100 >= (ex / tg * 100) - 10 ? 'g' : 'y', fmtPg(dn) + ' من ' + fmtPg(tg));
@@ -4040,7 +4057,7 @@ async function loadMsgArc(){ const rg = perRange(maP, maDate, 'maFrom', 'maTo', 
 function renderMsgArc(){
   const b = $('maBox'); b.innerHTML = ''; b.appendChild(el('small', '', 'الفترة: ' + MA.from + ' – ' + MA.to));
   if (maT === 'stats'){
-    const k = el('div', 'kpis'); k.style.marginTop = '8px'; const kp = (v, l, c) => { const d = el('div', 'kpi ' + (c || '')); d.appendChild(el('b', '', v)); d.appendChild(el('span', '', l)); k.appendChild(d); };
+    const k = el('div', 'kpis'); k.style.marginTop = '8px'; const kp = (v, l, c) => { const d = el('div', 'kpi ' + (c || '')); d.appendChild(el('b', '', v)); d.appendChild(el('span', '', nLbl(v, l))); k.appendChild(d); };
     kp(MA.total, 'كل الرسائل'); kp(MA.byStatus['أُرسلت'] || 0, 'أُرسلت', 'g'); kp(MA.byStatus['فشلت'] || 0, 'فشلت', (MA.byStatus['فشلت'] || 0) ? 'r' : ''); kp(MA.byStatus['في الانتظار'] || 0, 'في الانتظار', 'y'); b.appendChild(k);
     const sent = (MA.byStatus['أُرسلت'] || 0), fin = sent + (MA.byStatus['فشلت'] || 0); b.appendChild(el('div', 'slabel c-ok', 'نسبة نجاح الإرسال: ' + (fin ? Math.round(sent / fin * 100) + '%' : '—')));
     const g = el('div', 'chgrid'); g.style.marginTop = '12px'; b.appendChild(g);
@@ -4824,7 +4841,7 @@ async function loadSAtt(){
 }
 function renderSAtt(){
   const L = SA.list, day = SA.from === SA.to, k = $('saKpi'); k.innerHTML = '';
-  const kp = (v, l, cls, sub) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', l)); if (sub) d.appendChild(el('small', '', sub)); k.appendChild(d); };
+  const kp = (v, l, cls, sub) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', nLbl(v, l))); if (sub) d.appendChild(el('small', '', sub)); k.appendChild(d); };
   const sum = f => L.reduce((a, x) => a + (x[f] || 0), 0), req = sum('required'), pr = sum('present'), ab = sum('absent');
   if (day){ const due = L.filter(x => x.required).length; kp(due, 'عليهم دوام اليوم'); kp(pr, 'حضروا', 'g'); kp(sum('late'), 'متأخرون', sum('late') ? 'y' : ''); kp(L.filter(x => x.required && !x.present && !x.leave).length, day && SA.to === D.today ? 'لم يحضروا بعد' : 'غائبون', 'r'); }
   else { kp(L.length, 'الموظفون'); const pc = pr + ab ? Math.round(pr / (pr + ab) * 100) : null; kp(pc == null ? null : pc + '%', 'نسبة الحضور', pc == null ? '' : pc >= 90 ? 'g' : pc >= 75 ? 'y' : 'r'); kp(sum('late'), 'مرات التأخير', 'y', sum('lateMin') + ' دقيقة'); kp(ab, 'أيام الغياب', ab ? 'r' : '', 'إجازات معتمدة: ' + sum('leave')); }
@@ -4911,7 +4928,7 @@ async function loadTch(){
 function renderTch(){
   const L = TC.teachers, k = $('tcKpi'); k.innerHTML = '';
   const avg = f => { const v = L.map(f).filter(x => x != null); return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null; };
-  const kp = (v, l, cls) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', l)); k.appendChild(d); };
+  const kp = (v, l, cls) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', nLbl(v, l))); k.appendChild(d); };
   const sc = avg(x => x.score), ap = avg(x => x.apprPct), cv = avg(x => x.cover);
   if (tcOne && L[0]){ kp(L[0].score, 'مؤشر الأداء', lvSc(L[0].score).replace('lv-', '')); kp(L[0].apprPct == null ? null : L[0].apprPct + '%', 'الاعتماد', ''); kp(L[0].cover == null ? null : L[0].cover + '%', 'تغطية التسميع'); kp(L[0].students, 'الطلاب'); }
   else { kp(L.length, 'المعلمون'); kp(sc, 'متوسط الأداء', sc == null ? '' : sc >= 85 ? 'g' : sc >= 65 ? 'y' : 'r'); kp(ap == null ? null : ap + '%', 'متوسط الاعتماد'); kp(cv == null ? null : cv + '%', 'متوسط تغطية التسميع'); }
@@ -5220,7 +5237,7 @@ function chCal(days, legend){
   if (!days.length){ w.appendChild(el('div', 'chempty', 'لا توجد أيام في هذه الفترة.')); return w; }
   const c = el('div', 'chcal'); days.forEach(x => { const i = el('i', '', ud(x.d).getUTCDate()); i.style.background = x.color; i.title = fmtD(x.d, { weekday:'long', day:'numeric', month:'long' }) + ': ' + x.title; c.appendChild(i); }); w.appendChild(c); return w;
 }
-function chKv(list){ const g = el('div', 'chkv'); list.forEach(x => { const d = el('div'); d.appendChild(el('b', x[2] || '', x[0] == null ? '—' : x[0])); d.appendChild(el('span', '', x[1])); g.appendChild(d); }); return g; }
+function chKv(list){ const g = el('div', 'chkv'); list.forEach(x => { const d = el('div'); d.appendChild(el('b', x[2] || '', x[0] == null ? '—' : x[0])); d.appendChild(el('span', '', nLbl(x[0], x[1]))); g.appendChild(d); }); return g; }
 /* أعلى/أدنى N مع زر عرض الكل */
 function chTop(items, n, more){ const w = el('div'); let all = false; const draw = () => { w.innerHTML = ''; w.appendChild(chBars(all ? items : items.slice(0, n), more)); if (items.length > n){ const b = el('button', 'chmore', all ? 'عرض أقل' : 'عرض الكل (' + items.length + ')'); b.onclick = () => { all = !all; draw(); }; w.appendChild(b); } }; draw(); return w; }
 /* جدول للطباعة فقط (PDF) */
@@ -5282,7 +5299,7 @@ async function loadLive(){
   try { const r = await api({ action:'live' }); if (r.ok){ LV = r; renderLive(); } else $('lvTime').textContent = needSrv(r); } catch(e){ $('lvTime').textContent = 'تعذّر الاتصال — ستُعاد المحاولة'; }
   lvBusy = false;
 }
-function lvTile(v, l, sub, cls, go){ const d = el('button', 'lvk ' + (cls || '')); d.type = 'button'; d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', l)); if (sub) d.appendChild(el('small', '', sub)); if (go) d.onclick = go; else d.disabled = true; return d; }
+function lvTile(v, l, sub, cls, go){ const d = el('button', 'lvk ' + (cls || '')); d.type = 'button'; d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', nLbl(v, l))); if (sub) d.appendChild(el('small', '', sub)); if (go) d.onclick = go; else d.disabled = true; return d; }
 function renderLive(){
   const R = LV, K = R.kpi, at = K.present + K.late, mk = at + K.absent + K.excused;
   $('lvTime').textContent = 'آخر تحديث ' + R.now.slice(11, 16);
@@ -5365,7 +5382,7 @@ const lvAvg = v => v == null ? '' : v >= 8 ? 'lv-g' : v >= 6.5 ? 'lv-y' : 'lv-r'
 const lvPl = v => v == null ? '' : v >= 75 ? 'lv-g' : v >= 40 ? 'lv-y' : 'lv-r';
 function renderDash(){
   const K = DS.kpi, day = DS.from === DS.to, box = $('dsKpi'); box.innerHTML = '';
-  const k = (v, l, cls, sub) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', l)); if (sub) d.appendChild(el('small', '', sub)); box.appendChild(d); };
+  const k = (v, l, cls, sub) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', nLbl(v, l))); if (sub) d.appendChild(el('small', '', sub)); box.appendChild(d); };
   k(K.students, 'الطلاب');
   k(K.att == null ? null : K.att + '%', 'نسبة الحضور', K.att == null ? '' : K.att >= 90 ? 'g' : K.att >= 75 ? 'y' : 'r');
   k(K.absent, 'حالات الغياب', K.absent ? 'r' : ''); k(K.late, 'حالات التأخر', K.late ? 'y' : '');
