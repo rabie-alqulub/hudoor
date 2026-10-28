@@ -14,7 +14,9 @@
 <meta name="theme-color" content="#1F3546">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js"></script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com">
 <style>
   :root{
     --navy:#3B5F78; --navy2:#2C4A60; --navy3:#1F3546; --gold:#D08E2C; --gold2:#B87A1F;
@@ -413,17 +415,25 @@ function show(view){
 function msg(el, text, type){ $(el).innerHTML = text ? '<div class="msg ' + type + '"></div>' : ''; if (text) $(el).firstChild.textContent = text; }
 
 /* ---------- نماذج التعرف على الوجه ---------- */
+/* مكتبة الوجه تُحمَّل في الخلفية بعد ظهور الصفحة (كانت تؤخر فتح الصفحة حتى تكتمل) */
+let faceLib = null;
+function loadFaceLib(){
+  if (window.faceapi) return Promise.resolve();
+  if (!faceLib) faceLib = new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js'; sc.async = true;
+    sc.onload = ok; sc.onerror = () => { faceLib = null; no(new Error('تعذّر تحميل مكتبة الوجه، تحقق من الاتصال.')); }; document.head.appendChild(sc); });
+  return faceLib;
+}
 function loadModels(){
   if (!modelsReady){
-    modelsReady = Promise.all([
+    modelsReady = loadFaceLib().then(() => Promise.all([
       faceapi.nets.tinyFaceDetector.loadFromUri(MODELS),
       faceapi.nets.faceLandmark68Net.loadFromUri(MODELS),
       faceapi.nets.faceRecognitionNet.loadFromUri(MODELS)
-    ]).then(async () => {
+    ])).then(async () => {
       /* تسخين المحرك حتى تكون أول قراءة للوجه سريعة */
       try { const c = document.createElement('canvas'); c.width = c.height = 160;
             await faceapi.detectSingleFace(c, new faceapi.TinyFaceDetectorOptions({ inputSize:224 })); } catch(e){}
-    });
+    }).catch(e => { modelsReady = null; throw e; });   // فشل التحميل: تُعاد المحاولة في المرة القادمة
   }
   return modelsReady;
 }
@@ -574,7 +584,7 @@ async function freshLocation(){
 async function boot(){
   if (API_URL.indexOf('http') !== 0){ show('vLogin'); msg('loginMsg', 'لم يُضبط رابط الخادم بعد في الملف.', 'err'); return; }
   try { cfg = await api({ action:'config' }); } catch(e){ cfg = null; }
-  loadModels();
+  loadModels().catch(() => {});
   $('empId').value = store.get('rq_nid') || '';
   empId = store.get('rq_emp');
   if (empId && store.get('rq_ver') !== APP_VER){ empId = null; store.del('rq_emp'); store.del('lv_token'); }   // تحديث للموقع: يُطلب الدخول من جديد
@@ -605,7 +615,7 @@ async function route(){
     setToday(st.today);
     if (st.otherDevice){ show('vLogin'); rbMode(true); $('rbPin').value = ''; msg('loginMsg', 'هذا ليس جوالك المسجل. يمكنك نقل بصمتك إلى هذا الجوال برمزك في برنامج مثاني.', 'info'); return; }
     rbMode(false);
-    if (!noFaceMode) loadModels();
+    if (!noFaceMode) loadModels().catch(() => {});
     $('btnReports').classList.toggle('hidden', ADMIN_NIDS.indexOf(store.get('rq_nid') || '') === -1);
     enterMain();
   }
