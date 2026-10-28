@@ -821,15 +821,15 @@
     body.g2 .wkhead h2{flex-basis:100%;font-size:17px}
   }
   /* الترحيب */
-  body.g2 .welcome{background:none;box-shadow:none;color:var(--text);text-align:right;padding:18px 6px 10px;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"lg gr" "lg h" "lg r" "lg w" "hs hs";column-gap:18px;align-items:center;overflow:visible}
+  body.g2 .welcome{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);box-shadow:0 14px 34px rgba(30,52,70,.28);color:#fff;border-radius:24px;text-align:right;padding:22px 22px 18px;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"lg gr" "lg h" "lg r" "lg w" "hs hs";column-gap:18px;align-items:center;overflow:visible}
   body.g2 .welcome .sky{display:none}
   body.g2 .welcome .wlogo{grid-area:lg;width:96px;height:96px;margin:0;align-self:center}
-  body.g2 .welcome .greet{grid-area:gr;justify-content:flex-start;color:var(--gold2);font-weight:700;font-size:15px}
-  body.g2 .welcome h2{grid-area:h;color:var(--navy3);font-size:34px;margin:2px 0;letter-spacing:-.5px}
-  body.g2 .welcome .role{grid-area:r;color:var(--navy);margin:0}
-  body.g2 .welcome .when{grid-area:w;color:var(--muted);opacity:1}
-  body.g2 .welcome .hals{grid-area:hs;justify-content:flex-start} body.g2 .welcome .hals span{background:var(--gl);border:1px solid var(--glb);color:var(--text)}
-  @media (prefers-color-scheme: dark){ body.g2 .welcome h2{color:#fff} body.g2 .welcome .role{color:#C9DCEA} }
+  body.g2 .welcome .greet{grid-area:gr;justify-content:flex-start;color:#F3D9AE;font-weight:700;font-size:15px}
+  body.g2 .welcome h2{grid-area:h;color:#fff;font-size:34px;margin:2px 0;letter-spacing:-.5px}
+  body.g2 .welcome .role{grid-area:r;color:#F3D9AE;margin:0}
+  body.g2 .welcome .when{grid-area:w;color:#fff;opacity:.85}
+  body.g2 .welcome .hals{grid-area:hs;justify-content:flex-start} body.g2 .welcome .hals span{background:rgba(255,255,255,.14);border:0;color:#fff}
+  
   @media (min-width:860px){ body.g2 .welcome h2{font-size:40px} body.g2 .welcome .wlogo{width:116px;height:116px} }
   @media (max-width:520px){ body.g2 .welcome{grid-template-columns:auto 1fr;column-gap:12px} body.g2 .welcome .wlogo{width:72px;height:72px} body.g2 .welcome h2{font-size:26px} body.g2 .welcome .when{font-size:12px} }
   body.g2 .stats{gap:14px;margin-bottom:16px}
@@ -2830,7 +2830,7 @@ function renderWelcome(){
 }
 
 /* ---------- الواجهة الزجاجية (معاينة): ?ui=2 لتفعيلها و ?ui=1 للعودة ---------- */
-const UI2 = false; try { store.set('hq_ui', '1'); } catch(e){}   // واجهة واحدة للجميع (الواجهة الزجاجية التجريبية أُلغيت)
+const UI2 = true; try { store.set('hq_ui', '2'); } catch(e){}   // الواجهة الزجاجية لجميع المستخدمين
 document.body.classList.toggle('g2', UI2);
 const g2Desk = () => UI2 && innerWidth >= 860;
 function g2Place(){   // البحث داخل الشريط العلوي على الكمبيوتر
