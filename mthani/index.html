@@ -527,6 +527,9 @@
   .stepper{display:flex;align-items:center;gap:6px} .stepper button{width:40px;height:40px;min-height:40px;padding:0;border-radius:12px;font-size:22px;font-weight:800;background:var(--light);color:var(--navy);border:1px solid var(--line)}
   .stepper output{min-width:42px;text-align:center;font-size:22px;font-weight:800;color:var(--navy3);font-variant-numeric:tabular-nums}
   .stepper output.has{color:#C0392B}
+  body.subm #btnRoles, body.subm #btnBell, body.subm #gsWrap, body.subm #btnHome, body.subm #backBar, body.subm #btnPin, body.subm #halChips, body.subm #dPrev, body.subm #dNext{display:none!important}
+  .subform .fgrid{grid-template-columns:1fr 1fr} @media (max-width:520px){ .subform .fgrid{grid-template-columns:1fr} }
+  .sblink{margin-top:12px;padding:12px;border-radius:14px;border:1.5px dashed var(--navy);background:var(--light);word-break:break-all;font-size:13px;direction:ltr;text-align:left}
   .prow.lvrow{flex-direction:column;align-items:stretch;gap:8px}
   .lvchips{display:flex;flex-wrap:wrap;gap:6px}
   .lvchips button{width:auto;min-height:34px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--card);color:var(--muted);border:1.5px solid var(--line);display:inline-flex;align-items:center;gap:5px}
@@ -996,6 +999,13 @@
 <main>
   <!-- الدخول -->
   <section id="vLogin" class="card hidden">
+    <div id="stepSub" class="hidden">
+      <h2>تقييم حلقة — معلم بديل</h2>
+      <small>أدخل رقم جوالك المسجل في التكليف لفتح تقييم الحلقة.</small>
+      <label for="subPhone">رقم الجوال</label>
+      <input id="subPhone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="05xxxxxxxx" maxlength="10">
+      <button class="btn" id="btnSub" type="button">دخول</button>
+    </div>
     <div id="stepPortal">
       <h2>اختر بوابة الدخول</h2>
       <div class="portals" id="portalGrid"></div>
@@ -1073,6 +1083,7 @@
       <div class="card">
         <div class="chips" id="halChips"></div>
         <div class="msg info hidden" id="roNote">عرض فقط: التقييم يسجّله معلم الحلقة.</div>
+        <div class="msg info hidden" id="subNote"></div>
         <div class="zmbar hidden" id="zmBar"><button class="zmgo" id="zmGo">بدء الحلقة عن بعد</button><button class="link" id="zmCopy">نسخ الرابط</button><span class="grow"></span><span class="pill p-red hidden" id="zmLiveP">● مباشر</span></div>
         <div id="zmMsg"></div>
         <div class="pnav"><button id="dPrev">السابق</button><b id="dLabel"></b><button id="dNext">التالي</button></div>
@@ -1100,6 +1111,25 @@
     </div>
 
     <!-- إسناد حلقة لمعلم -->
+    <!-- تكليف معلم بديل -->
+    <div id="pSubst" class="hidden">
+      <div class="card subform">
+        <h2>تكليف معلم بديل</h2>
+        <small>لشخص من خارج النظام يقوم مقام معلم الحلقة. يصله رابط عبر الواتساب، يدخل منه برقم جواله فقط، ولا يرى إلا تقييم الحلقة في أيام التكليف. يُقفل الرابط بعد اعتماد تقييم كل يوم، وينتهي بانتهاء المدة أو بإلغائك.</small>
+        <div class="fgrid">
+          <div><label for="sbHal">الحلقة</label><select id="sbHal"></select></div>
+          <div><label for="sbName">اسم المعلم البديل</label><input id="sbName" autocomplete="off" placeholder="الاسم الأول واسم العائلة"></div>
+          <div><label for="sbPhone">جوال المعلم البديل</label><input id="sbPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="05xxxxxxxx"></div>
+          <div><label>مدة التكليف</label><div class="stchips" id="sbDur" style="margin:4px 0 0"><button type="button" data-d="1" class="on">يوم واحد</button><button type="button" data-d="n">أكثر من يوم</button></div></div>
+          <div><label for="sbFrom" id="sbFromL">اليوم</label><input type="date" id="sbFrom"></div>
+          <div class="hidden" id="sbToW"><label for="sbTo">إلى تاريخ</label><input type="date" id="sbTo"></div>
+        </div>
+        <button class="btn" id="sbSave" type="button" style="margin-top:12px">تكليف وإرسال الرابط</button>
+        <div id="sbMsg"></div>
+        <div class="hidden" id="sbRes"><div class="sblink" id="sbLink"></div><div class="stact" style="margin-top:8px"><button type="button" id="sbCopy">نسخ الرابط</button><button type="button" id="sbCopyT">نسخ الرسالة كاملة</button></div></div>
+      </div>
+      <div class="card"><h2>التكليفات</h2><div id="sbList"></div></div>
+    </div>
     <div id="pAssign" class="hidden">
       <div class="card">
         <h2>إسناد حلقة لمعلم</h2>
@@ -2415,7 +2445,58 @@ function pickPortal(k){
 /* حفظ بيانات الدخول (باختيار المستخدم): على هذا الجهاز فقط */
 function savedPin(k){ try { const v = store.get('hq_pin_' + k); return v ? atob(v) : ''; } catch(e){ return ''; } }
 function savePin(k, pin){ if (pin) store.set('hq_pin_' + k, btoa(pin)); else store.del('hq_pin_' + k); }
+/* ---------- تكليف معلم بديل (للمدير ومن يمنحه الصلاحية) ---------- */
+let SB2 = null, sbDur = '1', sbLast = null;
+async function openSubst(){
+  if (!$('sbFrom').value) $('sbFrom').value = D.today; $('sbFrom').min = D.today; $('sbTo').min = D.today;
+  const r = await cpCall({ action:'subList' }, 'sbList'); if (!r || !r.ok) return; SB2 = r; renderSubst();
+}
+function renderSubst(){
+  const cur = $('sbHal').value; fillSel('sbHal', SB2.halaqat.map(h => [h.hid, h.name + (h.teacher ? ' — ' + h.teacher : '')]), '— اختر الحلقة —'); $('sbHal').value = cur;
+  const box = $('sbList'); box.innerHTML = '';
+  if (!SB2.list.length) return box.appendChild(el('small', '', 'لا توجد تكليفات بعد.'));
+  const PC = { 'نشط':'p-ok', 'لم يبدأ':'p-late', 'منتهٍ':'p-none', 'ملغى':'p-red' };
+  SB2.list.forEach(x => { const w = el('div', 'strow' + (x.status === 'ملغى' || x.status === 'منتهٍ' ? ' off' : '')), tp = el('div', 'top');
+    tp.appendChild(el('b', '', x.name)); tp.appendChild(el('span', 'pill ' + (PC[x.status] || 'p-none'), x.status)); w.appendChild(tp);
+    const m = el('div', 'meta'); [['الحلقة', x.hname], ['الجوال', x.phone], ['المدة', x.from === x.to ? x.from : x.from + ' ← ' + x.to], ['اليوم', x.status === 'نشط' ? x.today : ''], ['اعتمد', x.done.join('، ')], ['كلّفه', x.by], ['آخر دخول', x.last]]
+      .forEach(p => { if (p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } }); w.appendChild(m);
+    if (x.status === 'نشط' || x.status === 'لم يبدأ'){ const ac = el('div', 'stact'), c = el('button', 'warn', 'إلغاء التكليف');
+      c.onclick = () => confirmOp('إلغاء تكليف ' + x.name, 'يتوقف رابطه فوراً ولا يستطيع الدخول. ما سجّله من تقييم يبقى كما هو.', 'إلغاء التكليف', async () => { const r = await cpCall({ action:'subCancel', id:x.id }, 'sbList'); if (r && r.ok){ SB2 = r; toast(r.msg); renderSubst(); } });
+      ac.appendChild(c); w.appendChild(ac); }
+    box.appendChild(w); });
+}
+document.querySelectorAll('#sbDur button').forEach(b => b.onclick = () => { sbDur = b.dataset.d; document.querySelectorAll('#sbDur button').forEach(x => x.classList.toggle('on', x === b));
+  $('sbToW').classList.toggle('hidden', sbDur === '1'); $('sbFromL').textContent = sbDur === '1' ? 'اليوم' : 'من تاريخ'; if (sbDur !== '1' && !$('sbTo').value) $('sbTo').value = $('sbFrom').value; });
+$('sbSave').onclick = async () => {
+  const data = { hid:$('sbHal').value, name:$('sbName').value.trim(), phone:digits($('sbPhone').value), from:$('sbFrom').value, to:sbDur === '1' ? $('sbFrom').value : $('sbTo').value };
+  if (!data.hid) return msg('sbMsg', 'اختر الحلقة.', 'err');
+  $('sbSave').disabled = true; $('sbRes').classList.add('hidden');
+  const r = await cpCall({ action:'subSave', data:data, base:location.origin + location.pathname }, 'sbMsg'); $('sbSave').disabled = false;
+  if (!r || !r.ok) return; SB2 = r; sbLast = r; msg('sbMsg', r.msg, 'ok'); $('sbLink').textContent = r.link; $('sbRes').classList.remove('hidden');
+  $('sbName').value = ''; $('sbPhone').value = ''; renderSubst();
+};
+const sbCopy = t => { try { navigator.clipboard.writeText(t).then(() => toast('تم النسخ'), () => toast('انسخ الرابط يدوياً')); } catch(e){ toast('انسخ الرابط يدوياً'); } };
+$('sbCopy').onclick = () => sbLast && sbCopy(sbLast.link); $('sbCopyT').onclick = () => sbLast && sbCopy(sbLast.text);
+
+/* ---------- المعلم البديل: دخول برابط التكليف ورقم الجوال فقط ---------- */
+const SUBT = (() => { try { const t = new URLSearchParams(location.search).get('sub'); return /^[0-9a-f]{40}$/.test(t || '') ? t : ''; } catch(e){ return ''; } })();
+const devId = () => { let d = store.get('hq_dev'); if (!d){ d = Math.random().toString(36).slice(2) + Date.now().toString(36); store.set('hq_dev', d); } return d; };
+function showSubLogin(text){
+  show('vLogin'); ['stepPin','stepNew','stepForgot','stepNid','stepPortal'].forEach(x => $(x).classList.add('hidden')); $('ptag').classList.add('hidden');
+  $('stepSub').classList.remove('hidden'); msg('loginMsg', text && text !== 'انتهت الجلسة، سجّل الدخول مجدداً.' ? text : '', 'info');
+}
+function subFinish(text){ store.del('hq_token'); store.del('hq_subt'); D = null; $('nav').classList.add('hidden'); document.body.classList.remove('in');
+  show('vLogin'); ['stepPin','stepNew','stepForgot','stepNid','stepPortal','stepSub'].forEach(x => $(x).classList.add('hidden')); $('ptag').classList.add('hidden'); msg('loginMsg', text, 'ok'); }
+$('btnSub').onclick = async () => {
+  const ph = digits($('subPhone').value); if (!/^05\d{8}$/.test(ph)) return msg('loginMsg', 'أدخل رقم الجوال كاملاً (05xxxxxxxx).', 'err');
+  $('btnSub').disabled = true; msg('loginMsg', 'جاري التحقق...', 'info');
+  try { const r = await api({ action:'subLogin', t:SUBT, phone:ph, dev:devId() });
+    if (!r.ok){ if (r.done) return subFinish(r.msg); return msg('loginMsg', r.msg, 'err'); }
+    store.set('hq_token', r.token); store.set('hq_subt', SUBT); await loadHome(); }
+  catch(e){ msg('loginMsg', 'تعذّر الاتصال بالخادم.', 'err'); } finally { $('btnSub').disabled = false; }
+};
 function showLogin(text){
+  if (SUBT) return showSubLogin(text);
   show('vLogin'); ['stepPin','stepNew','stepForgot','stepNid'].forEach(x => $(x).classList.add('hidden')); $('ptag').classList.add('hidden');
   const g = $('portalGrid'); g.innerHTML = '';
   PORTAL_UI.forEach(p => { const b = el('button', 'portal pc-' + p[0]); b.innerHTML = ICONS[p[3]] || ''; b.appendChild(el('b', '', p[1])); b.appendChild(el('small', '', p[2])); b.onclick = () => pickPortal(p[0]); g.appendChild(b); });
@@ -2589,7 +2670,10 @@ async function loadHome(){
   const supRO = admin && r.ro && !r.peek; document.body.classList.toggle('suro', supRO);
   if (supRO){ $('gsWrap').classList.add('hidden'); buildAdminNav(n, RO_NAV); }
   else if (admin) buildAdminNav(n); else buildAdminNav(n, userNav(TABS));
+  document.body.classList.toggle('subm', !!r.sub);
+  if (r.sub){ n.innerHTML = ''; buildAdminNav(n, [{ t:'تقييم ' + r.sub.hname, ic:'teach', r:'teach' }]); TABS = [['teach', 'التقييم']]; }
   show('vHome');
+  if (r.sub){ routeRestored = true; hal = (r.halaqat[0] || {}).hid; day = null; openRole('teach'); } else
   restoreRoute(); updBell(); clearInterval(window._bellT); window._bellT = setInterval(() => { if (!document.hidden) refreshCounts(); }, 300000);
   if (r.ro && !r.peek && !$('roBar')){ const b = el('div', 'robar', 'حساب المشرف العام: للاطلاع فقط، ولا يمكن التعديل.'); b.id = 'roBar'; $('vHome').insertBefore(b, $('vHome').firstChild); }   // المدير يرى شاشة عرض المجمع (اليوم) عند الدخول
 }
@@ -2628,7 +2712,7 @@ const STAFF_EXTRA = [['repStu', 'تقارير شؤون الطلاب', 'reports.s
 const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
   nafStars:['competition.manage', 'competition.star'], nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
   moveMany:'students.move', absent:'students.absent', staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
-  teach:'halaqat.evaluate_all', halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', remote:'halaqat.remote', reeval:'halaqat.reeval',
+  teach:'halaqat.evaluate_all', halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', subst:'halaqat.substitute', remote:'halaqat.remote', reeval:'halaqat.reeval',
   plans:'students.plans_all', refsEdu:'refs.edu', planF:'plans.follow', exams:'assoc.nominate',
   msgs:'messages.send', msgsStaff:'messages.send', msgArc:'messages.send', dash:'reports.dashboard', repAll:'reports.all', report:'halaqat.reports_all',
   staffFile:'reports.teachers', tvCfg:'tv.manage', ann:'ann.manage' };
@@ -2638,7 +2722,7 @@ const ADMIN_NAV = [
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['planF', 'متابعة سير الخطط'], ['refsEdu', 'الإحالات التعليمية']] },
   { t:'الاختبارات', ic:'exam', r:'exams' },
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
-  { t:'الحلقات', ic:'halaqa', items:[['teach', 'التقييم'], ['halaqaView', 'استعراض الحلقات'], ['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
+  { t:'الحلقات', ic:'halaqa', items:[['teach', 'التقييم'], ['halaqaView', 'استعراض الحلقات'], ['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['subst', 'تكليف معلم بديل'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
   { t:'نافس', ic:'trophy', items:[['nafStars', 'فارس الحلقة'], ['nafPts', 'نقاطي'], ['nafStore', 'المتجر']] },
   { t:'المعاملات', ic:'exam', items:[['trxS', 'المعاملات الصادرة'], ['trxR', 'المعاملات الواردة']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
@@ -2726,6 +2810,7 @@ function openRole(r, title, group){
   document.querySelectorAll('#nav .ngroup').forEach(w => { const d = w.classList.contains('direct'), has = d ? w.querySelector('.ghead').dataset.r === key : !!w.querySelector('.gitems button.on'); w.classList.toggle('cur', has); w.classList.toggle('open', has && !d); });   // تبقى قائمة التبويب الحالي مفتوحة فقط
   $('pSoon').classList.toggle('hidden', r !== 'soon');
   $('pAssign').classList.toggle('hidden', r !== 'assign');
+  $('pSubst').classList.toggle('hidden', r !== 'subst'); if (r === 'subst') openSubst();
   if (r === 'assign') openAssign();
   $('pStaff').classList.toggle('hidden', r !== 'staff');
   if (r === 'staff') openStaff();
@@ -3006,6 +3091,9 @@ async function loadAtt(){
   if (!r.ok) return msg('stuList', r.msg, 'err');
   dayCanFix = !!r.canFix; teachVO = !!r.ro; teachRO = !!r.ro || !!r.locked; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !r.ro); zmTeachBar();
   studs = r.students; exStuds = r.excluded || []; approval = r.approval; reeval = r.reeval || null; renderStuds(); renderAppr();
+  const sb = r.subBy && !(D && D.sub); $('subNote').classList.toggle('hidden', !sb && !(D && D.sub));
+  if (sb) $('subNote').textContent = 'معلم بديل لهذا اليوم: ' + r.subBy.name + ' (جوال ' + r.subBy.phone + ')' + (r.subBy.done ? ' — اعتمد التقييم.' : ' — لم يعتمد بعد.');
+  else if (D && D.sub) $('subNote').textContent = 'أهلاً ' + D.sub.name + '، أنت معلم بديل لـ«' + D.sub.hname + '» اليوم. سجّل الحضور وتقييم كل طالب حاضر، ثم اعتمد واختر فارس الحلقة. بعد الاعتماد يُقفل الرابط لهذا اليوم.';
   if (!r.studyDay) $('saveState').textContent = 'تنبيه: هذا اليوم ليس من أيام الدراسة.';
 }
 const EVT = () => (D.types || []).slice();   // حفظ، مراجعة قريبة، مراجعة بعيدة، تلاوة
@@ -3486,6 +3574,7 @@ $('apprGo').onclick = async () => {
   try {
     const r = await api({ action:'approve', hid:hal, date:day, star:apprStar });
     if (!r.ok) return msg('apprMsg', r.msg, 'err');
+    if (r.sub){ $('apprSheet') && $('apprSheet').classList.add('hidden'); subFinish('تم اعتماد تقييم اليوم بنجاح. انتهت مهمتك لهذا اليوم، جزاك الله خيراً.'); return; }
     studs.forEach(s => { if (!s.att) s.att = 'غائب'; });
     approval = { star:r.star, starName:r.starName, at:new Date().toLocaleTimeString('ar-SA', { hour:'numeric', minute:'2-digit' }) };
     renderStuds(); renderAppr();
@@ -7434,7 +7523,8 @@ function renderReport(r){
 
 /* ---------- البدء ---------- */
 if (!portal) portal = store.get('hq_portal') || '';
-if (store.get('hq_token')) loadHome(); else showLogin();
+if (SUBT){ if (store.get('hq_token') && store.get('hq_subt') === SUBT) loadHome(); else { store.del('hq_token'); showSubLogin(); } }
+else if (store.get('hq_token')) loadHome(); else showLogin();
 
 /* التحديث التلقائي: اختصار الشاشة الرئيسية في الجوال يُبقي الصفحة القديمة في الذاكرة، فنقارن الصفحة المنشورة بالمفتوحة
    عند العودة للتطبيق وكل 10 دقائق؛ إذا تغيّرت تُحدَّث تلقائياً في الرئيسية، أو يظهر شريط «تحديث» في غيرها حتى لا يضيع عمل المستخدم */
