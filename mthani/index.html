@@ -1924,7 +1924,7 @@
     </div>
     <div class="count" id="rsCount"></div>
     <button class="btn soft mushaf-btn hidden" id="rsMushaf" type="button">فتح المصحف على المقطع المحدد</button>
-    <div class="errbox"><label for="rsErrN">عدد الأخطاء <small>(اختياري)</small></label><div class="stepper"><button type="button" id="rsErrM" aria-label="إنقاص">−</button><output id="rsErrN">0</output><button type="button" id="rsErrP" aria-label="زيادة">+</button></div></div>
+    <div class="errbox"><label for="rsErrN">عدد الأخطاء</label><div class="stepper"><button type="button" id="rsErrM" aria-label="إنقاص">−</button><output id="rsErrN">0</output><button type="button" id="rsErrP" aria-label="زيادة">+</button></div></div>
     <label id="rsScoreL">قيّم الطالب من 10 <b class="rq">*</b></label>
     <div class="scores" id="rsScores"></div>
     <div class="slabel" id="rsLabel"></div>
@@ -5979,7 +5979,7 @@ function renderCfg(r, fill){
 }
 function cfPrev(){
   if (!CF) return;
-  const sample = 'الحضور: حاضر\n• حفظ: النبأ 1 ← النبأ 20 — ممتاز (10/10)\n• مراجعة بعيدة: البقرة 1 ← البقرة 50 — جيد جداً (8/10)\nابنكم فارس الحلقة اليوم، بارك الله فيه.';
+  const sample = 'الحضور: حاضر\n• حفظ: النبأ 1 ← النبأ 20 — ممتاز (10/10)\n• مراجعة بعيدة: البقرة 1 ← البقرة 50 — جيد جداً (8/10) — عدد الأخطاء: 2\nابنكم فارس الحلقة اليوم، بارك الله فيه.';
   const v = { 'الطالب':'أحمد خالد سعيد القحطاني', 'الحلقة':'حلقة أبي بكر الصديق', 'اليوم':'الأحد', 'التاريخ':'١٥ جمادى الأولى ١٤٤٨ هـ', 'التفاصيل':sample, 'المعلم':'أحمد الغامدي', 'المجمع':CF.org };
   $('cfPrev').textContent = ($('cfTmpl').value || CF.defTmpl).replace(/\{([^}]+)\}/g, (m, k) => v[k] ?? m);
 }
