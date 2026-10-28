@@ -2546,7 +2546,6 @@ async function loadHome(){
       if (!has('students.plans_all')) TABS.push(['plans', 'خطط طلاب الحلقة', 'own']);
       if (!has('plans.follow')) TABS.push(['planF', 'متابعة سير الخطط', 'own']);
       if (!has('halaqat.reports_all')) TABS.push(['report', 'تقارير الحلقة', 'own']); }
-    else if (has('halaqat.evaluate_all')) TABS.push(['teach', 'تقييم الحلقات']);
     // ٢) كل خانة من قائمة المدير منحها دور الموظف أو صلاحياته الإضافية، بنفس اسمها
     ADMIN_NAV.forEach(g => (g.items || [[g.r, g.t]]).forEach(it => { if (NAV_PERM[it[0]] && has(NAV_PERM[it[0]]) && (!NAV_LV[it[0]] || NAV_LV[it[0]].some(l => has(l))) && !TABS.some(x => x[0] === it[0])) TABS.push([it[0], it[1]]); }));
     STAFF_EXTRA.forEach(it => { if (has(it[2]) && !TABS.some(x => x[0] === it[0])) TABS.push([it[0], it[1]]); });
@@ -2604,7 +2603,7 @@ const STAFF_EXTRA = [['repStu', 'تقارير شؤون الطلاب', 'reports.s
 const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
   nafStars:'competition.manage', nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
   moveMany:'students.move', absent:'students.absent', staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
-  halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', remote:'halaqat.remote', reeval:'halaqat.reeval',
+  teach:'halaqat.evaluate_all', halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', remote:'halaqat.remote', reeval:'halaqat.reeval',
   plans:'students.plans_all', refsEdu:'refs.edu', planF:'plans.follow', exams:'assoc.nominate',
   msgs:'messages.send', msgsStaff:'messages.send', msgArc:'messages.send', dash:'reports.dashboard', repAll:'reports.all', report:'halaqat.reports_all',
   staffFile:'reports.teachers', tvCfg:'tv.manage', ann:'ann.manage' };
@@ -2614,7 +2613,7 @@ const ADMIN_NAV = [
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['planF', 'متابعة سير الخطط'], ['refsEdu', 'الإحالات التعليمية']] },
   { t:'الاختبارات', ic:'exam', r:'exams' },
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
-  { t:'الحلقات', ic:'halaqa', items:[['halaqaView', 'استعراض الحلقات'], ['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
+  { t:'الحلقات', ic:'halaqa', items:[['teach', 'التقييم'], ['halaqaView', 'استعراض الحلقات'], ['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
   { t:'نافس', ic:'trophy', items:[['nafStars', 'فارس الحلقة'], ['nafPts', 'نقاطي'], ['nafStore', 'المتجر']] },
   { t:'المعاملات', ic:'exam', items:[['trxS', 'المعاملات الصادرة'], ['trxR', 'المعاملات الواردة']] },
   { t:'الاتصالات والرسائل', ic:'chat', items:[['msgs', 'رسائل أولياء الأمور'], ['msgsStaff', 'رسائل الموظفين'], ['msgArc', 'أرشيف الرسائل وإحصائياتها'], ['msgCfg', 'ضبط الرسائل']] },
