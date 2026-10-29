@@ -2750,7 +2750,8 @@ async function loadHome(){
   if (isAdm){ TABS.push(['report', 'التقارير']); TABS.push(['settings', 'الإعدادات']); }
   if (isStaff){
     // ١) صفحات «حلقتي» لمن له حلقة (تأتي من إسناد الحلقة لا من الصلاحيات)
-    if (mineH){ TABS.push(['teach', 'التقييم', 'own']); TABS.push(['myStu', 'طلاب الحلقة', 'own']); TABS.push(['candsT', 'ترشيح طالب لاختبار المرحلية', 'own']);
+    if (mineH){ TABS.push(['teach', 'التقييم', 'own']); TABS.push(['myStu', 'طلاب الحلقة', 'own']);
+      if (canSendRef('stu')) TABS.push(['refS', 'إحالة طالب لشؤون الطلاب', 'own']); if (canSendRef('edu')) TABS.push(['refE', 'إحالة طالب للشؤون التعليمية', 'own']); TABS.push(['candsT', 'ترشيح طالب لاختبار المرحلية', 'own']);
       if (!has('students.plans_all')) TABS.push(['plans', 'خطط طلاب الحلقة', 'own']);
       if (!has('plans.follow')) TABS.push(['planF', 'متابعة سير الخطط', 'own']);
       if (!has('halaqat.reports_all')) TABS.push(['report', 'تقارير الحلقة', 'own']);
@@ -2894,7 +2895,7 @@ function restoreRoute(){
 function saveRoute(r, t){ if (D && r !== 'soon') ss.set('hq_route', JSON.stringify({ r, t:t || '', u:D.name + '|' + (D.portal || ''), day:r === 'teach' ? day : '' })); }
 window.addEventListener('pagehide', () => { try { const sr = JSON.parse(ss.get('hq_route') || 'null'); if (sr){ sr.y = window.scrollY; if (sr.r === 'teach') sr.day = day; ss.set('hq_route', JSON.stringify(sr)); } } catch(e){} });
 /* زر الرجوع: سجل الصفحات التي فتحها المستخدم في هذه الجلسة، ويعمل معه زر الرجوع في الجوال والمتصفح */
-let navHist = [], navBacking = false, roleTitle = '';
+let navHist = [], navBacking = false, roleTitle = '', refNav = '';
 const roleName = (r, t) => t || (r === 'welcome' ? 'الرئيسية' : ((document.querySelector('#nav [data-r="' + r + '"]') || {}).dataset || {}).t || ((TABS || []).find(x => x[0] === r) || [])[1] || '');
 function goBack(fromPop){
   const p = navHist.pop(); if (!p){ if (role !== 'welcome'){ navBacking = true; show('vHome'); openRole('welcome'); navBacking = false; window.scrollTo(0, 0); } return; }
@@ -2906,6 +2907,7 @@ $('btnPgBack').onclick = () => goBack(false);
 window.addEventListener('popstate', () => { if (D) goBack(true); });
 function openRole(r, title, group){
   if (r === 'mePin'){ setTimeout(openPin, 50); r = 'me'; }
+  if (r === 'refS' || r === 'refE'){ msSec = r === 'refS' ? 'stu' : 'edu'; refNav = r; r = 'myStu'; } else if (r !== 'myStu') refNav = '';
   if (!navBacking && role && role !== r && routeRestored){ if (r === 'welcome') navHist = []; else { navHist.push({ r:role, t:roleTitle, y:window.scrollY }); if (navHist.length > 30) navHist.shift(); try { history.pushState({ m:1 }, ''); } catch(e){} } }
   role = r; roleTitle = title || ''; saveRoute(r, title); setTimeout(backBar, 0);
   const key = r === 'soon' ? 'soon:' + title : r;
@@ -6458,9 +6460,11 @@ document.addEventListener('click', e => { const p = $('bellPop'); if (p && !p.cl
 $('btnHome').onclick = () => { if (D){ show('vHome'); closeMenu(); openRole('welcome'); window.scrollTo(0, 0); } };
 async function refreshCounts(){ try { if (!D || !store.get('hq_token')) return; const r = await api({ action:'home' }); if (r.ok){ D.refs = r.refs; D.trxN = r.trxN; D.ann = r.ann; D.planReqN = r.planReqN; updBell(); } } catch(e){} }
 
+/** رفع الإحالة (للمعلم) صلاحية مستقلة عن استقبالها والرد عليها */
+const canSendRef = k => { const P = (D && D.perms) || []; return P.indexOf('*') !== -1 || P.indexOf(k === 'stu' ? 'refs.sendStu' : 'refs.sendEdu') !== -1 || P.indexOf('refs.send:' + k) !== -1; };
 async function openMyStu(){
   const box = $('msTabs'); box.innerHTML = ''; const cT = role === 'candsT'; if (cT) msSec = 'exam'; else if (msSec === 'exam') msSec = 'stu'; box.classList.toggle('hidden', cT); $('msHead').classList.toggle('hidden', cT);
-  const c = refUnread(), TB = MS_TABS.filter(t => (t[0] !== 'stu' && t[0] !== 'edu') || hasL('refs.send', t[0]));   // الإحالة حسب صلاحية «إحالة طالب من الحلقة»
+  const c = refUnread(), TB = MS_TABS.filter(t => (t[0] !== 'stu' && t[0] !== 'edu') || canSendRef(t[0]));   // الإحالة حسب صلاحية «إحالة طالب من الحلقة»
   if (!cT && !TB.some(t => t[0] === msSec)) msSec = TB[0][0];
   TB.forEach(t => { const b = el('button', msSec === t[0] ? 'on' : ''); b.innerHTML = MSI[t[0]]; b.appendChild(el('span', '', t[1])); b.dataset.k = t[0];
     if (t[0] === 'track' && c.mine) b.appendChild(el('span', 'bdg', c.mine));
