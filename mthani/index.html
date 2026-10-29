@@ -45,7 +45,7 @@
   .mushaf{font-family:'Amiri Quran','Amiri','Traditional Arabic',serif;font-size:26px;line-height:2.25;text-align:justify;text-align-last:center;padding:14px 16px;margin-top:10px;border-radius:14px;background:#FFFBF2;color:#1E2A33;border:2px solid #E6D3A8;box-shadow:inset 0 0 0 4px #FFFBF2,inset 0 0 0 5px #E6D3A8}
   .mushaf .sh{display:block;text-align:center;font-family:Tajawal,sans-serif;font-weight:700;font-size:16px;color:#7A5A1E;background:#F6EAD0;border-radius:10px;padding:4px 0;margin:10px 0 4px;line-height:1.8}
   .mushaf .bs{display:block;text-align:center;margin-bottom:4px}
-  .mushaf.mfin{margin:4px 0 10px;padding:10px 14px;font-size:22px;line-height:2.1;text-align:right;text-align-last:auto}
+  .mushaf.mfin{position:sticky;right:0;max-width:calc(100vw - 56px);margin:4px 0 10px;padding:10px 14px;font-size:22px;line-height:2.1;text-align:right;text-align-last:auto}
   .mushaf .mfmore{display:block;margin:6px auto 0;font-family:Tajawal,sans-serif;font-size:13px;padding:4px 14px;width:auto;border-radius:999px;background:#F6EAD0;color:#7A5A1E;border:0;cursor:pointer}
   .mfbtn{width:auto!important;padding:5px 10px!important;font-size:12.5px!important;border-radius:999px!important;white-space:nowrap}
   tr.mfrow td{padding:0 4px!important;border-bottom:1px solid var(--line)}
@@ -3627,6 +3627,8 @@ async function openMushaf(){
     $('mushafSheet').querySelector('.panel').scrollTop = 0;
   } catch(e){ box.innerHTML = ''; box.appendChild(el('div', 'msg err', 'تعذّر تحميل المصحف. تحقق من الإنترنت.')); }
 }
+/* فتح عنصر منسدل يغلق ما قبله في نفس القائمة */
+function accClose(scope, sel, keep){ if (scope) scope.querySelectorAll(sel).forEach(x => { if (x !== keep) x.classList.remove('open'); }); }
 /* مصحف مضمَّن تحت سؤال الاختبار: من موضع السؤال، عشر آيات (تمتد للسورة التالية عند قصر السورة)، مع «المزيد» */
 function mfFont(){ if (!document.getElementById('amiriQ')){ const l = document.createElement('link'); l.id = 'amiriQ'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri&display=swap'; document.head.appendChild(l); } }
 async function mfInline(box, s, a, n){
@@ -4542,7 +4544,7 @@ function renderMsgArc(){
   if (!MA.detail.length) return b.appendChild(el('small', '', 'لا توجد نتائج.'));
   MA.detail.forEach(m => { const w = el('div', 'strow sfmsg'), tp = el('div', 'top'); tp.appendChild(el('b', '', m.names || m.phone)); w.appendChild(tp);
     const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (m.status === 'أُرسلت' ? 'p-ok' : m.status === 'فشلت' ? 'p-red' : 'p-late'), m.status)); pl.appendChild(el('span', 'pill p-none', m.kind)); pl.appendChild(el('span', 'pill p-none', (m.sentAt || m.at).slice(0, 16))); pl.appendChild(el('span', 'pill p-none', m.phone)); w.appendChild(pl);
-    w.appendChild(el('p', '', m.text + (m.err ? '\nخطأ: ' + m.err : ''))); w.onclick = () => w.classList.toggle('open'); b.appendChild(w); });
+    w.appendChild(el('p', '', m.text + (m.err ? '\nخطأ: ' + m.err : ''))); w.onclick = () => { accClose(b, '.open', w); w.classList.toggle('open'); }; b.appendChild(w); });
 }
 
 /* ---------- المعاملات الإدارية ---------- */
@@ -4930,7 +4932,8 @@ function ptForm(x, a){
       const mr = el('tr', 'mfrow hidden'), mtd = el('td'); mtd.colSpan = 7; const mbox = el('div'); mtd.appendChild(mbox); mr.appendChild(mtd);
       const tdM = el('td'), mb = el('button', 'btn soft mfbtn', 'عرض'); mb.type = 'button'; tdM.appendChild(mb); tr.appendChild(tdM);
       const mShow = () => mfInline(mbox, r.s.value, r.a.value, 10);
-      mb.onclick = () => { const op = mr.classList.toggle('hidden'); mb.textContent = op ? 'عرض' : 'إخفاء'; if (!op) mShow(); };
+      mb.onclick = () => { if (mr.classList.contains('hidden')) rows.forEach(o => { if (o !== r && o.mr && !o.mr.classList.contains('hidden')){ o.mr.classList.add('hidden'); o.mb.textContent = 'عرض'; } });
+        const op = mr.classList.toggle('hidden'); mb.textContent = op ? 'عرض' : 'إخفاء'; if (!op){ mShow(); setTimeout(() => tr.scrollIntoView({ block:'start', behavior:'smooth' }), 60); } };
       r.s.addEventListener('change', () => { if (!mr.classList.contains('hidden')) mShow(); }); r.a.addEventListener('change', () => { if (!mr.classList.contains('hidden')) mShow(); });
       r.mr = mr; r.mb = mb; tb.appendChild(tr); tb.appendChild(mr); rows.push(r); }
     t.appendChild(tb); calc(); };
@@ -5060,7 +5063,7 @@ function renderAnnFor(id){
   (D.ann || []).forEach(a => { const c = el('div', 'annc p-' + a.prio + (a.read ? ' read' : '')), h = el('div', 'h');
     if (!a.read) h.appendChild(el('span', 'new')); h.appendChild(el('b', '', (a.prio === 'عاجل' ? '[عاجل] ' : a.prio === 'مهم' ? '[مهم] ' : '') + a.title)); h.appendChild(el('small', '', a.at)); c.appendChild(h);
     if (a.body) c.appendChild(el('p', '', a.body));
-    c.onclick = () => { c.classList.toggle('open'); if (!a.read){ a.read = true; c.classList.add('read'); const n = c.querySelector('.new'); if (n) n.remove(); api({ action:'annRead', id:a.id }).catch(() => {}); } };
+    c.onclick = () => { accClose(c.parentNode, '.open', c); c.classList.toggle('open'); if (!a.read){ a.read = true; c.classList.add('read'); const n = c.querySelector('.new'); if (n) n.remove(); api({ action:'annRead', id:a.id }).catch(() => {}); } };
     box.appendChild(c); });
 }
 async function openAnn(){ $('anBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'annList' }, 'anBox'); if (r && r.ok){ AN = r; renderAnn(); } }
@@ -6564,7 +6567,7 @@ function sfSection(k, box, print){
     if (!SF.msgs.length) return box.appendChild(el('small', '', 'لم تُرسل رسائل لولي أمر هذا الطالب بعد.'));
     SF.msgs.forEach(m => { const w = el('div', 'strow sfmsg'), tp = el('div', 'top'); tp.appendChild(el('b', '', m.kind)); w.appendChild(tp);
       const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (m.status === 'أُرسلت' ? 'p-ok' : m.status === 'فشلت' ? 'p-red' : 'p-late'), m.status)); pl.appendChild(el('span', 'pill p-none', (m.sentAt || m.at).slice(0, 16))); w.appendChild(pl);
-      w.appendChild(el('p', '', m.text + (m.err ? '\nخطأ: ' + m.err : ''))); w.onclick = () => w.classList.toggle('open'); box.appendChild(w); });
+      w.appendChild(el('p', '', m.text + (m.err ? '\nخطأ: ' + m.err : ''))); w.onclick = () => { accClose(box, '.open', w); w.classList.toggle('open'); }; box.appendChild(w); });
     return;
   }
   if (k === 'log'){
@@ -7267,7 +7270,7 @@ async function loadAdd(){
     const f = el('div', 'frm hidden'), n = el('input'); n.type = 'number'; n.min = 1; n.max = 1000; n.placeholder = 'النقاط'; n.inputMode = 'numeric';
     const note = el('input'); note.placeholder = 'السبب (اختياري)'; note.maxLength = 200; const sv = el('button', 'mini', 'حفظ');
     f.appendChild(n); f.appendChild(note); f.appendChild(sv); w.appendChild(f);
-    open.onclick = () => { f.classList.toggle('hidden'); if (!f.classList.contains('hidden')) n.focus(); };
+    open.onclick = () => { if (f.classList.contains('hidden')) w.parentNode.querySelectorAll('.addrow .frm:not(.hidden)').forEach(x => x.classList.add('hidden')); f.classList.toggle('hidden'); if (!f.classList.contains('hidden')) n.focus(); };
     sv.onclick = async () => {
       const v = Number(n.value); if (!(v >= 1)) return toast('اكتب عدد النقاط');
       sv.disabled = true; const x = await cpCall({ action:'pointsAdd', sid:s.sid, points:v, note:note.value.trim() }); sv.disabled = false;
@@ -7694,7 +7697,7 @@ function renderCats(){
     const w = el('div', 'pcat' + (open.has(c) ? ' open' : '')); w.dataset.c = c;
     const h = el('button', 'ph'); const ic = el('span', 'ic'); ic.innerHTML = ICONS[CAT_ICON[c]] || ICONS.settings; h.appendChild(ic);
     h.appendChild(el('span', '', c)); h.appendChild(el('span', 'cnt' + (on ? ' some' : ''), on + ' من ' + defs.length));
-    h.insertAdjacentHTML('beforeend', ICONS.chev); h.onclick = () => w.classList.toggle('open'); w.appendChild(h);
+    h.insertAdjacentHTML('beforeend', ICONS.chev); h.onclick = () => { accClose(box, '.pcat.open', w); w.classList.toggle('open'); }; w.appendChild(h);
     const body = el('div', 'pb');
     const all = el('button', 'allbtn', on === defs.length ? 'إلغاء الكل' : 'تحديد الكل');
     all.onclick = () => { const full = on === defs.length; defs.forEach(d => [d.key].concat((d.lv || []).map(l => d.key + ':' + l[0])).forEach(k => peSet(k, !full))); renderCats(); };
@@ -8058,7 +8061,7 @@ function renderReport(r){
     tb.appendChild(chStack(h.students.slice().sort((a, b) => (b.types['حفظ'] || 0) - (a.types['حفظ'] || 0)).map(s => ({ label:s.name, sub:'حضور ' + (s.present + s.late) + ' • غياب ' + s.absent + (s.avg != null ? ' • المعدل ' + s.avg : ''), parts:s.types, onclick:() => openStudent(s.sid) })),
       r.types.map((t, i) => [t, t, tc[i % 4]]), { text:(x, t) => t + ' آية', empty:'لا يوجد طلاب.' }));
     const sync = () => more.textContent = tb.classList.contains('hidden') ? 'تفاصيل الطلاب' : 'إخفاء التفاصيل';
-    more.onclick = () => { tb.classList.toggle('hidden'); sync(); }; sync();
+    more.onclick = () => { if (tb.classList.contains('hidden')) body.querySelectorAll('.hal').forEach(o => { if (o !== w && o._close) o._close(); }); tb.classList.toggle('hidden'); sync(); }; w._close = () => { tb.classList.add('hidden'); sync(); }; sync();
     w.appendChild(more); w.appendChild(tb); body.appendChild(w);
   });
 }

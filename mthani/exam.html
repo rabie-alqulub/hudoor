@@ -47,7 +47,7 @@
   .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px 0}
   .sheet .card{width:min(760px,100%);margin:0 8px}
   @media (min-width:900px){ .sheet{align-items:center;padding:12px 0} .sheet .card{width:min(1280px,96vw);max-height:96vh;overflow:auto} .sheet .grid2{grid-template-columns:repeat(4,1fr)} }
-  .mushaf{font-family:'Amiri Quran','Amiri','Traditional Arabic',serif;font-size:22px;line-height:2.1;text-align:right;padding:10px 14px;margin:4px 0 10px;border-radius:14px;background:#FFFCF5;color:#2B2112;border:1px solid #E7D6B0;box-shadow:inset 0 0 0 4px #FFFCF5,inset 0 0 0 5px #E7D6B0}
+  .mushaf{position:sticky;right:0;max-width:calc(100vw - 48px);font-family:'Amiri Quran','Amiri','Traditional Arabic',serif;font-size:22px;line-height:2.1;text-align:right;padding:10px 14px;margin:4px 0 10px;border-radius:14px;background:#FFFCF5;color:#2B2112;border:1px solid #E7D6B0;box-shadow:inset 0 0 0 4px #FFFCF5,inset 0 0 0 5px #E7D6B0}
   .mushaf .sh{display:block;text-align:center;font-family:Tajawal,sans-serif;font-weight:700;font-size:15px;color:#7A5A1E;background:#F6EAD0;border-radius:10px;padding:3px 0;margin:8px 0 4px;line-height:1.6}
   .mushaf .bs{display:block;text-align:center;margin-bottom:4px} .mushaf .an{color:#9A6B16;white-space:nowrap}
   .mushaf .more{display:block;margin:6px auto 0;font-family:Tajawal,sans-serif;font-size:13px;padding:4px 14px;border-radius:999px;background:#F6EAD0;color:#7A5A1E}
@@ -260,7 +260,8 @@ function form(s){
     const mr = el('tr', 'mfr hidden'), mtd = el('td'); mtd.colSpan = 5; const mbox = el('div'); mtd.appendChild(mbox); mr.appendChild(mtd);
     const tdM = el('td'), mb = el('button', 'mfb', 'عرض'); mb.type = 'button'; tdM.appendChild(mb); tr.appendChild(tdM);
     const mShow = () => mfInline(mbox, r.s.value, r.a.value, 10); r.mr = mr; r.mShow = mShow;
-    mb.onclick = () => { const hid = mr.classList.toggle('hidden'); mb.textContent = hid ? 'عرض' : 'إخفاء'; if (!hid) mShow(); };
+    r.mb = mb; mb.onclick = () => { if (mr.classList.contains('hidden')) rows.forEach(o => { if (o !== r && o.mr && !o.mr.classList.contains('hidden')){ o.mr.classList.add('hidden'); o.mb.textContent = 'عرض'; } });
+      const hid = mr.classList.toggle('hidden'); mb.textContent = hid ? 'عرض' : 'إخفاء'; if (!hid){ mShow(); setTimeout(() => tr.scrollIntoView({ block:'start', behavior:'smooth' }), 60); } };
     r.s.addEventListener('change', () => { if (!mr.classList.contains('hidden')) mShow(); }); r.a.addEventListener('change', () => { if (!mr.classList.contains('hidden')) mShow(); });
     tb.appendChild(tr); tb.appendChild(mr); rows.push(r); }
   t.appendChild(tb); calc(); if (!prev.length && rg) generate();
