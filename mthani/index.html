@@ -348,6 +348,33 @@
     #sfPrint table{width:100%;border-collapse:collapse} #sfPrint td,#sfPrint th{border:1px solid #bbb;padding:3px 5px;text-align:right;font-size:11px}
     #sfPrint .ph{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #D08E2C;padding-bottom:6px;margin-bottom:8px}
   }
+  .sigcard{display:grid;gap:8px} .siggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+  .sigbox{display:grid;gap:6px;border:1px solid var(--line,#e2e8ee);border-radius:14px;padding:10px;background:rgba(255,255,255,.6)} .sigbox>span{font-weight:700;color:var(--navy,#1F3546)}
+  .sigprev{height:90px;display:flex;align-items:center;justify-content:center;border:1px dashed #c7d2da;border-radius:10px;background:#fff} .sigprev img{max-height:80px;max-width:90%;object-fit:contain}
+  .sigbox .lnk{background:none;border:0;color:#b4443b;font-size:12px;cursor:pointer;justify-self:start}
+  /* هوية المجمع في الطباعة */
+  @media print{
+    @page{size:A4;margin:10mm 10mm 8mm}
+    html:has(body.brprint),body.brprint{background:#fff!important;overflow:visible!important;height:auto!important} body.brprint::before,body.brprint::after{display:none!important} body.brprint>*:not(.branded){display:none!important}
+    .branded{position:static!important;padding:0!important;font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif!important;color:#1D2E3B!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .branded table.bwrap,.branded table.bwrap>tbody>tr>td,.branded table.bwrap>tfoot>tr>td{border:0!important;padding:0!important;background:none!important;text-align:right!important;font-size:inherit!important} .branded table.bwrap>tfoot{display:table-footer-group} .branded .bsp{height:11mm}
+    .branded .bh{display:grid;grid-template-columns:24mm 1fr 46mm;gap:5mm;align-items:center;padding-bottom:3mm;border-bottom:1mm solid #2F4F66;box-shadow:0 1.6mm 0 -1.1mm #C98A2B;margin-bottom:5mm}
+    .branded .bh .lg{width:22mm;height:22mm;object-fit:contain;border-radius:50%;border:.5mm solid #C98A2B;padding:.8mm;background:#fff}
+    .branded .bh .org{text-align:center} .branded .bh .org b{display:block;font-size:17px;color:#1F3546} .branded .bh .org span{font-size:11px;color:#5C6F7C}
+    .branded .bh .meta{font-size:9.5px;line-height:1.75;color:#3C5061;border-right:.3mm solid #D7DFE5;padding-right:3mm} .branded .bh .meta b{color:#1F3546}
+    .branded .bt h1{font-size:19px!important;color:#1F3546;margin:0 0 2mm!important}
+    .branded .bs{background:#F3F6F8;border-radius:2mm;padding:2mm 3mm;font-size:10.5px;margin-bottom:4mm}
+    .branded h3{font-size:12.5px!important;color:#1F3546;border:0!important;border-right:1.2mm solid #C98A2B!important;padding-right:2mm!important;margin:5mm 0 2mm!important}
+    .branded table{border-collapse:collapse;width:100%} .branded thead{display:table-header-group} .branded tr{page-break-inside:avoid}
+    .branded th{background:#2F4F66!important;color:#fff!important;border:.2mm solid #2F4F66!important;padding:1.6mm 1.2mm!important;font-size:10px!important;text-align:center!important}
+    .branded td{border:.2mm solid #DDE4E9!important;padding:1.3mm 1.2mm!important;font-size:10px!important;text-align:center!important} .branded tbody tr:nth-child(even) td{background:#F5F8FA!important} .branded td table{margin:0}
+    .branded .bwm{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:-1} .branded .bwm img{width:120mm;opacity:.05}
+    .branded .bft{position:fixed;bottom:0;background:#fff;right:0;left:0;display:flex;justify-content:space-between;font-size:8.5px;color:#6A7C89;border-top:.2mm solid #D7DFE5;padding-top:1.5mm}
+    .branded .bsig{display:grid;gap:8mm;margin-top:10mm;page-break-inside:avoid;text-align:center;font-size:11px}
+    .branded .bsig b{display:block;color:#1F3546} .branded .bsig .im{height:22mm;display:flex;align-items:center;justify-content:center;position:relative;border-bottom:.3mm dashed #9AAAB6;margin:2mm 6mm}
+    .branded .bsig .im img{max-height:20mm;max-width:45mm;object-fit:contain} .branded .bsig .im img.stamp{position:absolute;left:4mm;max-height:24mm;opacity:.85}
+    .branded .bsig span{display:block;margin-top:1.5mm;color:#3C5061}
+  }
   /* ضبط الرسائل */
   .cfst{display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px;border-radius:14px;background:var(--light)}
   .cfst .lamp{width:14px;height:14px;border-radius:50%;flex:none;background:var(--muted)}
@@ -1942,7 +1969,17 @@
       </div>
       <div id="sGeneral" class="card hidden">
         <h3>الإعدادات العامة</h3>
-        <div class="msg info">ستُضاف هنا الإعدادات العامة للمجمع. حالياً تُعدَّل من تبويب "الإعدادات" في جدول البيانات.</div>
+        <div class="sigcard">
+          <b>التوقيعات والختم</b>
+          <small class="muted">تظهر تلقائياً أسفل التقارير المهمة عند الطباعة أو الحفظ PDF: توقيعك والختم في التقارير المهمة، ويُضاف توقيع مدير الشؤون التعليمية في التقارير التعليمية. يُفضّل التوقيع بقلم أزرق أو أسود على ورقة بيضاء، وتُزال الخلفية البيضاء تلقائياً.</small>
+          <div class="siggrid">
+            <div class="sigbox"><span>توقيع مدير المجمع</span><div class="sigprev" id="sgMgrP"></div><input id="sgMgrN" placeholder="اسم مدير المجمع كما يظهر تحت التوقيع"><label class="btn soft">رفع صورة التوقيع<input type="file" accept="image/*" id="sgMgrF" hidden></label><button class="lnk" data-clr="mgrImg">إزالة</button></div>
+            <div class="sigbox"><span>توقيع مدير الشؤون التعليمية</span><div class="sigprev" id="sgEduP"></div><input id="sgEduN" placeholder="اسم مدير الشؤون التعليمية"><label class="btn soft">رفع صورة التوقيع<input type="file" accept="image/*" id="sgEduF" hidden></label><button class="lnk" data-clr="eduImg">إزالة</button></div>
+            <div class="sigbox"><span>ختم المجمع</span><div class="sigprev" id="sgStP"></div><small class="muted">يظهر بجانب توقيع مدير المجمع</small><label class="btn soft">رفع صورة الختم<input type="file" accept="image/*" id="sgStF" hidden></label><button class="lnk" data-clr="stamp">إزالة</button></div>
+          </div>
+          <div id="sgMsg"></div>
+          <div class="savebar"><button class="btn" id="sgSave">حفظ التوقيعات</button></div>
+        </div>
       </div>
     </div>
 
@@ -4182,7 +4219,7 @@ $('asPdf').onclick = () => { if (!AX) return; const list = asSorted(asList()), p
   const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'قائمة المرشحين لاختبارات الجمعية')); l.appendChild(el('div', '', (asDate ? 'موعد الاختبار: ' + asDate + ' • ' : '') + 'عدد الطلاب: ' + list.length)); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>الحلقة</th><th>المرحلية</th><th>تاريخ الاختبار</th></tr></thead>'; const tb = el('tbody');
   list.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.hname, x.level, x.examDate].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
-  setTimeout(() => window.print(), 50); };
+  setTimeout(brandPrint, 50); };
 /* ---------- مجموعات اختبار الجمعية: تجميع المرشحين حسب يوم الاختبار، ومشرفو الجمعية، واعتماد المجموعة ---------- */
 const exbIn = x => [AX.st.nom, AX.st.ok, AX.st.no].indexOf(x.status) !== -1 && x.examDate;
 function exbDates(){ const ds = new Set(AX.list.filter(exbIn).map(x => x.examDate));
@@ -4243,7 +4280,7 @@ function exbPrint(d, L, bt){ const p = $('dsPrint'); p.innerHTML = ''; $('sfPrin
   const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'كشف ' + (bt && bt.no ? exbName(bt) : 'مجموعة') + ' — اختبار المرحليات')); l.appendChild(el('div', '', wDay(d) + ' ' + d + ' • عدد الطلاب: ' + L.length + (bt && bt.sup ? ' • المختبِر: ' + bt.sup : '') + (bt && bt.done ? ' • اعتمد المشرف النتائج: ' + bt.done.slice(0, 16) : ''))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>المرحلية</th><th>الحلقة</th><th>الدرجة</th><th>النتيجة</th></tr></thead>'; const tb = el('tbody');
   L.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.level, x.hname, x.status === AX.st.nom ? '' : x.score, x.status === AX.st.nom ? '' : x.result].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
-  setTimeout(() => window.print(), 50); }
+  setTimeout(brandPrint, 50); }
 /* ---------- الطلاب المتعثرون ---------- */
 let SG = null, sgP = 'month', sgDate = null, sgSeq = 0;
 function openStrug(){
@@ -4481,7 +4518,7 @@ function txPrint(x){
   if (x.thread.length){ p.appendChild(el('h3', '', 'الإجراءات')); const t2 = el('table'); t2.innerHTML = '<thead><tr><th>التاريخ</th><th>بواسطة</th><th>الإجراء</th><th>الحالة</th></tr></thead>'; const b2 = el('tbody');
     x.thread.forEach(e => { const tr = el('tr'); [e.at.slice(0, 16), e.by, e.text, e.status || ''].forEach(v => tr.appendChild(el('td', '', v))); b2.appendChild(tr); }); t2.appendChild(b2); p.appendChild(t2); }
   const sg = el('div'); sg.style.cssText = 'display:flex;justify-content:space-between;margin-top:30px'; sg.appendChild(el('div', '', 'توقيع المرسل: ............')); sg.appendChild(el('div', '', 'اعتماد المستلم: ............')); p.appendChild(sg);
-  setTimeout(() => window.print(), 50);
+  setTimeout(brandPrint, 50);
 }
 
 /* ---------- الحلقات عن بعد (Zoom داخل مثاني) ---------- */
@@ -5019,7 +5056,7 @@ function efPrint(){
   const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
   const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'تقرير الموظف الشامل: ' + EF.info.name)); l.appendChild(el('div', '', EF.info.title + ' • الرقم الوظيفي ' + EF.info.emp + ' • ' + $('efLbl').textContent)); hd.appendChild(l); hd.appendChild(el('div', '', EF.org)); p.appendChild(hd);
   EF_TABS.forEach(t => { if (t[0] === 'perf' && !EF.perf) return; if (t[0] === 'att' && EF.att === undefined) return; if (t[0] === 'courses' && !EF.courses) return; p.appendChild(el('h3', '', t[1])); const d = el('div'); efSection(t[0], d); p.appendChild(d); });
-  setTimeout(() => window.print(), 50);
+  setTimeout(brandPrint, 50);
 }
 function efXls(){
   const I = EF.info, t = 'ملف الموظف: ' + I.name + ' — ' + $('efLbl').textContent, sheets = [['البيانات', [[t], ['البند', 'القيمة'], ['الاسم', I.name], ['الرقم الوظيفي', I.emp], ['الهوية', I.nid], ['الجوال', I.phone], ['الصفة', I.title], ['الفترة', I.shift], ['المباشرة', I.start], ['الحلقات', I.halaqat.join('، ')]]]];
@@ -5162,7 +5199,7 @@ $('saPdf').onclick = () => {
   [$('saKpi'), $('saTbl').parentNode].forEach(n => { const c = n.cloneNode(true); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); c.removeAttribute('id'); p.appendChild(c); });
   if (saOne && SA.list[0]) prTbl(p, 'الحضور اليومي', ['التاريخ', 'الحالة', 'الحضور', 'الانصراف', 'التأخير (د)', 'الخروج المبكر (د)', 'الساعات'], (SA.list[0].days || []).map(d => [d.date, d.status, d.in, d.out, d.late, d.early, d.hours]));
   else prTbl(p, 'الموظفون', ['الموظف', 'الصفة', 'أيام الدوام', 'حضور', 'تأخير', 'دقائق التأخير', 'غياب', 'إجازات', 'ساعات العمل', 'الحضور %'], sortBy(SA.list, 'name', 1).map(E => [E.name, E.title, E.required, E.present, E.late, E.lateMin, E.absent, E.leave, E.hours, E.pct == null ? '' : E.pct + '%']));
-  setTimeout(() => window.print(), 50);
+  setTimeout(brandPrint, 50);
 };
 
 /* ---------- أداء المعلمين ---------- */
@@ -5260,7 +5297,7 @@ $('tcPdf').onclick = () => {
   [$('tcKpi'), $('tcRank'), $('tcTbl').parentNode].forEach(n => { const c = n.cloneNode(true); c.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); c.querySelectorAll('.chseg').forEach(x => x.remove()); c.removeAttribute('id'); p.appendChild(c); });
   if (tcOne && TC.teachers[0]) prTbl(p, 'أيام الدراسة', ['التاريخ', 'الاعتماد', 'وقت الاعتماد', 'الحاضرون', 'الغائبون', 'التسميع', 'فارس الحلقة'], (TC.teachers[0].days || []).map(d => [d.date, d.approved >= d.of ? 'معتمد' : d.approved ? d.approved + '/' + d.of : 'لم يُعتمد', d.at, d.present, d.absent, d.recs, d.star]));
   else prTbl(p, 'تفاصيل المؤشرات', ['المعلم', 'الطلاب', 'الأداء', 'الاعتماد %', 'تغطية التسميع %', 'تسميع', 'حفظ', 'مراجعة', 'حضور الطلاب %', 'متوسط الدرجة', 'إنجاز الخطط %'], sortBy(TC.teachers, 'score', -1).map(T => [T.name, T.students, T.score, T.apprPct, T.cover, T.recs, T.hifz, T.mur, T.att, T.avg, T.plan]));
-  setTimeout(() => window.print(), 50);
+  setTimeout(brandPrint, 50);
 };
 
 /* ---------- شاشة العرض العامة ---------- */
@@ -5427,7 +5464,7 @@ $('rpPdf').onclick = () => {
   if (RP.list){ const cols = RP_COLS[rpK]; prTbl(p, 'تفاصيل الطلاب', cols.map(c => c[1]), sortBy(RP.list, 'hname', 1).map(x => cols.map(c => x[c[0]]))); }
   else { if (RP.days && RP.days.length && rpK !== 'edu') prTbl(p, 'أيام الحضور', ['التاريخ', 'اليوم', 'الحالة'], RP.days.map(d => [d.date, fmtD(d.date, { weekday:'long' }), d.status]));
     if (RP.records && RP.records.length && rpK !== 'stu') prTbl(p, 'التسميع', ['التاريخ', 'النوع', 'من', 'إلى', 'الآيات', 'الدرجة', 'ملاحظة'], RP.records.map(r => [r.date, r.type, r.from, r.to, r.ayat, scoreTxt(r), r.note])); }
-  setTimeout(() => window.print(), 50);
+  setTimeout(brandPrint, 50);
 };
 $('rpXls').onclick = () => {
   if (!RP) return;
@@ -5514,7 +5551,68 @@ function chKv(list){ const g = el('div', 'chkv'); list.forEach(x => { const d = 
 /* أعلى/أدنى N مع زر عرض الكل */
 function chTop(items, n, more){ const w = el('div'); let all = false; const draw = () => { w.innerHTML = ''; w.appendChild(chBars(all ? items : items.slice(0, n), more)); if (items.length > n){ const b = el('button', 'chmore', all ? 'عرض أقل' : 'عرض الكل (' + items.length + ')'); b.onclick = () => { all = !all; draw(); }; w.appendChild(b); } }; draw(); return w; }
 /* جدول للطباعة فقط (PDF) */
-function prTbl(p, title, head, rows){ p.appendChild(el('h3', '', title)); const t = el('table'), tr = el('tr'); head.forEach(h => tr.appendChild(el('th', '', h))); t.appendChild(tr); rows.forEach(r => { const x = el('tr'); r.forEach(v => x.appendChild(el('td', '', v == null || v === '' ? '—' : v))); t.appendChild(x); }); p.appendChild(t); }
+/* ---------- هوية المجمع في الطباعة وPDF: ترويسة بالشعار، علامة مائية، تذييل، وتوقيعات للتقارير المهمة ---------- */
+let SIGS = null;
+async function sigLoad(){ if (SIGS) return SIGS; try { const r = await api({ action:'sigData' }); SIGS = r && r.ok ? r : { mgr:{}, edu:{}, stamp:'' }; } catch(e){ SIGS = { mgr:{}, edu:{}, stamp:'' }; } return SIGS; }
+// التقارير المهمة بتوقيع مدير المجمع، والتعليمية معه توقيع مدير الشؤون التعليمية
+function sigKind(t){
+  if (/التقارير التعليمية|تقارير الشؤون التعليمية|المرشحين|اختبار المرحليات|الخطط/.test(t)) return ['edu', 'mgr'];
+  if (/ملف الطالب|تقرير الطلاب الشامل|تقرير الحلقات الشامل|تقرير الموظف الشامل|تقرير حضور الموظفين|أداء المعلمين|تقارير شؤون الطلاب/.test(t)) return ['mgr'];
+  return [];
+}
+const hijriLong = d => { try { return d.toLocaleDateString('ar-SA-u-ca-islamic-umalqura', { day:'numeric', month:'long', year:'numeric' }); } catch(e){ return ''; } };
+async function brandPrint(){
+  const p = [$('dsPrint'), $('sfPrint')].find(x => x && x.children.length); if (!p) return window.print();
+  const ph = p.querySelector('.ph'), title = ph && ph.querySelector('h1') ? ph.querySelector('h1').textContent : '', sub = ph && ph.querySelector('h1 + div') ? ph.querySelector('h1 + div').textContent : '';
+  const org = String((D && D.org) || 'مجمع حلقات ربيع القلوب القرآني بجامع علي الشبلان - أبها'), cut = org.indexOf(' بجامع'), now = new Date(), pad = n => ('0' + n).slice(-2);
+  const no = '\u2066' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + '-' + pad(now.getHours()) + pad(now.getMinutes()) + '\u2069';
+  const hd = el('div', 'bh'), lg = el('img', 'lg'); lg.src = '../logo.jpg'; lg.alt = 'شعار المجمع'; hd.appendChild(lg);
+  const o = el('div', 'org'); o.appendChild(el('b', '', cut > 0 ? org.slice(0, cut) : org)); if (cut > 0) o.appendChild(el('span', '', org.slice(cut + 1).replace(' - ', ' — '))); hd.appendChild(o);
+  const m = el('div', 'meta'); [['التاريخ', hijriLong(now)], ['الموافق', now.toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { day:'numeric', month:'long', year:'numeric' }) + 'م'], ['رقم التقرير', no]].forEach(x => { const d = el('div', '', x[0] + ': '); d.appendChild(el('b', '', x[1])); m.appendChild(d); }); hd.appendChild(m);
+  const tt = el('div', 'bt'); tt.appendChild(el('h1', '', title)); const bs = sub ? el('div', 'bs', sub) : null;
+  if (ph){ ph.replaceWith(hd); hd.after(tt); if (bs) tt.after(bs); } else { p.prepend(hd); }
+  const wm = el('div', 'bwm'), wi = el('img'); wi.src = '../logo.jpg'; wi.alt = ''; wm.appendChild(wi); p.appendChild(wm);
+  const ft = el('div', 'bft'); ft.appendChild(el('span', '', 'نظام مثاني لحلقات تحفيظ القرآن')); ft.appendChild(el('span', '', 'طُبع بواسطة: ' + ((D && D.name) || '') + ' — ' + now.toLocaleString('ar-SA-u-ca-gregory-nu-latn', { dateStyle:'short', timeStyle:'short' }))); ft.appendChild(el('span', '', no)); p.appendChild(ft);
+  const sk = sigKind(title);
+  if (sk.length){ const S0 = await sigLoad(), sg = el('div', 'bsig'); sg.style.gridTemplateColumns = 'repeat(' + sk.length + ',1fr)';
+    sk.forEach(k => { const x = S0[k] || {}, c = el('div'); c.appendChild(el('b', '', k === 'mgr' ? 'مدير المجمع' : 'مدير الشؤون التعليمية'));
+      const im = el('div', 'im'); if (x.img){ const i = el('img'); i.src = x.img; i.alt = 'التوقيع'; im.appendChild(i); } if (k === 'mgr' && S0.stamp){ const st = el('img', 'stamp'); st.src = S0.stamp; st.alt = 'الختم'; im.appendChild(st); }
+      c.appendChild(im); c.appendChild(el('span', '', x.name || '')); sg.appendChild(c); });
+    p.appendChild(sg); }
+  // غلاف جدولي: تذييله الفارغ يتكرر في كل صفحة فيحجز مكان التذييل الثابت فلا يغطي المحتوى
+  const wt = el('table', 'bwrap'), wf = el('tfoot'), wb = el('tbody'), wr = el('tr'), wc = el('td'), fr = el('tr'), fc = el('td'); fc.appendChild(el('div', 'bsp'));
+  [...p.childNodes].filter(n => n !== wm && n !== ft).forEach(n => wc.appendChild(n)); wr.appendChild(wc); wb.appendChild(wr); fr.appendChild(fc); wf.appendChild(fr); wt.appendChild(wb); wt.appendChild(wf); p.prepend(wt);
+  p.classList.add('branded'); document.body.classList.add('brprint');
+  // انتظار تحميل الشعار والتوقيعات قبل فتح نافذة الطباعة
+  await Promise.all([...p.querySelectorAll('img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; setTimeout(r, 2500); })));
+  window.print();
+}
+window.addEventListener('afterprint', () => { document.body.classList.remove('brprint'); ['dsPrint', 'sfPrint'].forEach(id => { const x = $(id); if (x) x.classList.remove('branded'); }); });
+/* إعداد التوقيعات (المدير فقط) */
+let SGE = {};
+async function openSig(){
+  if (!isAdm()){ $('sGeneral').querySelector('.sigcard').classList.add('hidden'); return; }
+  SIGS = null; const r = await sigLoad(); SGE = { mgrImg:r.mgr.img || '', mgrName:r.mgr.name || '', eduImg:r.edu.img || '', eduName:r.edu.name || '', stamp:r.stamp || '' };
+  $('sgMgrN').value = SGE.mgrName; $('sgEduN').value = SGE.eduName; renderSig();
+}
+function renderSig(){ [['sgMgrP', 'mgrImg'], ['sgEduP', 'eduImg'], ['sgStP', 'stamp']].forEach(x => { const b = $(x[0]); b.innerHTML = ''; if (SGE[x[1]]){ const i = el('img'); i.src = SGE[x[1]]; i.alt = ''; b.appendChild(i); } else b.appendChild(el('small', 'muted', 'لم تُرفع بعد — سيظهر سطر توقيع فارغ')); }); }
+// تصغير الصورة وإزالة الخلفية البيضاء ثم ضغطها لتناسب خلية واحدة في الجدول
+function sigImg(file, stamp){ return new Promise((ok, no) => { const fr = new FileReader(); fr.onerror = no; fr.onload = () => { const im = new Image(); im.onerror = () => no(new Error('صورة غير صالحة')); im.onload = () => {
+  let W = stamp ? 360 : 520, out = '';
+  for (let k = 0; k < 6; k++){ const sc = Math.min(1, W / im.width, (stamp ? W : W * .5) / im.height), w = Math.max(1, Math.round(im.width * sc)), h = Math.max(1, Math.round(im.height * sc)), c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d'); g.drawImage(im, 0, 0, w, h); const d = g.getImageData(0, 0, w, h), p = d.data;
+    for (let i = 0; i < p.length; i += 4){ const l = (p[i] + p[i + 1] + p[i + 2]) / 3; if (l > 215) p[i + 3] = 0; else if (l > 170) p[i + 3] = Math.round(p[i + 3] * (215 - l) / 45); }
+    g.putImageData(d, 0, 0); out = c.toDataURL('image/webp', .8); if (out.indexOf('data:image/webp') !== 0) out = c.toDataURL('image/png');
+    if (out.length < 45000) return ok(out); W = Math.round(W * .78); }
+  no(new Error('الصورة كبيرة جداً، جرّب صورة أصغر'));
+  }; im.src = fr.result; }; fr.readAsDataURL(file); }); }
+[['sgMgrF', 'mgrImg'], ['sgEduF', 'eduImg'], ['sgStF', 'stamp']].forEach(x => { const f = $(x[0]); if (f) f.onchange = async () => { const fl = f.files[0]; f.value = ''; if (!fl) return;
+  try { SGE[x[1]] = await sigImg(fl, x[1] === 'stamp'); renderSig(); msg('sgMsg', 'جاهزة للحفظ — اضغط «حفظ التوقيعات».', 'info'); } catch(e){ msg('sgMsg', e.message, 'err'); } }; });
+document.querySelectorAll('[data-clr]').forEach(b => b.onclick = () => { SGE[b.dataset.clr] = ''; renderSig(); });
+if ($('sgSave')) $('sgSave').onclick = async () => { const b = $('sgSave'); b.disabled = true;
+  try { const r = await api(Object.assign({ action:'sigSave' }, SGE, { mgrName:$('sgMgrN').value.trim(), eduName:$('sgEduN').value.trim() })); msg('sgMsg', r.ok ? r.msg : r.msg, r.ok ? 'ok' : 'err'); if (r.ok){ SIGS = r; } }
+  catch(e){ if (e.message !== 'expired') msg('sgMsg', 'تعذّر الاتصال بالخادم.', 'err'); } b.disabled = false; };
+function prTbl(p, title, head, rows){ p.appendChild(el('h3', '', title)); const t = el('table'), th = el('thead'), tb = el('tbody'), tr = el('tr'); head.forEach(h => tr.appendChild(el('th', '', h))); th.appendChild(tr); t.appendChild(th); rows.forEach(r => { const x = el('tr'); r.forEach(v => x.appendChild(el('td', '', v == null || v === '' ? '—' : v))); tb.appendChild(x); }); t.appendChild(tb); p.appendChild(t); }
 const ATT_SEGS = [['present', 'حاضر', CHC.ok], ['late', 'متأخر', CHC.late], ['absent', 'غائب', CHC.abs], ['excused', 'مستأذن', CHC.exc]];
 const ST_COL = { 'حاضر':CHC.ok, 'متأخر':CHC.late, 'غائب':CHC.abs, 'مستأذن':CHC.exc };
 /* ---------- شاشة عرض المجمع ---------- */
@@ -5763,19 +5861,38 @@ function dsTitle(){ return 'شاشة عرض المجمع — ' + $('dsLbl').text
 function xlsxBlob(sheets){
   const esc = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const col = i => { let s = ''; i++; while (i){ const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
-  const sheetXml = rows => { const w = rows[0].map((_, i) => Math.min(40, Math.max(8, ...rows.map(r => String(r[i] == null ? '' : r[i]).length + 2))));
-    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0" rightToLeft="1"><pane ySplit="2" topLeftCell="A3" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>' +
+  // هوية المجمع في Excel: صف لاسم المجمع، ثم عنوان التقرير، ثم الفترة ومن طبعه، ثم عناوين الأعمدة بالذهبي، والصفوف متناوبة
+  const brand = (nm, rows) => { const hasT = rows.length && rows[0].length === 1 && rows.length > 1, title = hasT ? String(rows[0][0]) : nm, body = hasT ? rows.slice(1) : rows;
+    return [[(D && D.org) || 'مجمع حلقات ربيع القلوب القرآني'], [title], ['طُبع ' + new Date().toLocaleString('ar-SA-u-ca-gregory-nu-latn', { dateStyle:'short', timeStyle:'short' }) + ((D && D.name) ? ' بواسطة ' + D.name : '') + ' • نظام مثاني']].concat(body); };
+  const sheetXml = rows => { const nc = Math.max(1, ...rows.slice(3).map(r => r.length)), w = Array.from({ length:nc }, (_, i) => Math.min(42, Math.max(9, ...rows.slice(3).map(r => String(r[i] == null ? '' : r[i]).length + 3))));
+    const stOf = ri => ri === 0 ? 3 : ri === 1 ? 4 : ri === 2 ? 5 : ri === 3 ? 1 : (ri % 2 ? 7 : 6);
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0" rightToLeft="1"><pane ySplit="4" topLeftCell="A5" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="18"/><cols>' +
       w.map((x, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + x + '" customWidth="1"/>').join('') + '</cols><sheetData>' +
-      rows.map((r, ri) => '<row r="' + (ri + 1) + '">' + r.map((v, ci) => { const ref = col(ci) + (ri + 1), st = ri === 0 ? ' s="2"' : ri === 1 ? ' s="1"' : '';
+      rows.map((r, ri) => { const cells = ri < 3 ? [r[0]].concat(Array(nc - 1).fill('')) : r.concat(Array(Math.max(0, nc - r.length)).fill('')), st = ' s="' + stOf(ri) + '"';
+        return '<row r="' + (ri + 1) + '"' + (ri === 0 ? ' ht="28" customHeight="1"' : ri < 4 ? ' ht="22" customHeight="1"' : '') + '>' + cells.map((v, ci) => { const ref = col(ci) + (ri + 1);
         if (v == null || v === '') return '<c r="' + ref + '"' + st + '/>';
-        return typeof v === 'number' ? '<c r="' + ref + '"' + st + '><v>' + v + '</v></c>' : '<c r="' + ref + '" t="inlineStr"' + st + '><is><t>' + esc(v) + '</t></is></c>'; }).join('') + '</row>').join('') +
-      '</sheetData>' + (rows[0].length > 1 ? '<mergeCells count="1"><mergeCell ref="A1:' + col(rows[1].length - 1) + '1"/></mergeCells>' : '') + '</worksheet>'; };
+        return typeof v === 'number' ? '<c r="' + ref + '"' + st + '><v>' + v + '</v></c>' : '<c r="' + ref + '" t="inlineStr"' + st + '><is><t>' + esc(v) + '</t></is></c>'; }).join('') + '</row>'; }).join('') +
+      '</sheetData>' + (nc > 1 ? '<mergeCells count="3"><mergeCell ref="A1:' + col(nc - 1) + '1"/><mergeCell ref="A2:' + col(nc - 1) + '2"/><mergeCell ref="A3:' + col(nc - 1) + '3"/></mergeCells>' : '') + '</worksheet>'; };
+  sheets = sheets.map(sh => [sh[0], brand(sh[0], sh[1])]);
   const files = [
     ['[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + sheets.map((s, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '</Types>'],
     ['_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
     ['xl/workbook.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets>' + sheets.map((s, i) => '<sheet name="' + esc(s[0]) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets></workbook>'],
     ['xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + sheets.map((s, i) => '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
-    ['xl/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="13"/><color rgb="FF2C4A60"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF3B5F78"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>']
+    ['xl/styles.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+      '<fonts count="5"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="15"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="12"/><color rgb="FFF3D9AE"/><name val="Arial"/></font><font><sz val="10"/><color rgb="FF7A4D0F"/><name val="Arial"/></font></fonts>' +
+      '<fills count="7"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFC98A2B"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1F3546"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF2F4F66"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFBF0DC"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF5F8FA"/></patternFill></fill></fills>' +
+      '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFDDE4E9"/></left><right style="thin"><color rgb="FFDDE4E9"/></right><top style="thin"><color rgb="FFDDE4E9"/></top><bottom style="thin"><color rgb="FFDDE4E9"/></bottom><diagonal/></border></borders>' +
+      '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="8">' +
+      '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+      '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>' +
+      '<xf numFmtId="0" fontId="1" fillId="4" borderId="0" xfId="0" applyFont="1" applyFill="1"/>' +
+      '<xf numFmtId="0" fontId="2" fillId="3" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' +
+      '<xf numFmtId="0" fontId="3" fillId="4" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' +
+      '<xf numFmtId="0" fontId="4" fillId="5" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' +
+      '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' +
+      '<xf numFmtId="0" fontId="0" fillId="6" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' +
+      '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>'],
   ].concat(sheets.map((s, i) => ['xl/worksheets/sheet' + (i + 1) + '.xml', sheetXml(s[1])]));
   // ملف zip مخزّن (بلا ضغط) مع CRC32
   const enc = new TextEncoder(), crcT = (() => { const t = []; for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
@@ -5808,7 +5925,7 @@ $('dsPdf').onclick = () => {
   const tbl = (title, head, rows) => { p.appendChild(el('h3', '', title)); const t = el('table'), tr = el('tr'); head.forEach(h => tr.appendChild(el('th', '', h))); t.appendChild(tr); rows.forEach(r => { const x = el('tr'); r.forEach(v => x.appendChild(el('td', '', v == null ? '—' : v))); t.appendChild(x); }); p.appendChild(t); };
   tbl('الحلقات', DS_HCOLS.map(c => c[1]), DS.halaqat.map(h => [h.name, h.teacher, h.students, h.att == null ? null : h.att + '%', h.absent, h.late, h.hifz, h.mur, h.recs, h.avg, hAppr(h)]));
   tbl('تقرير الطلاب الشامل', DS_SCOLS.map(c => c[1]), sortBy(DS.students, 'hname', 1).map(x => [x.name, x.hname, x.att == null ? null : x.att + '%', x.absent, x.late, x.hifz, x.mur, x.avg, x.plan == null ? null : x.plan + '%', x.stars, x.points, x.refs]));
-  setTimeout(() => window.print(), 50);
+  setTimeout(brandPrint, 50);
 };
 
 /* ---------- نقل الطلاب بين الحلقات ---------- */
@@ -6165,7 +6282,7 @@ function sfPrint(){
   hd.appendChild(l); hd.appendChild(el('div', '', ($('orgName').textContent || '') + ' — ' + D.today)); p.appendChild(hd);
   p.appendChild(el('div', '', sfStats().map(x => x[1] + ': ' + x[0]).join('   |   ')));
   [['info', 'البيانات الشخصية'], ['hifz', 'الحفظ والخطة'], ['att', 'الحضور'], ['refs', 'الإحالات والاختبارات'], ['pts', 'نافس'], ['log', 'سجل الطالب']].forEach(t => { p.appendChild(el('h3', '', t[1])); const b = el('div'); sfSection(t[0], b, true); p.appendChild(b); });
-  setTimeout(() => window.print(), 50);
+  setTimeout(brandPrint, 50);
 }
 /* صف مرقّم باسم الطالب وزر عين لاستعراض ملفه */
 const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -7199,7 +7316,7 @@ function setSub(sub){
   if (sub === 'perms') sub = 'roles';
   setSubNow = sub;
   document.querySelectorAll('#setTabs button').forEach(x => x.classList.toggle('on', x.dataset.s === sub));
-  $('sPerms').classList.toggle('hidden', sub === 'general'); $('sGeneral').classList.toggle('hidden', sub !== 'general');
+  $('sPerms').classList.toggle('hidden', sub === 'general'); $('sGeneral').classList.toggle('hidden', sub !== 'general'); if (sub === 'general') openSig();
 }
 document.querySelectorAll('#setTabs button').forEach(b => b.onclick = () => { setSub(b.dataset.s); if (b.dataset.s !== 'general') openSettings(); });
 /* الأدوار والصلاحيات في شاشة واحدة:
