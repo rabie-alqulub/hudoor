@@ -4911,7 +4911,7 @@ function ptForm(x, a){
   save.onclick = async () => { const score = calc(), sheet = { n:rows.length, w:PT_W, range: rF.value && rT.value ? D.surah[rF.value - 1] + ' — ' + D.surah[rT.value - 1] : '', q:rows.map(r => ({ p:r.p.value, h:+r.h.value || 0, t:+r.t.value || 0, j:+r.j.value || 0, s:Math.round(r.sc * 2) / 2 })) };
     if (!rows.some(r => r.p.value)) return msg('ptMsg', 'حدد موضع سؤال واحد على الأقل، أو اضغط «توليد الأسئلة تلقائياً».', 'err');
     save.disabled = true; const r = await cpCall({ action:'assocSave', op:'pre', id:a.id, data:{ score:score, date:dt.value, examiner:ex.value.trim(), notes:nt.value.trim(), sheet:sheet } }, 'ptMsg'); save.disabled = false; if (!r || !r.ok) return;
-    AX = r; $('ptSheet').classList.add('hidden'); toast(r.msg); if (r.passed && role === 'exams'){ exS = 3; exSub = ''; } renderCands(); };
+    AX = r; $('ptSheet').classList.add('hidden'); toast(r.msg); if (r.passed && role === 'exams'){ exS = 3; exSub = ''; } renderCands(); if (RB_KIND[role]) openRefs(RB_KIND[role]); };
   $('ptSheet').classList.remove('hidden');
 }
 function ptView(x){
@@ -7008,20 +7008,17 @@ function openRf(x, side){
   rp.appendChild(lab(side === 'h' ? 'الرد / الإجراء المتخذ' : 'تعقيب على الإحالة'));
   const tx = el('textarea', 'rftxt'); tx.maxLength = 1500; rp.appendChild(tx); R.text = () => tx.value.trim();
   if (side === 'h'){
-    if (x.kind === 'exam'){
-      const g4 = el('div', 'edgrid');
-      const fld = (t, inp, full) => { const d = el('div', full ? 'full' : ''); d.appendChild(lab(t)); d.appendChild(inp); g4.appendChild(d); return inp; };
-      const dt = el('input'); dt.type = 'date'; dt.value = x.examDate; fld('موعد الاختبار', dt);
-      const ex = el('input'); ex.maxLength = 60; ex.value = x.examiner; fld('المختبِر', ex);
-      const sc = el('input'); sc.type = 'number'; sc.min = 0; sc.max = 100; sc.inputMode = 'numeric'; sc.value = x.score; fld('الدرجة (من 100)', sc);
-      const rs = el('select'); fillSel2(rs, ['اجتاز', 'يعيد الاختبار'], '— النتيجة —'); rs.value = x.result; fld('النتيجة', rs);
-      rp.appendChild(g4); R.exam = () => ({ date:dt.value, examiner:ex.value.trim(), score:sc.value.trim(), result:rs.value });
-    }
     if (x.kind === 'exam' && ((D.perms || []).indexOf('*') !== -1 || (D.perms || []).indexOf('assoc.nominate') !== -1)){
-      const mv = el('button', 'btn gold', 'نقل إلى ترشيحات اختبار الجمعية'); mv.type = 'button'; mv.style.marginBottom = '10px';
-      mv.onclick = async () => { mv.disabled = true; const r = await cpCall({ action:'assocSave', op:'fromRef', data:{ refId:x.id } }, 'rfMsg'); mv.disabled = false; if (!r || !r.ok) return;
-        toast(r.msg); $('rfSheet').classList.add('hidden'); AX = r; asT = 'nom'; asDate = ''; openRole('assocNom'); };
-      rp.appendChild(mv);
+      // ترشيح المعلم لا يُنقل لاختبار الجمعية إلا بعد الاختبار القبلي؛ نتيجته تصل للمعلم تلقائياً في هذه الإحالة
+      const pre = el('div', 'msg info', 'لا يُرشَّح الطالب لاختبار الجمعية إلا بعد اجتيازه الاختبار القبلي. عند حفظ نتيجة الاختبار تصل للمعلم هنا تلقائياً: إن اجتاز رُشّح لاختبار الجمعية، وإن لم يجتز أُعيد إليه وأُغلقت الإحالة.');
+      rp.appendChild(pre);
+      const pt = el('button', 'btn gold', 'إجراء الاختبار القبلي'); pt.type = 'button'; pt.style.marginBottom = '10px';
+      pt.onclick = async () => { pt.disabled = true; const r = await cpCall({ action:'assoc' }, 'rfMsg'); pt.disabled = false; if (!r || !r.ok) return; AX = r;
+        const it = cdItems().find(y => y.ref && y.ref.id === x.id); if (!it) return msg('rfMsg', 'لا توجد مرحلية في هذا الترشيح، أو أُلغي.', 'err');
+        if (it.k === 'nom') return msg('rfMsg', 'الطالب مرشح لاختبار الجمعية مسبقاً.', 'info');
+        if (it.k === 'pass') return msg('rfMsg', 'اجتاز الطالب الاختبار القبلي، ويُرشَّح من «الاختبارات».', 'info');
+        $('rfSheet').classList.add('hidden'); document.body.style.overflow = ''; ptStart(it); };
+      rp.appendChild(pt);
     }
     rp.appendChild(lab('الحالة')); const st = selBox(['قيد المعالجة', 'مغلقة']); st.set(x.status === 'جديدة' ? '' : x.status); rp.appendChild(st); R.status = st.get;
   }
