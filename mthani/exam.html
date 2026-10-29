@@ -46,6 +46,14 @@
   .hidden{display:none!important}
   .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px 0}
   .sheet .card{width:min(760px,100%);margin:0 8px}
+  @media (min-width:900px){ .sheet{align-items:center;padding:12px 0} .sheet .card{width:min(1280px,96vw);max-height:96vh;overflow:auto} .sheet .grid2{grid-template-columns:repeat(4,1fr)} }
+  .mushaf{font-family:'Amiri Quran','Amiri','Traditional Arabic',serif;font-size:22px;line-height:2.1;text-align:right;padding:10px 14px;margin:4px 0 10px;border-radius:14px;background:#FFFCF5;color:#2B2112;border:1px solid #E7D6B0;box-shadow:inset 0 0 0 4px #FFFCF5,inset 0 0 0 5px #E7D6B0}
+  .mushaf .sh{display:block;text-align:center;font-family:Tajawal,sans-serif;font-weight:700;font-size:15px;color:#7A5A1E;background:#F6EAD0;border-radius:10px;padding:3px 0;margin:8px 0 4px;line-height:1.6}
+  .mushaf .bs{display:block;text-align:center;margin-bottom:4px} .mushaf .an{color:#9A6B16;white-space:nowrap}
+  .mushaf .more{display:block;margin:6px auto 0;font-family:Tajawal,sans-serif;font-size:13px;padding:4px 14px;border-radius:999px;background:#F6EAD0;color:#7A5A1E}
+  @media (prefers-color-scheme: dark){ .mushaf{background:#1F1A10;color:#F2E9D8;border-color:#5A4826;box-shadow:inset 0 0 0 4px #1F1A10,inset 0 0 0 5px #5A4826} .mushaf .sh,.mushaf .more{background:#3A2E18;color:#E8C98A} }
+  .mfb{padding:6px 10px;font-size:12.5px;border-radius:999px;white-space:nowrap}
+  tr.mfr td{border-top:0!important}
   .shd{display:flex;justify-content:space-between;align-items:center;gap:8px} .shd button{padding:6px 12px;font-size:13px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
   .tw{overflow-x:auto;margin-top:10px}
@@ -194,6 +202,22 @@ function stepIn(inp, min, max, step, ro){
   w.appendChild(mk('+', 1)); w.appendChild(inp); w.appendChild(mk('−', -1)); return w;
 }
 const hijri = d => { try { const p = d.split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2])).toLocaleDateString('ar-SA-u-ca-islamic-umalqura', { timeZone:'UTC', day:'numeric', month:'long', year:'numeric' }); } catch(e){ return ''; } };
+/* مصحف مضمَّن تحت كل سؤال: من موضع السؤال عشر آيات، مع «المزيد» */
+const MFC = {}, arN = n => String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+async function sText(n){ if (MFC[n]) return MFC[n]; const r = await fetch('quran/' + n + '.json', { cache:'force-cache' }); if (!r.ok) throw new Error('x'); return (MFC[n] = (await r.json()).ayat); }
+async function mfInline(box, s, a, n){
+  s = +s; a = +a || 1; box.innerHTML = ''; if (!s){ box.appendChild(el('small', 'note', 'حدد السورة والآية أولاً.')); return; }
+  if (!document.getElementById('amiriQ')){ const l = document.createElement('link'); l.id = 'amiriQ'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri&display=swap'; document.head.appendChild(l); }
+  box.className = 'mushaf'; box.textContent = 'جاري تحميل المصحف...';
+  try { const out = []; let cs = s, ca = a, left = n || 10;
+    while (left > 0 && cs <= 114){ const end = Math.min(X.ayat[cs - 1], ca + left - 1); out.push([cs, ca, end]); left -= end - ca + 1; cs++; ca = 1; }
+    const T = await Promise.all(out.map(g => sText(g[0]))); box.innerHTML = '';
+    out.forEach((g, k) => { if (k || g[1] === 1) box.appendChild(el('span', 'sh', 'سورة ' + X.surah[g[0] - 1]));
+      for (let x = g[1]; x <= g[2]; x++){ let t = T[k][x - 1] || ''; if (x === 1 && g[0] !== 1 && g[0] !== 9 && /^بِسْمِ/.test(t)){ const w = t.split(' '); box.appendChild(el('span', 'bs', w.slice(0, 4).join(' '))); t = w.slice(4).join(' '); }
+        box.appendChild(document.createTextNode(t + ' ')); box.appendChild(el('span', 'an', '\u06DD' + arN(x))); box.appendChild(document.createTextNode(' ')); } });
+    const last = out[out.length - 1]; if (last && !(last[0] === 114 && last[2] === 6)){ const m = el('button', 'more', 'المزيد'); m.type = 'button'; m.onclick = () => mfInline(box, s, a, (n || 10) + 10); box.appendChild(m); }
+  } catch(e){ box.innerHTML = ''; box.appendChild(el('div', 'msg err', 'تعذّر تحميل المصحف. تحقق من الإنترنت.')); }
+}
 const NQ = 4, QMAX = 20, PERF = 20;   // أربعة أسئلة لكل منها 20 درجة، و20 درجة للأداء = 100
 function form(s){
   const B = $('shB'); B.innerHTML = ''; $('shT').textContent = 'نموذج اختبار المرحلية'; const old = s.data || {}, ro = !X.canEdit;
@@ -220,10 +244,11 @@ function form(s){
   const generate = () => { const a1 = +rF.value, a2 = +rT.value; if (!a1 || !a2) return msg('shM', 'اختر النطاق: من سورة وإلى سورة.', 'err');
     const lo = Math.min(a1, a2), hi = Math.max(a1, a2), A = absAyah(lo, 1), Z = absAyah(hi, X.ayat[hi - 1]), seg = (Z - A + 1) / rows.length;
     rows.forEach((r, k) => { const sa = absTo(Math.min(Z, Math.floor(A + seg * k + Math.random() * seg))); r.s.value = sa[0]; r.a.max = X.ayat[sa[0] - 1]; r.a.value = sa[1]; });
+    rows.forEach(r => { if (r.mr && !r.mr.classList.contains('hidden')) r.mShow(); });
     msg('shM', '', ''); gen.textContent = 'توليد نموذج اختبار مرة أخرى'; };
   gen.onclick = generate;
   const prev = (old.q || []).map(q => { const p = String(q.p || '').match(/^(.*\S)\s+(\d+)$/), si = p ? X.surah.indexOf(p[1]) + 1 : 0; return { s:si || '', a:p ? p[2] : '', v:q.s }; });
-  t.innerHTML = '<thead><tr><th>السؤال</th><th>السورة</th><th>الآية</th><th>الدرجة من 20</th></tr></thead>'; const tb = el('tbody');
+  t.innerHTML = '<thead><tr><th>السؤال</th><th>السورة</th><th>الآية</th><th>الدرجة من 20</th><th>المصحف</th></tr></thead>'; const tb = el('tbody');
   for (let i = 0; i < NQ; i++){ const tr = el('tr'), r = {}, o = prev[i] || {};
     tr.appendChild(el('td', '', String(i + 1)));
     const td1 = el('td'); r.s = sOpt(); r.s.value = o.s || ''; td1.appendChild(r.s); tr.appendChild(td1);
@@ -231,7 +256,13 @@ function form(s){
     r.s.onchange = () => { r.a.max = r.s.value ? X.ayat[r.s.value - 1] : ''; if (r.s.value && +r.a.value > +r.a.max) r.a.value = r.a.max; if (r.s.value && !r.a.value) r.a.value = 1; };
     r.a.oninput = () => { if (r.s.value && +r.a.value > X.ayat[r.s.value - 1]) r.a.value = X.ayat[r.s.value - 1]; if (r.a.value !== '' && +r.a.value < 1) r.a.value = 1; };
     const td3 = el('td'); r.v = el('input'); r.v.value = o.v != null && o.v !== '' ? o.v : QMAX; r.v.addEventListener('input', calc); td3.appendChild(stepIn(r.v, 0, QMAX, 0.5, ro)); tr.appendChild(td3);
-    if (ro) tr.querySelectorAll('input,select').forEach(x => x.disabled = true); tb.appendChild(tr); rows.push(r); }
+    if (ro) tr.querySelectorAll('input,select').forEach(x => x.disabled = true);
+    const mr = el('tr', 'mfr hidden'), mtd = el('td'); mtd.colSpan = 5; const mbox = el('div'); mtd.appendChild(mbox); mr.appendChild(mtd);
+    const tdM = el('td'), mb = el('button', 'mfb', 'عرض'); mb.type = 'button'; tdM.appendChild(mb); tr.appendChild(tdM);
+    const mShow = () => mfInline(mbox, r.s.value, r.a.value, 10); r.mr = mr; r.mShow = mShow;
+    mb.onclick = () => { const hid = mr.classList.toggle('hidden'); mb.textContent = hid ? 'عرض' : 'إخفاء'; if (!hid) mShow(); };
+    r.s.addEventListener('change', () => { if (!mr.classList.contains('hidden')) mShow(); }); r.a.addEventListener('change', () => { if (!mr.classList.contains('hidden')) mShow(); });
+    tb.appendChild(tr); tb.appendChild(mr); rows.push(r); }
   t.appendChild(tb); calc(); if (!prev.length && rg) generate();
   if (s.result) rs.value = s.result;
   if (ro) [rF, rT, rs, nt, pIn].forEach(x => x.disabled = true);

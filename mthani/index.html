@@ -45,6 +45,11 @@
   .mushaf{font-family:'Amiri Quran','Amiri','Traditional Arabic',serif;font-size:26px;line-height:2.25;text-align:justify;text-align-last:center;padding:14px 16px;margin-top:10px;border-radius:14px;background:#FFFBF2;color:#1E2A33;border:2px solid #E6D3A8;box-shadow:inset 0 0 0 4px #FFFBF2,inset 0 0 0 5px #E6D3A8}
   .mushaf .sh{display:block;text-align:center;font-family:Tajawal,sans-serif;font-weight:700;font-size:16px;color:#7A5A1E;background:#F6EAD0;border-radius:10px;padding:4px 0;margin:10px 0 4px;line-height:1.8}
   .mushaf .bs{display:block;text-align:center;margin-bottom:4px}
+  .mushaf.mfin{margin:4px 0 10px;padding:10px 14px;font-size:22px;line-height:2.1;text-align:right;text-align-last:auto}
+  .mushaf .mfmore{display:block;margin:6px auto 0;font-family:Tajawal,sans-serif;font-size:13px;padding:4px 14px;width:auto;border-radius:999px;background:#F6EAD0;color:#7A5A1E;border:0;cursor:pointer}
+  .mfbtn{width:auto!important;padding:5px 10px!important;font-size:12.5px!important;border-radius:999px!important;white-space:nowrap}
+  tr.mfrow td{padding:0 4px!important;border-bottom:1px solid var(--line)}
+  @media (min-width:860px){ #ptSheet .panel{max-width:min(1280px,96vw);max-height:96vh} #ptSheet .panel .edgrid{grid-template-columns:repeat(4,1fr)} }
   .mushaf .an{font-family:'Amiri Quran','Amiri',serif;color:#9A6B16;white-space:nowrap}
   @media (prefers-color-scheme: dark){ .mushaf{background:#1F1A10;color:#F2E9D8;border-color:#5A4826;box-shadow:inset 0 0 0 4px #1F1A10,inset 0 0 0 5px #5A4826} .mushaf .sh{background:#3A2E18;color:#E9C98A} .mushaf .an{color:#E0B45E} }
   .mf-src{display:block;text-align:center;margin-top:8px;opacity:.7} #rsNone.on{background:#FCE8E6;color:#B3261E;border-color:#B3261E}
@@ -3622,6 +3627,21 @@ async function openMushaf(){
     $('mushafSheet').querySelector('.panel').scrollTop = 0;
   } catch(e){ box.innerHTML = ''; box.appendChild(el('div', 'msg err', 'تعذّر تحميل المصحف. تحقق من الإنترنت.')); }
 }
+/* مصحف مضمَّن تحت سؤال الاختبار: من موضع السؤال، عشر آيات (تمتد للسورة التالية عند قصر السورة)، مع «المزيد» */
+function mfFont(){ if (!document.getElementById('amiriQ')){ const l = document.createElement('link'); l.id = 'amiriQ'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri&display=swap'; document.head.appendChild(l); } }
+async function mfInline(box, s, a, n){
+  s = +s; a = +a || 1; if (!s){ box.innerHTML = ''; box.appendChild(el('small', 'muted', 'حدد السورة والآية أولاً.')); return; }
+  mfFont(); box.className = 'mushaf mfin'; box.style.fontSize = Math.max(20, MF.size - 4) + 'px'; box.innerHTML = '<div class="ge">جاري تحميل المصحف...</div>';
+  try {
+    const out = []; let cs = s, ca = a, left = n || 10;
+    while (left > 0 && cs <= 114){ const end = Math.min(D.ayat[cs - 1], ca + left - 1); out.push([cs, ca, end]); left -= end - ca + 1; cs++; ca = 1; }
+    const texts = await Promise.all(out.map(g => surahText(g[0]))); box.innerHTML = '';
+    out.forEach((g, k) => { if (k || g[1] === 1) box.appendChild(el('span', 'sh', 'سورة ' + D.surah[g[0] - 1]));
+      for (let x = g[1]; x <= g[2]; x++){ let t = texts[k][x - 1] || ''; if (x === 1 && g[0] !== 1 && g[0] !== 9 && /^بِسْمِ/.test(t)){ const w = t.split(' '); box.appendChild(el('span', 'bs', w.slice(0, 4).join(' '))); t = w.slice(4).join(' '); }
+        box.appendChild(document.createTextNode(t + ' ')); box.appendChild(el('span', 'an', '\u06DD' + arNum(x))); box.appendChild(document.createTextNode(' ')); } });
+    const last = out[out.length - 1]; if (last && !(last[0] === 114 && last[2] === 6)){ const m = el('button', 'mfmore', 'المزيد'); m.type = 'button'; m.onclick = () => mfInline(box, s, a, (n || 10) + 10); box.appendChild(m); }
+  } catch(e){ box.innerHTML = ''; box.appendChild(el('div', 'msg err', 'تعذّر تحميل المصحف. تحقق من الإنترنت.')); }
+}
 function mfSize(d){ MF.size = Math.max(18, Math.min(44, MF.size + d)); store.set('hq_mf', MF.size); $('mfText').style.fontSize = MF.size + 'px'; }
 $('rsMushaf').onclick = openMushaf;
 $('mfClose').onclick = () => $('mushafSheet').classList.add('hidden');
@@ -4392,13 +4412,13 @@ function renderBatches(){
     t.appendChild(tb); tw.appendChild(t); w.appendChild(tw);
     const ac = el('div', 'stact'), b = (tx, cls, fn) => { const y = el('button', cls, tx); y.onclick = fn; ac.appendChild(y); return y; };
     const ed = el('div'); ed.style.marginTop = '10px'; ed.appendChild(lab('مشرف الجمعية المختبِر', true)); const sp = el('select'); fillSel2(sp, AX.sups.map(s => [s.id, s.name + (s.org ? ' — ' + s.org : '')]), AX.sups.length ? '— اختر المشرف —' : '— أضف مشرفاً أولاً —'); if (bt) sp.value = bt.supId || ''; ed.appendChild(sp);
-    const approve = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر' + (AX.sups.length ? '.' : ' (أضفه من «مشرفو الجمعية» أعلى الصفحة).'), 'err'); exbDo('exbApprove', { date:d, supId:sp.value }, mid); };
+    const approve = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر' + (AX.sups.length ? '.' : ' (أضفه من «مشرفو الجمعية» أعلى الصفحة).'), 'err'); exbDo('exbApprove', { base:exbUrl(null), date:d, supId:sp.value }, mid); };
     if (AX.canNom && stt === AX.exSt.draft){ w.appendChild(ed); b('اعتماد المجموعة وإرسالها للمشرف', 'good', approve); }
     if (stt === AX.exSt.done) w.appendChild(el('div', 'msg ok', '✓ اعتمد المشرف نتائج هذه المجموعة، وهي مغلقة للاطلاع فقط.'));
     if (bt && bt.back && stt === AX.exSt.ok) w.appendChild(el('div', 'msg err', 'أُعيدت النتائج للمشرف ليراجعها (' + bt.back.by + ' • ' + String(bt.back.at).slice(0, 16) + '): ' + bt.back.reason));
     if (bt && stt !== AX.exSt.draft){ const kv = el('div', 'meta'); [['المختبِر', bt.sup + ' • ' + bt.phone], ['اعتمد المجموعة', bt.by + ' ' + (bt.approved || '').slice(0, 16)], ['اعتمد المشرف النتائج', (bt.done || '').slice(0, 16)]].forEach(p => { if (p[1].trim()){ const s0 = el('span', '', p[0] + ': '); s0.appendChild(el('i', '', p[1])); kv.appendChild(s0); } }); w.appendChild(kv);
       if (AX.canNom && stt === AX.exSt.ok){ const lk = el('div', 'msg info'); lk.style.fontSize = '13px'; lk.textContent = 'يدخل المشرف من رابط المشرفين برقم هويته، وتظهر له هذه المجموعة.'; w.appendChild(lk);
-        b('إرسال للمشرف عبر واتساب', 'good', () => window.open('https://wa.me/966' + String(bt.phone).replace(/^0/, '') + '?text=' + encodeURIComponent(exbText(bt, L.length)), '_blank'));
+        b('إعادة إرسال الرابط للمشرف عبر برق', 'good', () => exbDo('exbSend', { date:bt.date, base:exbUrl(null) }, mid));
         b('نسخ الرسالة', '', async () => { try { await navigator.clipboard.writeText(exbText(bt, L.length)); toast('نُسخت الرسالة مع الرابط'); } catch(e){ prompt('انسخ الرسالة:', exbText(bt, L.length)); } }); } }
     b('طباعة كشف المجموعة', '', () => exbPrint(d, L, bt));
     if (bt && stt === AX.exSt.done && D.roles.indexOf('admin') !== -1) b('إرجاع النتائج للمشرف', '', () => asSheet('exbBack', bt));
@@ -4756,7 +4776,7 @@ function renderExam(){
   const empty = t => wrap.appendChild(el('div', 'chempty', t));
   if (exS === 1){
     const L = X.s1.filter(x => mq(x.name + ' ' + x.hname)); if (!L.length) return empty('لا يوجد طلاب بانتظار الاختبار القبلي.');
-    L.forEach(x => wrap.appendChild(exCard(x.name, [[x.level || '—', 'p-late'], [x.ref ? 'ترشيح المعلم' : 'إضافة مباشرة', 'p-none']], [['الحلقة', x.hname], ['المعلم', x.teacher], ['تاريخ الترشيح', x.date], ['جاهزية الطالب', x.ready]],
+    L.forEach(x => wrap.appendChild(exCard(x.name, [[x.level || '—', 'p-late'], [x.ref ? 'ترشيح المعلم' : 'إضافة مباشرة', 'p-none']], [['الهوية', x.nid], ['الحلقة', x.hname], ['المعلم', x.teacher], ['تاريخ الترشيح', x.date], ['جاهزية الطالب', x.ready]],
       can ? ['إجراء الاختبار القبلي', () => ptStart(x)] : null, [x.ref && ['تفاصيل ترشيح المعلم', () => openRf(x.ref, 'h')], ['ملف الطالب', () => goFile(x.sid)], can && x.a && ['حذف من القائمة', () => { if (confirm('حذف ' + x.name + ' من القائمة؟')) asDo('del', x.a.id, {}, 'exBox'); }, 1]])));
     return;
   }
@@ -4780,7 +4800,7 @@ function renderExam(){
     ds.forEach(d => { const Ld = L.filter(x => x.examDate === d), g = el('div', 'exgrp'), h = el('div', 'exgh'), mid = 'exM' + d; g.id = 'exb-' + d;
       h.appendChild(el('b', '', 'مجموعة ' + wDay(d) + ' ' + d + ' — ' + Ld.length + ' طالب')); g.appendChild(h);
       if (can){ const row = el('div', 'exsend'), sp = el('select'); fillSel2(sp, AX.sups.map(s => [s.id, s.name + (s.org ? ' — ' + s.org : '')]), AX.sups.length ? '— اختر مشرف الجمعية المختبِر —' : '— أضف مشرفاً من «مشرفو الجمعية» —');
-        const go = el('button', 'btn gold', 'اعتماد المجموعة وإرسالها للمشرف'); go.onclick = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر.', 'err'); exbDo('exbApprove', { date:d, supId:sp.value }, mid).then(r => { if (r && r.ok){ exS = 4; renderExam(); } }); };
+        const go = el('button', 'btn gold', 'اعتماد المجموعة وإرسالها للمشرف'); go.onclick = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر.', 'err'); exbDo('exbApprove', { base:exbUrl(null), date:d, supId:sp.value }, mid).then(r => { if (r && r.ok){ exS = 4; renderExam(); } }); };
         row.appendChild(sp); row.appendChild(go); g.appendChild(row); const m = el('div'); m.id = mid; g.appendChild(m); }
       Ld.forEach(x => stu(x, g)); wrap.appendChild(g); });
     return;
@@ -4793,7 +4813,7 @@ function renderExam(){
       if (bt.back) g.appendChild(el('div', 'msg err', 'أُعيدت النتائج للمشرف ليراجعها: ' + bt.back.reason));
       const nl = el('div', 'numlist'); L.forEach((x, i) => { const r = el('div', 'numrow'); r.appendChild(el('span', 'no', i + 1)); const nm = el('div', 'nm'); nm.appendChild(el('b', '', x.sname)); nm.appendChild(el('small', '', x.level + ' • ' + x.hname)); r.appendChild(nm);
         r.appendChild(el('span', 'pill ' + (x.status === AX.st.nom ? 'p-none' : x.status === AX.st.ok ? 'p-ok' : 'p-red'), x.status === AX.st.nom ? 'بانتظار النتيجة' : x.result + ' (' + x.score + ')')); nl.appendChild(r); }); g.appendChild(nl);
-      const ac = el('div', 'exact'); if (can){ const b = el('button', 'btn exmain', 'إرسال للمشرف عبر واتساب'); b.onclick = () => window.open('https://wa.me/966' + String(bt.phone).replace(/^0/, '') + '?text=' + encodeURIComponent(exbText(bt, L.length)), '_blank'); ac.appendChild(b); }
+      const ac = el('div', 'exact'); if (can){ const b = el('button', 'btn exmain', 'إعادة إرسال الرابط للمشرف عبر برق'); b.onclick = () => exbDo('exbSend', { date:bt.date, base:exbUrl(null) }, mid); ac.appendChild(b); }
       const lk = el('div', 'exlinks'), a = (t, fn, red) => { const y = el('button', 'link' + (red ? ' red' : ''), t); y.type = 'button'; y.onclick = fn; lk.appendChild(y); };
       if (can) a('نسخ الرسالة', async () => { try { await navigator.clipboard.writeText(exbText(bt, L.length)); toast('نُسخت الرسالة مع الرابط'); } catch(e){ prompt('انسخ الرسالة:', exbText(bt, L.length)); } });
       a('طباعة الكشف', () => exbPrint(bt.date, L, bt));
@@ -4820,8 +4840,8 @@ function cdItems(){
   const st = AX.st, used = new Set(), out = [];
   (AX.refs || []).forEach(f => { const lv = f.data.stage || '';
     const a = AX.list.find(x => x.refId === f.id) || AX.list.find(x => !x.refId && x.sid === f.sid && x.level === lv && !used.has(x.id));
-    if (a) used.add(a.id); if (a && a.status === AX.st.cx) return; out.push({ ref:f, a:a, sid:f.sid, name:f.sname, hname:f.hname, teacher:f.tname, level:lv, date:f.date, ready:f.data.ready }); });
-  AX.list.filter(a => !used.has(a.id) && [st.wait, st.pass, st.fail].indexOf(a.status) !== -1).forEach(a => out.push({ ref:null, a:a, sid:a.sid, name:a.sname, hname:a.hname, teacher:'', level:a.level, date:a.date }));
+    if (a) used.add(a.id); if (a && a.status === AX.st.cx) return; out.push({ ref:f, a:a, sid:f.sid, nid:f.nid || (a && a.nid) || '', name:f.sname, hname:f.hname, teacher:f.tname, level:lv, date:f.date, ready:f.data.ready }); });
+  AX.list.filter(a => !used.has(a.id) && [st.wait, st.pass, st.fail].indexOf(a.status) !== -1).forEach(a => out.push({ ref:null, a:a, sid:a.sid, nid:a.nid || '', name:a.sname, hname:a.hname, teacher:'', level:a.level, date:a.date }));
   out.forEach(x => { const s0 = x.a ? x.a.status : ''; x.k = !x.a || s0 === st.wait ? 'new' : s0 === st.pass ? 'pass' : s0 === st.fail ? 'fail' : 'nom'; });
   return out;
 }
@@ -4838,7 +4858,7 @@ function renderCands(){
   list.forEach(x => { const w = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', x.name)); w.appendChild(tp);
     const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill p-late', x.level || '—')); pl.appendChild(el('span', 'pill ' + (x.k === 'pass' || x.k === 'nom' ? 'p-ok' : x.k === 'fail' ? 'p-red' : 'p-none'), x.a ? stL(x.a.status) : 'لم يُختبر بعد'));
     pl.appendChild(el('span', 'pill p-none', x.ref ? 'ترشيح المعلم' : 'إضافة مباشرة')); w.appendChild(pl);
-    const m = el('div', 'meta'); [['الحلقة', x.hname], ['المعلم', x.teacher], ['تاريخ الترشيح', x.date], ['جاهزية الطالب', x.ready], ['الاختبار القبلي', x.a && x.a.preScore ? x.a.preScore + ' من 100' + (x.a.preExaminer ? ' • ' + x.a.preExaminer : '') : '']]
+    const m = el('div', 'meta'); [['الهوية', x.nid], ['الحلقة', x.hname], ['المعلم', x.teacher], ['تاريخ الترشيح', x.date], ['جاهزية الطالب', x.ready], ['الاختبار القبلي', x.a && x.a.preScore ? x.a.preScore + ' من 100' + (x.a.preExaminer ? ' • ' + x.a.preExaminer : '') : '']]
       .forEach(p => { if (p[1]){ const d = el('span', '', p[0] + ': '); d.appendChild(el('i', '', p[1])); m.appendChild(d); } }); w.appendChild(m);
     const ac = el('div', 'stact'), b = (t, cls, fn) => { const y = el('button', cls, t); y.onclick = fn; ac.appendChild(y); };
     if (AX.canNom && (x.k === 'new' || x.k === 'fail')) b(x.k === 'fail' ? 'إعادة اختبار الطالب قبل الترشيح لاختبار الجمعية' : 'اختبار الطالب قبل الترشيح لاختبار الجمعية', 'good', () => ptStart(x));
@@ -4870,7 +4890,7 @@ async function ptStart(x){
 function ptForm(x, a){
   msg('ptMsg', '', ''); $('ptT').textContent = 'الاختبار قبل الترشيح'; const B0 = $('ptBody'); B0.innerHTML = '';
   const g = el('div', 'edgrid'), fld = (l, i) => { const d = el('div'); d.appendChild(lab(l)); d.appendChild(i); g.appendChild(d); return i; };
-  const nm0 = fld('اسم الطالب', el('input')); nm0.value = x.name; nm0.readOnly = true; const lv0 = fld('المرحلية', el('input')); lv0.value = x.level; lv0.readOnly = true;
+  const nm0 = fld('اسم الطالب', el('input')); nm0.value = x.name; nm0.readOnly = true; const id0 = fld('رقم الهوية', el('input')); id0.value = x.nid || (a && a.nid) || '—'; id0.readOnly = true; id0.dir = 'ltr'; const lv0 = fld('المرحلية', el('input')); lv0.value = x.level; lv0.readOnly = true;
   const dt = fld('تاريخ الاختبار (ميلادي)', el('input')); dt.type = 'date'; dt.value = D.today; const hj = fld('التاريخ الهجري', el('input')); hj.readOnly = true;
   const hjU = () => { hj.value = dt.value ? hijri(dt.value) : ''; }; dt.addEventListener('change', hjU); hjU();
   const ex = fld('المختبِر', el('input')); ex.value = D.name || '';
@@ -4895,17 +4915,24 @@ function ptForm(x, a){
     const lo = Math.min(s1, s2), hi = Math.max(s1, s2), A = absAyah(lo, 1), Z = absAyah(hi, D.ayat[hi - 1]), seg = (Z - A + 1) / rows.length;
     if (!mrRange(x.level)) try { localStorage.setItem('pt_rng_' + x.level, JSON.stringify([rF.value, rT.value])); } catch(e){}
     rows.forEach((r, k) => { const pos = Math.min(Z, Math.floor(A + seg * k + Math.random() * seg)), sa = absTo(pos); r.s.value = sa[0]; r.a.max = D.ayat[sa[0] - 1]; r.a.value = sa[1]; });
+    rows.forEach(r => { if (r.mr && !r.mr.classList.contains('hidden')) mfInline(r.mr.querySelector('div'), r.s.value, r.a.value, 10); });
     msg('ptMsg', '', ''); gen.textContent = 'توليد نموذج اختبار مرة أخرى'; };
   gen.onclick = generate;
   const draw = () => { const n = +nq.value, old = rows.map(r => ({ s:r.s.value, a:r.a.value, h:r.h.value, t:r.t.value, j:r.j.value })); rows = [];
-    t.innerHTML = '<thead><tr><th>السورة</th><th>الآية</th><th>أخطاء الحفظ</th><th>تنبيهات</th><th>أخطاء التجويد</th><th>الدرجة من ' + (Math.round(1000 / n) / 10) + '</th></tr></thead>'; const tb = el('tbody');
+    t.innerHTML = '<thead><tr><th>السورة</th><th>الآية</th><th>أخطاء الحفظ</th><th>تنبيهات</th><th>أخطاء التجويد</th><th>الدرجة من ' + (Math.round(1000 / n) / 10) + '</th><th>المصحف</th></tr></thead>'; const tb = el('tbody');
     for (let i = 0; i < n; i++){ const tr = el('tr'), r = {}; const mk = (k, num) => { const td = el('td'), inp = el('input'); inp.value = old[i] && old[i][k] !== '' && old[i][k] != null ? old[i][k] : '0'; inp.oninput = calc; td.appendChild(num ? stepIn(inp, 0, 99, 1) : inp); tr.appendChild(td); r[k] = inp; };
       const tdS = el('td'); r.s = sOpt(); r.s.style.minWidth = '130px'; if (old[i]) r.s.value = old[i].s; tdS.appendChild(r.s); tr.appendChild(tdS);
       const tdA = el('td'); r.a = el('input'); r.a.type = 'number'; r.a.min = 1; r.a.inputMode = 'numeric'; r.a.style.width = '70px'; if (old[i]) r.a.value = old[i].a; if (r.s.value) r.a.max = D.ayat[r.s.value - 1]; tdA.appendChild(r.a); tr.appendChild(tdA);
       r.s.onchange = () => { r.a.max = r.s.value ? D.ayat[r.s.value - 1] : ''; if (r.s.value && +r.a.value > +r.a.max) r.a.value = r.a.max; if (r.s.value && !r.a.value) r.a.value = 1; };
       r.a.oninput = () => { if (r.s.value && +r.a.value > D.ayat[r.s.value - 1]) r.a.value = D.ayat[r.s.value - 1]; if (r.a.value !== '' && +r.a.value < 1) r.a.value = 1; };
       r.p = { get value(){ return r.s.value ? D.surah[r.s.value - 1] + ' ' + (+r.a.value || 1) : ''; } };
-      mk('h', 1); mk('t', 1); mk('j', 1); r.out = el('td', '', ''); tr.appendChild(r.out); tb.appendChild(tr); rows.push(r); }
+      mk('h', 1); mk('t', 1); mk('j', 1); r.out = el('td', '', ''); tr.appendChild(r.out);
+      const mr = el('tr', 'mfrow hidden'), mtd = el('td'); mtd.colSpan = 7; const mbox = el('div'); mtd.appendChild(mbox); mr.appendChild(mtd);
+      const tdM = el('td'), mb = el('button', 'btn soft mfbtn', 'عرض'); mb.type = 'button'; tdM.appendChild(mb); tr.appendChild(tdM);
+      const mShow = () => mfInline(mbox, r.s.value, r.a.value, 10);
+      mb.onclick = () => { const op = mr.classList.toggle('hidden'); mb.textContent = op ? 'عرض' : 'إخفاء'; if (!op) mShow(); };
+      r.s.addEventListener('change', () => { if (!mr.classList.contains('hidden')) mShow(); }); r.a.addEventListener('change', () => { if (!mr.classList.contains('hidden')) mShow(); });
+      r.mr = mr; r.mb = mb; tb.appendChild(tr); tb.appendChild(mr); rows.push(r); }
     t.appendChild(tb); calc(); };
   nq.onchange = () => { draw(); if (rF.value && rT.value) generate(); }; draw(); if (saved) generate();
   save.onclick = async () => { const score = calc(), sheet = { n:rows.length, w:PT_W, range: rF.value && rT.value ? D.surah[rF.value - 1] + ' — ' + D.surah[rT.value - 1] : '', q:rows.map(r => ({ p:r.p.value, h:+r.h.value || 0, t:+r.t.value || 0, j:+r.j.value || 0, s:Math.round(r.sc * 2) / 2 })) };
