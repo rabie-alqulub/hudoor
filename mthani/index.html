@@ -560,6 +560,7 @@
   .diwday{border:1.5px solid #F0C98A;background:#FFF8EC;color:#7A4D0F;border-radius:14px;padding:12px 14px;font-weight:700;margin-bottom:10px}
   @media (prefers-color-scheme: dark){ .diwday{background:rgba(224,160,48,.12);color:#F0C98A} }
   @media (max-width:760px){ .dwhero{grid-template-columns:1fr} .dwside{grid-template-columns:1fr} .dwdow,.dwwk{grid-template-columns:repeat(4,1fr)} .dwdow span:first-child{display:none} .dwwl{grid-column:1 / -1;justify-content:flex-start;padding:4px 10px} .dwd{min-height:92px;padding:8px} .dwd .hd{font-size:21px} .dwd .st{font-size:12px} .dwleg{margin-inline-start:0} }
+  .scores.auto button{pointer-events:none;cursor:default} .scores.auto button:not(.on){opacity:.45}
   .prow.lvrow{flex-direction:column;align-items:stretch;gap:8px}
   .lvchips{display:flex;flex-wrap:wrap;gap:6px}
   .lvchips button{width:auto;min-height:34px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--card);color:var(--muted);border:1.5px solid var(--line);display:inline-flex;align-items:center;gap:5px}
@@ -2016,8 +2017,8 @@
     </div>
     <div class="count" id="rsCount"></div>
     <button class="btn soft mushaf-btn hidden" id="rsMushaf" type="button">فتح المصحف على المقطع المحدد</button>
-    <div class="errbox"><label for="rsErrN">عدد الأخطاء</label><div class="stepper"><button type="button" id="rsErrM" aria-label="إنقاص">−</button><output id="rsErrN">0</output><button type="button" id="rsErrP" aria-label="زيادة">+</button></div></div>
-    <label id="rsScoreL">قيّم الطالب من 10 <b class="rq">*</b></label>
+    <div class="errbox"><label for="rsErrN">عدد الأخطاء <small class="muted" id="rsErrHint"></small></label><div class="stepper"><button type="button" id="rsErrM" aria-label="إنقاص">−</button><output id="rsErrN">0</output><button type="button" id="rsErrP" aria-label="زيادة">+</button></div></div>
+    <label id="rsScoreL">الدرجة من 10 <small class="muted">— تُحسب تلقائياً من عدد الأخطاء</small></label>
     <div class="scores" id="rsScores"></div>
     <div class="slabel" id="rsLabel"></div>
     <button class="btn soft" id="rsNone" type="button" style="margin-top:6px">لم يسمّع</button>
@@ -3318,9 +3319,14 @@ function fillSurahs(){
   const t = $('rsType'); t.innerHTML = ''; t.classList.add('hidden');   // كل نوع يُعتمد وحده من زرّه تحت اسم الطالب
   EVT().forEach(x => { const b = el('button', '', x); b.dataset.t = x; b.onclick = () => go(EVT().indexOf(x)); t.appendChild(b); });
   const g = $('rsScores'); g.innerHTML = '';
-  for (let n = D.maxScore; n >= 0; n--){ const b = el('button', '', n); b.dataset.n = n; b.onclick = () => setScore(n); g.appendChild(b); }
+  for (let n = D.maxScore; n >= 0; n--){ const b = el('button', '', n); b.dataset.n = n; b.type = 'button'; b.tabIndex = -1; g.appendChild(b); }   // الدرجة تُحسب من الأخطاء، لا تُختار يدوياً
+  g.classList.add('auto');
 }
-function setErrs(n){ rs.errs = Math.max(0, Math.min(99, n)); const o = $('rsErrN'); o.textContent = rs.errs; o.classList.toggle('has', rs.errs > 0); }
+/* الدرجة = 10 − خصم الأخطاء: الحفظ كل خطأين بدرجة، المراجعة (القريبة والبعيدة) كل 3 أخطاء بدرجة، التلاوة كل خطأ بدرجة */
+const ERR_PER = { 'حفظ':2, 'مراجعة قريبة':3, 'مراجعة بعيدة':3, 'تلاوة':1 };
+const errScore = (type, e) => Math.max(0, D.maxScore - Math.floor((e || 0) / (ERR_PER[type] || 2)));
+function setErrs(n){ rs.errs = Math.max(0, Math.min(99, n)); const o = $('rsErrN'); o.textContent = rs.errs; o.classList.toggle('has', rs.errs > 0);
+  setScore(errScore(rs.type, rs.errs)); const per = ERR_PER[rs.type] || 2; $('rsErrHint').textContent = 'خصم درجة لكل ' + (per === 1 ? 'خطأ' : per === 2 ? 'خطأين' : per + ' أخطاء'); }
 $('rsErrM').onclick = () => setErrs((rs.errs || 0) - 1); $('rsErrP').onclick = () => setErrs((rs.errs || 0) + 1);
 function setScore(n){
   rs.score = n; if (n !== null) setNone(false); msg('rsMsg', '', '');
@@ -3508,7 +3514,7 @@ function rsWarn(t){ msg('rsMsg', t, 'err'); toast(t); $('rsMsg').scrollIntoView(
 $('rsNext').onclick = async () => {
   if (moving) return;
   if (!rs.none){
-    if (rs.score === null) return rsWarn('قم بتقييم الطالب: اختر الدرجة من ' + D.maxScore + ' أو «لم يسمّع».');
+    if (rs.score === null) return rsWarn('حدد عدد الأخطاء (والدرجة تُحسب منها)، أو اختر «لم يسمّع».');
     if (!$('rsFs').value || !endSurah()) return rsWarn('اختر السورة.');
     if (!ayahVal('rsFa') || !ayahVal('rsTa')) return rsWarn('حدد آية البداية وآية النهاية.');
   }
@@ -3550,7 +3556,7 @@ async function delRec(r){
     rs.s.today = rs.s.today.filter(y => y.id !== r.id); msg('rsMsg', 'تم الحذف.', 'ok'); renderRsToday(); markType(); summary();
   } catch(e){ msg('rsMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
 }
-$('rsNone').onclick = () => { const on = !rs.none; if (on) setScore(null); setNone(on); msg('rsMsg', '', ''); };
+$('rsNone').onclick = () => { const on = !rs.none; if (on) setScore(null); else setScore(errScore(rs.type, rs.errs)); setNone(on); msg('rsMsg', '', ''); };
 function markPresent(){ if (!isPresent(rs.s)){ rs.s.att = rs.pendAtt || 'حاضر'; rs.s._flag = false; pending[rs.s.sid] = rs.s.att; clearTimeout(saveTimer); saveTimer = setTimeout(flushAtt, 300); } }
 async function saveNone(){
   if (rs.s.today.some(r => r.type === rs.type && !r.ts)){ markPresent(); return true; }
@@ -3645,7 +3651,7 @@ function apStep(n){
 $('btnApprove').onclick = async () => {
   const un = studs.filter(s => !s.att);
   if (un.length){ un.forEach(s => s._flag = true); renderStuds(); const st = $('apprState'); st.innerHTML = '';
-    st.appendChild(el('div', 'msg err', 'لديك ' + (un.length === 1 ? 'الطالب ' + un[0].name + ' لم تقيّمه' : un.length + ' طلاب لم تقيّمهم: ' + un.map(s => s.name).join('، ')) + '. حدد حالتهم ثم اعتمد.'));
+    st.appendChild(el('div', 'msg err', (un.length === 1 ? 'الطالب ' + un[0].name + ' لم تحدد حالته' : un.length + ' طلاب لم تحدد حالتهم: ' + un.map(s => s.name).join('، ')) + '. حدد لكل طالب: حاضر أو متأخر أو غائب أو مستأذن، ثم اعتمد. الغائب والمستأذن لا يحتاجان تقييماً.'));
     const f = document.querySelector('#stuList .stu.unset'); if (f) f.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
   // الحاضر والمتأخر لا يُعتمد يومه حتى يُسجَّل له تقييم في أحد الأنواع أو «لم يسمّع»
   const nr = studs.filter(s => isPresent(s) && !s.today.length);
