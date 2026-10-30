@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="نظام مثاني">
 <meta name="application-name" content="نظام مثاني">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>مثاني - لحلقات تحفيظ القرآن</title>
+<title>منصة مثاني — نظام متكامل لإدارة تحفيظ القرآن الكريم</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -1120,12 +1120,12 @@
 <body>
 <div class="hero" id="loginHero">
   <img class="mark" src="mthani-192.png" alt="مثاني">
-  <h1>برنامج <span>مثاني</span></h1>
-  <p>لحلقات تحفيظ القرآن</p>
-  <div class="org"><img src="../logo.jpg" alt=""><span id="orgName">مجمع حلقات ربيع القلوب القرآني بجامع علي الشبلان - أبها</span></div>
+  <h1>منصة <span>مثاني</span></h1>
+  <p>نظام متكامل لإدارة تحفيظ القرآن الكريم</p>
+  <div class="org hidden" id="orgBox"><img class="orglogo" src="mthani-192.png" alt="شعار المجمع"><span id="orgName"></span></div>
 </div>
 <header class="appbar hidden" id="appbar">
-  <button class="brand" id="brandHome" aria-label="الرئيسية"><img class="mark" src="mthani-192.png" alt="مثاني"><span><b>مثاني</b><small>لحلقات تحفيظ القرآن</small></span></button>
+  <button class="brand" id="brandHome" aria-label="الرئيسية"><img class="mark" src="mthani-192.png" alt="مثاني"><span><b>منصة مثاني</b><small>نظام متكامل لإدارة تحفيظ القرآن الكريم</small></span></button>
   <span class="grow"></span>
   <button class="iconbtn" id="btnHome" aria-label="الشاشة الرئيسية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>الرئيسية</button>
   <button class="iconbtn hidden" id="btnRoles" aria-label="الأدوار"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 4.5l3 3-3 3"/><path d="M19 7.5h-5"/><path d="M14.5 13.5l-3 3 3 3"/></svg>الأدوار</button>
@@ -1203,7 +1203,7 @@
       <div class="notice hidden" id="pinNotice">أنت تستخدم الرمز الأولي. غيّره لحماية حسابك.<button id="btnPin2">تغيير الآن</button></div>
       <div class="welcome">
         <svg class="sky" id="sky" viewBox="0 0 120 120"></svg>
-        <img class="wlogo" src="../logo.jpg" alt="شعار مجمع ربيع القلوب">
+        <img class="wlogo orglogo" src="mthani-192.png" alt="شعار المجمع">
         <div class="greet" id="greet"></div>
         <h2 id="hello"></h2>
         <div class="role" id="roleLine"></div>
@@ -1661,7 +1661,7 @@
     <!-- التقرير الشامل للمجمع -->
     <div id="pFull" class="hidden">
       <div class="frh">
-        <div class="frtop"><img src="../logo.jpg" alt="شعار المجمع"><div class="grow"><h1 id="frTitle">التقرير الشامل للمجمع</h1><small id="frOrg"></small></div></div>
+        <div class="frtop"><img class="orglogo" src="mthani-192.png" alt="شعار المجمع"><div class="grow"><h1 id="frTitle">التقرير الشامل للمجمع</h1><small id="frOrg"></small></div></div>
         <div class="frf">
           <div class="frseg" id="frPer"><button data-p="day" type="button">اليوم</button><button data-p="week" type="button">هذا الأسبوع</button><button data-p="month" type="button" class="on">هذا الشهر</button><button data-p="term" type="button">الفصل الدراسي</button><button data-p="custom" type="button">من — إلى</button></div>
           <span class="frcu hidden" id="frCustom"><input type="date" id="frFrom" aria-label="من تاريخ"><input type="date" id="frTo" aria-label="إلى تاريخ"></span>
@@ -1716,7 +1716,7 @@
     <!-- شاشة عرض المجمع -->
     <div id="pDash" class="hidden">
       <div id="lvWrap">
-        <div class="card lvhead"><div class="lvtop"><img src="../logo.jpg" alt="شعار المجمع" class="lvlogo"><div class="grow"><h2>لوحة اليوم</h2><small id="lvDay"></small></div><span class="lvlive"><i></i>مباشر</span><small id="lvTime"></small><button class="mini" id="lvRef" type="button">تحديث الآن</button><button class="mini" id="lvFull" type="button">ملء الشاشة</button></div>
+        <div class="card lvhead"><div class="lvtop"><img src="mthani-192.png" alt="شعار المجمع" class="lvlogo orglogo"><div class="grow"><h2>لوحة اليوم</h2><small id="lvDay"></small></div><span class="lvlive"><i></i>مباشر</span><small id="lvTime"></small><button class="mini" id="lvRef" type="button">تحديث الآن</button><button class="mini" id="lvFull" type="button">ملء الشاشة</button></div>
           <div class="lvkpis" id="lvKpi"></div></div>
         <div class="card lvappr" id="lvAppr"></div>
         <div class="chgrid" id="lvRow1"></div>
@@ -2057,7 +2057,7 @@
           <div><label for="nsSifa">الصفة *</label><select id="nsSifa"></select></div>
           <div><label for="nsBirth">تاريخ الميلاد</label><input id="nsBirth" type="date"></div>
           <div><label for="nsStart">تاريخ المباشرة</label><input id="nsStart" type="date"></div>
-          <div class="full"><label for="nsHal">إسناد حلقة في مجمع ربيع القلوب (اختياري)</label><select id="nsHal"></select></div>
+          <div class="full"><label for="nsHal">إسناد حلقة (اختياري)</label><select id="nsHal"></select></div>
         </div>
         <button class="btn" id="nsSave">تسجيل الموظف</button>
         <div id="nsMsg"></div>
@@ -2109,11 +2109,12 @@
       <div id="sGeneral" class="card hidden">
         <h3>الإعدادات العامة</h3>
         <div class="sigcard">
-          <b>التوقيعات والختم</b>
+          <b>شعار المجمع والتوقيعات والختم</b>
           <small class="muted">تظهر تلقائياً أسفل التقارير المهمة عند الطباعة أو الحفظ PDF: توقيعك والختم في التقارير المهمة، ويُضاف توقيع مدير الشؤون التعليمية في التقارير التعليمية. يُفضّل التوقيع بقلم أزرق أو أسود على ورقة بيضاء، وتُزال الخلفية البيضاء تلقائياً.</small>
           <div class="siggrid">
             <div class="sigbox"><span>توقيع مدير المجمع</span><div class="sigprev" id="sgMgrP"></div><input id="sgMgrN" placeholder="اسم مدير المجمع كما يظهر تحت التوقيع"><label class="btn soft">رفع صورة التوقيع<input type="file" accept="image/*" id="sgMgrF" hidden></label><button class="lnk" data-clr="mgrImg">إزالة</button></div>
             <div class="sigbox"><span>توقيع مدير الشؤون التعليمية</span><div class="sigprev" id="sgEduP"></div><input id="sgEduN" placeholder="اسم مدير الشؤون التعليمية"><label class="btn soft">رفع صورة التوقيع<input type="file" accept="image/*" id="sgEduF" hidden></label><button class="lnk" data-clr="eduImg">إزالة</button></div>
+            <div class="sigbox"><span>شعار المجمع</span><div class="sigprev" id="sgLgP"></div><small class="muted">يظهر في القائمة والتقارير وشاشة الدخول</small><label class="btn soft">رفع الشعار<input type="file" accept="image/*" id="sgLgF" hidden></label><button class="lnk" data-clr="logo">إزالة</button></div>
             <div class="sigbox"><span>ختم المجمع</span><div class="sigprev" id="sgStP"></div><small class="muted">يظهر بجانب توقيع مدير المجمع</small><label class="btn soft">رفع صورة الختم<input type="file" accept="image/*" id="sgStF" hidden></label><button class="lnk" data-clr="stamp">إزالة</button></div>
           </div>
           <div id="sgMsg"></div>
@@ -2943,7 +2944,7 @@ async function loadHome(){
     : 'معاينة ' + r.peek + ' لبوابة ' + (PK_PORTAL[r.portal] || '') + ': ' + r.name + ' — للاطلاع فقط';
   if (r.portal === ''){ store.del('hq_token'); portal = ''; store.del('hq_portal'); return showLogin(); }   // جلسة قديمة قبل البوابات: يختار بوابته
   D = r; MS = null; RB = null; updBell();
-  if (r.org) $('orgName').textContent = r.org;
+  if (r.org){ $('orgName').textContent = r.org; $('orgBox').classList.remove('hidden'); }
   fillSurahs();
   // التبويبات على يمين الصفحة
   TABS = [];
@@ -3035,10 +3036,17 @@ const ADMIN_NAV = [
   { t:'تقارير عامة', ic:'report', items:[['dash', 'Dashboard'], ['full', 'التقرير الشامل للمجمع'], ['staffFile', 'تقرير الموظف الشامل']] },
   { t:'الإعدادات', ic:'settings', items:[['general', 'الإعدادات العامة'], ['tvCfg', 'شاشة عرض المجمع'], ['me', 'بياناتي الشخصية'], ['accs', 'بيانات دخول المستخدمين'], ['zoomCfg', 'ربط الحلقات عن بعد'], ['ann', 'الإعلانات'], ['arc', 'الأرشفة السنوية']] }
 ];
+/* هوية المجمع: الاسم والشعار من إعدادات كل مشترك (لا اسم ثابت في الواجهة)، وتُحفظ على الجهاز لعرض فوري */
+let BR = {}; try { BR = JSON.parse(localStorage.getItem('hq_brand') || '{}') || {}; } catch(e){}
+const brandLogo = () => BR.logo || 'mthani-192.png';
+function applyBrand(){ document.querySelectorAll('img.orglogo').forEach(i => { i.src = brandLogo(); });
+  if (BR.org){ $('orgName').textContent = BR.org; $('orgBox').classList.remove('hidden'); } }
+async function loadBrand(){ try { const r = await api({ action:'brand' }); if (r && r.ok){ BR = { org:r.org, orgShort:r.orgShort, logo:r.logo }; try { localStorage.setItem('hq_brand', JSON.stringify(BR)); } catch(e){} applyBrand(); } } catch(e){} }
 function navLogo(){
-  const lg = el('div', 'navlogo'), im = el('img'); im.src = '../logo.jpg'; im.alt = 'شعار مجمع ربيع القلوب';
+  const lg = el('div', 'navlogo'), im = el('img', 'orglogo'); im.src = brandLogo(); im.alt = 'شعار المجمع';
   lg.style.cursor = 'pointer'; lg.title = 'الصفحة الرئيسية'; lg.onclick = () => $('btnHome').onclick();
-  lg.appendChild(im); lg.appendChild(el('b', '', 'مجمع حلقات ربيع القلوب القرآني')); lg.appendChild(el('small', '', 'بجامع علي الشبلان - أبها'));
+  const full = String((D && D.org) || BR.org || ''), cut = full.indexOf(' بجامع'); lg.appendChild(im);
+  lg.appendChild(el('b', '', cut > 0 ? full.slice(0, cut) : (full || (D && D.orgShort) || 'منصة مثاني'))); if (cut > 0) lg.appendChild(el('small', '', full.slice(cut + 1)));
   return lg;
 }
 /* المشرف العام: بياناته والتقارير العامة وتغيير الرمز فقط */
@@ -4399,7 +4407,7 @@ $('asXls').onclick = () => {
 };
 const asSorted = l => l.slice().sort((a, b) => (a.examDate || '').localeCompare(b.examDate || '') || a.hname.localeCompare(b.hname, 'ar') || a.sname.localeCompare(b.sname, 'ar'));
 $('asPdf').onclick = () => { if (!AX) return; const list = asSorted(asList()), p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
-  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'قائمة المرشحين لاختبارات الجمعية')); l.appendChild(el('div', '', (asDate ? 'موعد الاختبار: ' + asDate + ' • ' : '') + 'عدد الطلاب: ' + list.length)); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'قائمة المرشحين لاختبارات الجمعية')); l.appendChild(el('div', '', (asDate ? 'موعد الاختبار: ' + asDate + ' • ' : '') + 'عدد الطلاب: ' + list.length)); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || BR.orgShort || 'المجمع')); p.appendChild(hd);
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>الحلقة</th><th>المرحلية</th><th>تاريخ الاختبار</th></tr></thead>'; const tb = el('tbody');
   list.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.hname, x.level, x.examDate].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
   setTimeout(brandPrint, 50); };
@@ -4413,7 +4421,7 @@ const ordAr = n => { const u = ['الأولى', 'الثانية', 'الثالث�
 const exbName = b => b && b.no ? 'المجموعة رقم ' + b.no : 'مجموعة (مسودة)';
 const exbUrl = b => new URL('exam.html' + (b && b.no ? '?g=' + b.no : ''), location.href).href;
 const wDay = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('ar-SA', { weekday:'long' }); } catch(e){ return ''; } };
-function exbText(b, n){ return 'السلام عليكم ورحمة الله وبركاته\nفضيلة الشيخ ' + String(b.sup).replace(/^(فضيلة\s+)?(الشيخ|الأستاذ)\s+/, '') + ' حفظه الله\n\nنفيدكم باعتماد ' + exbName(b) + ' لاختبار المرحليات لطلاب ' + ((D && D.org) || 'مجمع حلقات ربيع القلوب القرآني') + ' يوم ' + wDay(b.date) + ' ' + b.date + '، وعددهم ' + n + ' طالب.\n\nرابط ' + exbName(b) + ':\n' + exbUrl(b) +
+function exbText(b, n){ return 'السلام عليكم ورحمة الله وبركاته\nفضيلة الشيخ ' + String(b.sup).replace(/^(فضيلة\s+)?(الشيخ|الأستاذ)\s+/, '') + ' حفظه الله\n\nنفيدكم باعتماد ' + exbName(b) + ' لاختبار المرحليات لطلاب ' + ((D && D.org) || BR.org || 'منصة مثاني') + ' يوم ' + wDay(b.date) + ' ' + b.date + '، وعددهم ' + n + ' طالب.\n\nرابط ' + exbName(b) + ':\n' + exbUrl(b) +
   '\n\nالدخول برقم هويتكم فقط.\n\nيظهر لكم طلاب المجموعات المرسلة لكم فقط، ونموذج الاختبار معبأ بنطاق كل مرحلية. وبعد تسجيل النتائج اضغطوا «اعتماد النتائج»، ثم يمكنكم طباعة التقرير أو تنزيله Excel لاعتماده لدى الجمعية.\n\nجزاكم الله خيراً'; }
 function supCard(box){
   const c = el('div', 'strow'), tp = el('div', 'top'); tp.appendChild(el('b', '', 'مشرفو الجمعية (' + AX.sups.length + ')')); c.appendChild(tp);
@@ -4460,7 +4468,7 @@ function renderBatches(){
 }
 async function exbDo(op, data, mid){ const r = await cpCall({ action:'assocSave', op:op, data:data }, mid); if (r && r.ok){ AX = r; toast(r.msg); $('asSheet').classList.add('hidden'); renderAssoc(); } return r; }
 function exbPrint(d, L, bt){ const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = '';
-  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'كشف ' + (bt && bt.no ? exbName(bt) : 'مجموعة') + ' — اختبار المرحليات')); l.appendChild(el('div', '', wDay(d) + ' ' + d + ' • عدد الطلاب: ' + L.length + (bt && bt.sup ? ' • المختبِر: ' + bt.sup : '') + (bt && bt.done ? ' • اعتمد المشرف النتائج: ' + bt.done.slice(0, 16) : ''))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'كشف ' + (bt && bt.no ? exbName(bt) : 'مجموعة') + ' — اختبار المرحليات')); l.appendChild(el('div', '', wDay(d) + ' ' + d + ' • عدد الطلاب: ' + L.length + (bt && bt.sup ? ' • المختبِر: ' + bt.sup : '') + (bt && bt.done ? ' • اعتمد المشرف النتائج: ' + bt.done.slice(0, 16) : ''))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || BR.orgShort || 'المجمع')); p.appendChild(hd);
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>المرحلية</th><th>الحلقة</th><th>الدرجة</th><th>النتيجة</th></tr></thead>'; const tb = el('tbody');
   L.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.level, x.hname, x.status === AX.st.nom ? '' : x.score, x.status === AX.st.nom ? '' : x.result].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
   setTimeout(brandPrint, 50); }
@@ -4694,7 +4702,7 @@ function txOpen(x){
 $('txClose').onclick = () => $('txSheet').classList.add('hidden');
 function txPrint(x){
   const p = $('sfPrint'); p.innerHTML = ''; $('dsPrint').innerHTML = '';
-  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', x.type)); l.appendChild(el('div', '', 'رقم المعاملة: ' + x.no + ' • ' + x.at.slice(0, 10))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || 'مجمع ربيع القلوب')); p.appendChild(hd);
+  const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', x.type)); l.appendChild(el('div', '', 'رقم المعاملة: ' + x.no + ' • ' + x.at.slice(0, 10))); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || BR.orgShort || 'المجمع')); p.appendChild(hd);
   const t = el('table'), tb = el('tbody'), row = (k, v) => { if (!v) return; const tr = el('tr'); tr.appendChild(el('th', '', k)); tr.appendChild(el('td', '', v)); tb.appendChild(tr); };
   row('الموضوع', x.subject); row('من', x.fromName); row('إلى', x.toNames); if (!x.memo) row('الحالة', x.status);
   Object.keys(x.data || {}).forEach(k => row(TX_LBL[k] || k, x.data[k])); row('التفاصيل', x.body); t.appendChild(tb); p.appendChild(t);
@@ -5755,15 +5763,15 @@ const hijriLong = d => { try { return d.toLocaleDateString('ar-SA-u-ca-islamic-u
 async function brandPrint(){
   const p = [$('dsPrint'), $('sfPrint')].find(x => x && x.children.length); if (!p) return window.print();
   const ph = p.querySelector('.ph'), title = ph && ph.querySelector('h1') ? ph.querySelector('h1').textContent : '', sub = ph && ph.querySelector('h1 + div') ? ph.querySelector('h1 + div').textContent : '';
-  const org = String((D && D.org) || 'مجمع حلقات ربيع القلوب القرآني بجامع علي الشبلان - أبها'), cut = org.indexOf(' بجامع'), now = new Date(), pad = n => ('0' + n).slice(-2);
+  const org = String((D && D.org) || BR.org || 'منصة مثاني'), cut = org.indexOf(' بجامع'), now = new Date(), pad = n => ('0' + n).slice(-2);
   const no = '\u2066' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + '-' + pad(now.getHours()) + pad(now.getMinutes()) + '\u2069';
-  const hd = el('div', 'bh'), lg = el('img', 'lg'); lg.src = '../logo.jpg'; lg.alt = 'شعار المجمع'; hd.appendChild(lg);
+  const hd = el('div', 'bh'), lg = el('img', 'lg'); lg.src = brandLogo(); lg.alt = 'شعار المجمع'; hd.appendChild(lg);
   const o = el('div', 'org'); o.appendChild(el('b', '', cut > 0 ? org.slice(0, cut) : org)); if (cut > 0) o.appendChild(el('span', '', org.slice(cut + 1).replace(' - ', ' — '))); hd.appendChild(o);
   const m = el('div', 'meta'); [['التاريخ', hijriLong(now)], ['الموافق', now.toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { day:'numeric', month:'long', year:'numeric' }) + 'م'], ['رقم التقرير', no]].forEach(x => { const d = el('div', '', x[0] + ': '); d.appendChild(el('b', '', x[1])); m.appendChild(d); }); hd.appendChild(m);
   const tt = el('div', 'bt'); tt.appendChild(el('h1', '', title)); const bs = sub ? el('div', 'bs', sub) : null;
   if (ph){ ph.replaceWith(hd); hd.after(tt); if (bs) tt.after(bs); } else { p.prepend(hd); }
-  const wm = el('div', 'bwm'), wi = el('img'); wi.src = '../logo.jpg'; wi.alt = ''; wm.appendChild(wi); p.appendChild(wm);
-  const ft = el('div', 'bft'); ft.appendChild(el('span', '', 'نظام مثاني لحلقات تحفيظ القرآن')); ft.appendChild(el('span', '', 'طُبع بواسطة: ' + ((D && D.name) || '') + ' — ' + now.toLocaleString('ar-SA-u-ca-gregory-nu-latn', { dateStyle:'short', timeStyle:'short' }))); ft.appendChild(el('span', '', no)); p.appendChild(ft);
+  const wm = el('div', 'bwm'), wi = el('img'); wi.src = brandLogo(); wi.alt = ''; wm.appendChild(wi); p.appendChild(wm);
+  const ft = el('div', 'bft'); ft.appendChild(el('span', '', 'منصة مثاني — نظام متكامل لإدارة تحفيظ القرآن الكريم')); ft.appendChild(el('span', '', 'طُبع بواسطة: ' + ((D && D.name) || '') + ' — ' + now.toLocaleString('ar-SA-u-ca-gregory-nu-latn', { dateStyle:'short', timeStyle:'short' }))); ft.appendChild(el('span', '', no)); p.appendChild(ft);
   const sk = sigKind(title);
   if (sk.length){ const S0 = await sigLoad(), sg = el('div', 'bsig'); sg.style.gridTemplateColumns = 'repeat(' + sk.length + ',1fr)';
     sk.forEach(k => { const x = S0[k] || {}, c = el('div'); c.appendChild(el('b', '', k === 'mgr' ? 'مدير المجمع' : 'مدير الشؤون التعليمية'));
@@ -5807,7 +5815,7 @@ function frHk(L){ $('frHk').innerHTML = L.map(x => '<div class="frhk">' + (x.rin
 function frKg(id, L){ $(id).innerHTML = L.map(x => '<div class="frkc ' + (x.c || '') + '"><b>' + x.v + '</b><span>' + x.l + '</span>' + (x.s ? frSpark(x.s) : '') + '</div>').join(''); }
 const frLeg = L => L.map(x => '<div class="frlg" style="--c:' + x[2] + '"><i></i><span>' + x[0] + '</span><b>' + x[1] + '</b></div>').join('');
 async function openFull(){
-  $('frOrg').textContent = (D && D.org) || 'مجمع حلقات ربيع القلوب القرآني';
+  $('frOrg').textContent = (D && D.org) || BR.org || 'منصة مثاني';
   document.querySelectorAll('#frPer button').forEach(b => b.classList.toggle('on', b.dataset.p === frP));
   $('frCustom').classList.toggle('hidden', frP !== 'custom');
   if (frP === 'custom' && !$('frFrom').value){ $('frFrom').value = addDays(D.today, -30); $('frTo').value = D.today; }
@@ -5950,25 +5958,25 @@ let SGE = {};
 async function openSig(){
   if (!isAdm()){ $('sGeneral').querySelectorAll('.sigcard').forEach(x => x.classList.add('hidden')); return; }
   openBk();
-  SIGS = null; const r = await sigLoad(); SGE = { mgrImg:r.mgr.img || '', mgrName:r.mgr.name || '', eduImg:r.edu.img || '', eduName:r.edu.name || '', stamp:r.stamp || '' };
+  SIGS = null; const r = await sigLoad(); SGE = { mgrImg:r.mgr.img || '', mgrName:r.mgr.name || '', eduImg:r.edu.img || '', eduName:r.edu.name || '', stamp:r.stamp || '', logo:r.logo || '' };
   $('sgMgrN').value = SGE.mgrName; $('sgEduN').value = SGE.eduName; renderSig();
 }
-function renderSig(){ [['sgMgrP', 'mgrImg'], ['sgEduP', 'eduImg'], ['sgStP', 'stamp']].forEach(x => { const b = $(x[0]); b.innerHTML = ''; if (SGE[x[1]]){ const i = el('img'); i.src = SGE[x[1]]; i.alt = ''; b.appendChild(i); } else b.appendChild(el('small', 'muted', 'لم تُرفع بعد — سيظهر سطر توقيع فارغ')); }); }
+function renderSig(){ [['sgMgrP', 'mgrImg'], ['sgEduP', 'eduImg'], ['sgStP', 'stamp'], ['sgLgP', 'logo']].forEach(x => { const b = $(x[0]); b.innerHTML = ''; if (SGE[x[1]]){ const i = el('img'); i.src = SGE[x[1]]; i.alt = ''; b.appendChild(i); } else b.appendChild(el('small', 'muted', 'لم تُرفع بعد — سيظهر سطر توقيع فارغ')); }); }
 // تصغير الصورة وإزالة الخلفية البيضاء ثم ضغطها لتناسب خلية واحدة في الجدول
-function sigImg(file, stamp){ return new Promise((ok, no) => { const fr = new FileReader(); fr.onerror = no; fr.onload = () => { const im = new Image(); im.onerror = () => no(new Error('صورة غير صالحة')); im.onload = () => {
+function sigImg(file, stamp, keepBg){ return new Promise((ok, no) => { const fr = new FileReader(); fr.onerror = no; fr.onload = () => { const im = new Image(); im.onerror = () => no(new Error('صورة غير صالحة')); im.onload = () => {
   let W = stamp ? 360 : 520, out = '';
   for (let k = 0; k < 6; k++){ const sc = Math.min(1, W / im.width, (stamp ? W : W * .5) / im.height), w = Math.max(1, Math.round(im.width * sc)), h = Math.max(1, Math.round(im.height * sc)), c = document.createElement('canvas'); c.width = w; c.height = h;
     const g = c.getContext('2d'); g.drawImage(im, 0, 0, w, h); const d = g.getImageData(0, 0, w, h), p = d.data;
-    for (let i = 0; i < p.length; i += 4){ const l = (p[i] + p[i + 1] + p[i + 2]) / 3; if (l > 215) p[i + 3] = 0; else if (l > 170) p[i + 3] = Math.round(p[i + 3] * (215 - l) / 45); }
+    if (!keepBg) for (let i = 0; i < p.length; i += 4){ const l = (p[i] + p[i + 1] + p[i + 2]) / 3; if (l > 215) p[i + 3] = 0; else if (l > 170) p[i + 3] = Math.round(p[i + 3] * (215 - l) / 45); }
     g.putImageData(d, 0, 0); out = c.toDataURL('image/webp', .8); if (out.indexOf('data:image/webp') !== 0) out = c.toDataURL('image/png');
     if (out.length < 45000) return ok(out); W = Math.round(W * .78); }
   no(new Error('الصورة كبيرة جداً، جرّب صورة أصغر'));
   }; im.src = fr.result; }; fr.readAsDataURL(file); }); }
-[['sgMgrF', 'mgrImg'], ['sgEduF', 'eduImg'], ['sgStF', 'stamp']].forEach(x => { const f = $(x[0]); if (f) f.onchange = async () => { const fl = f.files[0]; f.value = ''; if (!fl) return;
-  try { SGE[x[1]] = await sigImg(fl, x[1] === 'stamp'); renderSig(); msg('sgMsg', 'جاهزة للحفظ — اضغط «حفظ التوقيعات».', 'info'); } catch(e){ msg('sgMsg', e.message, 'err'); } }; });
+[['sgMgrF', 'mgrImg'], ['sgEduF', 'eduImg'], ['sgStF', 'stamp'], ['sgLgF', 'logo']].forEach(x => { const f = $(x[0]); if (f) f.onchange = async () => { const fl = f.files[0]; f.value = ''; if (!fl) return;
+  try { SGE[x[1]] = await sigImg(fl, x[1] === 'stamp' || x[1] === 'logo', x[1] === 'logo'); renderSig(); msg('sgMsg', 'جاهزة للحفظ — اضغط «حفظ التوقيعات».', 'info'); } catch(e){ msg('sgMsg', e.message, 'err'); } }; });
 document.querySelectorAll('[data-clr]').forEach(b => b.onclick = () => { SGE[b.dataset.clr] = ''; renderSig(); });
 if ($('sgSave')) $('sgSave').onclick = async () => { const b = $('sgSave'); b.disabled = true;
-  try { const r = await api(Object.assign({ action:'sigSave' }, SGE, { mgrName:$('sgMgrN').value.trim(), eduName:$('sgEduN').value.trim() })); msg('sgMsg', r.ok ? r.msg : r.msg, r.ok ? 'ok' : 'err'); if (r.ok){ SIGS = r; } }
+  try { const r = await api(Object.assign({ action:'sigSave' }, SGE, { mgrName:$('sgMgrN').value.trim(), eduName:$('sgEduN').value.trim() })); msg('sgMsg', r.ok ? r.msg : r.msg, r.ok ? 'ok' : 'err'); if (r.ok){ SIGS = r; BR.logo = r.logo || ''; try { localStorage.setItem('hq_brand', JSON.stringify(BR)); } catch(e){} applyBrand(); } }
   catch(e){ if (e.message !== 'expired') msg('sgMsg', 'تعذّر الاتصال بالخادم.', 'err'); } b.disabled = false; };
 function prTbl(p, title, head, rows){ p.appendChild(el('h3', '', title)); const t = el('table'), th = el('thead'), tb = el('tbody'), tr = el('tr'); head.forEach(h => tr.appendChild(el('th', '', h))); th.appendChild(tr); t.appendChild(th); rows.forEach(r => { const x = el('tr'); r.forEach(v => x.appendChild(el('td', '', v == null || v === '' ? '—' : v))); tb.appendChild(x); }); t.appendChild(tb); p.appendChild(t); }
 const ATT_SEGS = [['present', 'حاضر', CHC.ok], ['late', 'متأخر', CHC.late], ['absent', 'غائب', CHC.abs], ['excused', 'مستأذن', CHC.exc]];
@@ -6221,7 +6229,7 @@ function xlsxBlob(sheets){
   const col = i => { let s = ''; i++; while (i){ const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
   // هوية المجمع في Excel: صف لاسم المجمع، ثم عنوان التقرير، ثم الفترة ومن طبعه، ثم عناوين الأعمدة بالذهبي، والصفوف متناوبة
   const brand = (nm, rows) => { const hasT = rows.length && rows[0].length === 1 && rows.length > 1, title = hasT ? String(rows[0][0]) : nm, body = hasT ? rows.slice(1) : rows;
-    return [[(D && D.org) || 'مجمع حلقات ربيع القلوب القرآني'], [title], ['طُبع ' + new Date().toLocaleString('ar-SA-u-ca-gregory-nu-latn', { dateStyle:'short', timeStyle:'short' }) + ((D && D.name) ? ' بواسطة ' + D.name : '') + ' • نظام مثاني']].concat(body); };
+    return [[(D && D.org) || BR.org || 'منصة مثاني'], [title], ['طُبع ' + new Date().toLocaleString('ar-SA-u-ca-gregory-nu-latn', { dateStyle:'short', timeStyle:'short' }) + ((D && D.name) ? ' بواسطة ' + D.name : '') + ' • نظام مثاني']].concat(body); };
   const sheetXml = rows => { const nc = Math.max(1, ...rows.slice(3).map(r => r.length)), w = Array.from({ length:nc }, (_, i) => Math.min(42, Math.max(9, ...rows.slice(3).map(r => String(r[i] == null ? '' : r[i]).length + 3))));
     const stOf = ri => ri === 0 ? 3 : ri === 1 ? 4 : ri === 2 ? 5 : ri === 3 ? 1 : (ri % 2 ? 7 : 6);
     return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0" rightToLeft="1"><pane ySplit="4" topLeftCell="A5" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="18"/><cols>' +
@@ -7386,7 +7394,7 @@ function openRegLink(){
   if ($('qrImg').src !== qr) $('qrImg').src = qr; $('qrDl').href = qr + '&format=png&download=1';
   $('qrShare').classList.toggle('hidden', !navigator.share);
 }
-$('qrShare').onclick = () => navigator.share && navigator.share({ title:'التسجيل في حلقات تحفيظ القرآن', text:'رابط التسجيل في ' + ((D && D.orgShort) || 'مجمع ربيع القلوب') + ':', url:APPLY_URL }).catch(() => {});
+$('qrShare').onclick = () => navigator.share && navigator.share({ title:'التسجيل في حلقات تحفيظ القرآن', text:'رابط التسجيل في ' + ((D && D.orgShort) || BR.orgShort || 'المجمع') + ':', url:APPLY_URL }).catch(() => {});
 $('snSave').onclick = async () => {
   const d = SNF.get(), e = SNF.check(d);
   if (e) return msg('snMsg', e, 'err');
@@ -7408,7 +7416,7 @@ $('qrPrint').onclick = () => {
   wnd.document.write('<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>التسجيل في حلقات تحفيظ القرآن</title><style>body{font-family:Tajawal,Tahoma,sans-serif;text-align:center;color:#1f3546;padding:40px}' +
     'h1{font-size:34px;margin:10px 0}h2{font-weight:500;color:#555;font-size:20px;margin:0 0 24px}img.q{width:320px;height:320px;border:10px solid #fff;box-shadow:0 0 0 2px #C9963B;border-radius:16px}' +
     'p{font-size:18px}.l{direction:ltr;font-size:14px;color:#666;word-break:break-all}.logo{width:90px;border-radius:50%}</style></head><body>' +
-    '<img class="logo" src="' + new URL('../logo.jpg', location.href).href + '"><h2>' + org.replace(/</g, '') + '</h2><h1>سجّل الآن في حلقات تحفيظ القرآن الكريم</h1>' +
+    '<img class="logo" src="' + new URL(brandLogo(), location.href).href + '"><h2>' + org.replace(/</g, '') + '</h2><h1>سجّل الآن في حلقات تحفيظ القرآن الكريم</h1>' +
     '<img class="q" src="' + $('qrImg').src + '" onload="setTimeout(function(){print()},300)"><p>امسح الباركود بكاميرا الجوال وعبّئ بيانات الطالب</p><div class="l">' + APPLY_URL + '</div></body></html>');
   wnd.document.close();
 };
@@ -7480,7 +7488,7 @@ const halaqaLabel = n => { n = String(n || '').trim(); return !n ? 'إحدى ا�
 const waPhone = p => { p = String(p || '').replace(/\D/g, ''); return /^05\d{8}$/.test(p) ? '966' + p.slice(1) : /^9665\d{8}$/.test(p) ? p : ''; };
 function openWa(a, tmpl, org){
   const text = (tmpl || DEF_ACCEPT).replace(/\{الطالب\}/g, a.name).replace(/\{الحلقة\}/g, halaqaLabel(a.hname))
-    .replace(/\{رقم_الطالب\}/g, a.sid || '').replace(/\{المجمع\}/g, org || 'مجمع ربيع القلوب');
+    .replace(/\{رقم_الطالب\}/g, a.sid || '').replace(/\{المجمع\}/g, org || BR.orgShort || 'المجمع');
   $('waText').value = text; $('waTo').textContent = '✓ قُبل وسُكّن في ' + halaqaLabel(a.hname) + ' — الرسالة إلى ولي أمره • ' + (a.pphone || 'لا يوجد جوال');
   const go = () => { const ph = waPhone(a.pphone); $('waGo').href = 'https://wa.me/' + ph + '?text=' + encodeURIComponent($('waText').value); $('waGo').classList.toggle('hidden', !ph); };
   $('waText').oninput = go; go();
@@ -7630,7 +7638,7 @@ $('nsSave').onclick = async () => {
 $('nsAgain').onclick = () => openNewStaff();
 $('nsList').onclick = () => openRole('staff');
 $('nsCopy').onclick = async () => {
-  const t = 'السلام عليكم ' + (nsLast ? nsLast.name : '') + '\nتم تسجيلك في ' + ((D && D.orgShort) || 'مجمع ربيع القلوب') + '.\n' +
+  const t = 'السلام عليكم ' + (nsLast ? nsLast.name : '') + '\nتم تسجيلك في ' + ((D && D.orgShort) || BR.orgShort || 'المجمع') + '.\n' +
     '١) بصمة الحضور: https://rabie-alqulub.github.io/hudoor/ ادخل برقم هويتك وسجّل بصمة وجهك.\n' +
     '٢) برنامج مثاني: https://rabie-alqulub.github.io/hudoor/mthani/ اختر بوابتك، واسم المستخدم رقم هويتك والرمز 123456 ثم غيّره.';
   try { await navigator.clipboard.writeText(t); toast('نُسخت الرسالة'); } catch(e){ toast('تعذّر النسخ'); }
@@ -8144,6 +8152,7 @@ else if (store.get('hq_token')) loadHome(); else showLogin();
   window.addEventListener('pageshow', e => { if (e.persisted) check(); });
   setInterval(check, 10 * 60000);
 })();
+applyBrand(); loadBrand();
 </script>
 </body>
 </html>

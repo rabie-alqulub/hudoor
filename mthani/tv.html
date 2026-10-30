@@ -80,8 +80,8 @@
 <body>
 <div class="wrap" id="app">
   <header>
-    <img src="../logo.jpg" alt="">
-    <div class="org"><b id="org">مجمع ربيع القلوب</b><span>مثاني لحلقات تحفيظ القرآن</span></div>
+    <img id="orgLogo" src="mthani-192.png" alt="">
+    <div class="org"><b id="org"></b><span>منصة مثاني</span></div>
     <span class="grow"></span>
     <div class="dates"><b id="dH"></b><span id="dG"></span></div>
     <div class="clock"><b id="clk">--:--</b></div>
@@ -93,6 +93,11 @@
 <button class="fs" id="fs">ملء الشاشة</button>
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbx1n59uCh_fri9XsUyxZlB7bXst4Ay-gZzKn8hIiQjunFotQQsEfE_8eQbhNmshHcI/exec';
+
+/* هوية المجمع من إعدادات المشترك (لا اسم ثابت): الاسم والشعار */
+(async () => { let B = {}; try { B = JSON.parse(localStorage.getItem('hq_brand') || '{}') || {}; } catch(e){}
+  const put = b => { const i = document.getElementById('orgLogo'), n = document.getElementById('org'); if (i) i.src = b.logo || 'mthani-192.png'; if (n && (b.org || b.orgShort)) n.textContent = b.org || b.orgShort;  };
+  put(B); try { const r = await (await fetch(API_URL, { method:'POST', body:JSON.stringify({ action:'brand' }) })).json(); if (r && r.ok){ B = { org:r.org, orgShort:r.orgShort, logo:r.logo }; try { localStorage.setItem('hq_brand', JSON.stringify(B)); } catch(e){} put(B); } } catch(e){} })();
 const $ = id => document.getElementById(id);
 const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
 const KEY = new URLSearchParams(location.search).get('k') || '';

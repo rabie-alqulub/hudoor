@@ -5,7 +5,7 @@
 <link rel="icon" type="image/png" href="mthani-64.png">
 <link rel="apple-touch-icon" href="mthani-192.png">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>طلب التسجيل في الحلقات - مجمع ربيع القلوب</title>
+<title>طلب التسجيل في الحلقات — منصة مثاني</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -52,9 +52,9 @@
 </head>
 <body>
 <div class="hero">
-  <div class="logo"><img src="../logo.jpg" alt="شعار مجمع ربيع القلوب"></div>
+  <div class="logo"><img id="orgLogo" src="mthani-192.png" alt="شعار المجمع"></div>
   <h1>طلب التسجيل في الحلقات</h1>
-  <p id="orgName">مجمع ربيع القلوب القرآني بجامع علي الشبلان - أبها</p>
+  <p id="orgName">منصة مثاني</p>
 </div>
 <main>
   <div class="card" id="form">
@@ -175,6 +175,11 @@ function studentFields(boxId, pre){
 }
 
 const F = studentFields('fields', 'a');
+
+/* هوية المجمع من إعدادات المشترك (لا اسم ثابت): الاسم والشعار */
+(async () => { let B = {}; try { B = JSON.parse(localStorage.getItem('hq_brand') || '{}') || {}; } catch(e){}
+  const put = b => { const i = document.getElementById('orgLogo'), n = document.getElementById('orgName'); if (i) i.src = b.logo || 'mthani-192.png'; if (n && (b.org || b.orgShort)) n.textContent = b.org || b.orgShort; if (b.orgShort || b.org) document.title = 'طلب التسجيل في الحلقات — ' + (b.orgShort || b.org); };
+  put(B); try { const r = await (await fetch(API_URL, { method:'POST', body:JSON.stringify({ action:'brand' }) })).json(); if (r && r.ok){ B = { org:r.org, orgShort:r.orgShort, logo:r.logo }; try { localStorage.setItem('hq_brand', JSON.stringify(B)); } catch(e){} put(B); } } catch(e){} })();
 async function post(data){ const r = await fetch(API_URL, { method:'POST', body: JSON.stringify(data) }); return r.json(); }
 $('send').onclick = async () => {
   const d = F.get(), e = F.check(d);
