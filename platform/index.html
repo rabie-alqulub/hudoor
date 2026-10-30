@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>منصة مثاني — نظام متكامل لإدارة حلقات تحفيظ القرآن الكريم</title>
+<meta name="description" content="منصة مثاني نظام متكامل لإدارة حلقات تحفيظ القرآن الكريم: الحضور والتسميع والخطط والاختبارات والتقارير وتواصل أولياء الأمور.">
+<meta name="theme-color" content="#1F3546">
+<meta property="og:title" content="منصة مثاني">
+<meta property="og:description" content="نظام متكامل لإدارة حلقات تحفيظ القرآن الكريم">
+<meta property="og:image" content="https://rabie-alqulub.github.io/hudoor/mthani/mthani-512.png">
+<link rel="icon" href="../mthani/mthani-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap">
+<style>
+  :root{--navy:#1F3546;--navy2:#2F4F66;--deep:#172A38;--gold:#C98A2B;--gold2:#E3B261;--ink:#1B2A36;--muted:#5F6F7B;--body:#4E5F6B;--line:#E1E7EA;--bg:#F3F5F4;color-scheme:light}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:80px}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;line-height:1.7}
+  a{color:var(--navy);text-decoration:none} a:hover{color:var(--gold)}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+  .wrap{max-width:1200px;margin:0 auto;padding-inline:max(24px,env(safe-area-inset-left,0px))}
+  .kufi{font-family:'Reem Kufi','IBM Plex Sans Arabic',sans-serif}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .two{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:48px;align-items:center}
+  .eyebrow{font-weight:600;color:var(--gold)}
+  h1,h2{text-wrap:balance}
+  h2{margin:0;font-family:'Reem Kufi',sans-serif;font-size:36px;color:var(--navy);line-height:1.35}
+  section{padding:88px 0}
+  .btn{white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:14px;font-weight:600;font-size:16px;border:1px solid transparent;cursor:pointer;font-family:inherit}
+  .btn.dark{background:var(--navy);color:#fff} .btn.dark:hover{background:var(--navy2);color:#fff}
+  .btn.gold{background:var(--gold);color:var(--ink);font-weight:700} .btn.gold:hover{background:var(--gold2);color:var(--ink)}
+  .btn.line{border-color:#C9D3D9;color:var(--navy);background:transparent}
+  .btn.ghost{border-color:rgba(255,255,255,.35);color:#fff}
+  /* الشريط العلوي */
+  header{position:sticky;top:0;z-index:20;background:rgba(243,245,244,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #DCE3E6}
+  .bar{display:flex;align-items:center;gap:20px;min-height:72px}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo img{width:44px;height:44px;border-radius:12px}
+  .logo b{white-space:nowrap;display:block;font-family:'Reem Kufi',sans-serif;font-size:22px;color:var(--navy);line-height:1.2}
+  .logo small{display:block;font-size:12px;color:var(--muted);line-height:1.3}
+  .nav{display:flex;gap:22px;flex:1;justify-content:center;font-weight:500;font-size:15px}
+  .acts{display:flex;gap:10px;margin-inline-start:auto}
+  .menu{display:none;width:44px;height:44px;border-radius:12px;border:1px solid #C9D3D9;background:#fff;color:var(--navy);cursor:pointer}
+  /* الواجهة */
+  .hero{background:var(--navy);color:#fff;padding:72px 0 96px}
+  .pill{align-self:flex-start;font-size:13px;font-weight:600;color:var(--gold2);border:1px solid rgba(227,178,97,.5);border-radius:999px;padding:4px 14px}
+  .hero h1{margin:0;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:54px;line-height:1.25}
+  .hero p{margin:0;font-size:18px;color:#D3DEE6;max-width:560px}
+  .mock{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:14px}
+  .mock .k{background:rgba(255,255,255,.09);border-radius:14px;padding:12px} .mock .k b{font-size:24px;display:block} .mock .k span{font-size:12px;color:#D3DEE6}
+  .mock .k.hl{background:var(--gold);color:var(--ink)} .mock .k.hl span{color:var(--ink)}
+  .trk{height:8px;border-radius:4px;background:rgba(255,255,255,.12)} .trk i{display:block;height:8px;border-radius:4px}
+  /* الأرقام */
+  .stats{margin-top:-44px;position:relative}
+  .stat{background:#fff;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(31,53,70,.08)}
+  .stat b{display:block;font-family:'Reem Kufi',sans-serif;font-size:34px;color:var(--navy);font-variant-numeric:tabular-nums;min-height:52px}
+  .stat span{color:var(--muted)}
+  /* بطاقات */
+  .card{background:#fff;border-radius:20px;padding:24px;border:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+  .card b{font-size:18px;color:var(--navy)} .card span{color:var(--body);font-size:15px}
+  .card svg{width:40px;height:40px;fill:none;stroke:var(--gold);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .mini{background:#fff;border-radius:18px;padding:20px;border:1px solid var(--line)} .mini b{display:block;color:var(--navy);font-size:17px} .mini span{color:var(--muted);font-size:14px}
+  .steps{list-style:none;margin:0;padding:0}
+  .steps li{display:flex;flex-direction:column;gap:8px;border-top:3px solid var(--gold);padding-top:16px}
+  .steps .n{font-family:'Reem Kufi',sans-serif;font-size:30px;color:var(--gold)} .steps b{font-size:18px;color:var(--navy)} .steps span{color:var(--body)}
+  .sec-dark{background:var(--navy);color:#fff} .sec-dark h2{color:#fff} .sec-dark .eyebrow{color:var(--gold2)}
+  .glass{background:rgba(255,255,255,.08);border-radius:18px;padding:18px} .glass b{display:block} .glass span{color:#C9D6E0;font-size:14px}
+  /* الباقات */
+  .plan{background:#fff;border-radius:22px;padding:28px;border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
+  .plan .price{font-family:'Reem Kufi',sans-serif;font-size:32px;color:var(--navy)} .plan .price small{font-size:15px;color:var(--muted)}
+  .plan ul{margin:0;padding-inline-start:18px;color:#3C4E5B;display:flex;flex-direction:column;gap:6px}
+  .plan .btn{margin-top:auto}
+  .plan.top{background:var(--navy);color:#fff;border:0;box-shadow:0 16px 40px rgba(31,53,70,.25)} .plan.top .price{color:#fff} .plan.top .price small,.plan.top .sub{color:#C9D6E0} .plan.top ul{color:#D3DEE6}
+  .badge{font-size:12px;background:var(--gold);color:var(--ink);border-radius:999px;padding:2px 10px;font-weight:700}
+  /* الأسئلة */
+  details{border:1px solid var(--line);border-radius:16px;padding:18px 20px;background:#fff}
+  summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px;font-weight:600;font-size:17px;color:var(--navy)}
+  summary::-webkit-details-marker{display:none}
+  summary .plus{color:var(--gold);transition:transform .2s;font-size:22px;line-height:1} details[open] .plus{transform:rotate(45deg)}
+  details p{margin:10px 0 0;color:var(--body)}
+  /* التواصل */
+  .crow{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px} .crow b{min-width:96px;color:var(--navy)}
+  form{background:#fff;border-radius:22px;padding:28px;border:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+  label{font-weight:600;font-size:14px}
+  input,textarea{min-height:46px;border-radius:12px;border:1px solid #C9D3D9;padding:10px 14px;font:inherit;color:var(--ink);background:#fff;width:100%}
+  textarea{min-height:80px}
+  .fmsg{border-radius:12px;padding:10px 14px;font-size:14px} .fmsg.ok{background:#E2F1E9;color:#1E6B45} .fmsg.err{background:#F8E3E1;color:#A23A31} .fmsg.info{background:#EAF0F4;color:var(--navy)}
+  .hp{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+  form{position:relative}
+  footer{background:var(--deep);color:#C9D6E0;padding:40px 0}
+  footer a{color:#C9D6E0}
+  [hidden]{display:none!important}
+  .sm{display:none}
+  @media (max-width:1000px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:minmax(0,1fr)}.hero h1{font-size:44px}}
+  @media (max-width:760px){
+    .nav{display:none;position:absolute;top:72px;inset-inline:0;background:#fff;flex-direction:column;gap:0;padding:8px 16px 16px;border-bottom:1px solid #DCE3E6;box-shadow:0 12px 24px rgba(31,53,70,.08)}
+    .nav.open{display:flex} .nav a{padding:12px 4px;border-bottom:1px solid var(--line)}
+    .menu{display:inline-flex;align-items:center;justify-content:center} .acts .btn.line{display:none} .logo small{display:none} .acts .lg{display:none} .acts .sm{display:inline}
+  }
+  @media (max-width:640px){.grid4,.grid3,.grid2{grid-template-columns:minmax(0,1fr)}.wrap{padding-inline:max(16px,env(safe-area-inset-left,0px))}section{padding:64px 0}h2{font-size:28px}.hero h1{font-size:34px}.hero{padding:48px 0 88px}.stats .grid4{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.stat{padding:16px}.stat b{font-size:28px;min-height:42px}.acts .btn{padding:0 14px;font-size:14px}}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}summary .plus{transition:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a href="#top" class="logo"><img src="../mthani/mthani-192.png" alt="شعار منصة مثاني"><span><b>منصة مثاني</b><small>لإدارة حلقات تحفيظ القرآن الكريم</small></span></a>
+    <nav class="nav" id="nav" aria-label="أقسام الموقع">
+      <a href="#features">المزايا</a><a href="#how">كيف تعمل</a><a href="#security">الأمان</a><a href="#plans">الاشتراكات</a><a href="#faq">الأسئلة</a><a href="#contact">تواصل معنا</a>
+    </nav>
+    <div class="acts">
+      <a class="btn line" href="../mthani/">تسجيل الدخول</a>
+      <a class="btn dark" href="#contact"><span class="lg">اطلب عرضاً تجريبياً</span><span class="sm">عرض تجريبي</span></a>
+      <button class="menu" id="menuBtn" type="button" aria-label="القائمة" aria-expanded="false" aria-controls="nav"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="top" class="hero">
+  <div class="wrap two">
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <span class="pill">نظام متكامل لإدارة حلقات تحفيظ القرآن الكريم</span>
+      <h1>حلقتك كلها في مكان واحد: الحضور والتسميع والخطط والتقارير</h1>
+      <p>منصة مثاني تجمع المعلم والمشرف وولي الأمر والإدارة على نظام واحد. يسجّل المعلم تقييم اليوم في دقيقة، ويصل التقرير لولي الأمر على واتساب، وترى الإدارة أداء المجمع كاملاً لحظة بلحظة.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn gold" href="#contact">اطلب عرضاً تجريبياً</a>
+        <a class="btn ghost" href="#features">تعرّف على المزايا</a>
+      </div>
+    </div>
+    <div class="mock" role="img" aria-label="مثال من لوحة اليوم في منصة مثاني">
+      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:17px">لوحة اليوم</b><span style="font-size:12px;color:#9BE3BC;background:rgba(93,194,142,.18);border-radius:999px;padding:2px 10px">مباشر</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+        <div class="k hl"><b>93٪</b><span>حضور اليوم</span></div>
+        <div class="k"><b>4 / 6</b><span>حلقات اعتُمدت</span></div>
+        <div class="k"><b>318</b><span>آية حُفظت اليوم</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.06);border-radius:14px;padding:14px">
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span>حلقة أبي بكر الصديق</span><span style="color:#9BE3BC">اعتُمدت</span></div>
+        <div class="trk"><i style="width:88%;background:#5DC28E"></i></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px"><span>حلقة عمر بن الخطاب</span><span style="color:#F3D9AE">بانتظار الاعتماد</span></div>
+        <div class="trk"><i style="width:74%;background:#E3B261"></i></div>
+      </div>
+      <small style="font-size:11px;color:#9FB1BE">أرقام توضيحية</small>
+    </div>
+  </div>
+</section>
+
+<div class="stats" aria-label="أرقام المنصة">
+  <div class="wrap grid4">
+    <div class="stat"><b id="stOrgs">—</b><span>مجمع قرآني مشترك</span></div>
+    <div class="stat"><b id="stHal">—</b><span>حلقة تُدار على المنصة</span></div>
+    <div class="stat"><b id="stStu">—</b><span>طالب وطالبة</span></div>
+    <div class="stat"><b id="stAy" style="color:var(--gold)">—</b><span>آية حُفظت منذ بداية العام</span></div>
+  </div>
+</div>
+
+<section id="about" style="padding-bottom:24px">
+  <div class="wrap two">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <span class="eyebrow">من نحن</span>
+      <h2>وُلدت مثاني داخل مجمع قرآني يعمل كل يوم</h2>
+      <p style="margin:0;font-size:17px;color:#3C4E5B">بُنيت المنصة من احتياج حقيقي في الميدان: معلم يريد تسجيلاً سريعاً، ومشرف يريد متابعة دقيقة، وولي أمر يريد أن يطمئن على ابنه. كل خاصية فيها جُرّبت في حلقات حقيقية قبل أن تصل إليكم.</p>
+      <p style="margin:0;font-size:17px;color:#3C4E5B" id="aboutExtra" hidden></p>
+    </div>
+    <div class="grid2">
+      <div class="mini"><b>مصممة للقرآن</b><span>بالسور والآيات والأوجه ومصحف المدينة، لا بنموذج مدرسي عام.</span></div>
+      <div class="mini"><b>عربية بالكامل</b><span>من اليمين إلى اليسار، بالتاريخين الهجري والميلادي.</span></div>
+      <div class="mini"><b>بهوية مجمعك</b><span>اسم المجمع وشعاره وتوقيع مديره على كل تقرير.</span></div>
+      <div class="mini"><b>على كل جهاز</b><span>جوال وتابلت وكمبيوتر، بالوضع الفاتح والداكن.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap" style="display:flex;flex-direction:column;gap:36px">
+    <div style="display:flex;flex-direction:column;gap:10px;max-width:720px">
+      <span class="eyebrow">المزايا</span>
+      <h2>كل ما تحتاجه الحلقة، من أول يوم إلى اختبار الجمعية</h2>
+    </div>
+    <div class="grid3">
+      <div class="card"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><b>التقييم اليومي والحضور</b><span>حضور وتسميع وعدد أخطاء تُحسب منها الدرجة تلقائياً، واعتماد الحلقة بضغطة.</span></div>
+      <div class="card"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l4-4 3 3 5-6"/></svg><b>الخطط ومؤشر تحقيق المستهدف</b><span>خطة لكل طالب بالأسطر أو الأوجه، ومتابعة من تأخر عن مستهدفه قبل أن يتراكم.</span></div>
+      <div class="card"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h6M8 11h6"/></svg><b>الاختبار القبلي واختبار الجمعية</b><span>ترشيح المرحليات، ونموذج اختبار بمصحف تحت كل سؤال، ورابط خاص لمشرف الجمعية.</span></div>
+      <div class="card"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><b>التقرير الشامل بهوية المجمع</b><span>تقارير للمجمع والحلقة والطالب، تُطبع PDF بتوقيع المدير أو تُصدَّر Excel.</span></div>
+      <div class="card"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><b>تواصل مع أولياء الأمور</b><span>تقرير يومي على واتساب بعد اعتماد المعلم، وتنبيهات الغياب والإعلانات.</span></div>
+      <div class="card"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.5 6 .9-4.4 4.2 1 6L12 16.8 6.7 19.6l1-6L3.3 9.4l6-.9z"/></svg><b>نافس: فارس الحلقة والمتجر</b><span>نقاط للطلاب المتميزين، ولوحة شرف، ومتجر جوائز يحفّز على الاستمرار.</span></div>
+      <div class="card"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 4.5l3 3-3 3"/></svg><b>بوابة لكل دور وصلاحيات دقيقة</b><span>المعلم وشؤون الطلاب والشؤون التعليمية وولي الأمر والطالب، كلٌّ يرى ما يخصه.</span></div>
+      <div class="card"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg><b>لوحة اليوم وشاشة العرض</b><span>متابعة لحظية للحلقات والتنبيهات، وشاشة للمسجد تعرض الفرسان والإعلانات.</span></div>
+      <div class="card"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3"/><path d="M18 12V9a6 6 0 0 0-3-5.2"/><path d="M9 12v1a3 3 0 0 0 6 0V9"/><path d="M6 16a9 9 0 0 0 12 0"/></svg><b>بصمة حضور الموظفين</b><span>حضور وانصراف بالوجه والموقع، مع الإجازات وتقرير الدوام.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background:#fff">
+  <div class="wrap" style="display:flex;flex-direction:column;gap:36px">
+    <div style="display:flex;flex-direction:column;gap:10px"><span class="eyebrow">كيف تعمل</span><h2>من طلب الاشتراك إلى أول تقييم في أربع خطوات</h2></div>
+    <ol class="steps grid4">
+      <li><span class="n">١</span><b>اطلب الاشتراك</b><span>تواصل معنا ونحدد معاً حجم المجمع واحتياجه.</span></li>
+      <li><span class="n">٢</span><b>نجهّز نسخة مجمعك</b><span>نسخة مستقلة باسم مجمعك وشعاره، وبياناتها لك وحدك.</span></li>
+      <li><span class="n">٣</span><b>أضف الحلقات والطلاب</b><span>المعلمون والحلقات والطلاب، أو رابط تسجيل يعبّئه أولياء الأمور.</span></li>
+      <li><span class="n">٤</span><b>ابدأ التقييم والمتابعة</b><span>يبدأ المعلمون التقييم من الجوال، وتصل التقارير تلقائياً.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section id="security" class="sec-dark">
+  <div class="wrap two">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span class="eyebrow">الأمان والخصوصية</span>
+      <h2>بيانات طلابكم أمانة، ونعاملها على هذا الأساس</h2>
+      <p style="margin:0;color:#D3DEE6;font-size:17px">لكل مجمع نسخة مستقلة لا تختلط بياناتها بغيره، ويُحفظ منها نسخة احتياطية كل ليلة.</p>
+    </div>
+    <ul class="grid2" style="list-style:none;margin:0;padding:0">
+      <li class="glass"><b>نسخة مستقلة لكل مجمع</b><span>بياناتكم في جدولكم وحسابكم.</span></li>
+      <li class="glass"><b>نسخ احتياطي يومي</b><span>30 نسخة يومية و12 شهرية.</span></li>
+      <li class="glass"><b>صلاحيات من الخادم</b><span>كل طلب يُفحص قبل تنفيذه.</span></li>
+      <li class="glass"><b>رموز دخول مشفّرة</b><span>وقفل بعد المحاولات الخاطئة.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="plans">
+  <div class="wrap" style="display:flex;flex-direction:column;gap:36px">
+    <div style="display:flex;flex-direction:column;gap:10px;text-align:center;align-items:center">
+      <span class="eyebrow">الاشتراكات</span>
+      <h2>اشتراك سنوي يناسب حجم مجمعك</h2>
+      <p style="margin:0;color:var(--body)">كل الباقات تشمل التحديثات والدعم والنسخ الاحتياطي.<span id="trialLine"></span></p>
+    </div>
+    <div class="grid3" style="align-items:stretch">
+      <div class="plan">
+        <b style="font-size:20px;color:var(--navy)">الأساسية</b><span class="sub" id="pBasicSub" style="color:var(--muted)">للمجمعات الصغيرة</span>
+        <div class="price" id="pBasic">تواصل معنا للسعر</div>
+        <ul><li>التقييم والحضور والخطط</li><li>بوابات المعلم وولي الأمر</li><li>التقارير بهوية المجمع</li></ul>
+        <a class="btn line" href="#contact" data-plan="الأساسية">اطلب هذه الباقة</a>
+      </div>
+      <div class="plan top">
+        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:20px">المتقدمة</b><span class="badge">الأكثر طلباً</span></div><span class="sub" id="pAdvSub">للمجمعات المتوسطة والكبيرة</span>
+        <div class="price" id="pAdv">تواصل معنا للسعر</div>
+        <ul><li>كل ما في الأساسية</li><li>رسائل واتساب لأولياء الأمور</li><li>الاختبارات واختبار الجمعية</li><li>نافس والتقرير الشامل</li></ul>
+        <a class="btn gold" href="#contact" data-plan="المتقدمة">اطلب هذه الباقة</a>
+      </div>
+      <div class="plan">
+        <b style="font-size:20px;color:var(--navy)">الجمعيات</b><span class="sub" style="color:var(--muted)">عدة مجمعات تحت جمعية واحدة</span>
+        <div class="price">بحسب الاتفاق</div>
+        <ul><li>كل ما في المتقدمة</li><li>بصمة حضور الموظفين</li><li>تهيئة ونقل بيانات ودعم مخصص</li></ul>
+        <a class="btn line" href="#contact" data-plan="الجمعيات">تواصل معنا</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="background:#fff">
+  <div class="wrap" style="display:flex;flex-direction:column;gap:16px;max-width:880px">
+    <h2 style="text-align:center;margin-bottom:12px">الأسئلة الشائعة</h2>
+    <details><summary>هل تظهر بيانات مجمعنا لمجمع آخر؟<span class="plus" aria-hidden="true">+</span></summary><p>لا. لكل مجمع نسخة مستقلة بجدول بيانات خاص به، ولا يطّلع عليها أحد من خارج مجمعكم.</p></details>
+    <details><summary>هل يحتاج المعلم إلى جهاز كمبيوتر؟<span class="plus" aria-hidden="true">+</span></summary><p>لا. المنصة تعمل على الجوال والتابلت والكمبيوتر من المتصفح، ويمكن إضافتها إلى الشاشة الرئيسية كتطبيق.</p></details>
+    <details><summary>هل يظهر اسم مجمعنا وشعاره؟<span class="plus" aria-hidden="true">+</span></summary><p>نعم، في القوائم والتقارير ورسائل أولياء الأمور، ومعها توقيع المدير وختم المجمع على التقارير المهمة.</p></details>
+    <details id="faqTrial" hidden><summary>هل توجد تجربة قبل الاشتراك؟<span class="plus" aria-hidden="true">+</span></summary><p id="faqTrialText"></p></details>
+    <details><summary>كيف ننقل بيانات طلابنا الحالية؟<span class="plus" aria-hidden="true">+</span></summary><p>نستلم منكم كشف الطلاب والحلقات بملف Excel ونجهّزه في نسختكم قبل البدء.</p></details>
+    <details><summary>هل يصل التقرير لولي الأمر تلقائياً؟<span class="plus" aria-hidden="true">+</span></summary><p>نعم، بعد اعتماد المعلم للحلقة يصل لولي الأمر تقرير يومه على واتساب: الحضور والمقطع المسمّع والدرجة.</p></details>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap two" style="align-items:start">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span class="eyebrow">تواصل معنا والدعم</span>
+      <h2>اطلب عرضاً تجريبياً لمجمعك</h2>
+      <p style="margin:0;color:var(--body);font-size:17px">نعرض لكم المنصة على بيانات تجريبية، ونجيب عن أسئلتكم، ونقترح الباقة المناسبة.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px" id="contactRows">
+        <div class="crow" id="cWa" hidden><b>واتساب</b><a dir="ltr" id="cWaLink" href="#"></a></div>
+        <div class="crow" id="cMail" hidden><b>البريد</b><a dir="ltr" id="cMailLink" href="#"></a></div>
+        <div class="crow" id="cHours" hidden><b>أوقات الدعم</b><span id="cHoursText"></span></div>
+      </div>
+    </div>
+    <form id="leadForm" novalidate aria-label="طلب عرض تجريبي">
+      <label for="fName">الاسم</label><input id="fName" name="name" autocomplete="name" required maxlength="60">
+      <label for="fOrg">اسم المجمع أو الجمعية</label><input id="fOrg" name="org" required maxlength="100">
+      <label for="fCity">المدينة</label><input id="fCity" name="city" maxlength="40">
+      <label for="fPhone">رقم الجوال</label><input id="fPhone" name="phone" type="tel" inputmode="tel" dir="ltr" placeholder="05xxxxxxxx" required maxlength="14" style="text-align:right">
+      <label for="fN">عدد الطلاب تقريباً</label><input id="fN" name="students" type="number" inputmode="numeric" min="0" max="100000">
+      <label for="fNotes">ملاحظات (اختياري)</label><textarea id="fNotes" name="notes" maxlength="400"></textarea>
+      <div class="hp" aria-hidden="true"><label for="fWeb">الموقع</label><input id="fWeb" tabindex="-1" autocomplete="off"></div>
+      <button class="btn dark" type="submit" id="fSend" style="min-height:52px">أرسل الطلب</button>
+      <div id="fMsg" role="status" aria-live="polite"></div>
+      <small style="color:var(--muted)">نستخدم بياناتك للتواصل معك بخصوص الطلب فقط.</small>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap" style="display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center">
+    <div class="logo"><img src="../mthani/mthani-192.png" alt="" style="width:40px;height:40px;border-radius:10px"><span><b style="color:#fff;font-size:18px">منصة مثاني</b><small style="color:#C9D6E0;display:block">نظام متكامل لإدارة حلقات تحفيظ القرآن الكريم</small></span></div>
+    <nav aria-label="روابط التذييل" style="display:flex;gap:18px;flex-wrap:wrap;font-size:14px"><a href="#about">من نحن</a><a href="#plans">الاشتراكات</a><a href="#contact">الدعم</a><a href="../mthani/">تسجيل الدخول</a></nav>
+    <small>© <span id="yr">2026</span> منصة مثاني</small>
+  </div>
+</footer>
+
+<script>
+/* ===== إعدادات الموقع: عبّئ ما يلزم، والخانة الفارغة تختفي من الصفحة ===== */
+const SITE = {
+  // روابط خوادم المجمعات المشتركة (رابط Apps Script لكل مجمع). الأرقام في الصفحة مجموعها، وعدد المجمعات = عدد الروابط التي ردّت.
+  tenants: ['https://script.google.com/macros/s/AKfycbx1n59uCh_fri9XsUyxZlB7bXst4Ay-gZzKn8hIiQjunFotQQsEfE_8eQbhNmshHcI/exec'],
+  leadServer: 'https://script.google.com/macros/s/AKfycbx1n59uCh_fri9XsUyxZlB7bXst4Ay-gZzKn8hIiQjunFotQQsEfE_8eQbhNmshHcI/exec',   // تصل إليه طلبات العرض التجريبي
+  whatsapp: '',        // مثال: '966500000000'
+  email: '',           // مثال: 'info@example.com'
+  hours: '',           // مثال: 'الأحد إلى الخميس، 4 العصر إلى 9 مساءً'
+  trial: '',           // مثال: 'نعم، تجربة مجانية لمدة 30 يوماً بكامل المزايا.'
+  about: '',           // سطران عن المؤسس أو الجهة المالكة
+  plans: { basic: { price: '', students: '' }, adv: { price: '', students: '' } }   // السعر بالريال سنوياً، وحد الطلاب
+};
+/* ===== ===== */
+const $ = id => document.getElementById(id);
+const fmt = n => Number(n).toLocaleString('ar-SA');
+$('yr').textContent = new Date().getFullYear();
+// القائمة على الجوال
+$('menuBtn').onclick = () => { const o = $('nav').classList.toggle('open'); $('menuBtn').setAttribute('aria-expanded', o); };
+$('nav').querySelectorAll('a').forEach(a => a.addEventListener('click', () => { $('nav').classList.remove('open'); $('menuBtn').setAttribute('aria-expanded', 'false'); }));
+// المعلومات القابلة للتعبئة
+if (SITE.whatsapp){ $('cWa').hidden = false; $('cWaLink').textContent = '+' + SITE.whatsapp; $('cWaLink').href = 'https://wa.me/' + SITE.whatsapp; }
+if (SITE.email){ $('cMail').hidden = false; $('cMailLink').textContent = SITE.email; $('cMailLink').href = 'mailto:' + SITE.email; }
+if (SITE.hours){ $('cHours').hidden = false; $('cHoursText').textContent = SITE.hours; }
+if (SITE.trial){ $('faqTrial').hidden = false; $('faqTrialText').textContent = SITE.trial; $('trialLine').textContent = ' وتتوفر تجربة مجانية قبل الاشتراك.'; }
+if (SITE.about){ $('aboutExtra').hidden = false; $('aboutExtra').textContent = SITE.about; }
+[['basic', 'pBasic', 'pBasicSub'], ['adv', 'pAdv', 'pAdvSub']].forEach(x => { const p = SITE.plans[x[0]] || {};
+  if (p.price){ const el = $(x[1]); el.textContent = fmt(p.price) + ' '; const s = document.createElement('small'); s.textContent = 'ريال سنوياً'; el.appendChild(s); }
+  if (p.students) $(x[2]).textContent = 'حتى ' + fmt(p.students) + ' طالب'; });
+document.querySelectorAll('[data-plan]').forEach(a => a.addEventListener('click', () => { $('fNotes').value = 'الباقة المطلوبة: ' + a.dataset.plan; }));
+// الأرقام الحية: مجموع المجمعات المشتركة
+(async () => {
+  const post = (u, o) => fetch(u, { method:'POST', body:JSON.stringify(o) }).then(r => r.json());
+  const res = await Promise.all(SITE.tenants.map(u => post(u, { action:'pubStats' }).catch(() => null)));
+  const ok = res.filter(r => r && r.ok); if (!ok.length) return;
+  const sum = k => ok.reduce((m, r) => m + (Number(r[k]) || 0), 0);
+  $('stOrgs').textContent = fmt(ok.length); $('stHal').textContent = fmt(sum('halaqat')); $('stStu').textContent = fmt(sum('students')); $('stAy').textContent = fmt(sum('ayatYear'));
+})();
+// طلب العرض التجريبي
+const fm = (t, c) => { const b = $('fMsg'); b.className = t ? 'fmsg ' + c : ''; b.textContent = t || ''; };
+$('leadForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const d = { name:$('fName').value.trim(), org:$('fOrg').value.trim(), city:$('fCity').value.trim(), phone:$('fPhone').value.replace(/[^\d+]/g, ''), students:$('fN').value, notes:$('fNotes').value.trim() };
+  if (d.name.length < 2 || d.org.length < 2) return fm('اكتب الاسم واسم المجمع.', 'err');
+  if (!/^(05\d{8}|\+?9665\d{8})$/.test(d.phone)) return fm('اكتب رقم جوال صحيحاً يبدأ بـ 05.', 'err');
+  const b = $('fSend'); b.disabled = true; fm('جاري الإرسال...', 'info');
+  try { const r = await (await fetch(SITE.leadServer, { method:'POST', body:JSON.stringify({ action:'lead', hp:$('fWeb').value, data:d }) })).json();
+    fm(r.msg || (r.ok ? 'وصل طلبك.' : 'تعذّر الإرسال.'), r.ok ? 'ok' : 'err'); if (r.ok) $('leadForm').reset(); }
+  catch(err){ fm('تعذّر الإرسال، تحقق من الإنترنت وحاول مجدداً.' + (SITE.whatsapp ? ' أو راسلنا على واتساب.' : ''), 'err'); }
+  b.disabled = false;
+});
+</script>
+</body>
+</html>
