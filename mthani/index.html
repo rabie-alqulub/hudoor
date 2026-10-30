@@ -84,6 +84,8 @@
   .brand b{display:block;font-size:19px;line-height:1.1} .brand small{color:#F3D9AE;font-size:12px;white-space:nowrap;display:block}
   @media (max-width:380px){ .brand small{font-size:10.5px} .brand{gap:7px} }
   @media (max-width:340px){ .brand small{display:none} }
+  .brand{min-width:0} .brand span{min-width:0} .brand small{overflow:hidden;text-overflow:ellipsis;max-width:42vw}
+  @media (max-width:560px){ .brand small{display:none} .brand b{white-space:nowrap} }
   @media (max-width:440px){ .appbar{gap:5px;padding:10px} .appbar .iconbtn{padding:7px 6px;min-width:44px;font-size:11px} .brand .mark{width:36px;height:36px} .brand{gap:7px} }
   .appbar .grow{flex:1}
   .appbar .iconbtn{background:rgba(255,255,255,.12);color:#fff}
