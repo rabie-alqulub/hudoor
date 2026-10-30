@@ -356,6 +356,8 @@
   .sigcard{display:grid;gap:8px} .siggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
   .sigbox{display:grid;gap:6px;border:1px solid var(--line,#e2e8ee);border-radius:14px;padding:10px;background:rgba(255,255,255,.6)} .sigbox>span{font-weight:700;color:var(--navy,#1F3546)}
   .sigprev{height:90px;display:flex;align-items:center;justify-content:center;border:1px dashed #c7d2da;border-radius:10px;background:#fff} .sigprev img{max-height:80px;max-width:90%;object-fit:contain}
+  .bkcard{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)} .bkstat{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px} .bkstat div{border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:rgba(255,255,255,.5)} .bkstat div span{display:block;font-size:12px;color:var(--muted)} .bkstat div b{font-size:14px} .bkstat .ok b{color:var(--ok)} .bkstat .bad b{color:var(--red)}
+  .bkcard .savebar{display:flex;gap:8px} .bkcard .savebar .btn{flex:1}
   .sigbox .lnk{background:none;border:0;color:#b4443b;font-size:12px;cursor:pointer;justify-self:start}
   /* ---------- التقرير الشامل للمجمع (التصميم الزجاجي) ---------- */
   #pFull{--fr-ink:#1B2A36;--fr-mu:#667785;--fr-line:rgba(31,53,70,.12);--fr-soft:rgba(31,53,70,.05);--fr-navy:#1F3546;--fr-navy2:#2F4F66;--fr-gold:#C98A2B;--fr-gold2:#E3B261;--fr-goldl:#FAF0DD;--fr-ok:#2E7D57;--fr-okl:#E2F1E9;--fr-warn:#B7791F;--fr-warnl:#FBF0DC;--fr-bad:#B4443B;--fr-badl:#F8E3E1;--fr-teal:#2B7A84;--fr-glass:rgba(255,255,255,.66);--fr-glassb:rgba(255,255,255,.8);display:grid;gap:14px;color:var(--fr-ink)}
@@ -2116,6 +2118,13 @@
           </div>
           <div id="sgMsg"></div>
           <div class="savebar"><button class="btn" id="sgSave">حفظ التوقيعات</button></div>
+        </div>
+        <div class="sigcard bkcard" id="bkCard">
+          <b>النسخ الاحتياطي</b>
+          <small class="muted">كل ليلة نحو الساعة 2 تُحفظ نسخة Excel كاملة من جدول مثاني وجدول البصمة في مجلد خاص بحساب Google المالك. يُحتفظ بآخر 30 نسخة يومية، وبنسخة أول كل شهر لمدة 12 شهراً.</small>
+          <div class="bkstat" id="bkStat"><small class="muted">جاري التحميل...</small></div>
+          <div id="bkMsg"></div>
+          <div class="savebar"><button class="btn soft" id="bkOpen" type="button">فتح مجلد النسخ</button><button class="btn" id="bkNow" type="button">نسخة احتياطية الآن</button></div>
         </div>
       </div>
     </div>
@@ -5919,10 +5928,28 @@ function frPdf(){
   setTimeout(brandPrint, 50);
 }
 document.querySelectorAll('#pFull [data-x]').forEach(b => b.onclick = () => b.dataset.x === 'xls' ? frXls() : frPdf());
+/* النسخ الاحتياطي (المدير فقط) */
+let BK = null;
+async function openBk(){ try { const r = await api({ action:'bkInfo' }); BK = r; renderBk(); } catch(e){ if (e.message !== 'expired') msg('bkMsg', 'تعذّر الاتصال بالخادم.', 'err'); } }
+function renderBk(){
+  const b = $('bkStat'); b.innerHTML = '';
+  if (!BK || !BK.ok){ b.appendChild(el('small', 'muted', BK && BK.msg === 'إجراء غير معروف' ? 'النسخ الاحتياطي يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : (BK && BK.msg) || '')); $('bkOpen').disabled = true; return; }
+  const L = BK.last, cell = (t, v, cls) => { const d = el('div', cls || ''); d.appendChild(el('span', '', t)); d.appendChild(el('b', '', v)); b.appendChild(d); };
+  cell('آخر نسخة', L ? L.at.slice(0, 16) + (L.ok ? ' ✓' : ' ✗') : 'لم تُؤخذ بعد', L ? (L.ok ? 'ok' : 'bad') : 'bad');
+  cell('النسخ الليلية', BK.trigger ? 'مفعّلة' : 'غير مفعّلة بعد', BK.trigger ? 'ok' : 'bad');
+  cell('عدد الملفات في المجلد', BK.count == null ? '—' : String(BK.count));
+  if (L && L.files && L.files.length) cell('حجم آخر نسخة', L.files.map(f => Math.max(1, Math.round(f.size / 1024)) + ' ك.ب').join(' + '));
+  if (L && !L.ok && L.err) msg('bkMsg', 'سبب فشل آخر نسخة: ' + L.err, 'err'); else msg('bkMsg', BK.trigger ? '' : 'لتفعيل النسخ الليلية: افتح محرر Apps Script، واختر الدالة backupSetup، ثم اضغط «تشغيل» ووافق على الصلاحيات مرة واحدة. أو اضغط «نسخة احتياطية الآن».', 'info');
+  $('bkOpen').disabled = !BK.url;
+}
+if ($('bkNow')) $('bkNow').onclick = async () => { const b = $('bkNow'); b.disabled = true; msg('bkMsg', 'جاري أخذ النسخة... قد يستغرق ذلك نصف دقيقة.', 'info');
+  try { const r = await api({ action:'bkNow' }); BK = Object.assign({}, r, { ok:r.trigger !== undefined }); renderBk(); msg('bkMsg', r.msg, r.ok ? 'ok' : 'err'); } catch(e){ if (e.message !== 'expired') msg('bkMsg', 'تعذّر الاتصال بالخادم.', 'err'); } b.disabled = false; };
+if ($('bkOpen')) $('bkOpen').onclick = () => { if (BK && BK.url) window.open(BK.url, '_blank', 'noopener'); };
 /* إعداد التوقيعات (المدير فقط) */
 let SGE = {};
 async function openSig(){
-  if (!isAdm()){ $('sGeneral').querySelector('.sigcard').classList.add('hidden'); return; }
+  if (!isAdm()){ $('sGeneral').querySelectorAll('.sigcard').forEach(x => x.classList.add('hidden')); return; }
+  openBk();
   SIGS = null; const r = await sigLoad(); SGE = { mgrImg:r.mgr.img || '', mgrName:r.mgr.name || '', eduImg:r.edu.img || '', eduName:r.edu.name || '', stamp:r.stamp || '' };
   $('sgMgrN').value = SGE.mgrName; $('sgEduN').value = SGE.eduName; renderSig();
 }
