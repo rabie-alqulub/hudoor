@@ -497,6 +497,24 @@
   .portals{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
   @media (min-width:700px){ .portals{grid-template-columns:repeat(3,1fr)} }
   @media (min-width:960px){ body:not(.in) main:has(#stepPortal:not(.hidden)){max-width:1120px} .portals{grid-template-columns:repeat(6,1fr)} .portal{min-height:150px;align-items:center!important;text-align:center!important;justify-content:center} .portal b{white-space:nowrap;font-size:15.5px!important} }
+  /* بوابات الدخول: بطاقات طويلة بشريط ملوّن ورسم خطي، وشريط تمرير على الشاشات الأصغر */
+  .gates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:14px}
+  .gate{--pc:#1F3546;--pt:#E6EDF2;display:flex;flex-direction:column;border-radius:22px;overflow:hidden;background:var(--card);border:1px solid var(--line);box-shadow:0 6px 18px rgba(20,40,60,.08);text-align:center;cursor:pointer;padding:0;font:inherit;color:var(--text);transition:transform .15s,box-shadow .15s}
+  .gate:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(20,40,60,.14)}
+  .gate:focus-visible{outline:3px solid var(--pc);outline-offset:3px}
+  .gate .gtop{height:118px;background:var(--pt);display:flex;align-items:center;justify-content:center}
+  .gate .gic{width:64px;height:64px;border-radius:20px;background:var(--pc);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(0,0,0,.14)}
+  .gate .gic svg{width:32px;height:32px}
+  .gate b{display:block;margin:16px 14px 6px;font-size:19px;color:var(--pc)}
+  .gate small{display:block;margin:0 16px;font-size:13.5px;line-height:1.7;color:var(--muted);min-height:46px}
+  .gate .gart{margin-top:auto;height:118px;display:flex;align-items:flex-end;justify-content:center;padding:8px 10px 0;color:var(--pc);opacity:.55}
+  .gate .gart svg{width:100%;height:110px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .g-admin{--pc:#2F4F66;--pt:#E3EBF1} .g-stu{--pc:#23786A;--pt:#DDF0EC} .g-edu{--pc:#B0731A;--pt:#F7EBD6}
+  .g-teach{--pc:#3F6B2C;--pt:#E4EEDC} .g-parent{--pc:#6A4C97;--pt:#ECE5F5} .g-student{--pc:#B04A33;--pt:#F7E2DC}
+  @media (prefers-color-scheme:dark){ .gate{--pt:rgba(255,255,255,.06)} .gate b{filter:brightness(1.6)} .gate .gart{opacity:.7;filter:brightness(1.5)} }
+  @media (min-width:601px){ body:not(.in) main:has(#stepPortal:not(.hidden)){max-width:min(1500px,96vw)!important} }
+  @media (min-width:1100px){ .gates{grid-template-columns:repeat(6,minmax(0,1fr))} }
+  @media (max-width:600px){ .gates{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px} .gate .gtop{height:78px} .gate .gic{width:50px;height:50px;border-radius:16px} .gate .gic svg{width:26px;height:26px} .gate b{margin:12px 8px 4px;font-size:16.5px} .gate small{margin:0 8px;font-size:12px;min-height:40px} .gate .gart{height:70px;padding:4px 6px 0} .gate .gart svg{height:66px} }
   .portal{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:16px 14px;border-radius:18px;color:#fff;text-align:right;min-height:118px;box-shadow:0 6px 16px rgba(0,0,0,.12);position:relative;overflow:hidden}
   .portal::after{content:'';position:absolute;left:-26px;bottom:-26px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.12)}
   .portal svg{width:30px;height:30px} .portal b{font-size:16px} .portal small{font-size:12px;color:rgba(255,255,255,.88)!important;line-height:1.5}
@@ -1152,7 +1170,7 @@
     </div>
     <div id="stepPortal">
       <h2>اختر بوابة الدخول</h2>
-      <div class="portals" id="portalGrid"></div>
+      <div class="gates" id="portalGrid"></div>
     </div>
     <div class="ptag hidden" id="ptag"><span id="ptagIc"></span><b id="ptagT"></b><button class="link" id="ptagChange">تغيير</button></div>
     <div id="stepNid" class="hidden">
@@ -2675,6 +2693,15 @@ const pillCls = s => 'pill ' + (PILL[s] || 'p-none');
 function tile(n, label, cls){ const t = el('div', 'tile ' + (cls || '')); t.appendChild(el('b', '', n)); t.appendChild(el('span', '', label)); return t; }
 function fill(id, list){ const e = $(id); e.innerHTML = ''; list.forEach(x => e.appendChild(x)); }
 
+/* رسوم خطية لبطاقات البوابات */
+const GART = {
+  admin:'<svg viewBox="0 0 220 110"><path d="M20 108h180"/><path d="M60 108V62h100v46"/><path d="M78 62c0-22 14-36 32-40 18 4 32 18 32 40"/><path d="M110 22v-10M106 14a5 5 0 1 0 8 0"/><path d="M98 108V84a12 12 0 0 1 24 0v24"/><path d="M170 108V40h14v68M170 40l7-12 7 12"/><path d="M36 108V40h14v68M36 40l7-12 7 12"/><path d="M70 76h12M138 76h12"/></svg>',
+  stu:'<svg viewBox="0 0 220 110"><circle cx="70" cy="44" r="13"/><path d="M44 108c0-20 12-34 26-34s26 14 26 34"/><circle cx="150" cy="44" r="13"/><path d="M124 108c0-20 12-34 26-34s26 14 26 34"/><circle cx="110" cy="34" r="15"/><path d="M80 108c0-24 14-40 30-40s30 16 30 40"/><path d="M104 86l6 6 10-12"/></svg>',
+  edu:'<svg viewBox="0 0 220 110"><path d="M110 40c-20-12-46-14-70-8v68c24-6 50-4 70 8 20-12 46-14 70-8V32c-24-6-50-4-70 8z"/><path d="M110 40v68"/><path d="M56 52c14-2 28 0 40 6M56 66c14-2 28 0 40 6M56 80c14-2 28 0 40 6M124 58c12-6 26-8 40-6M124 72c12-6 26-8 40-6M124 86c12-6 26-8 40-6"/><path d="M110 22l4-10 4 10-10-6h12z"/></svg>',
+  teach:'<svg viewBox="0 0 220 110"><path d="M70 108l40-34 40 34M80 108l30-24 30 24"/><path d="M110 74l-44-26M110 74l44-26"/><path d="M66 48c14-6 30-6 44 4 14-10 30-10 44-4"/><path d="M66 48l-6-8M154 48l6-8"/><path d="M88 50c8-2 15 0 22 4M132 50c-8-2-15 0-22 4"/><path d="M40 108h140"/></svg>',
+  parent:'<svg viewBox="0 0 220 110"><circle cx="82" cy="26" r="12"/><path d="M82 38v38M82 50l-16 18M82 50l22 14M82 76l-12 32M82 76l12 32"/><circle cx="136" cy="52" r="9"/><path d="M136 61v24M136 68l-32-4M136 68l12 12M136 85l-8 23M136 85l8 23"/><path d="M160 40c4-6 12-6 14 0 2-6 10-6 14 0 2 8-14 18-14 18s-16-10-14-18z"/></svg>',
+  student:'<svg viewBox="0 0 220 110"><path d="M80 18h60v26a30 30 0 0 1-60 0z"/><path d="M80 26H62c0 16 8 26 20 28M140 26h18c0 16-8 26-20 28"/><path d="M110 74v14M92 108h36l-4-20h-28z"/><path d="M110 28l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z"/><path d="M40 40l4-8 4 8-4 8zM176 60l3-6 3 6-3 6zM60 84l3-6 3 6-3 6z"/></svg>'
+};
 /* ---------- الدخول ---------- */
 const PORTAL_UI = [['admin', 'إدارة المجمع', 'المشرف العام على المجمع ومدير المجمع', 'settings'], ['stu', 'شؤون الطلاب', 'مشرف شؤون الطلاب', 'users'], ['edu', 'الشؤون التعليمية', 'مشرف الشؤون التعليمية', 'book'],
   ['teach', 'المعلمون', 'معلمو الحلقات', 'teach'], ['parent', 'أولياء الأمور', 'متابعة الأبناء وتقاريرهم', 'users'], ['student', 'الطلاب', 'تقريري ونقاطي والمتجر', 'trophy']];
@@ -2806,7 +2833,7 @@ function showLogin(text){
   if (SUBT) return showSubLogin(text);
   show('vLogin'); ['stepPin','stepNew','stepForgot','stepNid'].forEach(x => $(x).classList.add('hidden')); $('ptag').classList.add('hidden');
   const g = $('portalGrid'); g.innerHTML = '';
-  PORTAL_UI.forEach(p => { const b = el('button', 'portal pc-' + p[0]); b.innerHTML = ICONS[p[3]] || ''; b.appendChild(el('b', '', p[1])); b.appendChild(el('small', '', p[2])); b.onclick = () => pickPortal(p[0]); g.appendChild(b); });
+  PORTAL_UI.forEach(p => { const b = el('button', 'gate g-' + p[0]); b.type = 'button'; b.innerHTML = '<span class="gtop"><span class="gic">' + (ICONS[p[3]] || '') + '</span></span>'; b.appendChild(el('b', '', p[1])); b.appendChild(el('small', '', p[2])); const a = el('span', 'gart'); a.setAttribute('aria-hidden', 'true'); a.innerHTML = GART[p[0]] || ''; b.appendChild(a); b.onclick = () => pickPortal(p[0]); g.appendChild(b); });
   if (portal){ pickPortal(portal); } else $('stepPortal').classList.remove('hidden');
   msg('loginMsg', text || '', 'info');
 }
