@@ -7569,7 +7569,7 @@ $('apGo').onclick = async () => {
     const r = await api({ action:'appDecide', wait:apCur.wait, op:'accept', hid:$('apHid').value });
     if (!r.ok) return msg('apMsg', r.msg, 'err');
     $('apSheet').classList.add('hidden'); openApps();
-    openWa({ name:r.name || apCur.name, pphone:r.pphone || apCur.pphone, hname:r.hname, sid:r.sid }, r.tmpl, r.orgShort);
+    if (r.sent) toast(r.msg); else openWa({ name:r.name || apCur.name, pphone:r.pphone || apCur.pphone, hname:r.hname, sid:r.sid }, r.tmpl, r.orgShort);   // برق غير مربوط: تُفتح الرسالة للإرسال اليدوي
   } catch(e){ if (e.message !== 'expired') msg('apMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
   finally { $('apGo').disabled = false; }
 };
