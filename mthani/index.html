@@ -280,7 +280,7 @@
   .dsh-f select,.dsh-f input{font-size:14px;padding:9px}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   @media (max-width:560px){ .kpis{grid-template-columns:repeat(2,1fr)} }
-  .kpi{padding:12px 10px;border-radius:14px;background:var(--light);text-align:center}
+  .kpi{padding:12px 10px;border-radius:14px;background:var(--light);text-align:center} button.kpi.kgo{border:1.5px solid var(--line);font:inherit;color:inherit;cursor:pointer;width:100%} button.kpi.kgo:hover{border-color:var(--navy3)} .kpi.kgo small{display:block;font-size:11.5px;color:var(--muted)}
   .kpi b{display:block;font-size:24px;color:var(--navy);line-height:1.2} .kpi span{font-size:12.5px;color:var(--muted)} .kpi small{display:block;font-size:11px;color:var(--muted)}
   .kpi.g b{color:var(--ok)} .kpi.y b{color:var(--gold2)} .kpi.r b{color:var(--red)}
   @media (prefers-color-scheme: dark){ .kpi b{color:#9CC1DC} }
@@ -762,6 +762,7 @@
   .numrow .eye{flex:none;width:38px;height:38px;border-radius:12px;background:var(--light);color:var(--navy);display:flex;align-items:center;justify-content:center;padding:0} .numrow .eye svg{width:20px;height:20px}
   @media (prefers-color-scheme: dark){ .numrow .no,.numrow .eye{color:#C9DCEA} }
   .rspick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0} .rspick small{width:100%;color:var(--muted)} .rspick .mini.on{background:var(--navy);color:#fff}
+  .stucards .stu.exam,body.g2 .stucards .stu.exam{border:2px solid var(--ok)!important;background:var(--okbg)!important} .stu.exam .nm b{color:var(--ok)} .stu.exam .att button{cursor:not-allowed} .stu.exam .att button:not(.on){opacity:.4} .stu.exam .att button.on{background:var(--ok)!important;color:#fff!important;border-color:var(--ok)!important;opacity:1} .stu.exam .exnote{font-size:13.5px;color:var(--ok);font-weight:600;margin-top:8px}
   .exstu{background:var(--errbg);border-radius:12px;padding:12px;margin-top:8px;border:0} .exstu .nm b{color:var(--red)} .exstu .att button{opacity:.45;cursor:not-allowed}
   .stu:last-child{border-bottom:0}
   .stu .top{display:flex;align-items:center;gap:8px}
@@ -2311,6 +2312,13 @@
   </div>
 </div>
 
+<div class="sheet hidden" id="apvSheet">
+  <div class="panel">
+    <div class="head"><h2 id="apvT">الاعتمادات</h2><button class="iconbtn" id="apvClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
+    <div id="apvBody" class="lvappr"></div>
+  </div>
+</div>
+
 <!-- تغيير الرمز السري -->
 <div class="sheet hidden" id="acSheet">
   <div class="panel">
@@ -3469,6 +3477,14 @@ function renderStuds(){
   const box = $('stuList'); box.innerHTML = '';
   if (!studs.length && !exStuds.length){ msg('stuList', 'لا يوجد طلاب في هذه الحلقة.', 'info'); return; }
   studs.forEach(s => {
+    if (s.exam){   // في اختبار المرحلية عند مشرف الجمعية: حاضر، ولا يُقيَّم في الحلقة هذا اليوم
+      const w = el('div', 'stu exam'), top = el('div', 'top'), nm = el('button', 'nm'); w.dataset.sid = s.sid;
+      nm.appendChild(el('b', '', s.name)); nm.appendChild(el('small', '', lastText(s))); nm.onclick = () => openStudent(s.sid);
+      top.appendChild(nm); top.appendChild(el('span', 'pill p-ok', 'اختبار المرحلية' + (s.exam === 'مرحلية' ? '' : ' ' + s.exam))); w.appendChild(top);
+      const a = el('div', 'att'); D.attStatus.forEach(st => { const b = el('button', st === 'حاضر' ? 'on' : '', st); b.disabled = true; a.appendChild(b); }); w.appendChild(a);
+      w.appendChild(el('div', 'exnote', 'في اختبار المرحلية اليوم عند مشرف الجمعية: يُحسب حاضراً، ولا يُقيَّم في الحلقة هذا اليوم.'));
+      box.appendChild(w); return;
+    }
     const w = el('div', 'stu' + ((s._flag && !s.att) || (s._norec && isPresent(s) && !s.today.length) ? ' unset' : '')), top = el('div', 'top'); w.dataset.sid = s.sid;
     const nm = el('button', 'nm'); nm.appendChild(el('b', '', (approval && approval.star === s.sid ? '(فارس الحلقة) ' : '') + s.name)); nm.appendChild(el('small', '', lastText(s)));
     nm.onclick = () => openStudent(s.sid);
@@ -3516,7 +3532,7 @@ function renderExStuds(){
   });
 }
 function setAtt(s, st){
-  if (teachRO) return;
+  if (teachRO || s.exam) return;
   // حاضر/متأخر: تُفتح صفحة التقييم، ولا تُثبت الحالة إلا بعد اعتماد الدرجة (أو «لم يسمّع»). الغائب والمستأذن بلا تقييم
   if ((st === 'حاضر' || st === 'متأخر') && !isPresent(s)) return openRec(s, EVT()[0], st);
   s.att = st; s._flag = false; pending[s.sid] = st; renderStuds();
@@ -3723,7 +3739,7 @@ $('apClose').onclick = () => $('ayahSheet').classList.add('hidden');
 $('ayahSheet').onclick = e => { if (e.target === $('ayahSheet')) $('ayahSheet').classList.add('hidden'); };
 
 function openRec(s, type, pendAtt){
-  if (teachRO) return;
+  if (teachRO || s.exam) return;
   rs = { s, type:type || EVT()[0], score:null, multi:false, none:false, pendAtt:pendAtt || '' };
   $('rsForm').classList.remove('hidden'); $('rsEnd').classList.add('hidden');
   $('rsName').textContent = s.name; enterTab();
@@ -3906,12 +3922,12 @@ function apStep(n){
   msg('apprMsg', '', ''); $('apprSheet').querySelector('.panel').scrollTop = 0;
 }
 $('btnApprove').onclick = async () => {
-  const un = studs.filter(s => !s.att);
+  const un = studs.filter(s => !s.att && !s.exam);
   if (un.length){ un.forEach(s => s._flag = true); renderStuds(); const st = $('apprState'); st.innerHTML = '';
     st.appendChild(el('div', 'msg err', (un.length === 1 ? 'الطالب ' + un[0].name + ' لم تحدد حالته' : un.length + ' طلاب لم تحدد حالتهم: ' + un.map(s => s.name).join('، ')) + '. حدد لكل طالب: حاضر أو متأخر أو غائب أو مستأذن، ثم اعتمد. الغائب والمستأذن لا يحتاجان تقييماً.'));
     const f = document.querySelector('#stuList .stu.unset'); if (f) f.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
   // الحاضر والمتأخر لا يُعتمد يومه حتى يُسجَّل له تقييم في أحد الأنواع أو «لم يسمّع»
-  const nr = studs.filter(s => isPresent(s) && !s.today.length);
+  const nr = studs.filter(s => isPresent(s) && !s.today.length && !s.exam);
   if (nr.length && !teachVO){ nr.forEach(s => s._norec = true); renderStuds(); const st = $('apprState'); st.innerHTML = '';
     st.appendChild(el('div', 'msg err', (nr.length === 1 ? 'الطالب ' + nr[0].name + ' حاضر ولم يُسجَّل له تقييم' : nr.length + ' طلاب حاضرون لم يُسجَّل لهم تقييم: ' + nr.map(s => s.name).join('، ')) + '. سجّل لكل طالب درجة في الحفظ أو المراجعة القريبة أو البعيدة أو التلاوة، أو اختر «لم يسمّع»، ثم اعتمد.'));
     const f = document.querySelector('#stuList .stu.unset'); if (f) f.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
@@ -3922,7 +3938,7 @@ $('btnApprove').onclick = async () => {
   studs.forEach(s => { const e = eff(s); if (e === 'حاضر') c.p++; else if (e === 'متأخر') c.l++; else c.a++; c.r += s.today.length; });
   fill('apprTiles', [tile(c.p, 'حاضر', 't-ok'), tile(c.l, 'متأخر', 't-late'), tile(c.a, 'غائب/مستأذن', 't-abs'), tile(c.r, 'تسميع', 't-nav')]);
   const mb = $('apprMiss'); mb.innerHTML = '';
-  const noRec = studs.filter(s => isPresent(s) && !s.today.length);
+  const noRec = studs.filter(s => isPresent(s) && !s.today.length && !s.exam);
   if (noRec.length) mb.appendChild(el('div', 'msg info', 'حاضرون بلا تسميع: ' + noRec.map(s => s.name).join('، ')));
   // قائمة فارس الحلقة: كل الطلاب، والاختيار لطالب واحد فقط من الحاضرين
   const box = $('apprStars'); box.innerHTML = '';
@@ -6103,7 +6119,7 @@ function renderLive(){
   // الصف 1: الحلقات الآن + الحضور + الموظفون
   const r1 = $('lvRow1'); r1.innerHTML = '';
   const c1 = chCard('الحلقات الآن', 'اضغط الحلقة لتقييمها'); c1.appendChild(chStack(H.map(h => ({ label:h.name + (h.remote ? ' (عن بُعد)' : ''), sub:h.teacher + ' • تسميع ' + h.recs, parts:{ present:h.present, late:h.late, absent:h.absent, excused:h.excused, un:Math.max(0, h.students - h.present - h.late - h.absent - h.excused) }, onclick:() => { openRole('report'); } })),
-    ATT_SEGS.concat([['un', 'لم يُحضَّر', CHC.none]]), { rel:true, text:x => (LV.halaqat.find(h => h.name === x.label.replace(' (عن بُعد)', '')) || {}).approved ? '✓ معتمدة' : 'لم تُعتمد', empty:'لا توجد حلقات.' })); r1.appendChild(c1);
+    ATT_SEGS.concat([['un', 'لم يُحضَّر', CHC.none]]), { rel:true, text:x => { const h = LV.halaqat.find(h => h.name === x.label.replace(' (عن بُعد)', '')) || {}; return h.approved ? '✓ معتمدة' : h.diw ? 'في الديوانية' : 'لم تُعتمد'; }, empty:'لا توجد حلقات.' })); r1.appendChild(c1);
   const c2 = chCard('حضور الطلاب'); c2.appendChild(chDonut(ATT_SEGS.map(x => [x[1], K[x[0]], x[2]]).concat([['لم يُحضَّر', Math.max(0, K.students - mk), CHC.none]]), K.students ? Math.round(at * 100 / K.students) + '%' : '—', 'حضور')); r1.appendChild(c2);
   const c3 = chCard('حضور الموظفين (البصمة)'); c3.appendChild(S0 ? chDonut([['في الوقت', Math.max(0, S0.present - S0.late), CHC.ok], ['متأخر', S0.late, CHC.late], ['إجازة', S0.leave, CHC.exc], ['لم يبصم', S0.missing.length, CHC.abs]], S0.present + '/' + S0.due, 'موظف') : el('div', 'chempty', 'لم يُربط جدول البصمة.')); r1.appendChild(c3);
   // الصف 2: الاتجاه
@@ -6163,15 +6179,34 @@ async function loadDash(){
 const lvAtt = v => v == null ? '' : v >= 90 ? 'lv-g' : v >= 75 ? 'lv-y' : 'lv-r';
 const lvAvg = v => v == null ? '' : v >= 8 ? 'lv-g' : v >= 6.5 ? 'lv-y' : 'lv-r';
 const lvPl = v => v == null ? '' : v >= 75 ? 'lv-g' : v >= 40 ? 'lv-y' : 'lv-r';
+/* تفاصيل الاعتمادات: المعتمدة وغير المعتمدة وفي الديوانية (يوم واحد)، أو اعتمادات كل حلقة في الفترة */
+function openApList(){
+  const H = DS.halaqat || [], one = DS.from === DS.to, b = $('apvBody'); b.innerHTML = '';
+  $('apvT').textContent = one ? 'اعتمادات ' + fmtD(DS.from, { weekday:'long', day:'numeric', month:'long' }) : 'اعتمادات الحلقات من ' + fmtD(DS.from, { day:'numeric', month:'short' }) + ' إلى ' + fmtD(DS.to, { day:'numeric', month:'short' });
+  const go = h => { $('apvSheet').classList.add('hidden'); const L = (D && D.halaqat) || []; if (L.some(x => x.hid === h.hid)){ hal = h.hid; store.set('hq_hal', h.hid); day = one ? DS.from : null; openRole('teach'); } };
+  const sec = (t, list, cls, sub) => { if (!list.length) return; b.appendChild(el('div', 'apsec', t + ' (' + list.length + ')')); const g = el('div', 'apgrid');
+    list.forEach(h => { const x = el('button', 'api ' + cls); x.type = 'button'; x.appendChild(el('i')); const t2 = el('div'); t2.appendChild(el('b', '', h.name)); t2.appendChild(el('small', '', sub(h))); x.appendChild(t2); x.onclick = () => go(h); g.appendChild(x); });
+    b.appendChild(g); };
+  if (one){
+    sec('لم تُعتمد', H.filter(h => !h.apprToday && !h.diwToday), 'no', h => (h.teacher || 'بلا معلم'));
+    sec('معتمدة', H.filter(h => h.apprToday), 'ok', h => (h.teacher || '') + (h.star ? ' • فارس: ' + h.star : ''));
+    sec('في الديوانية (لا تحتاج اعتماداً)', H.filter(h => h.diwToday && !h.apprToday), 'ok', h => h.teacher || '');
+  } else {
+    const L = H.slice().sort((a, b) => (a.approved / (a.studyDays || 1)) - (b.approved / (b.studyDays || 1)));
+    sec('لم تكتمل اعتماداتها', L.filter(h => h.approved < h.studyDays), 'no', h => 'اعتمدت ' + h.approved + ' من ' + h.studyDays + ' يوماً' + (h.diwDays ? ' • ديوانية ' + h.diwDays : ''));
+    sec('مكتملة', L.filter(h => h.approved >= h.studyDays), 'ok', h => h.approved + ' من ' + h.studyDays + ' يوماً' + (h.diwDays ? ' • ديوانية ' + h.diwDays : ''));
+  }
+  $('apvSheet').classList.remove('hidden');
+}
 function renderDash(){
   const K = DS.kpi, day = DS.from === DS.to, box = $('dsKpi'); box.innerHTML = '';
-  const k = (v, l, cls, sub) => { const d = el('div', 'kpi ' + (cls || '')); d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', nLbl(v, l))); if (sub) d.appendChild(el('small', '', sub)); box.appendChild(d); };
+  const k = (v, l, cls, sub, go) => { const d = el(go ? 'button' : 'div', 'kpi ' + (cls || '') + (go ? ' kgo' : '')); if (go){ d.type = 'button'; d.onclick = go; } d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', nLbl(v, l))); if (sub) d.appendChild(el('small', '', sub)); box.appendChild(d); };
   k(K.students, 'الطلاب');
   k(K.att == null ? null : K.att + '%', 'نسبة الحضور', K.att == null ? '' : K.att >= 90 ? 'g' : K.att >= 75 ? 'y' : 'r');
   k(K.absent, 'حالات الغياب', K.absent ? 'r' : ''); k(K.late, 'حالات التأخر', K.late ? 'y' : '');
   k(K.hifz, 'آيات الحفظ', 'g'); k(K.mur, 'آيات المراجعة'); k(K.recs, 'مرات التسميع');
   k(K.avg == null ? null : K.avg + '/' + D.maxScore, 'متوسط الدرجات', K.avg == null ? '' : K.avg >= 8 ? 'g' : K.avg >= 6.5 ? 'y' : 'r');
-  k(K.approvals + '/' + K.apprNeed, day ? 'الحلقات المعتمدة اليوم' : 'اعتمادات الحلقات', K.approvals >= K.apprNeed ? 'g' : 'y');
+  k(K.approvals + '/' + K.apprNeed, day ? 'الحلقات المعتمدة اليوم' : 'اعتمادات الحلقات', K.approvals >= K.apprNeed ? 'g' : 'y', (K.diwN ? 'في الديوانية: ' + K.diwN + ' • ' : '') + 'اضغط للتفاصيل', openApList);
   k(K.excluded, 'منقطعون الآن', K.excluded ? 'r' : ''); k(K.refs, 'إحالات وترشيحات'); k(K.apps, 'طلبات تسجيل', '', K.appsWait ? 'بانتظار القبول: ' + K.appsWait : '');
   // الرسم: يومياً للفترة، وللحلقات في اليوم الواحد
   const ch = $('dsChart'); ch.innerHTML = '';
@@ -6190,7 +6225,7 @@ function renderDash(){
 }
 const DS_HCOLS = [['name', 'الحلقة'], ['teacher', 'المعلم'], ['students', 'الطلاب'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['recs', 'تسميع'], ['avg', 'متوسط الدرجة'], ['appr', 'الاعتماد']];
 const DS_SCOLS = [['name', 'الطالب'], ['hname', 'الحلقة'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %'], ['stars', 'فارس الحلقة'], ['points', 'النقاط'], ['refs', 'إحالات']];
-const hAppr = h => DS.from === DS.to ? (h.apprToday ? '✓ معتمدة' + (h.star ? ' • فارس: ' + h.star : '') : '✗ لم تُعتمد') : h.approved + '/' + h.studyDays;
+const hAppr = h => DS.from === DS.to ? (h.diwToday && !h.apprToday ? 'في الديوانية' : h.apprToday ? '✓ معتمدة' + (h.star ? ' • فارس: ' + h.star : '') : '✗ لم تُعتمد') : h.approved + '/' + h.studyDays;
 function sortBy(list, key, dir){ return list.slice().sort((a, b) => { const x = a[key], y = b[key]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return (typeof x === 'string' ? x.localeCompare(y, 'ar') : x - y) * dir; }); }
 function dsHead(t, cols, which, redraw){
   const tr = el('tr'); cols.forEach(c => { const th = el('th', dsSort[which][0] === c[0] ? 's' + (dsSort[which][1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { dsSort[which] = [c[0], dsSort[which][0] === c[0] ? -dsSort[which][1] : (c[0] === 'name' || c[0] === 'hname' || c[0] === 'teacher' ? 1 : -1)]; redraw(); }; tr.appendChild(th); });
@@ -6203,7 +6238,8 @@ function dsMet(m, x, hal){
   if (m === 'att') return { value:v, text:v == null ? '—' : v + '%', cls:lvC(lvAtt(v)), max:100 };
   if (m === 'avg') return { value:v, text:v == null ? '—' : v + '/' + D.maxScore, cls:lvC(lvAvg(v)), max:D.maxScore };
   if (m === 'plan') return { value:v, text:v == null ? '—' : v + '%', cls:lvC(lvPl(v)), max:100 };
-  if (m === 'appr'){ if (DS.from === DS.to) return { value:x.apprToday ? 100 : 0, text:x.apprToday ? '✓ معتمدة' : '✗ لم تُعتمد', cls:x.apprToday ? 'g' : 'r', max:100 };
+  if (m === 'appr'){ if (DS.from === DS.to && x.diwToday && !x.apprToday) return { value:null, text:'في الديوانية', cls:'', max:100 };
+    if (DS.from === DS.to) return { value:x.apprToday ? 100 : 0, text:x.apprToday ? '✓ معتمدة' : '✗ لم تُعتمد', cls:x.apprToday ? 'g' : 'r', max:100 };
     const p = x.studyDays ? Math.round(x.approved * 100 / x.studyDays) : null; return { value:p, text:x.approved + '/' + x.studyDays, cls:lvC(lvAtt(p)), max:100 }; }
   if (m === 'absent') return { value:v, text:v, cls:v ? 'r' : '' };
   if (m === 'late') return { value:v, text:v, cls:v ? 'y' : '' };
@@ -7962,6 +7998,7 @@ async function openPlanCal(){ const r = await cpCall({ action:'planCal' }, 'plCa
   $('pcDays').innerHTML = ''; pcDaysB = selBox(WD_AR, true); $('pcDays').appendChild(pcDaysB); pcDaysB.set(r.cal.days.map(i => WD_AR[i])); pcDaysB.onpick = pcCountUpd;
   ['pcFrom', 'pcTo', 'pcOff'].forEach(id => $(id).oninput = pcCountUpd); pcCountUpd(); msg('pcMsg', '', ''); $('pcSheet').classList.remove('hidden'); }
 $('pcClose').onclick = () => $('pcSheet').classList.add('hidden');
+$('apvClose').onclick = () => $('apvSheet').classList.add('hidden');
 $('pcSave').onclick = async () => { $('pcSave').disabled = true;
   const r = await cpCall({ action:'planCalSave', cal:{ from:$('pcFrom').value, to:$('pcTo').value, days:pcDaysB.get().map(x => WD_AR.indexOf(x)), off:$('pcOff').value } }, 'pcMsg'); $('pcSave').disabled = false;
   if (r && r.ok){ D.planLeft = r.left; toast(r.msg); $('pcSheet').classList.add('hidden'); plCalInfo(); } };
