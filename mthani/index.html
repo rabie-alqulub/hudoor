@@ -7961,8 +7961,8 @@ function plAmtBox(t, p){ const box = el('div'), u = el('div', 'types'), st = PS[
   [['سطر', 'بالأسطر'], ['وجه', 'بالأوجه']].forEach(x => { const b = el('button', '', x[1]); b.type = 'button'; b.dataset.u = x[0]; b.onclick = () => { if (plLockedT(t)) return; st.unit = x[0]; plUpd(t); }; u.appendChild(b); });
   box.appendChild(el('label', '', 'المقدار اليومي')); box.appendChild(u);
   const ln = el('input'); ln.value = p && p.unit === 'سطر' ? p.daily : 7; const rL = el('div', 'amtrow'); rL.appendChild(stepIn(ln, 1, 150, 1)); rL.appendChild(el('b', '', 'سطر'));
-  const amt = p && p.unit === 'وجه' ? p.daily : 1, w = Math.floor(amt + 1e-9), f = amt - w, pg = el('input'); pg.value = w; const fr = el('select'); [['0', 'فقط'], ['0.25', 'وربع'], ['0.3333', 'وثلث'], ['0.5', 'ونصف']].forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; fr.appendChild(o); });
-  fr.value = f > 0.45 ? '0.5' : f > 0.3 ? '0.3333' : f > 0.2 ? '0.25' : '0'; const rP = el('div', 'amtrow'); rP.appendChild(el('b', '', 'وجه')); rP.appendChild(stepIn(pg, 0, 20, 1)); rP.appendChild(fr);
+  const amt = p && p.unit === 'وجه' ? p.daily : 1, w = Math.floor(amt + 1e-9), f = amt - w, pg = el('input'); pg.value = w; const fr = el('select'); [['0', '—'], ['0.25', 'ربع'], ['0.3333', 'ثلث'], ['0.5', 'نصف']].forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; fr.appendChild(o); });
+  fr.value = f > 0.45 ? '0.5' : f > 0.3 ? '0.3333' : f > 0.2 ? '0.25' : '0'; const rP = el('div', 'amtrow'); rP.appendChild(el('b', '', 'وجه')); rP.appendChild(stepIn(pg, 0, 20, 1)); rP.appendChild(el('b', '', 'و')); rP.appendChild(fr);
   [ln, pg].forEach(x => x.addEventListener('input', () => plUpd(t))); fr.onchange = () => plUpd(t);
   box.appendChild(rL); box.appendChild(rP); Object.assign(st, { ub:u, rL, rP, ln, pg, fr, amt:() => st.unit === 'سطر' ? +ln.value || 0 : (+pg.value || 0) + (+fr.value || 0) }); return box; }
 function plStartBox(t, p, label){ const st = PS[t], w = el('div'); w.appendChild(el('label', '', label)); const pr = el('div', 'pair'), fs = el('select'), fa = el('input'); fa.type = 'number'; fa.inputMode = 'numeric'; fa.min = 1; fa.placeholder = 'آية';
