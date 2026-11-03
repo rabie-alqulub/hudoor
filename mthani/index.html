@@ -399,7 +399,7 @@
   .frbar{display:grid;grid-template-columns:minmax(100px,150px) 1fr 84px;gap:10px;align-items:center;font-size:13px;margin-bottom:9px}
   .frbar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600} .frbar b{font-variant-numeric:tabular-nums;text-align:left}
   .frtrk{height:12px;border-radius:6px;background:var(--fr-soft);overflow:hidden} .frtrk i{display:block;height:100%;background:linear-gradient(90deg,var(--fr-gold),var(--fr-navy2));border-radius:6px}
-  .frtw{overflow-x:auto}
+  .frtw{overflow-x:auto} .pdt td{vertical-align:top;line-height:1.6;min-width:110px} .pdt td.pdn{font-weight:700;color:var(--navy3);cursor:pointer;min-width:120px} .pdt tr.pdpause td{background:var(--light);color:var(--muted)} .pdt td.pdlate{color:var(--red);font-weight:600}
   .frt{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
   .frt th{color:var(--fr-mu);font-weight:600;padding:8px;text-align:center;border-bottom:2px solid var(--fr-line);white-space:nowrap;font-size:12.5px;background:none}
   .frt th:first-child,.frt td:first-child{text-align:right} .frt td{padding:8px;text-align:center;border-bottom:1px solid var(--fr-line);white-space:nowrap} .frt td:first-child{font-weight:600}
@@ -824,6 +824,10 @@
   @media (prefers-color-scheme: dark){ .bellpop b.t{color:#C9DCEA} }
   @media (max-width:600px){ .bellpop{position:fixed;top:72px;left:12px;right:12px;width:auto} }  .pair{display:grid;grid-template-columns:2fr 1fr;gap:8px}
   .types{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--light);padding:4px;border-radius:12px;margin-top:8px}
+  #planSheet .plmr{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;margin-bottom:6px} #planSheet .plmr label{margin:0} #planSheet .plmr select{margin:0} #planSheet .plmr small{grid-column:1/-1;color:var(--muted)}
+  .plsec{border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-top:14px;background:var(--card)} .plsec h3{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px;font-size:17px;color:var(--navy3)}
+  .plsec .plnote{display:block;color:var(--muted);line-height:1.7;margin:4px 0 6px} .plsec .stact{margin-top:10px;display:flex;align-items:center;gap:12px} .plsec .stact .btn{width:auto;min-height:44px;padding:0 22px;font-size:15px;font-weight:700;margin:0} .plchk{display:flex;align-items:center;gap:8px;font-weight:600;margin:8px 0} .plchk input{width:20px;height:20px;margin:0}
+  .plfoot{position:sticky;bottom:-1px;background:var(--card);padding:12px 0 4px;margin-top:14px;border-top:1px solid var(--line);z-index:2} .plfoot small{display:block;color:var(--muted);text-align:center;margin-top:4px}
   .amtrow{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap} .amtrow b{font-size:16px;color:var(--navy)} .amtrow select{width:auto;min-width:96px;margin:0}
   .goal{margin-top:14px;padding:14px;border-radius:16px;background:var(--goldlight);text-align:center;line-height:1.8} .goal b{display:block;font-size:19px;color:var(--gold2)} .goal small{color:var(--muted)}
   @media (prefers-color-scheme: dark){ .amtrow b{color:#C9DCEA} }
@@ -1425,6 +1429,16 @@
     </div>
 
     <!-- شاشة عرض متابعة الخطط -->
+    <div id="pPlanDay" class="hidden">
+      <div class="card">
+        <h2>خطة اليوم للطلاب</h2>
+        <small>ما على كل طالب اليوم من حفظ ومراجعة قريبة وبعيدة وفق خطته المعتمدة. أيام الاستئذان والديوانية والاختبار تقف فيها الخطة.</small>
+        <div class="dsh-f" style="margin-top:8px"><select id="pdHal"></select><input type="date" id="pdDate"><input id="pdQ" placeholder="ابحث باسم الطالب"></div>
+        <div class="stact"><button id="pdXls">Excel</button><button id="pdPdf">PDF</button></div>
+      </div>
+      <div class="card"><div class="stchips" id="pdSum"></div><div class="frtw" style="margin-top:10px"><table class="frt pdt" id="pdTbl"></table></div></div>
+      <div class="card" id="pdNo"></div>
+    </div>
     <div id="pPlanF" class="hidden">
       <div class="card">
         <h2>متابعة الخطط</h2>
@@ -2278,23 +2292,9 @@
 <div class="sheet hidden" id="planSheet">
   <div class="panel">
     <div class="head"><h2 id="plName"></h2><button class="iconbtn" id="plClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
-    <label>نوع الخطة</label>
-    <div class="types" id="plType"></div>
-    <label>نوع المقدار اليومي</label>
-    <div class="types" id="plUnit"><button type="button" data-u="سطر">بالأسطر</button><button type="button" data-u="وجه">بالأوجه</button></div>
-    <label>المقدار اليومي</label>
-    <div class="amtrow" id="plAmtL"><span id="plLnW"></span><b>سطر</b></div>
-    <div class="amtrow hidden" id="plAmtP"><b>وجه</b><span id="plPgW"></span><select id="plFr"><option value="0">فقط</option><option value="0.25">وربع</option><option value="0.3333">وثلث</option><option value="0.5">ونصف</option></select></div>
-    <div id="plDirW" class="hidden"><label>اتجاه المراجعة</label>
-    <div class="types" id="plDir"><button type="button" data-d="من الناس">من الناس إلى البقرة</button><button type="button" data-d="من الفاتحة">من البقرة إلى الناس</button></div></div>
-    <label>بداية الخطة (من سورة وآية)</label>
-    <div class="pair"><select id="plFs"></select><input id="plFa" type="number" inputmode="numeric" min="1" placeholder="آية"></div>
-    <div class="goal" id="plGoal"></div>
-    <div id="plLock"></div>
-    <label for="plNotes">ملاحظات (اختياري)</label>
-    <input id="plNotes" maxlength="200">
-    <button class="btn" id="plSave">حفظ الخطة</button>
-    <button class="link" id="plDel">حذف هذه الخطة</button>
+    <div class="plmr"><label for="plMr">مرحلية الطالب</label><select id="plMr"></select><small id="plMrHint"></small></div>
+    <div id="plBody"></div>
+    <div class="plfoot"><button class="btn" id="plSaveAll">حفظ واعتماد الخطط</button><small>يحفظ الأنواع الثلاثة معاً ويعتمدها، ثم لا تُعدَّل إلا بموافقة الشؤون التعليمية.</small></div>
     <div id="plMsg"></div>
   </div>
 </div>
@@ -3040,7 +3040,7 @@ function userNav(T){
 }
 function userNavOld(T){
   const out = [], grp = { halaqaNew:['الحلقات', 'halaqa'], halaqaEdit:['الحلقات', 'halaqa'], reeval:['الحلقات', 'halaqa'], preT:['الاختبارات', 'exam'], assocT:['الاختبارات', 'exam'], trxS:['المعاملات', 'exam'], trxR:['المعاملات', 'exam'] }, seen = {};
-  const icOf = k => ICONS[k] ? k : ({ candsT:'exam', ann:'chat', repStu:'report', repEdu:'report', full:'report', planF:'plans', studentsList:'users' }[k] || 'exam');
+  const icOf = k => ICONS[k] ? k : ({ candsT:'exam', ann:'chat', repStu:'report', repEdu:'report', full:'report', planF:'plans', planDay:'plans', studentsList:'users' }[k] || 'exam');
   T.forEach(x => { const g = grp[x[0]]; if (!g){ out.push({ t:x[1], ic:icOf(x[0]), r:x[0] }); return; }
     if (!seen[g[0]]){ seen[g[0]] = { t:g[0], ic:g[1], items:[] }; out.push(seen[g[0]]); } seen[g[0]].items.push(x); });
   return out;
@@ -3057,13 +3057,13 @@ const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', 
   nafStars:['competition.manage', 'competition.star'], nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
   moveMany:'students.move', absent:'students.absent', staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
   teach:'halaqat.evaluate_all', halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', subst:'halaqat.substitute', diw:'diw.manage', remote:'halaqat.remote', reeval:'halaqat.reeval',
-  plans:'students.plans_all', refsEdu:'refs.edu', planF:'plans.follow', exams:'assoc.nominate',
+  plans:'students.plans_all', planDay:'students.plans_all', refsEdu:'refs.edu', planF:'plans.follow', exams:'assoc.nominate',
   msgs:'messages.send', msgsStaff:'messages.send', msgArc:'messages.send', dash:'reports.dashboard', full:['reports.all', 'halaqat.reports_all'], repAll:'reports.all', report:'halaqat.reports_all',
   staffFile:'reports.teachers', tvCfg:'tv.manage', ann:'ann.manage' };
 /* قائمة المدير على يمين الصفحة: تبويبات رئيسية تنبثق منها خيارات (تُضاف أوامرها لاحقاً) */
 const ADMIN_NAV = [
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير بصمة الحضور'], ['courses', 'الدورات التدريبية']] },
-  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['planF', 'متابعة سير الخطط'], ['refsEdu', 'الإحالات التعليمية']] },
+  { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['planDay', 'خطة اليوم للطلاب'], ['planF', 'متابعة سير الخطط'], ['refsEdu', 'الإحالات التعليمية']] },
   { t:'الاختبارات', ic:'exam', r:'exams' },
   { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
   { t:'الحلقات', ic:'halaqa', items:[['teach', 'التقييم'], ['halaqaView', 'استعراض الحلقات'], ['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['subst', 'تكليف معلم بديل (من خارج المجمع)'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
@@ -3185,6 +3185,8 @@ function openRole(r, title, group){
   else if (r === 'preTest') openAssoc(r);
   $('pStrug').classList.toggle('hidden', r !== 'strug');
   if (r === 'strug') openStrug();
+  $('pPlanDay').classList.toggle('hidden', r !== 'planDay');
+  if (r === 'planDay') openPlanDay();
   $('pPlanF').classList.toggle('hidden', r !== 'planF');
   if (r === 'planF') openPlanF();
   $('pMsgArc').classList.toggle('hidden', r !== 'msgArc');
@@ -3308,7 +3310,7 @@ function renderWelcome(){
     regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
     repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
     preTest:['الاختبار قبل الترشيح', 'اختبار داخلي قبل ترشيح الجمعية', ''], assocNom:['ترشيحات الجمعية', 'ترشيح المجتازين ونتائج الجمعية', 'gold'],
-    strug:['الطلاب المتعثرون', 'من يحتاج متابعة تعليمية', ''], planF:['متابعة سير الخطط', 'إنجاز الخطط مقارنة بالمتوقع', ''], msgArc:['أرشيف الرسائل', 'سجل الرسائل وإحصائياتها', ''],
+    strug:['الطلاب المتعثرون', 'من يحتاج متابعة تعليمية', ''], planF:['متابعة سير الخطط', 'إنجاز الخطط مقارنة بالمتوقع', ''], planDay:['خطة اليوم للطلاب', 'الحفظ والمراجعة لكل طالب اليوم', ''], msgArc:['أرشيف الرسائل', 'سجل الرسائل وإحصائياتها', ''],
     mine:['تقريري', 'حضوري وتسميعي وخطتي', 'gold'], shop:['المتجر', 'نقاطي وجوائز المتجر', ''],
     trx:['المعاملات', 'طلباتك للإدارة والتعاميم الواردة', ''],
     cands:['الطلاب المرشحون', 'ترشيحات المعلمين والاختبار قبل الترشيح', 'gold'], candsT:['الطلاب المرشحون', 'ترشيح طالب لاختبار مرحلية ومتابعته', 'gold'],
@@ -4546,6 +4548,30 @@ function renderStrug(){
 ['sgFrom', 'sgTo', 'sgHal'].forEach(id => $(id).onchange = loadStrug); $('sgQ').oninput = () => SG && renderStrug();
 $('sgXls').onclick = () => { if (!SG) return; const rows = [['الطلاب المتعثرون ' + SG.from + ' – ' + SG.to], ['رقم الطالب', 'الطالب', 'الحلقة', 'المعلم', 'الحضور %', 'متوسط الدرجات', 'المؤشرات']].concat(SG.list.map(x => [Number(x.sid) || x.sid, x.name, x.hname, x.teacher, x.att == null ? '' : x.att, x.avg == null ? '' : x.avg, x.why.join(' • ')]));
   const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['المتعثرون', rows]])); a.download = 'الطلاب-المتعثرون.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel'); };
+/* ---------- خطة اليوم: ما على كل طالب من حفظ ومراجعة ---------- */
+let PDY = null;
+const PD_HEAD = ['الطالب', 'الحلقة', 'المرحلية', 'الحفظ', 'المراجعة القريبة', 'المراجعة البعيدة', 'الحالة'];
+const pdSeg = (t, pg) => t ? t + (pg ? ' (' + fmtPg(pg) + ')' : '') : '—';
+const pdRow = x => [x.name, x.hname, (x.mr || '').replace('المرحلية ', '') + (x.mrSet ? '' : ' *'), x.pause ? 'متوقفة: ' + x.pause : x.noPlan ? (x.legacy ? 'خطة قديمة تحتاج تحديث' : 'لا توجد خطة') : pdSeg(x.hifzT, x.hifzP), x.pause ? '' : pdSeg(x.nearT, x.nearP), x.pause ? '' : pdSeg(x.farT, x.farP),
+  ((x.state || {})['حفظ'] || (x.state || {})['مراجعة بعيدة'] || '') + (Object.values(x.lock || {}).some(v => v === 'مسودة') ? ' • مسودة غير معتمدة' : '')];
+async function openPlanDay(){ if (!$('pdDate').value) $('pdDate').value = D.today; msg('pdNo', '', ''); $('pdNo').classList.add('hidden');
+  const r = await cpCall({ action:'planDay', hid:$('pdHal').value, date:$('pdDate').value }, 'pdNo'); if (!r || !r.ok){ $('pdNo').classList.remove('hidden'); return; } PDY = r;
+  if (!$('pdHal').children.length){ fillSel('pdHal', r.halaqat.map(h => [h.hid, h.name]), 'كل الحلقات'); } renderPlanDay(); }
+function renderPlanDay(){ const q = normAr($('pdQ').value), L = PDY.list.filter(x => !q || normAr(x.name).indexOf(q) !== -1), sm = $('pdSum'); sm.innerHTML = '';
+  const chip = (t, n, c) => sm.appendChild(el('span', 'pill ' + (c || 'p-none'), t + ' ' + n));
+  if (!PDY.isDay) sm.appendChild(el('div', 'msg info', 'هذا اليوم ليس من أيام الدوام في تقويم الخطط.'));
+  chip('طلاب', L.length); chip('لهم حفظ اليوم', L.filter(x => x.hifz && !x.hifz.done).length, 'p-ok'); chip('متوقفة اليوم', L.filter(x => x.pause && PDY.isDay).length, 'p-late'); chip('بلا خطة', L.filter(x => x.noPlan).length, 'p-red');
+  chip('متأخرون', L.filter(x => Object.values(x.state || {}).some(v => /متأخر/.test(v))).length, 'p-late');
+  const t = $('pdTbl'); t.innerHTML = ''; const th = el('thead'), tr = el('tr'); PD_HEAD.forEach(h => tr.appendChild(el('th', '', h))); th.appendChild(tr); t.appendChild(th);
+  const tb = el('tbody'); L.forEach(x => { const r = el('tr'); if (x.pause && PDY.isDay) r.className = 'pdpause'; pdRow(x).forEach((v, i) => { const td = el('td', '', v || '—'); if (i === 0){ td.className = 'pdn'; td.onclick = () => goFile(x.sid); } if (i === 6 && /متأخر/.test(v)) td.className = 'pdlate'; r.appendChild(td); }); tb.appendChild(r); });
+  t.appendChild(tb); if (!L.length) $('pdTbl').innerHTML = '<tbody><tr><td>لا يوجد طلاب.</td></tr></tbody>';
+  if (L.some(x => !x.mrSet)) sm.appendChild(el('small', 'muted', '* المرحلية مقترحة تلقائياً (التالية لآخر مرحلية اجتازها)، ويؤكدها المعلم في بناء الخطة.')); }
+const pdTitle = () => 'خطة اليوم للطلاب — ' + fmtD(PDY.date, { weekday:'long', day:'numeric', month:'long' }) + ($('pdHal').value ? ' — ' + $('pdHal').selectedOptions[0].textContent : '');
+$('pdXls').onclick = () => { if (!PDY) return; const rows = [[pdTitle()], PD_HEAD].concat(PDY.list.map(pdRow)); const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['خطة اليوم', rows]])); a.download = 'خطة-اليوم-' + PDY.date + '.xlsx';
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel'); };
+$('pdPdf').onclick = () => { if (!PDY) return; const p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = ''; const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', pdTitle())); hd.appendChild(l); hd.appendChild(el('div', '', (D && D.org) || '')); p.appendChild(hd);
+  prTbl(p, 'الطلاب', PD_HEAD, PDY.list.map(pdRow)); setTimeout(brandPrint, 50); };
+['pdHal', 'pdDate'].forEach(id => $(id).onchange = openPlanDay); $('pdQ').oninput = () => PDY && renderPlanDay();
 /* ---------- متابعة الخطط ---------- */
 let PF = null, pfS = '';
 const PF_CLS = { 'متقدم':'lv-g', 'مكتملة':'lv-g', 'على المسار':'lv-g', 'متأخر':'lv-y', 'متأخر جداً':'lv-r', 'لم تبدأ':'', 'خطة قديمة (تحتاج تحديث)':'lv-y' };
@@ -7868,7 +7894,7 @@ async function loadPlans(){
   let r;
   try { r = await api({ action:'plans', hid:pl.hal }); } catch(e){ if (e.message !== 'expired') msg('planList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (!r.ok) return msg('planList', r.msg, 'err');
-  planStuds = r.students; renderPlans(); renderPlanReqs(r.reqs || []);
+  PLR = r; planStuds = r.students; renderPlans(); renderPlanReqs(r.reqs || []);
 }
 function renderPlanReqs(L){
   let c = $('plReqs'); if (!c){ c = el('div', 'card'); c.id = 'plReqs'; $('planList').parentNode.insertBefore(c, $('planList')); }
@@ -7883,14 +7909,14 @@ function renderPlans(){
   if (!planStuds.length){ msg('planList', 'لا يوجد طلاب في هذه الحلقة.', 'info'); return; }
   planStuds.forEach(s => {
     const w = el('div', 'stu'), top = el('div', 'top'), nm = el('div', 'nm');
-    nm.appendChild(el('b', '', s.name)); if (s.level) nm.appendChild(el('small', '', 'مقدار الحفظ: ' + s.level));
-    const add = el('button', 'mini', '+ خطة'); add.onclick = () => openPlan(s, PLAN_T.find(t => !s.plans[t]) || 'حفظ'); if (PLAN_T.every(t => s.plans[t])) add.classList.add('hidden');
+    nm.appendChild(el('b', '', s.name)); nm.appendChild(el('small', '', (s.mr || '') + (s.mrSet ? '' : ' (مقترحة)') + (s.level ? ' • مقدار الحفظ: ' + s.level : '')));
+    const add = el('button', 'mini', PLAN_T.some(t => s.plans[t]) ? 'فتح الخطة' : '+ خطة'); add.onclick = () => openPlan(s, PLAN_T.find(t => !s.plans[t]) || 'حفظ');
     top.appendChild(nm); top.appendChild(add); w.appendChild(top);
     const ks = PLAN_T.filter(t => s.plans[t]);
     if (!ks.length) w.appendChild(el('div', 'plan none', 'لا توجد خطة'));
     ks.forEach(t => {
       const p = s.plans[t], row = el('div', 'row'), g = el('div', 'grow');
-      g.appendChild(el('b', '', t + ': من ' + p.from + (p.to ? ' ← ' + p.to : '')));
+      g.appendChild(el('b', '', p.unit === 'تلقائي' ? t + (p.from ? ': اليوم من ' + p.from + ' ← ' + p.to : '') : t + ': من ' + p.from + (p.to ? ' ← ' + p.to : '')));
       g.appendChild(el('small', '', planText(p)));
       if (p.unit) g.appendChild(el('span', 'pill ' + (p.lock === 'معتمدة' ? 'p-ok' : p.lock === 'طلب تعديل' ? 'p-late' : 'p-none'), p.lock === 'معتمدة' ? '✓ معتمدة' : p.lock));
       if (p.pct != null){ const bar = el('div', 'bar2'), i = el('i'); i.style.width = p.pct + '%'; bar.appendChild(i); g.appendChild(bar); }
@@ -7918,75 +7944,107 @@ function fmtPg(x){ x = +x || 0; let w = Math.floor(x + 1e-9), f = x - w; const F
   const fr = best[1]; if (!w) return fr ? fr + ' وجه' : '0'; const base = w === 1 ? 'وجه' : w === 2 ? 'وجهان' : w <= 10 ? w + ' أوجه' : w + ' وجهاً'; return fr ? base + ' و' + fr : base; }
 const fmtAmt = (unit, v) => unit === 'سطر' ? fmtLn(v) : fmtPg(v);
 function planText(p){
+  if (p.unit === 'تلقائي') return 'تلقائية من خطة الحفظ' + (p.from ? ' • اليوم: ' + p.from + ' ← ' + p.to : ' • لا مراجعة اليوم') + (p.pct != null ? ' • أنجز ' + p.pct + '% من المتوقع كاملاً' : '');
   if (!p.unit) return p.daily + ' آية يومياً (خطة قديمة — حدّثها بالأسطر أو الأوجه)' + (p.pct != null ? ' • أنجز ' + p.pct + '%' : '');
   return 'يومياً: ' + fmtAmt(p.unit, p.daily) + ' • الهدف: ' + fmtAmt(p.unit, p.target) + ' خلال ' + fmtDays(p.days) + ' • أنجز ' + fmtAmt(p.unit, p.done) + (p.pct != null ? ' (' + p.pct + '%)' : '');
 }
-let plUnitV = 'وجه', plDirV = 'من الناس';
-function fillPlanForm(){
-  const p = pl.s.plans[pl.type];
-  $('plType').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === pl.type));
-  plUnitV = p && p.unit ? p.unit : 'وجه'; plDirV = pl.type !== 'حفظ' && p && p.dir ? p.dir : 'من الناس';
-  if (!$('plLn')){ const a = el('input'); a.id = 'plLn'; $('plLnW').appendChild(stepIn(a, 1, 150, 1)); const b = el('input'); b.id = 'plPg'; $('plPgW').appendChild(stepIn(b, 0, 20, 1));
-    a.addEventListener('input', planCount); b.addEventListener('input', planCount); $('plFr').onchange = planCount;
-    $('plUnit').querySelectorAll('button').forEach(x => x.onclick = () => { if (!plLocked()) { plUnitV = x.dataset.u; planCount(); } });
-    $('plDir').querySelectorAll('button').forEach(x => x.onclick = () => { if (!plLocked()) { plDirV = x.dataset.d; planCount(); } }); }
-  const amt = p && p.unit ? p.daily : 0;
-  $('plLn').value = p && p.unit === 'سطر' ? amt : 7;
-  const w = Math.floor(amt + 1e-9), f = amt - w; $('plPg').value = p && p.unit === 'وجه' ? w : 1; $('plFr').value = p && p.unit === 'وجه' ? (f > 0.45 ? '0.5' : f > 0.3 ? '0.3333' : f > 0.2 ? '0.25' : '0') : '0';
-  $('plFs').value = p && p.fs ? p.fs : 114; $('plFa').value = p && p.fa ? p.fa : 1;
-  $('plNotes').value = p ? p.notes : '';
-  $('plDel').classList.toggle('hidden', !p); msg('plMsg', '', ''); planCount(); plLockUI();
-}
+/* صفحة خطة الطالب: الحفظ ثم المراجعة القريبة (تلقائية) ثم البعيدة، ولكل قسم زر حفظ، وفي الأسفل «حفظ واعتماد» للكل */
+let PLR = null;
+const PL_SEC = { 'حفظ':{ k:'hz', dir:'من الناس' }, 'مراجعة قريبة':{ k:'nr' }, 'مراجعة بعيدة':{ k:'fr', dir:'من الفاتحة' } };
 const plEdu = () => document.body.classList.contains('admin') || (D.perms || []).indexOf('students.plans_all') !== -1;
-const plLocked = () => { const p = pl.s && pl.s.plans[pl.type]; return !!(p && p.unit && !plEdu() && p.lock !== 'مفتوحة للتعديل'); };
-function plLockUI(){
-  const p = pl.s.plans[pl.type], lk = plLocked(), box = $('plLock'); box.innerHTML = '';
-  ['plLn', 'plPg', 'plFr', 'plFs', 'plFa', 'plNotes'].forEach(id => { const e = $(id); if (e) e.disabled = lk; });
-  document.querySelectorAll('#plAmtL .stepper button, #plAmtP .stepper button').forEach(b => b.disabled = lk);
-  $('plSave').classList.toggle('hidden', lk); $('plDel').classList.toggle('hidden', !p || lk);
-  $('plSave').textContent = p && p.unit ? 'حفظ التعديل واعتماده' : 'اعتماد الخطة';
-  if (!p || !p.unit) return;
-  if (lk && p.lock === 'طلب تعديل'){ box.appendChild(el('div', 'msg info', 'طلبت تعديل هذه الخطة، وهو بانتظار موافقة الشؤون التعليمية.')); return; }
-  if (lk){ box.appendChild(el('div', 'msg info', 'الخطة معتمدة. لتعديلها اطلب موافقة الشؤون التعليمية.')); const why = el('input'); why.placeholder = 'سبب طلب التعديل'; why.maxLength = 200; box.appendChild(why);
-    const b = el('button', 'btn soft', 'طلب تعديل الخطة'); b.onclick = async () => { if (why.value.trim().length < 3) return msg('plMsg', 'اكتب سبب طلب التعديل.', 'err');
-      const r = await cpCall({ action:'planReq', sid:pl.s.sid, type:pl.type, op:'ask', reason:why.value.trim() }, 'plMsg'); if (r && r.ok){ toast(r.msg); closePlan(); loadPlans(); } }; box.appendChild(b); return; }
-  if (!plEdu() && p.lock === 'مفتوحة للتعديل') box.appendChild(el('div', 'msg ok', 'وافقت الشؤون التعليمية على تعديل الخطة. عدّلها ثم اعتمدها، وتُقفل بعد الحفظ.'));
+const plLockedT = t => { const p = pl.s && pl.s.plans[t]; return !!(p && p.unit && !plEdu() && p.lock !== 'مفتوحة للتعديل' && p.lock !== 'مسودة'); };
+const plMrRg = () => { const k = String($('plMr').value || '').replace(/^المرحلية\s*/, '').trim(); return (PLR && PLR.mrRange && PLR.mrRange[k]) || null; };
+const plSurOpts = (sel, rg, cur) => { sel.innerHTML = ''; const L = []; if (rg) for (let i = rg[0]; i >= rg[1]; i--) L.push(i); else for (let i = 1; i <= 114; i++) L.push(i);
+  L.forEach(i => { const o = el('option', '', i + ' - ' + D.surah[i - 1]); o.value = i; sel.appendChild(o); }); if (cur && L.indexOf(+cur) !== -1) sel.value = cur; };
+const PS = {};
+function plAmtBox(t, p){ const box = el('div'), u = el('div', 'types'), st = PS[t]; st.unit = p && (p.unit === 'سطر' || p.unit === 'وجه') ? p.unit : 'وجه';
+  [['سطر', 'بالأسطر'], ['وجه', 'بالأوجه']].forEach(x => { const b = el('button', '', x[1]); b.type = 'button'; b.dataset.u = x[0]; b.onclick = () => { if (plLockedT(t)) return; st.unit = x[0]; plUpd(t); }; u.appendChild(b); });
+  box.appendChild(el('label', '', 'المقدار اليومي')); box.appendChild(u);
+  const ln = el('input'); ln.value = p && p.unit === 'سطر' ? p.daily : 7; const rL = el('div', 'amtrow'); rL.appendChild(stepIn(ln, 1, 150, 1)); rL.appendChild(el('b', '', 'سطر'));
+  const amt = p && p.unit === 'وجه' ? p.daily : 1, w = Math.floor(amt + 1e-9), f = amt - w, pg = el('input'); pg.value = w; const fr = el('select'); [['0', 'فقط'], ['0.25', 'وربع'], ['0.3333', 'وثلث'], ['0.5', 'ونصف']].forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; fr.appendChild(o); });
+  fr.value = f > 0.45 ? '0.5' : f > 0.3 ? '0.3333' : f > 0.2 ? '0.25' : '0'; const rP = el('div', 'amtrow'); rP.appendChild(el('b', '', 'وجه')); rP.appendChild(stepIn(pg, 0, 20, 1)); rP.appendChild(fr);
+  [ln, pg].forEach(x => x.addEventListener('input', () => plUpd(t))); fr.onchange = () => plUpd(t);
+  box.appendChild(rL); box.appendChild(rP); Object.assign(st, { ub:u, rL, rP, ln, pg, fr, amt:() => st.unit === 'سطر' ? +ln.value || 0 : (+pg.value || 0) + (+fr.value || 0) }); return box; }
+function plStartBox(t, p, label){ const st = PS[t], w = el('div'); w.appendChild(el('label', '', label)); const pr = el('div', 'pair'), fs = el('select'), fa = el('input'); fa.type = 'number'; fa.inputMode = 'numeric'; fa.min = 1; fa.placeholder = 'آية';
+  pr.appendChild(fs); pr.appendChild(fa); w.appendChild(pr); st.fs = fs; st.fa = fa; st.fs0 = p && p.fs ? p.fs : t === 'مراجعة بعيدة' ? 2 : 0; fa.value = p && p.fa ? p.fa : 1;
+  fs.onchange = () => plUpd(t); fa.oninput = () => plUpd(t); return w; }
+function plLockBox(t, sec){ const p = pl.s.plans[t], box = el('div'); sec.appendChild(box); if (!p || !p.unit) return;
+  if (plLockedT(t) && p.lock === 'طلب تعديل') return box.appendChild(el('div', 'msg info', 'طلبت تعديل هذه الخطة، وهو بانتظار موافقة الشؤون التعليمية.'));
+  if (plLockedT(t)){ box.appendChild(el('div', 'msg info', 'الخطة معتمدة. لتعديلها اطلب موافقة الشؤون التعليمية.')); const why = el('input'); why.placeholder = 'سبب طلب التعديل'; why.maxLength = 200; box.appendChild(why);
+    const b = el('button', 'btn soft', 'طلب تعديل خطة ' + t); b.onclick = async () => { if (why.value.trim().length < 3) return msg('plMsg', 'اكتب سبب طلب التعديل.', 'err');
+      const r = await cpCall({ action:'planReq', sid:pl.s.sid, type:t, op:'ask', reason:why.value.trim() }, 'plMsg'); if (r && r.ok){ toast(r.msg); closePlan(); loadPlans(); } }; box.appendChild(b); return; }
+  if (!plEdu() && p.lock === 'مفتوحة للتعديل') box.appendChild(el('div', 'msg ok', 'وافقت الشؤون التعليمية على تعديل الخطة. عدّلها ثم اعتمدها، وتُقفل بعد الاعتماد.')); }
+function plSecHead(t, title){ const p = pl.s.plans[t], sec = el('section', 'plsec'); sec.dataset.t = t; const h = el('h3', '', title);
+  h.appendChild(el('span', 'pill ' + (!p || !p.unit ? 'p-none' : p.lock === 'معتمدة' ? 'p-ok' : p.lock === 'مسودة' ? 'p-none' : 'p-late'), !p || !p.unit ? 'لا توجد خطة' : p.lock === 'معتمدة' ? '✓ معتمدة' : p.lock)); sec.appendChild(h); return sec; }
+function plSecFoot(t, sec){ const p = pl.s.plans[t], ft = el('div', 'stact'), sv = el('button', 'btn soft', 'حفظ ' + (t === 'حفظ' ? 'خطة الحفظ' : t)); sv.onclick = () => plSave([t], false);
+  ft.appendChild(sv); if (p && (p.unit || p.daily != null) && !plLockedT(t)){ const d = el('button', 'link', 'حذف'); d.onclick = async () => { const r = await cpCall({ action:'delPlan', sid:pl.s.sid, type:t }, 'plMsg'); if (r && r.ok){ toast(r.msg); closePlan(); loadPlans(); } }; ft.appendChild(d); }
+  if (plLockedT(t)) ft.classList.add('hidden'); PS[t].foot = ft; sec.appendChild(ft); }
+function fillPlanForm(){
+  const b = $('plBody'); b.innerHTML = ''; ['حفظ', 'مراجعة قريبة', 'مراجعة بعيدة'].forEach(t => PS[t] = {});
+  // الحفظ
+  let p = pl.s.plans['حفظ'], sec = plSecHead('حفظ', 'خطة الحفظ'); sec.appendChild(plAmtBox('حفظ', p)); sec.appendChild(plStartBox('حفظ', p, 'بداية الحفظ (من سورة وآية) — من سور المرحلية'));
+  PS['حفظ'].goal = el('div', 'goal'); sec.appendChild(PS['حفظ'].goal); plLockBox('حفظ', sec); plSecFoot('حفظ', sec); b.appendChild(sec);
+  // المراجعة القريبة
+  p = pl.s.plans['مراجعة قريبة']; sec = plSecHead('مراجعة قريبة', 'المراجعة القريبة');
+  sec.appendChild(el('small', 'plnote', 'تُحسب تلقائياً من خطة الحفظ: لا مراجعة في أول يوم، ثم يراجع كل يوم ما حفظه من بداية خطته حتى أمس، فتكبر بمقدار حفظه داخل مرحليته. الغياب يُحسب عليه، والاستئذان والديوانية ويوم الاختبار تقف فيها الخطة.'));
+  const cb = el('label', 'plchk'), ck = el('input'); ck.type = 'checkbox'; ck.checked = !!(p && p.bfs); cb.appendChild(ck); cb.appendChild(document.createTextNode(' له محفوظ سابق من مرحليته يُضاف إلى مراجعته القريبة من أول يوم')); sec.appendChild(cb);
+  const bw = el('div', 'edgrid'), mk = (lbl, sv, av) => { const w = el('div'); w.appendChild(el('label', '', lbl)); const pr = el('div', 'pair'), s1 = el('select'), a1 = el('input'); a1.type = 'number'; a1.inputMode = 'numeric'; a1.min = 1; a1.placeholder = 'آية'; a1.value = av || 1; pr.appendChild(s1); pr.appendChild(a1); w.appendChild(pr); bw.appendChild(w); s1.dataset.v = sv || ''; return [s1, a1]; };
+  const F = mk('من سورة وآية', p && p.bfs, p && p.bfa), T2 = mk('إلى سورة وآية', p && p.bts, p && p.bta); sec.appendChild(bw);
+  Object.assign(PS['مراجعة قريبة'], { ck, bw, bfs:F[0], bfa:F[1], bts:T2[0], bta:T2[1] }); ck.onchange = () => plUpd('مراجعة قريبة'); [F[0], T2[0]].forEach(x => x.onchange = () => plUpd('مراجعة قريبة')); [F[1], T2[1]].forEach(x => x.oninput = () => plUpd('مراجعة قريبة'));
+  PS['مراجعة قريبة'].goal = el('div', 'goal'); sec.appendChild(PS['مراجعة قريبة'].goal); plLockBox('مراجعة قريبة', sec); plSecFoot('مراجعة قريبة', sec); b.appendChild(sec);
+  // المراجعة البعيدة
+  p = pl.s.plans['مراجعة بعيدة']; sec = plSecHead('مراجعة بعيدة', 'المراجعة البعيدة'); sec.appendChild(el('small', 'plnote', 'باتجاه واحد: من البقرة نحو الناس. يحدد المعلم المقدار اليومي والبداية، والمستهدف = المقدار × أيام الدوام المتبقية.'));
+  sec.appendChild(plAmtBox('مراجعة بعيدة', p)); sec.appendChild(plStartBox('مراجعة بعيدة', p, 'بداية المراجعة البعيدة (من سورة وآية)'));
+  PS['مراجعة بعيدة'].goal = el('div', 'goal'); sec.appendChild(PS['مراجعة بعيدة'].goal); plLockBox('مراجعة بعيدة', sec); plSecFoot('مراجعة بعيدة', sec); b.appendChild(sec);
+  plMrFill(); msg('plMsg', '', '');
 }
-const plAmt = () => plUnitV === 'سطر' ? +$('plLn').value || 0 : (+$('plPg').value || 0) + (+$('plFr').value || 0);
-function planCount(){
-  $('plUnit').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.u === plUnitV));
-  $('plDirW').classList.toggle('hidden', pl.type === 'حفظ'); $('plDir').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.d === plDirV));
-  $('plAmtL').classList.toggle('hidden', plUnitV !== 'سطر'); $('plAmtP').classList.toggle('hidden', plUnitV !== 'وجه');
-  const p = pl.s && pl.s.plans[pl.type], keep = p && p.unit, days = keep ? p.days : (D.planLeft || 0), amt = plAmt(), fs = +$('plFs').value, fa = +$('plFa').value, g = $('plGoal'); g.innerHTML = '';
+function plMrFill(){ const rg = plMrRg(), hz = PS['حفظ'], nr = PS['مراجعة قريبة'], fr = PS['مراجعة بعيدة'];
+  plSurOpts(hz.fs, rg, hz.fs.value || hz.fs0 || (rg ? rg[0] : 114)); plSurOpts(nr.bfs, rg, nr.bfs.value || nr.bfs.dataset.v || (rg ? rg[0] : 114)); plSurOpts(nr.bts, rg, nr.bts.value || nr.bts.dataset.v || (rg ? rg[0] : 114)); plSurOpts(fr.fs, null, fr.fs.value || fr.fs0 || 2);
+  const s0 = pl.s, lk = plLockedT('حفظ'); $('plMr').disabled = lk;
+  $('plMrHint').textContent = rg ? 'من سورة ' + D.surah[rg[0] - 1] + ' إلى سورة ' + D.surah[rg[1] - 1] + (s0.passed && s0.passed.length ? ' • اجتاز في الجمعية: ' + s0.passed.join('، ') : '') + (s0.mrSet ? '' : ' • مقترحة تلقائياً') : '';
+  ['حفظ', 'مراجعة قريبة', 'مراجعة بعيدة'].forEach(plUpd); }
+function plUpd(t){ const st = PS[t], lk = plLockedT(t), p = pl.s.plans[t], g = st.goal; if (!g) return;
+  if (st.ub){ st.ub.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.u === st.unit)); st.rL.classList.toggle('hidden', st.unit !== 'سطر'); st.rP.classList.toggle('hidden', st.unit !== 'وجه'); }
+  [st.ln, st.pg, st.fr, st.fs, st.fa, st.ck, st.bfs, st.bfa, st.bts, st.bta].forEach(x => { if (x) x.disabled = lk; }); g.closest('.plsec').querySelectorAll('.stepper button').forEach(x => x.disabled = lk);
+  if (st.bw) st.bw.classList.toggle('hidden', !st.ck.checked);
+  g.innerHTML = ''; const keep = p && p.unit && p.days, days = keep ? p.days : (D.planLeft || 0);
   if (!days){ g.appendChild(el('b', '', 'لا توجد أيام دوام متبقية في تقويم الخطط')); return; }
-  if (!amt){ g.appendChild(el('small', '', 'حدد المقدار اليومي')); return; }
-  const tot = amt * days, lines = (plUnitV === 'سطر' ? amt : amt * LPP) * days;
-  g.appendChild(el('span', '', 'هدف الطالب')); g.appendChild(el('b', '', fmtAmt(plUnitV, tot) + ' خلال ' + fmtDays(days)));
-  if (plUnitV === 'سطر') g.appendChild(el('small', '', 'أي نحو ' + fmtPg(lines / LPP) + ' • '));
-  if (fs && fa && fa <= D.ayat[fs - 1]){ const e = planEndC(fs, fa, plDirV, lines); g.appendChild(el('small', '', 'من ' + D.surah[fs - 1] + ' ' + fa + ' وينتهي تقريباً عند ' + D.surah[e[0] - 1] + ' ' + e[1] + (e[2] ? '' : ' (نهاية المصحف بهذا الاتجاه)'))); }
-  if (keep) g.appendChild(el('small', '', ' • أيام الخطة محسوبة من يوم إدخالها (' + p.start + ')'));
+  if (t === 'مراجعة قريبة'){ const h = PS['حفظ'], a = h.amt ? h.amt() : 0; if (!a){ g.appendChild(el('small', '', 'حدد خطة الحفظ أولاً')); return; }
+    const u = h.unit, f = x => fmtAmt(u, x); g.appendChild(el('span', '', 'المراجعة القريبة يومياً'));
+    g.appendChild(el('b', '', (st.ck.checked ? 'المحفوظ السابق، ثم ' : '') + 'تزيد ' + f(a) + ' كل يوم'));
+    g.appendChild(el('small', '', 'اليوم الأول: ' + (st.ck.checked ? 'المحفوظ السابق فقط' : 'لا مراجعة') + ' • الثاني: ' + (st.ck.checked ? 'السابق + ' : '') + f(a) + ' • الثالث: ' + (st.ck.checked ? 'السابق + ' : '') + f(a * 2) + ' • … حتى نهاية المرحلية')); return; }
+  const amt = st.amt(); if (!amt){ g.appendChild(el('small', '', 'حدد المقدار اليومي')); return; }
+  const tot = amt * days, lines = (st.unit === 'سطر' ? amt : amt * LPP) * days, fs = +st.fs.value, fa = +st.fa.value;
+  g.appendChild(el('span', '', 'المستهدف')); g.appendChild(el('b', '', fmtAmt(st.unit, tot) + ' خلال ' + fmtDays(days)));
+  if (fs && fa && fa <= D.ayat[fs - 1]){ const e = planEndC(fs, fa, PL_SEC[t].dir, lines), rg = t === 'حفظ' ? plMrRg() : null, over = rg && ((114 - e[0]) * 1000 + e[1]) > ((114 - rg[1]) * 1000 + D.ayat[rg[1] - 1]);
+    g.appendChild(el('small', '', 'من ' + D.surah[fs - 1] + ' ' + fa + ' وينتهي تقريباً عند ' + D.surah[e[0] - 1] + ' ' + e[1] + (over ? ' — بعد نهاية المرحلية، وتقف الخطة اليومية عند نهايتها' : e[2] ? '' : ' (نهاية المصحف بهذا الاتجاه)'))); }
 }
-['plFs','plFa'].forEach(id => $(id).addEventListener('input', planCount)); $('plFs').addEventListener('change', planCount);
+function plItem(t){ const st = PS[t];
+  if (t === 'مراجعة قريبة'){ const o = { type:t }; if (st.ck.checked){ Object.assign(o, { fs:+st.bfs.value, fa:+st.bfa.value || 1, ts:+st.bts.value, ta:+st.bta.value }); if (!o.ta || o.ta > D.ayat[o.ts - 1] || o.fa > D.ayat[o.fs - 1]) return { err:'رقم الآية غير صحيح في المحفوظ السابق.' }; } return o; }
+  const o = { type:t, unit:st.unit, daily:st.amt(), fs:+st.fs.value, fa:+st.fa.value }; if (!o.daily) return null;
+  if (!o.fa || o.fa > D.ayat[o.fs - 1]) return { err:'رقم الآية غير صحيح لسورة ' + D.surah[o.fs - 1] + ' في ' + t + '.' }; return o; }
+async function plSave(types, final){
+  const items = []; for (const t of types){ if (plLockedT(t)) continue; if (t === 'مراجعة قريبة' && !(PS['حفظ'].amt() || (pl.s.plans['حفظ'] || {}).unit)) continue; const it = plItem(t); if (it && it.err) return msg('plMsg', it.err, 'err'); if (it) items.push(it); }
+  if (!items.length) return msg('plMsg', final ? 'لا توجد خطة لاعتمادها. حدد المقدار اليومي للحفظ أو المراجعة.' : 'حدد المقدار اليومي أولاً.', 'err');
+  const bs = document.querySelectorAll('#planSheet .btn'); bs.forEach(b => b.disabled = true); msg('plMsg', 'جاري الحفظ...', 'info');
+  try { const r = await api({ action:'savePlans', sid:pl.s.sid, mr:$('plMr').value, final:final, items }); if (!r.ok){ msg('plMsg', r.msg, 'err'); if (r.done && r.done.length) loadPlans(); return; }
+    toast(r.msg); if (final){ closePlan(); loadPlans(); } else { const L = await api({ action:'plans', hid:pl.hal }); if (L.ok){ PLR = L; planStuds = L.students; renderPlans(); const s2 = planStuds.find(x => x.sid === pl.s.sid); if (s2){ pl.s = s2; const y = $('planSheet').querySelector('.panel').scrollTop; fillPlanForm(); $('planSheet').querySelector('.panel').scrollTop = y; } }
+      msg('plMsg', r.msg + ' كمسودة — اضغط «حفظ واعتماد الخطط» عند الانتهاء.', 'ok'); } }
+  catch(e){ msg('plMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
+  finally { bs.forEach(b => b.disabled = false); }
+}
+$('plSaveAll').onclick = () => plSave(['حفظ', 'مراجعة قريبة', 'مراجعة بعيدة'], true);
+$('plMr').onchange = plMrFill;
 function openPlan(s, type){
-  pl.s = s; pl.type = type;
-  ['plFs'].forEach(id => { const e = $(id); if (e.options.length) return; D.surah.forEach((n, i) => { const o = el('option', '', (i + 1) + ' - ' + n); o.value = i + 1; e.appendChild(o); }); });
-  const t = $('plType'); if (!t.children.length) PLAN_T.forEach(x => { const b = el('button', '', x); b.dataset.t = x; b.onclick = () => { pl.type = x; fillPlanForm(); }; t.appendChild(b); });
-  $('plName').textContent = 'خطة ' + s.name;
-  fillPlanForm();
+  pl.s = s; pl.type = type; $('plName').textContent = 'خطة ' + s.name;
+  fillSel('plMr', ((PLR && PLR.marhala) || []).map(x => [x, x])); $('plMr').value = s.mr || '';
+  fillPlanForm(); document.querySelector('#planSheet .plfoot').classList.toggle('hidden', ['حفظ', 'مراجعة قريبة', 'مراجعة بعيدة'].every(plLockedT));
   $('planSheet').classList.remove('hidden'); document.body.style.overflow = 'hidden';
+  const sec = $('plBody').querySelector('[data-t="' + type + '"]'), pn = $('planSheet').querySelector('.panel'); pn.scrollTop = 0; if (sec && type !== 'حفظ') setTimeout(() => { pn.scrollTop = sec.offsetTop - 60; }, 50);
 }
 function closePlan(){ $('planSheet').classList.add('hidden'); document.body.style.overflow = ''; }
 $('plClose').onclick = closePlan;
 $('planSheet').onclick = e => { if (e.target === $('planSheet')) closePlan(); };
-$('plSave').onclick = async () => {
-  const p = { action:'savePlan', sid:pl.s.sid, type:pl.type, unit:plUnitV, daily:plAmt(), dir:plDirV, fs:+$('plFs').value, fa:+$('plFa').value, notes:$('plNotes').value.trim() };
-  if (!p.daily) return msg('plMsg', 'حدد المقدار اليومي.', 'err');
-  if (!p.fa || p.fa > D.ayat[p.fs - 1]) return msg('plMsg', 'رقم الآية غير صحيح لسورة ' + D.surah[p.fs - 1] + '.', 'err');
-  $('plSave').disabled = true; msg('plMsg', 'جاري الحفظ...', 'info');
-  try { const r = await api(p); if (!r.ok) return msg('plMsg', r.msg, 'err'); toast(r.msg); closePlan(); loadPlans(); }
-  catch(e){ msg('plMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
-  finally { $('plSave').disabled = false; }
-};
 /* تقويم أيام الخطط */
 const WD_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 let pcDaysB = null;
@@ -8004,11 +8062,6 @@ $('pcSave').onclick = async () => { $('pcSave').disabled = true;
   if (r && r.ok){ D.planLeft = r.left; toast(r.msg); $('pcSheet').classList.add('hidden'); plCalInfo(); } };
 function plCalInfo(){ const b = $('plCalInfo'); b.innerHTML = ''; b.appendChild(el('span', '', 'أيام الدوام الفعلي المتبقية للخطط الجديدة: ')); b.appendChild(el('b', '', fmtDays(D.planLeft || 0)));
   if (document.body.classList.contains('admin') || (D.perms || []).indexOf('students.plans_all') !== -1){ const x = el('button', 'mini', 'تقويم أيام الخطط'); x.onclick = openPlanCal; x.style.marginInlineStart = 'auto'; b.appendChild(x); } }
-$('plDel').onclick = async () => {
-  msg('plMsg', 'جاري الحذف...', 'info');
-  try { const r = await api({ action:'delPlan', sid:pl.s.sid, type:pl.type }); if (!r.ok) return msg('plMsg', r.msg, 'err'); toast(r.msg); closePlan(); loadPlans(); }
-  catch(e){ msg('plMsg', 'تعذّر الاتصال بالخادم.', 'err'); }
-};
 
 /* ---------- سجل الطالب ---------- */
 let backTo = 'vHome';
