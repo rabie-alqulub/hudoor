@@ -4364,7 +4364,7 @@ function asSheet(op, x){
           const nm = el('span', '', s.name + (s.pre ? ' ✓' : '')); nm.title = s.pre ? 'اجتاز الاختبار القبلي: ' + s.pre : ''; l.appendChild(c); l.appendChild(nm);
           const ls = el('select'); ls.style.cssText = 'width:auto;max-width:150px;padding:6px 8px;font-size:13px;margin:0;margin-inline-start:auto'; [''].concat(AX.levels.filter(x => (s.passed || []).indexOf(x) === -1)).forEach(x => { const o = el('option', '', x || 'المرحلية'); o.value = x; ls.appendChild(o); });
           if ((s.passed || []).length) nm.title = 'اجتاز في الجمعية: ' + s.passed.join('، ');
-          ls.value = [lv[s.sid], s.tStage, s.pre].find(v => v && (s.passed || []).indexOf(v) === -1) || ''; lv[s.sid] = ls.value; ls.onclick = e => e.stopPropagation(); ls.onchange = () => { lv[s.sid] = ls.value; if (ls.value && !sel[s.sid]){ sel[s.sid] = 1; c.checked = true; upd(); } }; l.appendChild(ls); box.appendChild(l); });
+          ls.value = [lv[s.sid], s.tStage, s.pre, s.mr].find(v => v && (s.passed || []).indexOf(v) === -1) || ''; lv[s.sid] = ls.value; ls.onclick = e => e.stopPropagation(); ls.onchange = () => { lv[s.sid] = ls.value; if (ls.value && !sel[s.sid]){ sel[s.sid] = 1; c.checked = true; upd(); } }; l.appendChild(ls); box.appendChild(l); });
         lst.appendChild(box); }); upd(); };
     hs.onpick = draw; ba.onclick = () => { if (!bl.value) return; let sk = 0; Object.keys(sel).forEach(k => { const st0 = AX.students.find(y => y.sid === k); if (st0 && (st0.passed || []).indexOf(bl.value) !== -1){ sk++; return; } lv[k] = bl.value; }); draw(); if (sk) toast(sk + ' طالب اجتاز هذه المرحلية سابقاً فلم تُطبّق عليه'); };
     if (AX.halaqat.length === 1){ hs.set([AX.halaqat[0].name]); } draw();
@@ -4380,7 +4380,7 @@ function asSheet(op, x){
       const nm = el('span', '', s.name); l.appendChild(nm); l.appendChild(el('small', '', (md.get() === 'البحث بالحلقة' ? '' : s.hname + ' • ') + (s.nid || '')));
       const ls = el('select'); ls.style.cssText = 'width:auto;max-width:170px;padding:6px 8px;font-size:13px;margin:0;margin-inline-start:auto';
       [''].concat(AX.levels.filter(x => (s.passed || []).indexOf(x) === -1)).forEach(x => { const o = el('option', '', x || 'المرحلية'); o.value = x; ls.appendChild(o); });
-      ls.value = lv[s.sid] || [s.tStage, s.level].find(v => v && AX.levels.indexOf(v) !== -1 && (s.passed || []).indexOf(v) === -1) || ''; lv[s.sid] = ls.value;
+      ls.value = lv[s.sid] || [s.tStage, s.mr, s.level].find(v => v && AX.levels.indexOf(v) !== -1 && (s.passed || []).indexOf(v) === -1) || ''; lv[s.sid] = ls.value;
       ls.onclick = e => e.stopPropagation(); ls.onchange = () => { lv[s.sid] = ls.value; if (ls.value && !sel[s.sid]){ sel[s.sid] = 1; c.checked = true; upd(); } };
       c.onchange = () => { c.checked ? sel[s.sid] = 1 : delete sel[s.sid]; upd(); }; l.appendChild(ls); return l; };
     const draw = () => { lst.innerHTML = ''; const byH = md.get() === 'البحث بالحلقة'; hw.classList.toggle('hidden', !byH); qw.classList.toggle('hidden', byH);
@@ -7069,7 +7069,7 @@ function renderRefForm(k){
     const lst = el('div', 'stlist'); MS.students.forEach(s => { const l = el('label'); const c = el('input'); c.type = 'checkbox'; c.value = s.sid; l.appendChild(c); l.appendChild(el('span', '', s.name));
       const sub = [MS.students.some(x => x.hid !== s.hid) ? s.hname : '', (s.passed || []).length ? 'اجتاز: ' + s.passed.map(v => v.replace('المرحلية ', '')).join('، ') : ''].filter(Boolean).join(' • '); if (sub) l.appendChild(el('small', '', sub));
       const ls = el('select'); ls.style.cssText = 'width:auto;max-width:170px;padding:6px 8px;font-size:13px;margin:0;margin-inline-start:auto';
-      mOpt(s).forEach(m => { const o = el('option', '', m || 'المرحلية'); o.value = m; ls.appendChild(o); }); ls.onclick = e => e.stopPropagation();
+      mOpt(s).forEach(m => { const o = el('option', '', m || 'المرحلية'); o.value = m; ls.appendChild(o); }); if (s.mr && mOpt(s).indexOf(s.mr) !== -1){ ls.value = s.mr; stv[s.sid] = s.mr; } ls.onclick = e => e.stopPropagation();
       ls.onchange = () => { stv[s.sid] = ls.value; if (ls.value) c.checked = true; }; l.appendChild(ls); lst.appendChild(l); });
     ca.onchange = () => lst.querySelectorAll('input').forEach(c => c.checked = ca.checked);
     f.appendChild(lst); F.sids = () => [...lst.querySelectorAll('input:checked')].map(c => c.value);
