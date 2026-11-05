@@ -122,7 +122,7 @@
   .welcome .hals{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
   .welcome .hals span{font-size:12px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.14)}
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center} #lvAppr{scroll-margin-top:90px} button.stat.sgo{font:inherit;color:inherit;cursor:pointer;width:100%} button.stat.sgo:hover{border-color:var(--gold)} button.stat.sgo:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   .stat svg{width:22px;height:22px;color:var(--gold)}
   .stat b{display:block;font-size:22px;margin-top:2px} .stat span{font-size:12px;color:var(--muted)}
   .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
@@ -3300,7 +3300,8 @@ function renderWelcome(){
   const st = D.stats;
   const box = $('stats'); box.innerHTML = ''; box.classList.toggle('hidden', !st);
   if (st) [['users', st.students, 'الطلاب'], ['check', st.present, 'حاضرون اليوم'], ['book', st.recs, 'تسميع اليوم'], ['seal', st.halaqat ? st.approved + '/' + st.halaqat : '—', 'اعتماد اليوم']]
-    .forEach(x => { const d = el('div', 'stat'); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', nLbl(x[1], x[2]))); box.appendChild(d); });
+    .forEach(x => { const go = x[0] === 'seal' && document.querySelector('#nav button[data-r="dash"]'), d = el(go ? 'button' : 'div', 'stat' + (go ? ' sgo' : '')); d.innerHTML = ICONS[x[0]]; d.appendChild(el('b', '', x[1])); d.appendChild(el('span', '', nLbl(x[1], x[2])));
+      if (go){ d.type = 'button'; d.title = 'عرض اعتمادات الحلقات اليوم'; d.onclick = () => { lvGoAppr = true; openRole('dash', 'Dashboard'); }; } box.appendChild(d); });   // اعتماد اليوم: ينقل إلى قسم الاعتمادات في Dashboard
   renderWeek();
   const ac = $('actions'); ac.innerHTML = '';
   const DESC = { settings:['الصلاحيات', 'صلاحيات الموظفين حسب التبويبات', ''], teach:['التقييم', 'الحضور والتسميع واعتماد اليوم', ''], plans:['بناء الخطط التعليمية', 'خطط الحفظ والمراجعة لكل طالب', 'gold'], report:['تقرير الحلقات الشامل', 'حضور الحلقات وتسميعها وطلابها', 'gold'], repAll:['تقرير الطلاب الشامل', 'الحضور والحفظ والدرجات والخطط لكل طالب', 'gold'], full:['التقرير الشامل للمجمع', 'الإنجاز والحضور والمستهدف والترتيب لكل الحلقات أو حلقة أو طالب', 'gold'], tvCfg:['شاشة عرض المجمع', 'شاشة العرض العامة في الجامع', ''], remote:['تفعيل حلقة عن بعد', 'تحويل الحلقات بين الحضوري وعن بعد', ''], parent:['أبنائي', 'حفظ أبنائك وحضورهم', ''],
@@ -6102,7 +6103,7 @@ function dsShift(dir){
   loadDash();
 }
 /* ===== Dashboard المباشر: يتحدث كل 30 ثانية ===== */
-let LV = null, lvTimer = null, lvBusy = false;
+let LV = null, lvTimer = null, lvBusy = false, lvGoAppr = false;
 function lvStop(){ if (lvTimer){ clearInterval(lvTimer); lvTimer = null; } }
 function lvStart(){ lvStop(); loadLive(); lvTimer = setInterval(() => { if (role !== 'dash'){ lvStop(); return; } if (!document.hidden) loadLive(); }, 60000); }
 async function loadLive(){
@@ -6114,7 +6115,7 @@ function lvTile(v, l, sub, cls, go){ const d = el('button', 'lvk ' + (cls || '')
 /* الاعتمادات أول الـ Dashboard: نسبة الحلقات المعتمدة اليوم، ثم غير المعتمدة أولاً؛ الضغط يفتح تقييم الحلقة */
 function renderLvAppr(H0, apN, R){
   const H = H0.filter(h => !h.diw), DWH = H0.filter(h => h.diw);
-  const b = $('lvAppr'); b.innerHTML = ''; const n = H.length, pct = n ? Math.round(apN * 100 / n) : 0;
+  const b = $('lvAppr'); b.innerHTML = ''; if (lvGoAppr){ lvGoAppr = false; setTimeout(() => b.scrollIntoView({ behavior:'smooth', block:'start' }), 80); } const n = H.length, pct = n ? Math.round(apN * 100 / n) : 0;
   const hd = el('div', 'aph'); hd.appendChild(el('h2', '', 'اعتمادات اليوم')); hd.appendChild(el('span', 'grow'));
   const big = el('div', 'apn', apN + ' '); big.appendChild(el('small', '', 'من ' + n + ' • ' + pct + '%')); hd.appendChild(big); b.appendChild(hd);
   if (R.studyToday === false) b.appendChild(el('small', 'muted', 'اليوم ليس يوم دراسة، والمعروض آخر يوم دراسي.'));
