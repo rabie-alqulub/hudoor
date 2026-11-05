@@ -3753,6 +3753,8 @@ function prefillStart(){
   const t = rs.type, s = rs.s, p = (s.plans || {})[t], pk = $('rsPick'); pk.innerHTML = '';
   let last = s.today.filter(r => r.type === t && r.ts).slice(-1)[0] || ((s.prev || {})[t] && (s.prev || {})[t].ts ? s.prev[t] : null);
   if (p && p.unit && p.start && last && last.date < p.start) last = null;
+  if (p && p.seg){ const g = p.seg, b = el('button', 'mini on', 'مقرر اليوم حسب الخطة: ' + D.surah[g[0] - 1] + ' ' + g[1] + ' ← ' + (g[2] !== g[0] ? D.surah[g[2] - 1] + ' ' : '') + g[3]); b.type = 'button'; b.onclick = () => fillSeg(g); pk.appendChild(b);
+    if (t === 'مراجعة قريبة' || !last){ fillSeg(g); return; } }   // المراجعة القريبة تراكمية: تُعبّأ من الخطة دائماً
   const put = (fs, fa) => { if (!fs || fs < 1 || fs > 114) return; $('rsFs').value = fs; $('rsTs').value = fs; setAyah('rsFa', fa || 1); setAyah('rsTa', ''); countAyat(); if ((fa || 1) === D.ayat[fs - 1]) goMulti(); };
   if (last){
     if (last.ta < D.ayat[last.ts - 1]) return put(last.ts, last.ta + 1);
@@ -3764,6 +3766,7 @@ function prefillStart(){
   }
   if (p && p.fs) put(p.fs, p.fa || 1);
 }
+function fillSeg(g){ $('rsFs').value = g[0]; setAyah('rsFa', g[1]); if (g[2] !== g[0]){ goMulti(); $('rsSug').innerHTML = ''; } $('rsTs').value = g[2]; setAyah('rsTa', g[3]); countAyat(); }
 function closeRec(){ $('recSheet').classList.add('hidden'); document.body.style.overflow = ''; renderStuds(); }
 function closeRecToList(){ closeRec(); }
 $('rsClose').onclick = closeRec;   // خروج دون أي إجراء: تبقى حالة الطالب كما كانت
@@ -7065,7 +7068,7 @@ function renderRefForm(k){
   if (k === 'exam'){
     f.appendChild(lab('الطلاب المرشحون ومرحلية كل طالب', true));
     const all = el('label', 'chk'); const ca = el('input'); ca.type = 'checkbox'; all.appendChild(ca); all.appendChild(document.createTextNode(' تحديد الكل')); f.appendChild(all);
-    const mOpt = s => [''].concat(MS.marhala.filter(m => (s.passed || []).indexOf(m) === -1)), stv = {};
+    const mOpt = s => [''].concat(MS.marhala.filter((m, i) => (s.passed || []).indexOf(m) === -1 && !(s.mr && i < MS.marhala.indexOf(s.mr)))), stv = {};
     const lst = el('div', 'stlist'); MS.students.forEach(s => { const l = el('label'); const c = el('input'); c.type = 'checkbox'; c.value = s.sid; l.appendChild(c); l.appendChild(el('span', '', s.name));
       const sub = [MS.students.some(x => x.hid !== s.hid) ? s.hname : '', (s.passed || []).length ? 'اجتاز: ' + s.passed.map(v => v.replace('المرحلية ', '')).join('، ') : ''].filter(Boolean).join(' • '); if (sub) l.appendChild(el('small', '', sub));
       const ls = el('select'); ls.style.cssText = 'width:auto;max-width:170px;padding:6px 8px;font-size:13px;margin:0;margin-inline-start:auto';
@@ -7960,8 +7963,8 @@ const PS = {};
 function plAmtBox(t, p){ const box = el('div'), u = el('div', 'types'), st = PS[t]; st.unit = p && (p.unit === 'سطر' || p.unit === 'وجه') ? p.unit : 'وجه';
   [['سطر', 'بالأسطر'], ['وجه', 'بالأوجه']].forEach(x => { const b = el('button', '', x[1]); b.type = 'button'; b.dataset.u = x[0]; b.onclick = () => { if (plLockedT(t)) return; st.unit = x[0]; plUpd(t); }; u.appendChild(b); });
   box.appendChild(el('label', '', 'المقدار اليومي')); box.appendChild(u);
-  const ln = el('input'); ln.value = p && p.unit === 'سطر' ? p.daily : 7; const rL = el('div', 'amtrow'); rL.appendChild(stepIn(ln, 1, 150, 1)); rL.appendChild(el('b', '', 'سطر'));
-  const amt = p && p.unit === 'وجه' ? p.daily : 1, w = Math.floor(amt + 1e-9), f = amt - w, pg = el('input'); pg.value = w; const fr = el('select'); [['0', '—'], ['0.25', 'ربع'], ['0.3333', 'ثلث'], ['0.5', 'نصف']].forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; fr.appendChild(o); });
+  const ln = el('input'); ln.value = p && p.unit === 'سطر' ? p.daily : ''; const rL = el('div', 'amtrow'); rL.appendChild(stepIn(ln, 1, 150, 1)); rL.appendChild(el('b', '', 'سطر'));
+  const amt = p && p.unit === 'وجه' ? p.daily : 0, w = Math.floor(amt + 1e-9), f = amt - w, pg = el('input'); pg.value = amt ? w : ''; const fr = el('select'); [['0', '—'], ['0.25', 'ربع'], ['0.3333', 'ثلث'], ['0.5', 'نصف']].forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; fr.appendChild(o); });
   fr.value = f > 0.45 ? '0.5' : f > 0.3 ? '0.3333' : f > 0.2 ? '0.25' : '0'; const rP = el('div', 'amtrow'); rP.appendChild(el('b', '', 'وجه')); rP.appendChild(stepIn(pg, 0, 20, 1)); rP.appendChild(el('b', '', 'و')); rP.appendChild(fr);
   [ln, pg].forEach(x => x.addEventListener('input', () => plUpd(t))); fr.onchange = () => plUpd(t);
   box.appendChild(rL); box.appendChild(rP); Object.assign(st, { ub:u, rL, rP, ln, pg, fr, amt:() => st.unit === 'سطر' ? +ln.value || 0 : (+pg.value || 0) + (+fr.value || 0) }); return box; }
@@ -7988,6 +7991,7 @@ function fillPlanForm(){
   p = pl.s.plans['مراجعة قريبة']; sec = plSecHead('مراجعة قريبة', 'المراجعة القريبة');
   sec.appendChild(el('small', 'plnote', 'تُحسب تلقائياً من خطة الحفظ: لا مراجعة في أول يوم، ثم يراجع كل يوم ما حفظه من بداية خطته حتى أمس، فتكبر بمقدار حفظه داخل مرحليته. الغياب يُحسب عليه، والاستئذان والديوانية ويوم الاختبار تقف فيها الخطة.'));
   const cb = el('label', 'plchk'), ck = el('input'); ck.type = 'checkbox'; ck.checked = !!(p && p.bfs); cb.appendChild(ck); cb.appendChild(document.createTextNode(' له محفوظ سابق من مرحليته يُضاف إلى مراجعته القريبة من أول يوم')); sec.appendChild(cb);
+  sec.appendChild(el('small', 'plnote', 'استخدمها إذا بدأت خطة الحفظ من منتصف المرحلية: مثلاً مرحليته من الناس إلى الملك وقد حفظ من الناس إلى النبأ قبل الخطة، فحدد «من الناس 1 إلى النبأ 40» ليراجعها من أول يوم، ثم يُضاف إليها ما يحفظه يوماً بعد يوم.'));
   const bw = el('div', 'edgrid'), mk = (lbl, sv, av) => { const w = el('div'); w.appendChild(el('label', '', lbl)); const pr = el('div', 'pair'), s1 = el('select'), a1 = el('input'); a1.type = 'number'; a1.inputMode = 'numeric'; a1.min = 1; a1.placeholder = 'آية'; a1.value = av || 1; pr.appendChild(s1); pr.appendChild(a1); w.appendChild(pr); bw.appendChild(w); s1.dataset.v = sv || ''; return [s1, a1]; };
   const F = mk('من سورة وآية', p && p.bfs, p && p.bfa), T2 = mk('إلى سورة وآية', p && p.bts, p && p.bta); sec.appendChild(bw);
   Object.assign(PS['مراجعة قريبة'], { ck, bw, bfs:F[0], bfa:F[1], bts:T2[0], bta:T2[1] }); ck.onchange = () => plUpd('مراجعة قريبة'); [F[0], T2[0]].forEach(x => x.onchange = () => plUpd('مراجعة قريبة')); [F[1], T2[1]].forEach(x => x.oninput = () => plUpd('مراجعة قريبة'));
@@ -7995,6 +7999,10 @@ function fillPlanForm(){
   // المراجعة البعيدة
   p = pl.s.plans['مراجعة بعيدة']; sec = plSecHead('مراجعة بعيدة', 'المراجعة البعيدة'); sec.appendChild(el('small', 'plnote', 'باتجاه واحد: من البقرة نحو الناس. يحدد المعلم المقدار اليومي والبداية، والمستهدف = المقدار × أيام الدوام المتبقية.'));
   sec.appendChild(plAmtBox('مراجعة بعيدة', p)); sec.appendChild(plStartBox('مراجعة بعيدة', p, 'بداية المراجعة البعيدة (من سورة وآية)'));
+  { const w = el('div'); w.appendChild(el('label', '', 'نهاية المراجعة البعيدة (إلى سورة وآية)')); const pr = el('div', 'pair'), ts = el('select'), ta = el('input'); ta.type = 'number'; ta.inputMode = 'numeric'; ta.min = 1; ta.placeholder = 'آية';
+    const o0 = el('option', '', 'تلقائية: بحسب المقدار والأيام'); o0.value = ''; ts.appendChild(o0); for (let i = 1; i <= 114; i++){ const o = el('option', '', i + ' - ' + D.surah[i - 1]); o.value = i; ts.appendChild(o); }
+    if (p && p.ts && p.unit) ts.value = p.ts; ta.value = p && p.ta && p.unit ? p.ta : ''; pr.appendChild(ts); pr.appendChild(ta); w.appendChild(pr); sec.appendChild(w);
+    Object.assign(PS['مراجعة بعيدة'], { ts, ta }); ts.onchange = () => { if (ts.value && !ta.value) ta.value = D.ayat[ts.value - 1]; plUpd('مراجعة بعيدة'); }; ta.oninput = () => plUpd('مراجعة بعيدة'); }
   PS['مراجعة بعيدة'].goal = el('div', 'goal'); sec.appendChild(PS['مراجعة بعيدة'].goal); plLockBox('مراجعة بعيدة', sec); plSecFoot('مراجعة بعيدة', sec); b.appendChild(sec);
   plMrFill(); msg('plMsg', '', '');
 }
@@ -8005,7 +8013,7 @@ function plMrFill(){ const rg = plMrRg(), hz = PS['حفظ'], nr = PS['مراجع
   ['حفظ', 'مراجعة قريبة', 'مراجعة بعيدة'].forEach(plUpd); }
 function plUpd(t){ const st = PS[t], lk = plLockedT(t), p = pl.s.plans[t], g = st.goal; if (!g) return;
   if (st.ub){ st.ub.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.u === st.unit)); st.rL.classList.toggle('hidden', st.unit !== 'سطر'); st.rP.classList.toggle('hidden', st.unit !== 'وجه'); }
-  [st.ln, st.pg, st.fr, st.fs, st.fa, st.ck, st.bfs, st.bfa, st.bts, st.bta].forEach(x => { if (x) x.disabled = lk; }); g.closest('.plsec').querySelectorAll('.stepper button').forEach(x => x.disabled = lk);
+  [st.ln, st.pg, st.fr, st.fs, st.fa, st.ck, st.bfs, st.bfa, st.bts, st.bta, st.ts, st.ta].forEach(x => { if (x) x.disabled = lk; }); g.closest('.plsec').querySelectorAll('.stepper button').forEach(x => x.disabled = lk);
   if (st.bw) st.bw.classList.toggle('hidden', !st.ck.checked);
   g.innerHTML = ''; const keep = p && p.unit && p.days, days = keep ? p.days : (D.planLeft || 0);
   if (!days){ g.appendChild(el('b', '', 'لا توجد أيام دوام متبقية في تقويم الخطط')); return; }
@@ -8016,12 +8024,14 @@ function plUpd(t){ const st = PS[t], lk = plLockedT(t), p = pl.s.plans[t], g = s
   const amt = st.amt(); if (!amt){ g.appendChild(el('small', '', 'حدد المقدار اليومي')); return; }
   const tot = amt * days, lines = (st.unit === 'سطر' ? amt : amt * LPP) * days, fs = +st.fs.value, fa = +st.fa.value;
   g.appendChild(el('span', '', 'المستهدف')); g.appendChild(el('b', '', fmtAmt(st.unit, tot) + ' خلال ' + fmtDays(days)));
+  if (t === 'مراجعة بعيدة' && st.ts && st.ts.value && fs){ g.appendChild(el('small', '', 'تدور داخل النطاق من ' + D.surah[fs - 1] + ' ' + (fa || 1) + ' إلى ' + D.surah[st.ts.value - 1] + ' ' + (st.ta.value || D.ayat[st.ts.value - 1]) + '، وإذا بلغ النهاية عاد إلى البداية')); return; }
   if (fs && fa && fa <= D.ayat[fs - 1]){ const e = planEndC(fs, fa, PL_SEC[t].dir, lines), rg = t === 'حفظ' ? plMrRg() : null, over = rg && ((114 - e[0]) * 1000 + e[1]) > ((114 - rg[1]) * 1000 + D.ayat[rg[1] - 1]);
     g.appendChild(el('small', '', 'من ' + D.surah[fs - 1] + ' ' + fa + ' وينتهي تقريباً عند ' + D.surah[e[0] - 1] + ' ' + e[1] + (over ? ' — بعد نهاية المرحلية، وتقف الخطة اليومية عند نهايتها' : e[2] ? '' : ' (نهاية المصحف بهذا الاتجاه)'))); }
 }
 function plItem(t){ const st = PS[t];
   if (t === 'مراجعة قريبة'){ const o = { type:t }; if (st.ck.checked){ Object.assign(o, { fs:+st.bfs.value, fa:+st.bfa.value || 1, ts:+st.bts.value, ta:+st.bta.value }); if (!o.ta || o.ta > D.ayat[o.ts - 1] || o.fa > D.ayat[o.fs - 1]) return { err:'رقم الآية غير صحيح في المحفوظ السابق.' }; } return o; }
   const o = { type:t, unit:st.unit, daily:st.amt(), fs:+st.fs.value, fa:+st.fa.value }; if (!o.daily) return null;
+  if (st.ts && st.ts.value){ o.ts = +st.ts.value; o.ta = +st.ta.value || D.ayat[o.ts - 1]; if (o.ta > D.ayat[o.ts - 1]) return { err:'رقم آية نهاية المراجعة البعيدة غير صحيح.' }; if (o.ts * 1000 + o.ta <= o.fs * 1000 + o.fa) return { err:'نهاية المراجعة البعيدة يجب أن تكون بعد بدايتها (من البقرة نحو الناس).' }; }
   if (!o.fa || o.fa > D.ayat[o.fs - 1]) return { err:'رقم الآية غير صحيح لسورة ' + D.surah[o.fs - 1] + ' في ' + t + '.' }; return o; }
 async function plSave(types, final){
   const items = []; for (const t of types){ if (plLockedT(t)) continue; if (t === 'مراجعة قريبة' && !(PS['حفظ'].amt() || (pl.s.plans['حفظ'] || {}).unit)) continue; const it = plItem(t); if (it && it.err) return msg('plMsg', it.err, 'err'); if (it) items.push(it); }
