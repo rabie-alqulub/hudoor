@@ -399,7 +399,16 @@
   .frbar{display:grid;grid-template-columns:minmax(100px,150px) 1fr 84px;gap:10px;align-items:center;font-size:13px;margin-bottom:9px}
   .frbar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600} .frbar b{font-variant-numeric:tabular-nums;text-align:left}
   .frtrk{height:12px;border-radius:6px;background:var(--fr-soft);overflow:hidden} .frtrk i{display:block;height:100%;background:linear-gradient(90deg,var(--fr-gold),var(--fr-navy2));border-radius:6px}
-  .frtw{overflow-x:auto} .pdt td{vertical-align:top;line-height:1.6;min-width:110px} .pdt td.pdn{font-weight:700;color:var(--navy3);cursor:pointer;min-width:120px} .pdt tr.pdpause td{background:var(--light);color:var(--muted)} .pdt td.pdlate{color:var(--red);font-weight:600}
+  .frtw{overflow-x:auto}
+  .trcard{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer} .trcard b{display:block;font-size:17px;color:var(--navy3)} .trcard small{color:var(--muted)}
+  .trr select{width:auto;min-width:140px;margin:0;flex:0 0 auto}
+  #trActs{display:flex;flex-wrap:wrap;gap:8px} #trActs button{width:auto;margin:0;flex:0 0 auto}
+  .trhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px} .seg2{display:flex;flex-wrap:wrap;gap:6px} .seg2 button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font:inherit;cursor:pointer;color:var(--text)} .seg2 button.on{background:var(--navy3);color:#fff;border-color:var(--navy3)}
+  .trr{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;border-bottom:1px solid var(--line);padding:10px 2px} .trr .nm{flex:1 1 200px;min-width:0} .trr .nm b{display:block} .trr .nm small{color:var(--muted);display:block;line-height:1.6}
+  .trr .bd{display:flex;gap:6px} .trr .bd button{min-height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);font:inherit;cursor:pointer;color:var(--text)} .trr .bd button.on{background:var(--ok);color:#fff;border-color:var(--ok)} .trr .bd button.off.on{background:var(--red);border-color:var(--red)}
+  .trhal{display:flex;flex-wrap:wrap;gap:6px} .trhal label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;margin:0;font-weight:600;cursor:pointer} .trhal input{width:18px;height:18px;margin:0}
+  .trstu{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:14px;padding:4px 10px;margin-top:6px} .trstu label{display:flex;align-items:center;gap:8px;margin:0;padding:7px 0;border-bottom:1px solid var(--line);font-weight:500} .trstu label:last-child{border-bottom:0} .trstu input{width:18px;height:18px;margin:0} .trstu small{color:var(--muted)}
+  .trmore{margin-top:10px} .trmore summary{cursor:pointer;color:var(--muted);font-weight:600} .pdt td{vertical-align:top;line-height:1.6;min-width:110px} .pdt td.pdn{font-weight:700;color:var(--navy3);cursor:pointer;min-width:120px} .pdt tr.pdpause td{background:var(--light);color:var(--muted)} .pdt td.pdlate{color:var(--red);font-weight:600}
   .frt{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
   .frt th{color:var(--fr-mu);font-weight:600;padding:8px;text-align:center;border-bottom:2px solid var(--fr-line);white-space:nowrap;font-size:12.5px;background:none}
   .frt th:first-child,.frt td:first-child{text-align:right} .frt td{padding:8px;text-align:center;border-bottom:1px solid var(--fr-line);white-space:nowrap} .frt td:first-child{font-weight:600}
@@ -2167,6 +2176,19 @@
 
     <!-- ولي الأمر -->
     <div id="pParent" class="hidden"></div>
+    <div id="pTrips" class="hidden">
+      <div id="trHome">
+        <div class="card"><h2>الرحلات</h2><small>أنشئ الرحلة واختر حلقاتها وطلابها، ثم أرسل طلب الموافقة لأولياء الأمور عبر برق، وتابع الردود ويوم الرحلة.</small>
+          <div class="stact"><button class="btn" id="trNew" style="width:auto;padding:0 22px">+ رحلة جديدة</button></div><div id="trMsg"></div></div>
+        <div id="trList"></div>
+      </div>
+      <div id="trView" class="hidden">
+        <div class="card"><div class="trhead"><button class="link" id="trBack">→ كل الرحلات</button><span class="pill" id="trSt"></span></div>
+          <h2 id="trTitle"></h2><small id="trSub"></small><div class="stchips" id="trChips" style="margin-top:10px"></div>
+          <div class="stact" id="trActs"></div><div id="trVMsg"></div></div>
+        <div class="card"><div class="seg2" id="trTabs"></div><input id="trQ" placeholder="ابحث باسم الطالب" style="margin-top:8px"><div id="trRows"></div></div>
+      </div>
+    </div>
     <div id="pMine" class="hidden"></div>
     <div id="pShop" class="hidden">
       <div class="card"><h2>المتجر</h2><div class="kpis" id="shBal"></div></div>
@@ -2316,6 +2338,26 @@
   <div class="panel">
     <div class="head"><h2 id="apvT">الاعتمادات</h2><button class="iconbtn" id="apvClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
     <div id="apvBody" class="lvappr"></div>
+  </div>
+</div>
+
+<div class="sheet hidden" id="trSheet">
+  <div class="panel">
+    <div class="head"><h2 id="trFT">رحلة جديدة</h2><button class="iconbtn" id="trFClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
+    <label for="trfTitle">اسم الرحلة</label><input id="trfTitle" maxlength="80" placeholder="مثال: رحلة المزرعة">
+    <div class="edgrid"><div><label for="trfDate">التاريخ</label><input id="trfDate" type="date"></div><div><label for="trfSeats">عدد المقاعد (اختياري)</label><input id="trfSeats" type="number" inputmode="numeric" min="0" placeholder="بلا حد"></div>
+      <div><label for="trfGo">وقت الذهاب</label><input id="trfGo" type="time"></div><div><label for="trfBack">وقت العودة</label><input id="trfBack" type="time"></div></div>
+    <label for="trfPlace">المكان</label><input id="trfPlace" maxlength="120">
+    <label for="trfMeet">نقطة التجمع</label><input id="trfMeet" maxlength="120" placeholder="مثال: ساحة الجامع">
+    <label for="trfBring">ما يحضره الطالب (اختياري)</label><input id="trfBring" maxlength="300">
+    <label for="trfDl">آخر موعد للموافقة</label><input id="trfDl" type="datetime-local">
+    <label for="trfSups">المشرفون المرافقون</label><input id="trfSups" maxlength="200">
+    <label for="trfPledge">نص التعهد (يعيد ولي الأمر كتابته)</label><textarea id="trfPledge" maxlength="400" rows="2"></textarea>
+    <label for="trfNotes">ملاحظات لأولياء الأمور (اختياري)</label><textarea id="trfNotes" maxlength="400" rows="2"></textarea>
+    <details class="trmore"><summary>خيارات إضافية</summary><label for="trfFee">الرسوم (اتركها فارغة إن كانت مجانية)</label><input id="trfFee" maxlength="40"></details>
+    <label>الحلقات</label><div class="trhal" id="trfHal"></div>
+    <label>الطلاب <small id="trfN"></small></label><input id="trfQ" placeholder="ابحث لإضافة طالب من حلقة أخرى أو استبعاد طالب"><div class="trstu" id="trfStu"></div>
+    <button class="btn" id="trfSave">حفظ الرحلة</button><div id="trfMsg"></div>
   </div>
 </div>
 
@@ -3053,7 +3095,7 @@ const hasL = (k, lv) => { const P = (D && D.perms) || []; return P.indexOf('*') 
 // خانات تظهر فقط لمن عنده مستوى معيّن داخل البند (لا يكفيها «عرض»)
 const NAV_LV = { halaqaNew:['halaqat.manage:add'], halaqaEdit:['halaqat.manage:edit', 'halaqat.manage:del'] };
 const STAFF_EXTRA = [['repStu', 'تقارير شؤون الطلاب', 'reports.students'], ['repEdu', 'تقارير الشؤون التعليمية', 'reports.edu']];
-const NAV_PERM = { studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
+const NAV_PERM = { trips:'trips.manage', studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
   nafStars:['competition.manage', 'competition.star'], nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
   moveMany:'students.move', absent:'students.absent', staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
   teach:'halaqat.evaluate_all', halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', subst:'halaqat.substitute', diw:'diw.manage', remote:'halaqat.remote', reeval:'halaqat.reeval',
@@ -3065,7 +3107,7 @@ const ADMIN_NAV = [
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير بصمة الحضور'], ['courses', 'الدورات التدريبية']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['planDay', 'خطة اليوم للطلاب'], ['planF', 'متابعة سير الخطط'], ['refsEdu', 'الإحالات التعليمية']] },
   { t:'الاختبارات', ic:'exam', r:'exams' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['trips', 'الرحلات']] },
   { t:'الحلقات', ic:'halaqa', items:[['teach', 'التقييم'], ['halaqaView', 'استعراض الحلقات'], ['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['subst', 'تكليف معلم بديل (من خارج المجمع)'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
   { t:'نافس', ic:'trophy', items:[['nafStars', 'فارس الحلقة'], ['nafPts', 'نقاطي'], ['nafStore', 'المتجر'], ['diw', 'الديوانية']] },
   { t:'المعاملات', ic:'exam', items:[['trxS', 'المعاملات الصادرة'], ['trxR', 'المعاملات الواردة']] },
@@ -3250,6 +3292,7 @@ function openRole(r, title, group){
   $('pTeach').classList.toggle('hidden', r !== 'teach');
   $('pPlans').classList.toggle('hidden', r !== 'plans');
   $('pParent').classList.toggle('hidden', r !== 'parent');
+  $('pTrips').classList.toggle('hidden', r !== 'trips'); if (r === 'trips') openTrips();
   $('pMine').classList.toggle('hidden', r !== 'mine'); if (r === 'mine') renderMine();
   $('pShop').classList.toggle('hidden', r !== 'shop'); if (r === 'shop') renderShop();
   $('pReport').classList.toggle('hidden', r !== 'report');
@@ -3308,7 +3351,7 @@ function renderWelcome(){
     myStu:['طلاب الحلقة', 'إحالة الطلاب وترشيحهم للمرحلية ومتابعة الردود', 'gold'], refsStu:['إحالات شؤون الطلاب', 'استقبال إحالات المعلمين والرد عليها', ''],
     refsEdu:['الإحالات التعليمية', 'إحالات مستوى الحفظ والخطط', ''], refsExam:['ترشيحات المرحلية', 'مواعيد الاختبارات المرحلية ونتائجها', 'gold'],
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['نافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
-    regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''],
+    regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''], trips:['الرحلات', 'موافقات أولياء الأمور ويوم الرحلة', ''],
     repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
     preTest:['الاختبار قبل الترشيح', 'اختبار داخلي قبل ترشيح الجمعية', ''], assocNom:['ترشيحات الجمعية', 'ترشيح المجتازين ونتائج الجمعية', 'gold'],
     strug:['الطلاب المتعثرون', 'من يحتاج متابعة تعليمية', ''], planF:['متابعة سير الخطط', 'إنجاز الخطط مقارنة بالمتوقع', ''], planDay:['خطة اليوم للطلاب', 'الحفظ والمراجعة لكل طالب اليوم', ''], msgArc:['أرشيف الرسائل', 'سجل الرسائل وإحصائياتها', ''],
@@ -4552,6 +4595,92 @@ function renderStrug(){
 ['sgFrom', 'sgTo', 'sgHal'].forEach(id => $(id).onchange = loadStrug); $('sgQ').oninput = () => SG && renderStrug();
 $('sgXls').onclick = () => { if (!SG) return; const rows = [['الطلاب المتعثرون ' + SG.from + ' – ' + SG.to], ['رقم الطالب', 'الطالب', 'الحلقة', 'المعلم', 'الحضور %', 'متوسط الدرجات', 'المؤشرات']].concat(SG.list.map(x => [Number(x.sid) || x.sid, x.name, x.hname, x.teacher, x.att == null ? '' : x.att, x.avg == null ? '' : x.avg, x.why.join(' • ')]));
   const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['المتعثرون', rows]])); a.download = 'الطلاب-المتعثرون.xlsx'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('جاري تنزيل ملف Excel'); };
+/* ---------- الرحلات وموافقات أولياء الأمور ---------- */
+let TRL = null, TRV = null, trTab = 'all', trDay = false;
+const TR_STC = { 'موافق':'p-ok', 'رافض':'p-red', 'لم يرد':'p-none', 'انتظار':'p-late', 'مستبعد':'p-none' };
+const trBase = () => new URL('trip.html', location.href).href;
+const trDayTxt = d => d ? fmtD(d, { weekday:'long', day:'numeric', month:'long' }) : '';
+async function openTrips(){ $('trView').classList.add('hidden'); $('trHome').classList.remove('hidden'); msg('trMsg', '', '');
+  const r = await cpCall({ action:'tripsList' }, 'trMsg'); if (!r || !r.ok) return; TRL = r; const L = $('trList'); L.innerHTML = '';
+  if (!r.trips.length) L.appendChild(el('div', 'card msg info', 'لا توجد رحلات بعد. اضغط «+ رحلة جديدة».'));
+  r.trips.forEach(t => { const c = el('div', 'card trcard'); const a = el('div'); a.appendChild(el('b', '', t.title)); a.appendChild(el('small', '', trDayTxt(t.date) + (t.place ? ' • ' + t.place : '')));
+    a.appendChild(el('small', '', 'وافق ' + t.counts.yes + ' • رفض ' + t.counts.no + ' • لم يرد ' + t.counts.none + (t.counts.wait ? ' • انتظار ' + t.counts.wait : '') + ' من ' + t.counts.total + (t.seats ? ' • المقاعد ' + t.seats : '')));
+    c.appendChild(a); c.appendChild(el('span', 'pill ' + (t.status === 'مفتوحة' ? 'p-ok' : t.status === 'ملغاة' ? 'p-red' : 'p-none'), t.status)); c.onclick = () => openTrip(t.id); L.appendChild(c); }); }
+$('trNew').onclick = () => trForm(null);
+$('trBack').onclick = openTrips;
+async function openTrip(id){ const r = await cpCall({ action:'tripGet', id }, 'trMsg'); if (!r || !r.ok) return; TRV = r; $('trHome').classList.add('hidden'); $('trView').classList.remove('hidden'); msg('trVMsg', '', ''); renderTrip(); window.scrollTo(0, 0); }
+async function trReload(){ const r = await api({ action:'tripGet', id:TRV.trip.id }); if (r.ok){ TRV = r; renderTrip(); } }
+function renderTrip(){ const t = TRV.trip, c = TRV.counts;
+  $('trTitle').textContent = t.title; $('trSt').textContent = t.status; $('trSt').className = 'pill ' + (t.status === 'مفتوحة' ? 'p-ok' : t.status === 'ملغاة' ? 'p-red' : 'p-none');
+  $('trSub').textContent = [trDayTxt(t.date), t.place, t.go && 'الذهاب ' + t.go, t.back && 'العودة ' + t.back, t.meet && 'التجمع: ' + t.meet, t.deadline && 'آخر موعد للرد: ' + t.deadline.replace('T', ' ')].filter(Boolean).join(' • ');
+  const ch = $('trChips'); ch.innerHTML = ''; [['وافق', c.yes, 'p-ok'], ['رفض', c.no, 'p-red'], ['لم يرد', c.none, 'p-none'], ['انتظار', c.wait, 'p-late']].forEach(x => ch.appendChild(el('span', 'pill ' + x[2], x[0] + ' ' + x[1])));
+  if (t.seats) ch.appendChild(el('span', 'pill', 'المقاعد المتبقية ' + Math.max(0, t.seats - c.yes) + ' من ' + t.seats));
+  const A = $('trActs'); A.innerHTML = ''; const live = ['ملغاة', 'منتهية'].indexOf(t.status) === -1, b = (txt, cls, fn) => { const x = el('button', cls || 'soft', txt); x.onclick = fn; A.appendChild(x); };
+  if (live){ b('تعديل الرحلة والطلاب', '', () => trForm(TRV));
+    b('إرسال طلب الموافقة', 'btn', () => trDo('tripSend', { base:trBase() }, 'إرسال طلب الموافقة عبر برق لأولياء أمور الطلاب الذين لم يُرسل لهم بعد؟'));
+    if (TRV.reqs.some(x => x.status === 'لم يرد' && x.sends)) b('تذكير من لم يرد', '', () => trDo('tripSend', { base:trBase(), scope:'pending' }, 'إرسال تذكير لمن لم يرد؟'));
+    b(trDay ? 'إخفاء أدوات يوم الرحلة' : 'يوم الرحلة: الصعود والعودة', '', () => { trDay = !trDay; if (trDay) trTab = 'yes'; renderTrip(); });
+    if (trDay){ b('رسالة الانطلاق', '', () => trDo('tripOp', { op:'go' }, 'إرسال رسالة «انطلقت الرحلة» لأولياء أمور الطلاب الصاعدين؟')); b('رسالة الوصول', '', () => trDo('tripOp', { op:'arrive' }, 'إرسال رسالة «وصلت الرحلة»؟')); }
+    b('رسالة للموافقين', '', () => { const tx = prompt('نص الرسالة لأولياء أمور الموافقين:'); if (tx) trDo('tripOp', { op:'msg', text:tx }); });
+    b(t.status === 'مغلقة' ? 'فتح الموافقات' : 'إغلاق الموافقات', '', () => trDo('tripOp', { op:t.status === 'مغلقة' ? 'open' : 'close' }));
+    b('إلغاء الرحلة', 'danger', () => { const why = prompt('سيصل لأولياء أمور الموافقين إشعار بالإلغاء. سبب الإلغاء (اختياري):', ''); if (why !== null) trDo('tripOp', { op:'cancel', text:why }); });
+    b('إنهاء الرحلة', '', () => trDo('tripOp', { op:'done' }, 'إغلاق الرحلة كمنتهية؟')); }
+  b('كشف المشاركين PDF', '', trPdf); b('Excel', '', trXls);
+  const tb = $('trTabs'); tb.innerHTML = ''; [['all', 'الكل'], ['yes', 'موافق'], ['no', 'رافض'], ['none', 'لم يرد'], ['wait', 'انتظار']].forEach(x => { const k = el('button', trTab === x[0] ? 'on' : '', x[1]); k.onclick = () => { trTab = x[0]; renderTrip(); }; tb.appendChild(k); });
+  trRows(); }
+const TRK = { yes:'موافق', no:'رافض', none:'لم يرد', wait:'انتظار' };
+function trRows(){ const box = $('trRows'); box.innerHTML = ''; const q = normAr($('trQ').value), live = ['ملغاة', 'منتهية'].indexOf(TRV.trip.status) === -1;
+  const L = TRV.reqs.filter(x => x.status !== 'مستبعد' && (trTab === 'all' || x.status === TRK[trTab]) && (!q || normAr(x.sname).indexOf(q) !== -1));
+  if (!L.length) box.appendChild(el('div', 'msg info', 'لا يوجد طلاب هنا.'));
+  L.forEach(x => { const r = el('div', 'trr'), nm = el('div', 'nm'); nm.appendChild(el('b', '', x.sname));
+    nm.appendChild(el('small', '', x.hname + (x.sentAt ? ' • أُرسل ' + x.sentAt.slice(5, 16) + (x.sends > 1 ? ' (' + x.sends + ' مرات)' : '') : ' • لم يُرسل له')));
+    if (x.pname) nm.appendChild(el('small', '', 'ولي الأمر: ' + x.pname + (x.emerg ? ' • الطوارئ: ' + x.emerg : '') + (x.at ? ' • ' + x.at.slice(5, 16) : '') + (x.via && x.via !== 'الرابط' ? ' • ' + x.via : '')));
+    if (x.health) nm.appendChild(el('small', '', '⚕ ' + x.health));
+    r.appendChild(nm); r.appendChild(el('span', 'pill ' + (TR_STC[x.status] || 'p-none'), x.status));
+    if (trDay && x.status === 'موافق'){ const bd = el('div', 'bd'); [['board', 'صعد', ''], ['board', 'غائب', 'off'], ['ret', 'عاد', '']].forEach(z => { const k = el('button', z[2] + (x[z[0]] === z[1] ? ' on' : ''), z[1]); k.type = 'button';
+      k.onclick = async () => { const v = x[z[0]] === z[1] ? '' : z[1]; x[z[0]] = v; trRows(); const rr = await api({ action:'tripMark', id:TRV.trip.id, sid:x.sid, f:z[0], v }); if (!rr.ok) toast(rr.msg); }; bd.appendChild(k); }); r.appendChild(bd); }
+    else if (live){ const m = el('select'); [['', 'إجراء'], ['link', 'نسخ رابط الموافقة'], ['wa', 'إرسال الرابط بالواتساب يدوياً'], ['موافق', 'تسجيل موافقة ورقية'], ['رافض', 'تسجيل اعتذار'], ['لم يرد', 'إعادة إلى «لم يرد»']].forEach(o => { const op = el('option', '', o[1]); op.value = o[0]; m.appendChild(op); });
+      m.onchange = async () => { const v = m.value; m.value = ''; const ln = trBase() + '?t=' + x.t;
+        if (v === 'link'){ try { await navigator.clipboard.writeText(ln); toast('نُسخ الرابط'); } catch(e){ prompt('انسخ الرابط:', ln); } }
+        else if (v === 'wa'){ const p = String(x.pphone || '').replace(/\D/g, '').replace(/^0/, '966'); window.open('https://wa.me/' + p + '?text=' + encodeURIComponent('السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ ' + x.sname + '\n\nنأمل التكرم بالرد على مشاركة ابنكم في رحلة «' + TRV.trip.title + '» عبر الرابط:\n' + ln), '_blank'); }
+        else if (v){ const note = v === 'موافق' ? prompt('ملاحظة (مثلاً: موافقة ورقية مستلمة):', 'موافقة ورقية') : ''; if (note === null) return; const rr = await cpCall({ action:'tripMark', id:TRV.trip.id, sid:x.sid, f:'status', v, note }, 'trVMsg'); if (rr && rr.ok){ toast(rr.msg); trReload(); } } };
+      r.appendChild(m); }
+    box.appendChild(r); }); }
+$('trQ').oninput = () => TRV && trRows();
+async function trDo(action, extra, ask){ if (ask && !confirm(ask)) return; msg('trVMsg', 'جاري التنفيذ...', 'info'); const r = await cpCall(Object.assign({ action, id:TRV.trip.id }, extra), 'trVMsg'); if (r && r.ok){ msg('trVMsg', r.msg, 'ok'); trReload(); } }
+const TR_HEAD = ['الطالب', 'الحلقة', 'ولي الأمر', 'جوال ولي الأمر', 'جوال الطوارئ', 'ملاحظات صحية', 'الصعود', 'العودة'];
+const trPart = () => TRV.reqs.filter(x => x.status === 'موافق').map(x => [x.sname, x.hname, x.pname, x.pphone, x.emerg, x.health, x.board, x.ret]);
+function trXls(){ const t = TRV.trip, rows = [['كشف المشاركين — ' + t.title + ' — ' + t.date], TR_HEAD].concat(trPart()); const a = el('a'); a.href = URL.createObjectURL(xlsxBlob([['المشاركون', rows]])); a.download = 'رحلة-' + t.date + '.xlsx';
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
+function trPdf(){ const t = TRV.trip, p = $('dsPrint'); p.innerHTML = ''; $('sfPrint').innerHTML = ''; const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'كشف المشاركين — رحلة ' + t.title));
+  l.appendChild(el('div', '', [trDayTxt(t.date), t.place, t.go && 'الذهاب ' + t.go, t.back && 'العودة ' + t.back, t.sups && 'المشرفون: ' + t.sups].filter(Boolean).join(' • '))); hd.appendChild(l); p.appendChild(hd);
+  prTbl(p, 'المشاركون (' + trPart().length + ')', TR_HEAD, trPart()); setTimeout(brandPrint, 50); }
+/* نموذج الرحلة: البيانات والحلقات والطلاب */
+let TRF = null;
+function trForm(v){ const t = v ? v.trip : {}, H = (TRL && TRL.halaqat) || [];
+  TRF = { id:t.id || null, hids:new Set(t.hids || []), stu:(v && v.students) || (TRL && TRL.students) || [], sel:{} };
+  $('trFT').textContent = v ? 'تعديل الرحلة' : 'رحلة جديدة';
+  [['trfTitle', 'title'], ['trfDate', 'date'], ['trfSeats', 'seats'], ['trfGo', 'go'], ['trfBack', 'back'], ['trfPlace', 'place'], ['trfMeet', 'meet'], ['trfBring', 'bring'], ['trfDl', 'deadline'], ['trfSups', 'sups'], ['trfNotes', 'notes'], ['trfFee', 'fee']].forEach(x => $(x[0]).value = t[x[1]] || '');
+  $('trfSeats').value = t.seats || ''; $('trfPledge').value = t.pledge || (TRL && TRL.pledge) || '';
+  if (v) v.reqs.forEach(x => { if (x.status !== 'مستبعد') TRF.sel[x.sid] = true; });
+  const hb = $('trfHal'); hb.innerHTML = ''; H.forEach(h => { const lb = el('label'), c = el('input'); c.type = 'checkbox'; c.checked = TRF.hids.has(h.hid); c.onchange = () => { c.checked ? TRF.hids.add(h.hid) : TRF.hids.delete(h.hid); (TRF.stu || []).forEach(s => { if (s.hid === h.hid) TRF.sel[s.sid] = c.checked; }); trfStu(); };
+    lb.appendChild(c); lb.appendChild(document.createTextNode(h.name)); hb.appendChild(lb); });
+  msg('trfMsg', '', ''); $('trfQ').value = ''; $('trSheet').classList.remove('hidden'); document.body.style.overflow = 'hidden';
+  trfStu(); }
+function trfStu(){ const box = $('trfStu'); box.innerHTML = ''; const q = normAr($('trfQ').value), H = {}; ((TRL && TRL.halaqat) || []).forEach(h => H[h.hid] = h.name);
+  const L = (TRF.stu || []).filter(s => q ? normAr(s.name).indexOf(q) !== -1 : (TRF.hids.has(s.hid) || TRF.sel[s.sid]));
+  L.slice(0, 300).forEach(s => { const lb = el('label'), c = el('input'); c.type = 'checkbox'; c.checked = !!TRF.sel[s.sid]; c.onchange = () => { TRF.sel[s.sid] = c.checked; trfN(); };
+    lb.appendChild(c); lb.appendChild(document.createTextNode(s.name + ' ')); lb.appendChild(el('small', '', H[s.hid] || '')); box.appendChild(lb); });
+  if (!L.length) box.appendChild(el('small', '', q ? 'لا نتائج.' : 'اختر حلقة أو ابحث عن طالب.')); trfN(); }
+const trfN = () => { $('trfN').textContent = '(' + Object.keys(TRF.sel).filter(k => TRF.sel[k]).length + ' طالب)'; };
+$('trfQ').oninput = () => TRF && trfStu();
+$('trFClose').onclick = () => { $('trSheet').classList.add('hidden'); document.body.style.overflow = ''; };
+$('trfSave').onclick = async () => { const d = { title:$('trfTitle').value.trim(), date:$('trfDate').value, seats:$('trfSeats').value, go:$('trfGo').value, back:$('trfBack').value, place:$('trfPlace').value.trim(), meet:$('trfMeet').value.trim(),
+    bring:$('trfBring').value.trim(), deadline:$('trfDl').value, sups:$('trfSups').value.trim(), pledge:$('trfPledge').value.trim(), notes:$('trfNotes').value.trim(), fee:$('trfFee').value.trim(), hids:[...TRF.hids] };
+  const inH = s => TRF.hids.has(s.hid); d.add = (TRF.stu || []).filter(s => TRF.sel[s.sid] && !inH(s)).map(s => s.sid); d.rem = (TRF.stu || []).filter(s => !TRF.sel[s.sid] && inH(s)).map(s => s.sid);
+  if (!d.hids.length && !d.add.length) return msg('trfMsg', 'اختر حلقة أو طلاباً للرحلة.', 'err');
+  msg('trfMsg', 'جاري الحفظ...', 'info'); const r = await cpCall({ action:'tripSave', id:TRF.id, data:d }, 'trfMsg'); if (!r || !r.ok) return;
+  toast(r.msg); $('trSheet').classList.add('hidden'); document.body.style.overflow = ''; openTrip(r.id); };
 /* ---------- خطة اليوم: ما على كل طالب من حفظ ومراجعة ---------- */
 let PDY = null;
 const PD_HEAD = ['الطالب', 'الحلقة', 'المرحلية', 'الحفظ', 'المراجعة القريبة', 'المراجعة البعيدة', 'الحالة'];
@@ -8157,6 +8286,8 @@ function renderShop(){
 function renderParent(){
   const box = $('pParent'); box.innerHTML = '';
   const ab = el('div'); ab.id = 'annParent'; box.appendChild(ab); renderAnnFor('annParent');
+  if ((D.trips || []).length){ const c = el('div', 'card'); c.appendChild(el('h2', '', 'الرحلات')); D.trips.forEach(t => { const r = el('div', 'trr'), nm = el('div', 'nm'); nm.appendChild(el('b', '', t.title + ' — ' + t.sname)); nm.appendChild(el('small', '', t.day + (t.closed ? ' • ' + t.closed : '')));
+    r.appendChild(nm); r.appendChild(el('span', 'pill ' + (TR_STC[t.status] || 'p-none'), t.status)); if (!t.closed || t.status !== 'لم يرد'){ const a = el('a', 'btn soft', t.status === 'لم يرد' ? 'الرد على طلب الموافقة' : 'عرض الرد'); a.href = 'trip.html?t=' + t.t; a.style.width = 'auto'; r.appendChild(a); } c.appendChild(r); }); box.appendChild(c); }
   (D.children || []).forEach(s => kidCard(s, box));
   if (!(D.children || []).length) box.appendChild(el('div', 'card msg info', 'لا يوجد أبناء مسجلون باسمك.'));
 }
