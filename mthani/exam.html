@@ -198,21 +198,21 @@ function render(){
   if (X.org) $('hOrg').textContent = X.org;
   $('bTitle').textContent = bName(X.no) + ' — ' + dayName(X.date) + ' ' + X.date;
   const n = X.list.length, d = X.list.filter(done).length, ok = X.list.filter(s => s.status === X.st.ok).length, ab = X.list.filter(isAbs).length;
-  const kv = $('bKv'); kv.innerHTML = ''; [['المختبِر', X.sup + (X.supOrg ? ' — ' + X.supOrg : '')], ['عدد الطلاب', n], ['سُجّلت نتائجهم', d + ' من ' + n], ['اجتازوا', ok]].concat(ab ? [['لم يحضروا', ab]] : []).concat(X.final ? [['اعتماد النتائج', X.final.slice(0, 16)]] : []).forEach(p => { const b = el('div'); b.appendChild(el('small', '', p[0])); b.appendChild(el('b', '', p[1])); kv.appendChild(b); });
+  const kv = $('bKv'); kv.innerHTML = ''; [['المختبِر', X.sup + (X.supOrg ? ' — ' + X.supOrg : '')], ['عدد الطلاب', n], ['سُجّلت نتائجهم', d + ' من ' + n], ['اجتازوا', ok]].concat(ab ? [['لم يُختبروا', ab]] : []).concat(X.final ? [['اعتماد النتائج', X.final.slice(0, 16)]] : []).forEach(p => { const b = el('div'); b.appendChild(el('small', '', p[0])); b.appendChild(el('b', '', p[1])); kv.appendChild(b); });
   $('bBar').style.width = (n ? Math.round(d * 100 / n) : 0) + '%';
   $('fin').classList.toggle('hidden', !(X.canEdit && n && d === n));
   if (X.back && !X.final){ msg('bMsg', 'أعاد ' + X.back.by + ' النتائج إليك للمراجعة: ' + X.back.reason + ' — عدّل ما يلزم ثم اضغط «اعتماد النتائج» مرة أخرى.', 'err'); $('fin').classList.toggle('hidden', !(X.canEdit && n && d === n)); } else
   msg('bMsg', X.final ? '✓ اعتمدتَ نتائج هذه المجموعة، وهي الآن مرجع للاطلاع فقط. التقرير جاهز للطباعة والتنزيل.' : d === n && n ? 'سُجّلت نتائج جميع الطلاب. راجعها ثم اضغط «اعتماد النتائج» لإنهاء المجموعة.' : '', X.final ? 'ok' : 'info');
   const fl = $('flt'); fl.innerHTML = '';
-  [['all', 'الكل', n], ['wait', 'لم يُختبر', n - d], ['ok', 'اجتاز', ok], ['no', 'لم يجتز', d - ok - ab]].concat(ab ? [['abs', 'لم يحضر', ab]] : []).forEach(f => { const b = el('button', F === f[0] ? 'on' : '', f[1] + ' (' + f[2] + ')'); b.onclick = () => { F = f[0]; render(); }; fl.appendChild(b); });
+  [['all', 'الكل', n], ['wait', 'بانتظار الاختبار', n - d], ['ok', 'اجتاز', ok], ['no', 'لم يجتز', d - ok - ab]].concat(ab ? [['abs', 'لم يُختبر', ab]] : []).forEach(f => { const b = el('button', F === f[0] ? 'on' : '', f[1] + ' (' + f[2] + ')'); b.onclick = () => { F = f[0]; render(); }; fl.appendChild(b); });
   const q = $('q').value.trim(), box = $('list'); box.innerHTML = '';
   const L = X.list.filter(s => (F === 'all' || (F === 'wait' ? !done(s) : s.status === X.st[F])) && (!q || (s.name + ' ' + s.nid).indexOf(q) !== -1));
   if (!L.length) box.appendChild(el('small', 'note', 'لا يوجد طلاب في هذا التصنيف.'));
   L.forEach(s => { const w = el('div', 'st'), nm = el('div', 'nm'); nm.appendChild(el('b', '', s.name)); nm.appendChild(el('small', '', 'الهوية: ' + (s.nid || '—') + ' • ' + s.hname)); w.appendChild(nm);
     w.appendChild(el('span', 'pill p-lv', s.level));
-    if (isAbs(s)) w.appendChild(el('span', 'pill p-abs', 'لم يحضر' + (s.gone ? ' — أُعيد للمرشحين' : '')));
+    if (isAbs(s)) w.appendChild(el('span', 'pill p-abs', 'لم يُختبر' + (s.gone ? ' — أُعيد للمرشحين' : '')));
     else if (done(s)) w.appendChild(el('span', 'pill ' + (s.status === X.st.ok ? 'p-ok' : 'p-no'), s.result + ' — ' + s.score));
-    else w.appendChild(el('span', 'pill', 'لم يُختبر'));
+    else w.appendChild(el('span', 'pill', 'بانتظار الاختبار'));
     if (s.gone){ box.appendChild(w); return; }
     const b = el('button', done(s) ? '' : 'gold', !X.canEdit ? 'عرض' : done(s) ? 'تعديل النتيجة' : 'اختبار الطالب'); b.onclick = () => form(s); w.appendChild(b);
     box.appendChild(w); });
@@ -259,7 +259,7 @@ function form(s){
   const tw = el('div', 'tw'), t = el('table', 'q'); tw.appendChild(t); B.appendChild(tw);
   const pf = el('div', 'perf'); pf.appendChild(el('b', '', 'الأداء (من 20)')); const pIn = el('input'); pIn.value = old.perf != null ? old.perf : PERF; pf.appendChild(stepIn(pIn, 0, PERF, 0.5, ro)); B.appendChild(pf);
   const tot = el('div', 'tot'); B.appendChild(tot);
-  const rs = el('select'); [['', '— النتيجة —'], ['اجتاز', 'اجتاز'], ['لم يجتز', 'لم يجتز'], ['لم يحضر', 'لم يحضر الاختبار']].forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; rs.appendChild(o); });
+  const rs = el('select'); [['', '— النتيجة —'], ['اجتاز', 'اجتاز'], ['لم يجتز', 'لم يجتز'], ['لم يُختبر', 'لم يُختبر (غياب أو تأجيل أو غيره)']].forEach(x => { const o = el('option', '', x[1]); o.value = x[0]; rs.appendChild(o); });
   B.appendChild(el('label', '', 'النتيجة النهائية')); B.appendChild(rs);
   const nt = el('textarea'); nt.placeholder = 'ملاحظات المختبِر (اختياري)'; nt.value = old.notes || ''; B.appendChild(el('label', '', 'ملاحظات')); B.appendChild(nt);
   const sv = el('button', 'main', 'حفظ النتيجة'); if (!ro) B.appendChild(sv); const m = el('div'); m.id = 'shM'; B.appendChild(m);
@@ -267,9 +267,9 @@ function form(s){
   const calc = () => { let sum = 0; rows.forEach(r => { r.sc = Math.min(QMAX, Math.max(0, +r.v.value || 0)); sum += r.sc; }); sum += Math.min(PERF, Math.max(0, +pIn.value || 0));
     sum = Math.round(sum * 2) / 2; const ok = sum >= X.pass; tot.className = 'tot ' + (ok ? 'ok' : 'no'); tot.innerHTML = ''; tot.appendChild(el('span', '', 'المجموع (حد الاجتياز ' + X.pass + ')')); tot.appendChild(el('b', '', sum + ' / 100'));
     if (!touched) rs.value = ok ? 'اجتاز' : 'لم يجتز'; return sum; };
-  const absNote = el('div', 'msg info hidden', 'لم يحضر الطالب: لا تُسجّل له درجة، ويعود بعد «اعتماد النتائج» إلى قائمة الطلاب المرشحين ليُدرج في مجموعة قادمة.');
+  const absNote = el('div', 'msg info hidden', 'لم يُختبر الطالب: لا تُسجّل له درجة، ويُبلَّغ ولي أمره بأنه لم يُختبر وسيُحدَّد له موعد آخر، ويعود بعد «اعتماد النتائج» إلى قائمة المرشحين ليُدرج في مجموعة قادمة. اكتب السبب في الملاحظات (اختياري).');
   rs.parentNode.insertBefore(absNote, rs.nextSibling);
-  const absUi = () => { const a = rs.value === 'لم يحضر'; [tw, pf, tot, gen].forEach(x => x.classList.toggle('dim', a)); absNote.classList.toggle('hidden', !a); };
+  const absUi = () => { const a = rs.value === 'لم يُختبر'; [tw, pf, tot, gen].forEach(x => x.classList.toggle('dim', a)); absNote.classList.toggle('hidden', !a); };
   pIn.addEventListener('input', calc); rs.onchange = () => { touched = true; absUi(); };
   const generate = () => { const a1 = +rF.value, a2 = +rT.value; if (!a1 || !a2) return msg('shM', 'اختر النطاق: من سورة وإلى سورة.', 'err');
     const lo = Math.min(a1, a2), hi = Math.max(a1, a2), A = absAyah(lo, 1), Z = absAyah(hi, X.ayat[hi - 1]), seg = (Z - A + 1) / rows.length;
@@ -298,8 +298,8 @@ function form(s){
   if (s.result) rs.value = s.result; absUi();
   if (ro) [rF, rT, rs, nt, pIn].forEach(x => x.disabled = true);
   sv.onclick = async () => { const score = calc(); if (!rs.value) return msg('shM', 'اختر النتيجة النهائية.', 'err');
-    if (rs.value === 'لم يحضر'){ sv.disabled = true; msg('shM', 'جاري الحفظ...', 'info');
-      try { const r = await call({ action:'exSave', id:s.id, data:{ result:'لم يحضر', notes:nt.value.trim() } }); if (!r.ok) return msg('shM', r.msg || 'تعذّر الحفظ.', 'err');
+    if (rs.value === 'لم يُختبر'){ sv.disabled = true; msg('shM', 'جاري الحفظ...', 'info');
+      try { const r = await call({ action:'exSave', id:s.id, data:{ result:'لم يُختبر', notes:nt.value.trim() } }); if (!r.ok) return msg('shM', r.msg || 'تعذّر الحفظ.', 'err');
         X = r; $('sh').classList.add('hidden'); render(); msg('bMsg', r.msg, 'ok'); window.scrollTo({ top:0, behavior:'smooth' }); }
       catch(e){ msg('shM', 'تعذّر الاتصال، حاول مجدداً.', 'err'); } finally { sv.disabled = false; } return; }
     if (!rows.some(r => r.s.value)) return msg('shM', 'حدد مواضع الأسئلة أو اضغط «توليد الأسئلة تلقائياً».', 'err');
@@ -313,11 +313,11 @@ function form(s){
   $('sh').classList.remove('hidden'); $('sh').scrollTop = 0;
 }
 $('shX').onclick = () => $('sh').classList.add('hidden');
-const repRows = () => X.list.map((s, i) => [i + 1, s.name, s.nid, s.level, s.hname, done(s) && !isAbs(s) ? Number(s.score) : '', isAbs(s) ? 'لم يحضر' : done(s) ? s.result : 'لم يُختبر']);
+const repRows = () => X.list.map((s, i) => [i + 1, s.name, s.nid, s.level, s.hname, done(s) && !isAbs(s) ? Number(s.score) : '', isAbs(s) ? 'لم يُختبر' : done(s) ? s.result : 'بانتظار الاختبار']);
 $('rPrint').onclick = () => { const p = $('print'); p.innerHTML = '';
   const hd = el('div', 'ph'), l = el('div'); l.appendChild(el('h1', '', 'تقرير نتائج ' + bName(X.no) + ' — اختبار المرحليات')); l.appendChild(el('div', '', 'تاريخ الاختبار: ' + dayName(X.date) + ' ' + X.date + ' • المختبِر: ' + X.sup + (X.supOrg ? ' (' + X.supOrg + ')' : ''))); hd.appendChild(l); hd.appendChild(el('div', '', X.org)); p.appendChild(hd);
   const n = X.list.length, ok = X.list.filter(s => s.status === X.st.ok).length, d = X.list.filter(done).length;
-  const ab = X.list.filter(isAbs).length; p.appendChild(el('p', '', 'عدد الطلاب: ' + n + ' • اجتازوا: ' + ok + ' • لم يجتازوا: ' + (d - ok - ab) + (ab ? ' • لم يحضروا: ' + ab : '') + (n - d ? ' • لم يُختبروا: ' + (n - d) : '')));
+  const ab = X.list.filter(isAbs).length; p.appendChild(el('p', '', 'عدد الطلاب: ' + n + ' • اجتازوا: ' + ok + ' • لم يجتازوا: ' + (d - ok - ab) + (ab ? ' • لم يُختبروا: ' + ab : '') + (n - d ? ' • بانتظار الاختبار: ' + (n - d) : '')));
   const t = el('table'); t.innerHTML = '<thead><tr><th>م</th><th>اسم الطالب</th><th>رقم الهوية</th><th>المرحلية</th><th>الحلقة</th><th>الدرجة</th><th>النتيجة</th></tr></thead>'; const tb = el('tbody');
   repRows().forEach(r => { const tr = el('tr'); r.forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
   if (!X.final) p.appendChild(el('p', '', 'مسودة: لم يعتمد المختبِر النتائج بعد.'));
