@@ -1559,7 +1559,7 @@
         <div id="rsList" style="margin-top:10px"></div>
         <label for="rsConf">للتأكيد اكتب كلمة: تصفير</label><input id="rsConf" autocomplete="off">
         <div class="stact"><button class="danger" id="rsRun">تصفير الآن</button></div>
-        <div id="rsMsg"></div>
+        <div id="rzMsg"></div>
       </div>
     </div>
 
@@ -1986,7 +1986,7 @@
           <small>لحالات نادرة، كغياب المعلم. الإضافة لليوم نفسه فقط، ولا تُقبل لحلقة لها فارس اليوم.</small>
           <div class="fgrid" style="grid-template-columns:1fr 1fr">
             <div><label for="saHal">بحث بالحلقة</label><select id="saHal"></select></div>
-            <div><label for="saQ">بحث باسم الطالب</label><input id="saQ" autocomplete="off" placeholder="اكتب اسم الطالب"></div>
+            <div><label for="staQ">بحث باسم الطالب</label><input id="staQ" autocomplete="off" placeholder="اكتب اسم الطالب"></div>
           </div>
           <div id="saList"></div>
         </div>
@@ -2182,14 +2182,14 @@
     <div id="pTrips" class="hidden">
       <div id="trHome">
         <div class="card"><h2>الرحلات</h2><small>أنشئ الرحلة واختر حلقاتها وطلابها، ثم أرسل طلب الموافقة لأولياء الأمور عبر برق، وتابع الردود ويوم الرحلة.</small>
-          <button type="button" id="trNew" class="trnew"><span aria-hidden="true">+</span> رحلة جديدة</button><div id="trMsg"></div></div>
+          <button type="button" id="trNew" class="trnew"><span aria-hidden="true">+</span> رحلة جديدة</button><div id="tpMsg"></div></div>
         <div id="trList"></div>
       </div>
       <div id="trView" class="hidden">
         <div class="card"><div class="trhead"><button class="link" id="trBack">→ كل الرحلات</button><span class="pill" id="trSt"></span></div>
-          <h2 id="trTitle"></h2><small id="trSub"></small><div class="stchips" id="trChips" style="margin-top:10px"></div>
+          <h2 id="tpTitle"></h2><small id="trSub"></small><div class="stchips" id="trChips" style="margin-top:10px"></div>
           <div class="stact" id="trActs"></div><div id="trVMsg"></div></div>
-        <div class="card"><div class="seg2" id="trTabs"></div><input id="trQ" placeholder="ابحث باسم الطالب" style="margin-top:8px"><div id="trRows"></div></div>
+        <div class="card"><div class="seg2" id="trTabs"></div><input id="tpQ" placeholder="ابحث باسم الطالب" style="margin-top:8px"><div id="trRows"></div></div>
       </div>
     </div>
     <div id="pMine" class="hidden"></div>
@@ -2344,7 +2344,7 @@
   </div>
 </div>
 
-<div class="sheet hidden" id="trSheet">
+<div class="sheet hidden" id="tpSheet">
   <div class="panel">
     <div class="head"><h2 id="trFT">رحلة جديدة</h2><button class="iconbtn" id="trFClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
     <label for="trfTitle">اسم الرحلة</label><input id="trfTitle" maxlength="80" placeholder="مثال: رحلة المزرعة">
@@ -2456,7 +2456,7 @@
 <div class="sheet hidden" id="mvSheet">
   <div class="panel">
     <div class="head"><h2>نقل إلى حلقة</h2><button class="iconbtn" id="mvClose">إلغاء</button></div>
-    <p id="mvText" style="line-height:1.8;margin:4px 0 6px"></p>
+    <p id="mvCurT" style="line-height:1.8;margin:4px 0 6px"></p>
     <label for="mvHid">الحلقة الجديدة</label>
     <select id="mvHid"></select>
     <button class="btn" id="mvGo">نقل الطالب</button>
@@ -2631,7 +2631,7 @@
 </div>
 <div class="sheet hidden" id="ayahSheet">
   <div class="panel">
-    <div class="head"><h2 id="apTitle"></h2><button class="iconbtn" id="apClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
+    <div class="head"><h2 id="apTitle"></h2><button class="iconbtn" id="ayClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
     <small id="apSub"></small>
     <div class="grid" id="apGrid"></div>
   </div>
@@ -2744,6 +2744,8 @@ function show(v){
   window.scrollTo(0, 0);
 }
 function msg(el, text, type){ const e = $(el); e.innerHTML = ''; if (text){ const d = document.createElement('div'); d.className = 'msg ' + type; d.textContent = text; e.appendChild(d); } }
+// حماية: التقارير التي تُبنى كـ HTML تُنظَّف من وسوم < > في كل النصوص القادمة من الخادم (أسماء الطلاب قد تأتي من نموذج التسجيل العام)
+function noTags(o){ if (typeof o === 'string') return o.replace(/[<>]/g, ''); if (Array.isArray(o)) return o.map(noTags); if (o && typeof o === 'object'){ const r = {}; for (const k in o) r[k] = noTags(o[k]); return r; } return o; }
 function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 function toast(t){ const x = el('div', 'toast', t); document.body.appendChild(x); setTimeout(() => x.remove(), 2200); }
 const digits = s => String(s || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g, '');
@@ -3797,7 +3799,7 @@ $('mfPlus').onclick = () => mfSize(2); $('mfMinus').onclick = () => mfSize(-2);
 
 $('rsFa').onclick = () => openAyah('rsFa');
 $('rsTa').onclick = () => openAyah('rsTa');
-$('apClose').onclick = () => $('ayahSheet').classList.add('hidden');
+$('ayClose').onclick = () => $('ayahSheet').classList.add('hidden');
 $('ayahSheet').onclick = e => { if (e.target === $('ayahSheet')) $('ayahSheet').classList.add('hidden'); };
 
 function openRec(s, type, pendAtt){
@@ -4616,18 +4618,18 @@ let TRL = null, TRV = null, trTab = 'all', trDay = false;
 const TR_STC = { 'موافق':'p-ok', 'رافض':'p-red', 'لم يرد':'p-none', 'انتظار':'p-late', 'مستبعد':'p-none' };
 const trBase = () => new URL('trip.html', location.href).href;
 const trDayTxt = d => d ? fmtD(d, { weekday:'long', day:'numeric', month:'long' }) : '';
-async function openTrips(){ $('trView').classList.add('hidden'); $('trHome').classList.remove('hidden'); msg('trMsg', '', '');
-  const r = await cpCall({ action:'tripsList' }, 'trMsg'); if (!r || !r.ok) return; TRL = r; const L = $('trList'); L.innerHTML = '';
+async function openTrips(){ $('trView').classList.add('hidden'); $('trHome').classList.remove('hidden'); msg('tpMsg', '', '');
+  const r = await cpCall({ action:'tripsList' }, 'tpMsg'); if (!r || !r.ok) return; TRL = r; const L = $('trList'); L.innerHTML = '';
   if (!r.trips.length) L.appendChild(el('div', 'card msg info', 'لا توجد رحلات بعد. اضغط «+ رحلة جديدة».'));
   r.trips.forEach(t => { const c = el('div', 'card trcard'); const a = el('div'); a.appendChild(el('b', '', t.title)); a.appendChild(el('small', '', trDayTxt(t.date) + (t.place ? ' • ' + t.place : '')));
     a.appendChild(el('small', '', 'وافق ' + t.counts.yes + ' • رفض ' + t.counts.no + ' • لم يرد ' + t.counts.none + (t.counts.wait ? ' • انتظار ' + t.counts.wait : '') + ' من ' + t.counts.total + (t.seats ? ' • المقاعد ' + t.seats : '')));
     c.appendChild(a); c.appendChild(el('span', 'pill ' + (t.status === 'مفتوحة' ? 'p-ok' : t.status === 'ملغاة' ? 'p-red' : 'p-none'), t.status)); c.onclick = () => openTrip(t.id); L.appendChild(c); }); }
 $('trNew').onclick = () => trForm(null);
 $('trBack').onclick = openTrips;
-async function openTrip(id){ const r = await cpCall({ action:'tripGet', id }, 'trMsg'); if (!r || !r.ok) return; TRV = r; $('trHome').classList.add('hidden'); $('trView').classList.remove('hidden'); msg('trVMsg', '', ''); renderTrip(); window.scrollTo(0, 0); }
+async function openTrip(id){ const r = await cpCall({ action:'tripGet', id }, 'tpMsg'); if (!r || !r.ok) return; TRV = r; $('trHome').classList.add('hidden'); $('trView').classList.remove('hidden'); msg('trVMsg', '', ''); renderTrip(); window.scrollTo(0, 0); }
 async function trReload(){ const r = await api({ action:'tripGet', id:TRV.trip.id }); if (r.ok){ TRV = r; renderTrip(); } }
 function renderTrip(){ const t = TRV.trip, c = TRV.counts;
-  $('trTitle').textContent = t.title; $('trSt').textContent = t.status; $('trSt').className = 'pill ' + (t.status === 'مفتوحة' ? 'p-ok' : t.status === 'ملغاة' ? 'p-red' : 'p-none');
+  $('tpTitle').textContent = t.title; $('trSt').textContent = t.status; $('trSt').className = 'pill ' + (t.status === 'مفتوحة' ? 'p-ok' : t.status === 'ملغاة' ? 'p-red' : 'p-none');
   $('trSub').textContent = [trDayTxt(t.date), t.place, t.go && 'الذهاب ' + t.go, t.back && 'العودة ' + t.back, t.meet && 'التجمع: ' + t.meet, t.deadline && 'آخر موعد للرد: ' + t.deadline.replace('T', ' ')].filter(Boolean).join(' • ');
   const ch = $('trChips'); ch.innerHTML = ''; [['وافق', c.yes, 'p-ok'], ['رفض', c.no, 'p-red'], ['لم يرد', c.none, 'p-none'], ['انتظار', c.wait, 'p-late']].forEach(x => ch.appendChild(el('span', 'pill ' + x[2], x[0] + ' ' + x[1])));
   if (t.seats) ch.appendChild(el('span', 'pill', 'المقاعد المتبقية ' + Math.max(0, t.seats - c.yes) + ' من ' + t.seats));
@@ -4648,7 +4650,7 @@ function renderTrip(){ const t = TRV.trip, c = TRV.counts;
   const tb = $('trTabs'); tb.innerHTML = ''; [['all', 'الكل'], ['yes', 'موافق'], ['no', 'رافض'], ['none', 'لم يرد'], ['wait', 'انتظار']].forEach(x => { const k = el('button', trTab === x[0] ? 'on' : '', x[1]); k.onclick = () => { trTab = x[0]; renderTrip(); }; tb.appendChild(k); });
   trRows(); }
 const TRK = { yes:'موافق', no:'رافض', none:'لم يرد', wait:'انتظار' };
-function trRows(){ const box = $('trRows'); box.innerHTML = ''; const q = normAr($('trQ').value), live = ['ملغاة', 'منتهية'].indexOf(TRV.trip.status) === -1;
+function trRows(){ const box = $('trRows'); box.innerHTML = ''; const q = normAr($('tpQ').value), live = ['ملغاة', 'منتهية'].indexOf(TRV.trip.status) === -1;
   const L = TRV.reqs.filter(x => x.status !== 'مستبعد' && (trTab === 'all' || x.status === TRK[trTab]) && (!q || normAr(x.sname).indexOf(q) !== -1));
   if (!L.length) box.appendChild(el('div', 'msg info', 'لا يوجد طلاب هنا.'));
   L.forEach(x => { const r = el('div', 'trr'), nm = el('div', 'nm'); nm.appendChild(el('b', '', x.sname));
@@ -4665,7 +4667,7 @@ function trRows(){ const box = $('trRows'); box.innerHTML = ''; const q = normAr
         else if (v){ const note = v === 'موافق' ? prompt('ملاحظة (مثلاً: موافقة ورقية مستلمة):', 'موافقة ورقية') : ''; if (note === null) return; const rr = await cpCall({ action:'tripMark', id:TRV.trip.id, sid:x.sid, f:'status', v, note }, 'trVMsg'); if (rr && rr.ok){ toast(rr.msg); trReload(); } } };
       r.appendChild(m); }
     box.appendChild(r); }); }
-$('trQ').oninput = () => TRV && trRows();
+$('tpQ').oninput = () => TRV && trRows();
 async function trDo(action, extra, ask){ if (ask && !confirm(ask)) return; msg('trVMsg', 'جاري التنفيذ...', 'info'); const r = await cpCall(Object.assign({ action, id:TRV.trip.id }, extra), 'trVMsg'); if (r && r.ok){ msg('trVMsg', r.msg, 'ok'); trReload(); } }
 const TR_HEAD = ['الطالب', 'الحلقة', 'ولي الأمر', 'جوال ولي الأمر', 'جوال الطوارئ', 'ملاحظات صحية', 'الصعود', 'العودة'];
 const trPart = () => TRV.reqs.filter(x => x.status === 'موافق').map(x => [x.sname, x.hname, x.pname, x.pphone, x.emerg, x.health, x.board, x.ret]);
@@ -4683,7 +4685,7 @@ function trForm(v){ const t = v ? v.trip : {}, H = (TRL && TRL.halaqat) || [];
   $('trfSeats').value = t.seats || ''; $('trfPledge').value = t.pledge || (TRL && TRL.pledge) || '';
   if (v) v.reqs.forEach(x => { if (x.status !== 'مستبعد') TRF.sel[x.sid] = true; });
   TRF.H = H.length ? H : (D.halaqat || []).map(h => ({ hid:String(h.hid), name:h.name })); trfHal();
-  msg('trfMsg', '', ''); $('trfQ').value = ''; $('trSheet').classList.remove('hidden'); document.body.style.overflow = 'hidden';
+  msg('trfMsg', '', ''); $('trfQ').value = ''; $('tpSheet').classList.remove('hidden'); document.body.style.overflow = 'hidden';
   trfStu(); }
 function trfStu(){ const box = $('trfStu'); box.innerHTML = ''; const q = normAr($('trfQ').value), H = {}; ((TRL && TRL.halaqat) || []).forEach(h => H[h.hid] = h.name);
   const L = (TRF.stu || []).filter(s => q ? normAr(s.name).indexOf(q) !== -1 : (TRF.hids.has(s.hid) || TRF.sel[s.sid]));
@@ -4700,14 +4702,14 @@ function trfSetHal(h, on, quiet){ on ? TRF.hids.add(h.hid) : TRF.hids.delete(h.h
   if (!quiet){ trfHal(); trfStu(); } }
 const trfN = () => { $('trfN').textContent = '(' + Object.keys(TRF.sel).filter(k => TRF.sel[k]).length + ' طالب)'; };
 $('trfQ').oninput = () => TRF && trfStu();
-$('trFClose').onclick = () => { $('trSheet').classList.add('hidden'); document.body.style.overflow = ''; };
+$('trFClose').onclick = () => { $('tpSheet').classList.add('hidden'); document.body.style.overflow = ''; };
 $('trfSave').onclick = async () => { const d = { title:$('trfTitle').value.trim(), date:$('trfDate').value, seats:$('trfSeats').value, go:$('trfGo').value, back:$('trfBack').value, place:$('trfPlace').value.trim(), meet:$('trfMeet').value.trim(), meetLoc:$('trfMeetLoc').value.trim(),
     bring:$('trfBring').value.trim(), deadline:$('trfDl').value, sups:$('trfSups').value.trim(), supPhone:$('trfSupP').value.trim(), tname:$('trfTn').value.trim(), tphone:$('trfTp').value.trim(), pledge:$('trfPledge').value.trim(), notes:$('trfNotes').value.trim(), fee:$('trfFee').value.trim(), hids:[...TRF.hids] };
   const inH = s => TRF.hids.has(s.hid); d.add = (TRF.stu || []).filter(s => TRF.sel[s.sid] && !inH(s)).map(s => s.sid); d.rem = (TRF.stu || []).filter(s => !TRF.sel[s.sid] && inH(s)).map(s => s.sid);
   if (!d.hids.length && !d.add.length) return msg('trfMsg', 'اختر حلقة أو طلاباً للرحلة.', 'err');
   const sb = $('trfSave'); if (sb.disabled) return; sb.disabled = true;
   msg('trfMsg', 'جاري الحفظ...', 'info'); let r; try { r = await cpCall({ action:'tripSave', id:TRF.id, data:d }, 'trfMsg'); } finally { sb.disabled = false; } if (!r || !r.ok) return;
-  TRF.id = r.id; toast(r.msg); $('trSheet').classList.add('hidden'); document.body.style.overflow = ''; openTrip(r.id); };
+  TRF.id = r.id; toast(r.msg); $('tpSheet').classList.add('hidden'); document.body.style.overflow = ''; openTrip(r.id); };
 /* ---------- خطة اليوم: ما على كل طالب من حفظ ومراجعة ---------- */
 let PDY = null;
 const PD_HEAD = ['الطالب', 'الحلقة', 'المرحلية', 'الحفظ', 'المراجعة القريبة', 'المراجعة البعيدة', 'الحالة'];
@@ -5233,17 +5235,17 @@ $('meChangePin').onclick = () => openPin();
 /* ---------- الأرشفة السنوية ---------- */
 let AR = null;
 const RS_T = { eval:['التقييم والتقارير', 'الحضور والتسميع واعتماد الحلقات (ومنها تُحسب التقارير وفارس الحلقة)'], refs:['الإحالات والترشيحات', 'الإحالات وترشيحات الاختبار القبلي والجمعية ومجموعاتها'], plans:['الخطط', 'خطط الطلاب وطلبات تعديلها'] };
-async function openRs(){ const b = $('rsList'); b.innerHTML = ''; $('rsConf').value = ''; msg('rsMsg', '', ''); const r = await cpCall({ action:'resetInfo' }, 'rsMsg'); if (!r || !r.ok) return;
+async function openRs(){ const b = $('rsList'); b.innerHTML = ''; $('rsConf').value = ''; msg('rzMsg', '', ''); const r = await cpCall({ action:'resetInfo' }, 'rzMsg'); if (!r || !r.ok) return;
   Object.keys(RS_T).forEach(g => { const l = el('label', 'chk'), c = el('input'); c.type = 'checkbox'; c.value = g; c.checked = true; c.style.width = 'auto'; l.style.display = 'flex'; l.style.gap = '8px'; l.style.alignItems = 'flex-start';
     const t = el('div'); t.appendChild(el('b', '', RS_T[g][0] + ' — ' + r.groups[g].reduce((a, x) => a + x.n, 0) + ' سجل')); t.appendChild(el('small', '', RS_T[g][1] + ' • ' + r.groups[g].map(x => x.name + ': ' + x.n).join('، ')));
     l.appendChild(c); l.appendChild(t); b.appendChild(l); }); }
 $('rsRun').onclick = async () => {
-  const gs = [...$('rsList').querySelectorAll('input:checked')].map(x => x.value); if (!gs.length) return msg('rsMsg', 'اختر ما تريد تصفيره.', 'err');
-  if ($('rsConf').value.trim() !== 'تصفير') return msg('rsMsg', 'اكتب كلمة «تصفير» للتأكيد.', 'err');
+  const gs = [...$('rsList').querySelectorAll('input:checked')].map(x => x.value); if (!gs.length) return msg('rzMsg', 'اختر ما تريد تصفيره.', 'err');
+  if ($('rsConf').value.trim() !== 'تصفير') return msg('rzMsg', 'اكتب كلمة «تصفير» للتأكيد.', 'err');
   if (!confirm('سيُمسح: ' + gs.map(g => RS_T[g][0]).join('، ') + '. متأكد؟')) return;
-  $('rsRun').disabled = true; msg('rsMsg', 'جاري أخذ نسخة احتياطية ثم التصفير...', 'info');
-  const r = await cpCall({ action:'resetRun', groups:gs, confirm:'تصفير' }, 'rsMsg'); $('rsRun').disabled = false;
-  if (r && r.ok){ msg('rsMsg', '✓ ' + r.msg, 'ok'); const a = el('a', '', 'فتح النسخة الاحتياطية'); a.href = r.backup; a.target = '_blank'; $('rsMsg').appendChild(a); const keep = $('rsMsg').innerHTML; await openRs(); $('rsMsg').innerHTML = keep; }
+  $('rsRun').disabled = true; msg('rzMsg', 'جاري أخذ نسخة احتياطية ثم التصفير...', 'info');
+  const r = await cpCall({ action:'resetRun', groups:gs, confirm:'تصفير' }, 'rzMsg'); $('rsRun').disabled = false;
+  if (r && r.ok){ msg('rzMsg', '✓ ' + r.msg, 'ok'); const a = el('a', '', 'فتح النسخة الاحتياطية'); a.href = r.backup; a.target = '_blank'; $('rzMsg').appendChild(a); const keep = $('rzMsg').innerHTML; await openRs(); $('rzMsg').innerHTML = keep; }
 };
 async function openArc(){ openRs(); $('arPv').classList.add('hidden'); $('arRun').disabled = true; const r = await cpCall({ action:'arcInfo' }, 'arMsg'); if (r && r.ok){ AR = r; if (!$('arBefore').value) $('arBefore').value = r.def; renderArc(); } }
 function renderArc(){
@@ -6052,7 +6054,7 @@ async function openFull(){
   if (frP === 'custom' && !$('frFrom').value){ $('frFrom').value = addDays(D.today, -30); $('frTo').value = D.today; }
   const my = ++frSeq, rg = frRange(), sid = $('frStu').value, hid = $('frHal').value;
   $('frMsg').innerHTML = '<div class="msg info">جاري تحميل التقرير...</div>';
-  let r; try { r = await api(Object.assign({ action:'fullRep', hid:hid, sid:sid }, rg ? { from:rg[0], to:rg[1] } : { term:1 })); } catch(e){ if (my === frSeq && e.message !== 'expired') msg('frMsg', 'تعذّر الاتصال بالخادم.', 'err'); return; }
+  let r; try { r = noTags(await api(Object.assign({ action:'fullRep', hid:hid, sid:sid }, rg ? { from:rg[0], to:rg[1] } : { term:1 }))); } catch(e){ if (my === frSeq && e.message !== 'expired') msg('frMsg', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (my !== frSeq) return;
   if (!r.ok) return msg('frMsg', r.msg === 'إجراء غير معروف' ? 'التقرير الشامل يحتاج تحديث كود الخادم (Apps Script) إلى آخر نسخة.' : r.msg, 'err');
   $('frMsg').innerHTML = ''; FR = r; frFilters(); frRender();
@@ -7426,7 +7428,7 @@ async function loadStarAdd(){
 }
 function renderStarAdd(){
   const box = $('saList'); box.innerHTML = ''; if (!STA) return;
-  const hid = $('saHal').value, q = normAr($('saQ').value.trim()), H = {}; STA.halaqat.forEach(h => H[h.hid] = h);
+  const hid = $('saHal').value, q = normAr($('staQ').value.trim()), H = {}; STA.halaqat.forEach(h => H[h.hid] = h);
   if (!hid && !q){ box.appendChild(el('small', 'muted', 'اختر الحلقة أو اكتب اسم الطالب.')); return; }
   const L = STA.students.filter(x => (!hid || x.hid === hid) && (!q || normAr(x.name).indexOf(q) !== -1)).slice(0, 40);
   if (hid && H[hid] && H[hid].star) box.appendChild(el('div', 'msg info', 'لـ«' + H[hid].name + '» فارس اليوم: ' + H[hid].star.name + (H[hid].star.manual ? ' (أُضيف يدوياً)' : '') + '.'));
@@ -7437,7 +7439,7 @@ function renderStarAdd(){
       const r = await cpCall({ action:'starAdd', sid:x.sid }, 'saList'); if (r && r.ok){ STA = r; toast(r.msg); loadStarAdd(); openStars(); } });
     w.appendChild(b); box.appendChild(w); });
 }
-$('saHal').onchange = () => STA && renderStarAdd(); $('saQ').oninput = () => STA && renderStarAdd();
+$('saHal').onchange = () => STA && renderStarAdd(); $('staQ').oninput = () => STA && renderStarAdd();
 async function openStars(){
   loadStarAdd();
   const per = $('fsPeriod'); per.innerHTML = '';
@@ -7824,7 +7826,7 @@ function openStudentEdit(x){
 let mvCur = null;
 function openMove(x){
   mvCur = x; msg('mvMsg', '', '');
-  $('mvText').textContent = x.name + ' — حلقته الحالية: ' + (x.hname || 'بدون حلقة');
+  $('mvCurT').textContent = x.name + ' — حلقته الحالية: ' + (x.hname || 'بدون حلقة');
   fillSel('mvHid', SB.halaqat.filter(h => h.hid !== x.hid).map(h => [h.hid, h.name]), '— اختر الحلقة —');
   $('mvSheet').classList.remove('hidden');
 }
