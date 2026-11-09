@@ -2352,6 +2352,8 @@
       <div><label for="trfGo">وقت الذهاب</label><input id="trfGo" type="time"></div><div><label for="trfBack">وقت العودة</label><input id="trfBack" type="time"></div></div>
     <label for="trfPlace">المكان</label><input id="trfPlace" maxlength="120">
     <label for="trfMeet">نقطة التجمع</label><input id="trfMeet" maxlength="120" placeholder="مثال: ساحة الجامع">
+    <label for="trfMeetLoc">موقع التجمع على الخرائط (اختياري)</label><input id="trfMeetLoc" maxlength="300" dir="ltr" style="text-align:right" inputmode="url" placeholder="https://maps.app.goo.gl/...">
+    <small class="muted" style="display:block;margin-top:4px">انسخ رابط الموقع من خرائط Google أو Apple. يصل لولي الأمر في رسالة الدعوة ورسالة الوصول، ويظهر زراً في صفحة الموافقة.</small>
     <label for="trfBring">ما يحضره الطالب (اختياري)</label><input id="trfBring" maxlength="300">
     <label for="trfDl">آخر موعد للموافقة</label><input id="trfDl" type="datetime-local">
     <div class="edgrid"><div><label for="trfSups">المشرفون المرافقون</label><input id="trfSups" maxlength="200"></div><div><label for="trfSupP">جوال المشرف (يظهر لأولياء الأمور)</label><input id="trfSupP" type="tel" inputmode="tel" maxlength="10" dir="ltr" style="text-align:right" placeholder="05xxxxxxxx"></div>
@@ -4520,7 +4522,7 @@ $('asPdf').onclick = () => { if (!AX) return; const list = asSorted(asList()), p
   list.forEach((x, i) => { const tr = el('tr'); [i + 1, x.sname, x.nid, x.hname, x.level, x.examDate].forEach(v => tr.appendChild(el('td', '', v))); tb.appendChild(tr); }); t.appendChild(tb); p.appendChild(t);
   setTimeout(brandPrint, 50); };
 /* ---------- مجموعات اختبار الجمعية: تجميع المرشحين حسب يوم الاختبار، ومشرفو الجمعية، واعتماد المجموعة ---------- */
-const exbIn = x => [AX.st.nom, AX.st.ok, AX.st.no].indexOf(x.status) !== -1 && x.examDate;
+const exbIn = x => [AX.st.nom, AX.st.ok, AX.st.no, AX.st.abs].indexOf(x.status) !== -1 && x.examDate;
 function exbDates(){ const ds = new Set(AX.list.filter(exbIn).map(x => x.examDate));
   const t = D.today; return [...ds].sort((a, b) => (a < t) - (b < t) || (a < t ? b.localeCompare(a) : a.localeCompare(b))); }
 const ordAr = n => { const u = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة', 'العاشرة'], h = ['الحادية', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة'],
@@ -4677,7 +4679,7 @@ let TRF = null;
 function trForm(v){ const t = v ? v.trip : {}, H = (TRL && TRL.halaqat) || [];
   TRF = { id:t.id || null, hids:new Set(t.hids || []), stu:(v && v.students) || (TRL && TRL.students) || [], sel:{} };
   $('trFT').textContent = v ? 'تعديل الرحلة' : 'رحلة جديدة';
-  [['trfTitle', 'title'], ['trfDate', 'date'], ['trfSeats', 'seats'], ['trfGo', 'go'], ['trfBack', 'back'], ['trfPlace', 'place'], ['trfMeet', 'meet'], ['trfBring', 'bring'], ['trfDl', 'deadline'], ['trfSups', 'sups'], ['trfSupP', 'supPhone'], ['trfTn', 'tname'], ['trfTp', 'tphone'], ['trfNotes', 'notes'], ['trfFee', 'fee']].forEach(x => $(x[0]).value = t[x[1]] || '');
+  [['trfTitle', 'title'], ['trfDate', 'date'], ['trfSeats', 'seats'], ['trfGo', 'go'], ['trfBack', 'back'], ['trfPlace', 'place'], ['trfMeet', 'meet'], ['trfMeetLoc', 'meetLoc'], ['trfBring', 'bring'], ['trfDl', 'deadline'], ['trfSups', 'sups'], ['trfSupP', 'supPhone'], ['trfTn', 'tname'], ['trfTp', 'tphone'], ['trfNotes', 'notes'], ['trfFee', 'fee']].forEach(x => $(x[0]).value = t[x[1]] || '');
   $('trfSeats').value = t.seats || ''; $('trfPledge').value = t.pledge || (TRL && TRL.pledge) || '';
   if (v) v.reqs.forEach(x => { if (x.status !== 'مستبعد') TRF.sel[x.sid] = true; });
   TRF.H = H.length ? H : (D.halaqat || []).map(h => ({ hid:String(h.hid), name:h.name })); trfHal();
@@ -4699,7 +4701,7 @@ function trfSetHal(h, on, quiet){ on ? TRF.hids.add(h.hid) : TRF.hids.delete(h.h
 const trfN = () => { $('trfN').textContent = '(' + Object.keys(TRF.sel).filter(k => TRF.sel[k]).length + ' طالب)'; };
 $('trfQ').oninput = () => TRF && trfStu();
 $('trFClose').onclick = () => { $('trSheet').classList.add('hidden'); document.body.style.overflow = ''; };
-$('trfSave').onclick = async () => { const d = { title:$('trfTitle').value.trim(), date:$('trfDate').value, seats:$('trfSeats').value, go:$('trfGo').value, back:$('trfBack').value, place:$('trfPlace').value.trim(), meet:$('trfMeet').value.trim(),
+$('trfSave').onclick = async () => { const d = { title:$('trfTitle').value.trim(), date:$('trfDate').value, seats:$('trfSeats').value, go:$('trfGo').value, back:$('trfBack').value, place:$('trfPlace').value.trim(), meet:$('trfMeet').value.trim(), meetLoc:$('trfMeetLoc').value.trim(),
     bring:$('trfBring').value.trim(), deadline:$('trfDl').value, sups:$('trfSups').value.trim(), supPhone:$('trfSupP').value.trim(), tname:$('trfTn').value.trim(), tphone:$('trfTp').value.trim(), pledge:$('trfPledge').value.trim(), notes:$('trfNotes').value.trim(), fee:$('trfFee').value.trim(), hids:[...TRF.hids] };
   const inH = s => TRF.hids.has(s.hid); d.add = (TRF.stu || []).filter(s => TRF.sel[s.sid] && !inH(s)).map(s => s.sid); d.rem = (TRF.stu || []).filter(s => !TRF.sel[s.sid] && inH(s)).map(s => s.sid);
   if (!d.hids.length && !d.add.length) return msg('trfMsg', 'اختر حلقة أو طلاباً للرحلة.', 'err');

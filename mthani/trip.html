@@ -49,7 +49,7 @@
   .hp{position:absolute;top:0;right:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
   .hidden{display:none!important}
 
-  .dl{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;margin:10px 0 0;font-size:15px;line-height:1.7} .dl dt{color:var(--muted);white-space:nowrap} .dl dd{margin:0;font-weight:600}
+  .dl{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;margin:10px 0 0;font-size:15px;line-height:1.7} .dl dt{color:var(--muted);white-space:nowrap} .dl dd{margin:0;font-weight:600} .mapb{display:inline-block;padding:6px 14px;border-radius:999px;background:var(--light);color:var(--navy);text-decoration:none;font-weight:700}
   .who{display:flex;align-items:center;gap:10px;background:var(--goldlight);border-radius:14px;padding:12px 14px;margin-top:4px} .who b{font-size:17px} .who small{display:block}
   .pledge{background:var(--light);border-radius:12px;padding:12px 14px;line-height:1.9;font-weight:700;margin:8px 0 2px;border-inline-start:4px solid var(--gold)}
   textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);min-height:84px;resize:vertical} textarea:focus{outline:none;border-color:var(--gold)}
@@ -114,6 +114,8 @@ function show(r){
   const t = r.trip; $('tTitle').textContent = /^رحل(ة|ه)\s/.test(t.title) ? t.title : 'رحلة ' + t.title; $('sName').textContent = r.sname; $('hName').textContent = r.hname || '';
   const dl = $('tInfo'); dl.innerHTML = ''; [['اليوم', t.day], ['المكان', t.place], ['الانطلاق', [t.go && 'الساعة ' + t.go, t.meet && 'من ' + t.meet].filter(Boolean).join(' ')], ['العودة', t.back && 'الساعة ' + t.back],
     ['ما يحضره الطالب', t.bring], ['المشرفون', t.sups], ['جوال المشرف', t.supPhone], ['معلم الحلقة', [t.tname, t.tphone].filter(Boolean).join(' — ')], ['الرسوم', t.fee], ['ملاحظات', t.notes], ['آخر موعد للرد', t.deadline]].forEach(x => { if (!x[1]) return; const a = document.createElement('dt'), b = document.createElement('dd'); a.textContent = x[0]; b.textContent = x[1]; dl.appendChild(a); dl.appendChild(b); });
+  if (/^https:\/\//.test(t.meetLoc || '')){ const a = document.createElement('dt'), b = document.createElement('dd'), l = document.createElement('a'); a.textContent = 'موقع التجمع';
+    l.href = t.meetLoc; l.target = '_blank'; l.rel = 'noopener'; l.className = 'mapb'; l.textContent = '📍 فتح الموقع في الخرائط'; b.appendChild(l); dl.appendChild(a); dl.appendChild(b); }
   $('pledgeTxt').textContent = t.pledge;
   const st = STT[r.status];
   if (st){ $('prev').classList.remove('hidden'); $('prevMsg').className = 'msg ' + (st[0] === 'no' ? 'err' : st[0] === 'wait' ? 'info' : 'ok'); $('prevMsg').textContent = st[1] + (r.pname ? ' — ' + r.pname : '') + (r.at ? ' (' + r.at.slice(0, 16) + ')' : ''); }
