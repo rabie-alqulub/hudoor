@@ -2711,7 +2711,17 @@ function arFix(node){
 }
 try { new MutationObserver(ms => ms.forEach(m => { if (m.type === 'characterData') arFix(m.target); else m.addedNodes.forEach(arFix); })).observe(document.documentElement, { childList:true, subtree:true, characterData:true }); } catch(e){}
 const apiWait = ms => new Promise(r => setTimeout(r, ms));
-async function api(data){
+// منع الطلب المكرر: إن ضُغط الزر مرتين والطلب الأول لم يرجع بعد، يُنتظر الأول ولا يُرسل طلب ثانٍ
+const API_INFL = {};
+function api(data){
+  if (API_SAFE.indexOf(data.action) !== -1) return apiRaw(data);
+  let k; try { k = JSON.stringify(data); } catch(e){ return apiRaw(data); }
+  if (API_INFL[k]) return API_INFL[k];
+  const p = apiRaw(data); API_INFL[k] = p;
+  const done = () => setTimeout(() => { if (API_INFL[k] === p) delete API_INFL[k]; }, 2500); p.then(done, done);
+  return p;
+}
+async function apiRaw(data){
   if (API_URL.indexOf('http') !== 0) throw new Error('لم يُضبط رابط الخادم بعد في الملف.');
   const tok = store.get('hq_token'); if (tok) data.token = tok;
   const safe = API_SAFE.indexOf(data.action) !== -1;
@@ -4693,8 +4703,9 @@ $('trfSave').onclick = async () => { const d = { title:$('trfTitle').value.trim(
     bring:$('trfBring').value.trim(), deadline:$('trfDl').value, sups:$('trfSups').value.trim(), supPhone:$('trfSupP').value.trim(), tname:$('trfTn').value.trim(), tphone:$('trfTp').value.trim(), pledge:$('trfPledge').value.trim(), notes:$('trfNotes').value.trim(), fee:$('trfFee').value.trim(), hids:[...TRF.hids] };
   const inH = s => TRF.hids.has(s.hid); d.add = (TRF.stu || []).filter(s => TRF.sel[s.sid] && !inH(s)).map(s => s.sid); d.rem = (TRF.stu || []).filter(s => !TRF.sel[s.sid] && inH(s)).map(s => s.sid);
   if (!d.hids.length && !d.add.length) return msg('trfMsg', 'اختر حلقة أو طلاباً للرحلة.', 'err');
-  msg('trfMsg', 'جاري الحفظ...', 'info'); const r = await cpCall({ action:'tripSave', id:TRF.id, data:d }, 'trfMsg'); if (!r || !r.ok) return;
-  toast(r.msg); $('trSheet').classList.add('hidden'); document.body.style.overflow = ''; openTrip(r.id); };
+  const sb = $('trfSave'); if (sb.disabled) return; sb.disabled = true;
+  msg('trfMsg', 'جاري الحفظ...', 'info'); let r; try { r = await cpCall({ action:'tripSave', id:TRF.id, data:d }, 'trfMsg'); } finally { sb.disabled = false; } if (!r || !r.ok) return;
+  TRF.id = r.id; toast(r.msg); $('trSheet').classList.add('hidden'); document.body.style.overflow = ''; openTrip(r.id); };
 /* ---------- خطة اليوم: ما على كل طالب من حفظ ومراجعة ---------- */
 let PDY = null;
 const PD_HEAD = ['الطالب', 'الحلقة', 'المرحلية', 'الحفظ', 'المراجعة القريبة', 'المراجعة البعيدة', 'الحالة'];
