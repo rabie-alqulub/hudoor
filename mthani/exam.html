@@ -66,6 +66,30 @@
   .stepper{display:inline-flex;align-items:center;gap:4px} .stepper input{width:58px!important;text-align:center;padding:7px 4px!important;-moz-appearance:textfield}
   .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .stepper button{width:34px;height:34px;padding:0;border-radius:10px;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}
+  @media (max-width:700px){
+    .sheet{padding:8px 0} .sheet .card{margin:0 6px;padding:14px 12px}
+    .sheet input[readonly]{font-size:14.5px;padding:9px 8px}
+    .tw{overflow:visible}
+    table.q,table.q tbody{display:block} table.q thead{display:none}
+    table.q tr:not(.mfr){display:grid;grid-template-columns:30px minmax(0,1fr) 78px;grid-template-areas:"n s a" "n v m";gap:8px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:10px;background:var(--card)}
+    table.q tr:not(.mfr) td{border:0;padding:0}
+    table.q td:nth-child(1){grid-area:n;align-self:stretch;display:flex;align-items:center;justify-content:center;background:var(--light);color:var(--navy);font-weight:800;border-radius:10px;font-size:16px}
+    table.q td:nth-child(2){grid-area:s} table.q td:nth-child(2) select{width:100%;min-width:0}
+    table.q td:nth-child(3){grid-area:a} table.q td:nth-child(3) input{width:100%}
+    table.q td:nth-child(4){grid-area:v;display:flex;align-items:center;gap:8px} table.q td:nth-child(4)::before{content:'الدرجة';font-size:12.5px;color:var(--muted)}
+    table.q td:nth-child(5){grid-area:m} table.q td:nth-child(5) .mfb{width:100%;padding:9px 6px;font-size:14px}
+    table.q td:nth-child(3)::before{content:'الآية';display:block;font-size:11.5px;color:var(--muted);margin-bottom:2px}
+    table.q tr.mfr{display:block} table.q tr.mfr td{display:block;padding:0}
+    .mushaf{max-width:none;font-size:21px}
+    .stepper button{width:40px;height:40px} .stepper input{width:60px!important}
+    .perf{flex-wrap:wrap}
+  }
+  @media (max-width:430px){
+    .grid2 .wd{grid-column:1/-1}
+    table.q tr:not(.mfr){grid-template-columns:28px minmax(0,1fr) 70px;gap:8px 6px;padding:10px 8px}
+    table.q td:nth-child(4)::before{display:none}
+    .stepper button{width:38px;height:38px} .stepper input{width:52px!important}
+  }
   .perf{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:10px}
   input[readonly]{background:var(--light);font-weight:700}
   .bar{height:8px;background:var(--light);border-radius:8px;overflow:hidden;margin-top:10px} .bar i{display:block;height:100%;background:var(--ok)}
@@ -224,7 +248,7 @@ function form(s){
   const g = el('div', 'grid2'), fld = (l, i) => { const d = el('div'); d.appendChild(el('label', '', l)); d.appendChild(i); g.appendChild(d); return i; };
   const roIn = v => { const i = el('input'); i.value = v; i.readOnly = true; return i; };
   fld('اسم الطالب', roIn(s.name)); fld('رقم الهوية', roIn(s.nid || '—')); fld('المرحلية', roIn(s.level)); fld('الحلقة', roIn(s.hname));
-  fld('تاريخ الاختبار (ميلادي)', roIn(X.date)); fld('التاريخ الهجري', roIn(hijri(X.date)));
+  [fld('تاريخ الاختبار (ميلادي)', roIn(X.date)), fld('التاريخ الهجري', roIn(hijri(X.date)))].forEach(i => i.parentNode.className = 'wd');
   const rF = fld('النطاق: من سورة', sOpt()), rT = fld('إلى سورة', sOpt()); B.appendChild(g);
   const rg = mrRange(s.level); if (rg){ rF.value = rg[0]; rT.value = rg[1]; }
   const gen = el('button', '', 'توليد الأسئلة تلقائياً'); gen.type = 'button'; gen.style.marginTop = '10px'; if (!ro) B.appendChild(gen);
