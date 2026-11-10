@@ -4628,8 +4628,10 @@ $('sgXls').onclick = () => { if (!SG) return; const rows = [['الطلاب ال�
 let TRL = null, TRV = null, trTab = 'all', trDay = false;
 const TR_STC = { 'موافق':'p-ok', 'رافض':'p-red', 'لم يرد':'p-none', 'انتظار':'p-late', 'مستبعد':'p-none' };
 const trBase = () => new URL('trip.html', location.href).href;
+// مستويات صلاحية الرحلات: «عرض» للجميع ممن لهم البند، و«edit» للإنشاء والإرسال، و«day» لتحضير يوم الرحلة
+const tCan = lv => hasL('trips.manage', lv);
 const trDayTxt = d => d ? fmtD(d, { weekday:'long', day:'numeric', month:'long' }) : '';
-async function openTrips(){ $('trView').classList.add('hidden'); $('trHome').classList.remove('hidden'); msg('tpMsg', '', '');
+async function openTrips(){ $('trView').classList.add('hidden'); $('trHome').classList.remove('hidden'); msg('tpMsg', '', ''); $('trNew').classList.toggle('hidden', !tCan('edit'));
   const r = await cpCall({ action:'tripsList' }, 'tpMsg'); if (!r || !r.ok) return; TRL = r; const L = $('trList'); L.innerHTML = '';
   if (!r.trips.length) L.appendChild(el('div', 'card msg info', 'لا توجد رحلات بعد. اضغط «+ رحلة جديدة».'));
   r.trips.forEach(t => { const c = el('div', 'card trcard'); const a = el('div'); a.appendChild(el('b', '', t.title)); a.appendChild(el('small', '', trDayTxt(t.date) + (t.place ? ' • ' + t.place : '')));
@@ -4645,18 +4647,20 @@ function renderTrip(){ const t = TRV.trip, c = TRV.counts;
   const ch = $('trChips'); ch.innerHTML = ''; [['وافق', c.yes, 'p-ok'], ['رفض', c.no, 'p-red'], ['لم يرد', c.none, 'p-none'], ['انتظار', c.wait, 'p-late']].forEach(x => ch.appendChild(el('span', 'pill ' + x[2], x[0] + ' ' + x[1])));
   if (t.seats) ch.appendChild(el('span', 'pill', 'المقاعد المتبقية ' + Math.max(0, t.seats - c.yes) + ' من ' + t.seats));
   const A = $('trActs'); A.innerHTML = ''; const live = ['ملغاة', 'منتهية'].indexOf(t.status) === -1, b = (txt, cls, fn) => { const x = el('button', cls || 'soft', txt); x.onclick = fn; A.appendChild(x); };
-  if (live){ b('تعديل الرحلة والطلاب', '', () => trForm(TRV));
-    b('إرسال طلب الموافقة', 'btn', () => trDo('tripSend', { base:trBase() }, 'إرسال طلب الموافقة عبر برق لأولياء أمور الطلاب الذين لم يُرسل لهم بعد؟'));
-    if (TRV.reqs.some(x => x.status === 'لم يرد' && x.sends)) b('تذكير من لم يرد', '', () => trDo('tripSend', { base:trBase(), scope:'pending' }, 'إرسال تذكير لمن لم يرد؟'));
-    b(trDay ? 'إخفاء أدوات يوم الرحلة' : 'يوم الرحلة: الصعود والعودة', '', () => { trDay = !trDay; if (trDay) trTab = 'yes'; renderTrip(); });
+  const E = tCan('edit'), Y = tCan('day'); $('trNew').classList.toggle('hidden', !E);
+  if (live){ if (E) b('تعديل الرحلة والطلاب', '', () => trForm(TRV));
+    if (E) b('إرسال طلب الموافقة', 'btn', () => trDo('tripSend', { base:trBase() }, 'إرسال طلب الموافقة عبر برق لأولياء أمور الطلاب الذين لم يُرسل لهم بعد؟'));
+    if (E && TRV.reqs.some(x => x.status === 'لم يرد' && x.sends)) b('تذكير من لم يرد', '', () => trDo('tripSend', { base:trBase(), scope:'pending' }, 'إرسال تذكير لمن لم يرد؟'));
+    if (!Y) trDay = false;
+    if (Y) b(trDay ? 'إخفاء أدوات يوم الرحلة' : 'يوم الرحلة: الصعود والعودة', '', () => { trDay = !trDay; if (trDay) trTab = 'yes'; renderTrip(); });
     if (trDay){ b('انطلقت الرحلة', 'btn', () => trDo('tripOp', { op:'go' }, 'سيصل لأولياء أمور الصاعدين «انطلقت الرحلة»، ولأولياء أمور الغائبين تنبيه بأن أبناءهم لم يحضروا. متابعة؟'));
       b('وصلت الرحلة', '', async () => { if (!confirm('إرسال «وصلت الرحلة» لأولياء أمور الصاعدين؟')) return; const r = await api({ action:'tripOp', id:TRV.trip.id, op:'arrive' });
         if (r.notBack){ if (!confirm('تنبيه: لم يُسجَّل عودة: ' + r.notBack.join('، ') + '\nتأكد من وجودهم قبل الإرسال. هل تريد الإرسال رغم ذلك؟')) { msg('trVMsg', r.msg, 'err'); return; } return trDo('tripOp', { op:'arrive', force:1 }); }
         msg('trVMsg', r.msg, r.ok ? 'ok' : 'err'); if (r.ok) trReload(); }); }
-    b('رسالة للموافقين', '', () => { const tx = prompt('نص الرسالة لأولياء أمور الموافقين:'); if (tx) trDo('tripOp', { op:'msg', text:tx }); });
+    if (E){ b('رسالة للموافقين', '', () => { const tx = prompt('نص الرسالة لأولياء أمور الموافقين:'); if (tx) trDo('tripOp', { op:'msg', text:tx }); });
     b(t.status === 'مغلقة' ? 'فتح الموافقات' : 'إغلاق الموافقات', '', () => trDo('tripOp', { op:t.status === 'مغلقة' ? 'open' : 'close' }));
     b('إلغاء الرحلة', 'danger', () => { const why = prompt('سيصل لأولياء أمور الموافقين إشعار بالإلغاء. سبب الإلغاء (اختياري):', ''); if (why !== null) trDo('tripOp', { op:'cancel', text:why }); });
-    b('إنهاء الرحلة', '', () => trDo('tripOp', { op:'done' }, 'إغلاق الرحلة كمنتهية؟')); }
+    b('إنهاء الرحلة', '', () => trDo('tripOp', { op:'done' }, 'إغلاق الرحلة كمنتهية؟')); } }
   b('كشف المشاركين PDF', '', trPdf); b('Excel', '', trXls);
   const tb = $('trTabs'); tb.innerHTML = ''; [['all', 'الكل'], ['yes', 'موافق'], ['no', 'رافض'], ['none', 'لم يرد'], ['wait', 'انتظار']].forEach(x => { const k = el('button', trTab === x[0] ? 'on' : '', x[1]); k.onclick = () => { trTab = x[0]; renderTrip(); }; tb.appendChild(k); });
   trRows(); }
@@ -4672,7 +4676,7 @@ function trRows(){ const box = $('trRows'); box.innerHTML = ''; const q = normAr
     if (trDay && x.status === 'موافق'){ const bd = el('div', 'bd'); [['board', 'صعد', ''], ['board', 'غائب', 'off'], ['ret', 'عاد', '']].forEach(z => { const k = el('button', z[2] + (x[z[0]] === z[1] ? ' on' : ''), z[1]); k.type = 'button';
       k.onclick = async () => { const v = x[z[0]] === z[1] ? '' : z[1]; x[z[0]] = v; trRows(); const rr = await api({ action:'tripMark', id:TRV.trip.id, sid:x.sid, f:z[0], v }); if (!rr.ok) toast(rr.msg); }; bd.appendChild(k); }); r.appendChild(bd); }
     if (x.pname || x.at || x.status === 'موافق' || x.status === 'رافض'){ const vb = el('button', 'trvb', 'استعراض'); vb.type = 'button'; vb.onclick = () => trView(x); r.appendChild(vb); }
-    if (trDay && x.status === 'موافق'){} else if (live){ const m = el('select'); m.className = 'trop'; m.title = 'خيارات التواصل مع ولي الأمر وتسجيل رده يدوياً'; [['', '⋯ خيارات'], ['link', 'نسخ رابط الموافقة'], ['wa', 'إرسال الرابط بالواتساب يدوياً'], ['موافق', 'تسجيل موافقة ورقية'], ['رافض', 'تسجيل اعتذار'], ['لم يرد', 'إعادة إلى «لم يرد»']].forEach(o => { const op = el('option', '', o[1]); op.value = o[0]; m.appendChild(op); });
+    if (trDay && x.status === 'موافق'){} else if (live && tCan('edit')){ const m = el('select'); m.className = 'trop'; m.title = 'خيارات التواصل مع ولي الأمر وتسجيل رده يدوياً'; [['', '⋯ خيارات'], ['link', 'نسخ رابط الموافقة'], ['wa', 'إرسال الرابط بالواتساب يدوياً'], ['موافق', 'تسجيل موافقة ورقية'], ['رافض', 'تسجيل اعتذار'], ['لم يرد', 'إعادة إلى «لم يرد»']].forEach(o => { const op = el('option', '', o[1]); op.value = o[0]; m.appendChild(op); });
       m.onchange = async () => { const v = m.value; m.value = ''; const ln = trBase() + '?t=' + x.t;
         if (v === 'link'){ try { await navigator.clipboard.writeText(ln); toast('نُسخ الرابط'); } catch(e){ prompt('انسخ الرابط:', ln); } }
         else if (v === 'wa'){ const p = String(x.pphone || '').replace(/\D/g, '').replace(/^0/, '966'); window.open('https://wa.me/' + p + '?text=' + encodeURIComponent('السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ ' + x.sname + '\n\nنأمل التكرم بالرد على مشاركة ابنكم في رحلة «' + TRV.trip.title + '» عبر الرابط:\n' + ln), '_blank'); }
