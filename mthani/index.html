@@ -402,6 +402,10 @@
   .frtw{overflow-x:auto}
   .trcard{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer} .trcard b{display:block;font-size:17px;color:var(--navy3)} .trcard small{color:var(--muted)}
   .trr select{width:auto;min-width:140px;margin:0;flex:0 0 auto}
+  .trr .trvb{min-height:38px;padding:0 14px;border-radius:12px;border:1px solid var(--navy);background:var(--card);color:var(--navy);font:inherit;font-weight:700;cursor:pointer;flex:0 0 auto}
+  .trr select.trop{min-width:120px}
+  .trkv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 14px;margin:6px 0 4px} .trkv dt{color:var(--muted)} .trkv dd{margin:0;font-weight:700;overflow-wrap:anywhere} .trkv a{color:var(--navy)}
+  .trpl{margin:8px 0 0;padding:12px 14px;border-radius:12px;background:var(--light);border-inline-start:4px solid var(--gold);white-space:pre-wrap;line-height:1.8}
   .trnew{display:inline-flex;align-items:center;gap:10px;margin-top:12px;min-height:50px;padding:0 26px;border:0;border-radius:16px;background:linear-gradient(135deg,var(--navy3),#2F5D7A);color:#fff;font:inherit;font-size:16.5px;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(31,53,70,.22)}
   .trnew span{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--gold);color:#1B2A36;font-size:20px;line-height:1} .trnew:hover{filter:brightness(1.08)}
   .trchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px} .trchips span{display:inline-flex;align-items:center;gap:6px;background:var(--light);border:1px solid var(--line);border-radius:999px;padding:5px 6px 5px 12px;font-weight:600} .trchips button{border:0;background:var(--card);border-radius:50%;width:26px;height:26px;cursor:pointer;color:var(--muted);font-size:15px}
@@ -2334,6 +2338,13 @@
     <label for="pcOff">أيام مستثناة (إجازات واختبارات) — تاريخ في كل سطر</label><textarea id="pcOff" class="rftxt" dir="ltr" placeholder="2026-11-22"></textarea>
     <div class="goal" id="pcCount"></div>
     <button class="btn" id="pcSave">حفظ التقويم</button><div id="pcMsg"></div>
+  </div>
+</div>
+
+<div class="sheet hidden" id="trvSheet">
+  <div class="panel">
+    <div class="head"><h2 id="trvT">رد ولي الأمر</h2><button class="iconbtn" id="trvClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
+    <div id="trvBody"></div>
   </div>
 </div>
 
@@ -4660,7 +4671,8 @@ function trRows(){ const box = $('trRows'); box.innerHTML = ''; const q = normAr
     r.appendChild(nm); r.appendChild(el('span', 'pill ' + (TR_STC[x.status] || 'p-none'), x.status));
     if (trDay && x.status === 'موافق'){ const bd = el('div', 'bd'); [['board', 'صعد', ''], ['board', 'غائب', 'off'], ['ret', 'عاد', '']].forEach(z => { const k = el('button', z[2] + (x[z[0]] === z[1] ? ' on' : ''), z[1]); k.type = 'button';
       k.onclick = async () => { const v = x[z[0]] === z[1] ? '' : z[1]; x[z[0]] = v; trRows(); const rr = await api({ action:'tripMark', id:TRV.trip.id, sid:x.sid, f:z[0], v }); if (!rr.ok) toast(rr.msg); }; bd.appendChild(k); }); r.appendChild(bd); }
-    else if (live){ const m = el('select'); [['', 'إجراء'], ['link', 'نسخ رابط الموافقة'], ['wa', 'إرسال الرابط بالواتساب يدوياً'], ['موافق', 'تسجيل موافقة ورقية'], ['رافض', 'تسجيل اعتذار'], ['لم يرد', 'إعادة إلى «لم يرد»']].forEach(o => { const op = el('option', '', o[1]); op.value = o[0]; m.appendChild(op); });
+    if (x.pname || x.at || x.status === 'موافق' || x.status === 'رافض'){ const vb = el('button', 'trvb', 'استعراض'); vb.type = 'button'; vb.onclick = () => trView(x); r.appendChild(vb); }
+    if (trDay && x.status === 'موافق'){} else if (live){ const m = el('select'); m.className = 'trop'; m.title = 'خيارات التواصل مع ولي الأمر وتسجيل رده يدوياً'; [['', '⋯ خيارات'], ['link', 'نسخ رابط الموافقة'], ['wa', 'إرسال الرابط بالواتساب يدوياً'], ['موافق', 'تسجيل موافقة ورقية'], ['رافض', 'تسجيل اعتذار'], ['لم يرد', 'إعادة إلى «لم يرد»']].forEach(o => { const op = el('option', '', o[1]); op.value = o[0]; m.appendChild(op); });
       m.onchange = async () => { const v = m.value; m.value = ''; const ln = trBase() + '?t=' + x.t;
         if (v === 'link'){ try { await navigator.clipboard.writeText(ln); toast('نُسخ الرابط'); } catch(e){ prompt('انسخ الرابط:', ln); } }
         else if (v === 'wa'){ const p = String(x.pphone || '').replace(/\D/g, '').replace(/^0/, '966'); window.open('https://wa.me/' + p + '?text=' + encodeURIComponent('السلام عليكم ورحمة الله وبركاته\nولي أمر الطالب/ ' + x.sname + '\n\nنأمل التكرم بالرد على مشاركة ابنكم في رحلة «' + TRV.trip.title + '» عبر الرابط:\n' + ln), '_blank'); }
@@ -4668,6 +4680,17 @@ function trRows(){ const box = $('trRows'); box.innerHTML = ''; const q = normAr
       r.appendChild(m); }
     box.appendChild(r); }); }
 $('tpQ').oninput = () => TRV && trRows();
+/** استعراض رد ولي الأمر كاملاً */
+function trView(x){ $('trvT').textContent = 'رد ولي أمر: ' + x.sname; const b = $('trvBody'); b.innerHTML = '';
+  const kv = el('dl', 'trkv'), add = (k, v, href) => { if (!v) return; kv.appendChild(el('dt', '', k)); const d = el('dd'); if (href){ const a = el('a', '', v); a.href = href; a.dir = 'ltr'; d.appendChild(a); } else d.textContent = v; kv.appendChild(d); };
+  const tel = v => 'tel:' + String(v).replace(/\D/g, '');
+  add('الحالة', x.status); add('الحلقة', x.hname); add('اسم ولي الأمر', x.pname); add('هوية ولي الأمر', x.pnid);
+  add('جوال ولي الأمر', x.pphone, x.pphone && tel(x.pphone)); add('جوال الطوارئ', x.emerg, x.emerg && tel(x.emerg));
+  add('ملاحظات صحية', x.health || (x.pname ? 'لا يوجد' : '')); add('وقت الرد', x.at); add('طريقة الرد', x.via); add('ملاحظة', x.note);
+  add('الصعود', x.board); add('العودة', x.ret); b.appendChild(kv);
+  if (x.pledge){ b.appendChild(el('div', 'rfsec', 'التعهد كما كتبه ولي الأمر')); b.appendChild(el('blockquote', 'trpl', x.pledge)); }
+  $('trvSheet').classList.remove('hidden'); }
+$('trvClose').onclick = () => $('trvSheet').classList.add('hidden');
 async function trDo(action, extra, ask){ if (ask && !confirm(ask)) return; msg('trVMsg', 'جاري التنفيذ...', 'info'); const r = await cpCall(Object.assign({ action, id:TRV.trip.id }, extra), 'trVMsg'); if (r && r.ok){ msg('trVMsg', r.msg, 'ok'); trReload(); } }
 const TR_HEAD = ['الطالب', 'الحلقة', 'ولي الأمر', 'جوال ولي الأمر', 'جوال الطوارئ', 'ملاحظات صحية', 'الصعود', 'العودة'];
 const trPart = () => TRV.reqs.filter(x => x.status === 'موافق').map(x => [x.sname, x.hname, x.pname, x.pphone, x.emerg, x.health, x.board, x.ret]);
