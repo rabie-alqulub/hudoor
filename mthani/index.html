@@ -3982,7 +3982,7 @@ function renderAppr(){
     const d = el('div', 'appr', '✓ تم اعتماد تقييمات هذا اليوم' + (approval.at ? ' الساعة ' + approval.at : ''));
     st.appendChild(d);
     if (approval.starName) st.appendChild(el('div', '', 'فارس الحلقة: ' + approval.starName));
-    if (dayCanFix && !teachDiw){ const fb = el('button', 'soft', 'إرسال التقرير المصحَّح لأولياء الأمور'); fb.type = 'button'; fb.style.marginTop = '8px';
+    if ((dayCanFix || teachVO) && !teachDiw){ const fb = el('button', 'soft', 'إرسال التقرير المصحَّح لأولياء الأمور'); fb.type = 'button'; fb.style.marginTop = '8px';
       fb.title = 'بعد تصحيح الحضور أو التقييم: يصل التقرير الجديد فقط لمن تغيّر تقريره عمّا أُرسل له';
       fb.onclick = () => confirmOp('إرسال التقرير المصحَّح', 'تقارن المنصة تقرير كل طالب بما أُرسل لولي أمره اليوم، وترسل التقرير المصحَّح فقط لمن تغيّر تقريره، مع اعتذار عن الخطأ.', 'إرسال', async () => {
         fb.disabled = true; try { const r = await api({ action:'reportFix', hid:hal, date:day }); toast(r.msg); if (!r.ok) fb.disabled = false; } catch(e){ fb.disabled = false; toast('تعذّر الاتصال، حاول مجدداً.'); } });
@@ -6402,7 +6402,7 @@ const lvAvg = v => v == null ? '' : v >= 8 ? 'lv-g' : v >= 6.5 ? 'lv-y' : 'lv-r'
 const lvPl = v => v == null ? '' : v >= 75 ? 'lv-g' : v >= 40 ? 'lv-y' : 'lv-r';
 /* تفاصيل الاعتمادات: المعتمدة وغير المعتمدة وفي الديوانية (يوم واحد)، أو اعتمادات كل حلقة في الفترة */
 // المدير والشؤون التعليمية: يصححان اليوم المعتمد ويرسلان التقرير المصحَّح
-const canFixUI = () => { const P = (D && D.perms) || []; return P.indexOf('*') !== -1 || (D && D.portal === 'edu') || /تعليمي/.test(String((D && D.title) || '')) || P.indexOf('halaqat.reeval') !== -1; };
+const canFixUI = () => { const P = (D && D.perms) || []; return (D && (D.roles || []).indexOf('admin') !== -1) || P.indexOf('*') !== -1 || (D && D.portal === 'edu') || /تعليمي/.test(String((D && D.title) || '')) || P.indexOf('halaqat.reeval') !== -1; };
 function openApList(){
   const H = DS.halaqat || [], one = DS.from === DS.to, b = $('apvBody'); b.innerHTML = '';
   $('apvT').textContent = one ? 'اعتمادات ' + fmtD(DS.from, { weekday:'long', day:'numeric', month:'long' }) : 'اعتمادات الحلقات من ' + fmtD(DS.from, { day:'numeric', month:'short' }) + ' إلى ' + fmtD(DS.to, { day:'numeric', month:'short' });
