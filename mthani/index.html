@@ -402,6 +402,7 @@
   .frtw{overflow-x:auto}
   .trcard{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer} .trcard b{display:block;font-size:17px;color:var(--navy3)} .trcard small{color:var(--muted)}
   .trr select{width:auto;min-width:140px;margin:0;flex:0 0 auto}
+  .apcell{display:flex;flex-direction:column;gap:6px} .apcell .api{width:100%} .apfix{min-height:36px;border-radius:10px;border:1px dashed var(--navy);background:var(--card);color:var(--navy);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
   .trr .trvb{min-height:38px;padding:0 14px;border-radius:12px;border:1px solid var(--navy);background:var(--card);color:var(--navy);font:inherit;font-weight:700;cursor:pointer;flex:0 0 auto}
   .trr select.trop{min-width:120px}
   .trkv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 14px;margin:6px 0 4px} .trkv dt{color:var(--muted)} .trkv dd{margin:0;font-weight:700;overflow-wrap:anywhere} .trkv a{color:var(--navy)}
@@ -6400,12 +6401,18 @@ const lvAtt = v => v == null ? '' : v >= 90 ? 'lv-g' : v >= 75 ? 'lv-y' : 'lv-r'
 const lvAvg = v => v == null ? '' : v >= 8 ? 'lv-g' : v >= 6.5 ? 'lv-y' : 'lv-r';
 const lvPl = v => v == null ? '' : v >= 75 ? 'lv-g' : v >= 40 ? 'lv-y' : 'lv-r';
 /* تفاصيل الاعتمادات: المعتمدة وغير المعتمدة وفي الديوانية (يوم واحد)، أو اعتمادات كل حلقة في الفترة */
+// المدير والشؤون التعليمية: يصححان اليوم المعتمد ويرسلان التقرير المصحَّح
+const canFixUI = () => { const P = (D && D.perms) || []; return P.indexOf('*') !== -1 || (D && D.portal === 'edu') || /تعليمي/.test(String((D && D.title) || '')) || P.indexOf('halaqat.reeval') !== -1; };
 function openApList(){
   const H = DS.halaqat || [], one = DS.from === DS.to, b = $('apvBody'); b.innerHTML = '';
   $('apvT').textContent = one ? 'اعتمادات ' + fmtD(DS.from, { weekday:'long', day:'numeric', month:'long' }) : 'اعتمادات الحلقات من ' + fmtD(DS.from, { day:'numeric', month:'short' }) + ' إلى ' + fmtD(DS.to, { day:'numeric', month:'short' });
   const go = h => { $('apvSheet').classList.add('hidden'); const L = (D && D.halaqat) || []; if (L.some(x => x.hid === h.hid)){ hal = h.hid; store.set('hq_hal', h.hid); day = one ? DS.from : null; openRole('teach'); } };
   const sec = (t, list, cls, sub) => { if (!list.length) return; b.appendChild(el('div', 'apsec', t + ' (' + list.length + ')')); const g = el('div', 'apgrid');
-    list.forEach(h => { const x = el('button', 'api ' + cls); x.type = 'button'; x.appendChild(el('i')); const t2 = el('div'); t2.appendChild(el('b', '', h.name)); t2.appendChild(el('small', '', sub(h))); x.appendChild(t2); x.onclick = () => go(h); g.appendChild(x); });
+    list.forEach(h => { const x = el('button', 'api ' + cls); x.type = 'button'; x.appendChild(el('i')); const t2 = el('div'); t2.appendChild(el('b', '', h.name)); t2.appendChild(el('small', '', sub(h))); x.appendChild(t2); x.onclick = () => go(h);
+      if (cls === 'ok' && one && canFixUI()){ const w = el('div', 'apcell'); w.appendChild(x); const fb = el('button', 'apfix', 'إرسال التقرير المصحَّح'); fb.type = 'button';
+        fb.onclick = () => confirmOp('إرسال التقرير المصحَّح — ' + h.name, 'بعد تصحيح الحضور أو التقييم: تقارن المنصة تقرير كل طالب بما أُرسل لولي أمره، وترسل التقرير المصحَّح فقط لمن تغيّر تقريره، مع اعتذار عن الخطأ.', 'إرسال', async () => {
+          fb.disabled = true; try { const r = await api({ action:'reportFix', hid:h.hid, date:DS.from }); toast(r.msg); if (!r.ok) fb.disabled = false; } catch(e){ fb.disabled = false; toast('تعذّر الاتصال، حاول مجدداً.'); } });
+        w.appendChild(fb); g.appendChild(w); } else g.appendChild(x); });
     b.appendChild(g); };
   if (one){
     sec('لم تُعتمد', H.filter(h => !h.apprToday), 'no', h => (h.diwToday ? 'في الديوانية • ' : '') + (h.teacher || 'بلا معلم'));
