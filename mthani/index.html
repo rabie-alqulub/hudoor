@@ -4675,7 +4675,7 @@ function renderTrip(){ const t = TRV.trip, c = TRV.counts;
   const E = tCan('edit'), Y = tCan('day'); $('trNew').classList.toggle('hidden', !E);
   if (live){ if (E) b('تعديل الرحلة والطلاب', '', () => trForm(TRV));
     if (E) b('إرسال طلب الموافقة', 'btn', () => trDo('tripSend', { base:trBase() }, 'إرسال طلب الموافقة عبر برق لأولياء أمور الطلاب الذين لم يُرسل لهم بعد؟'));
-    if (E && TRV.reqs.some(x => x.status === 'لم يرد' && x.sends)) b('تذكير من لم يرد', '', () => trDo('tripSend', { base:trBase(), scope:'pending' }, 'إرسال تذكير لمن لم يرد؟'));
+    if (E && TRV.reqs.some(x => x.status === 'لم يرد') && TRV.reqs.some(x => x.sends)) b('تذكير من لم يرد', '', () => trDo('tripSend', { base:trBase(), scope:'pending' }, 'إرسال تذكير لمن لم يرد؟'));
     if (!Y) trDay = false;
     if (Y) b(trDay ? 'إخفاء أدوات يوم الرحلة' : 'يوم الرحلة: الصعود والعودة', '', () => { trDay = !trDay; if (trDay) trTab = 'yes'; renderTrip(); });
     if (trDay){ b('انطلقت الرحلة', 'btn', () => trDo('tripOp', { op:'go' }, 'سيصل لأولياء أمور الصاعدين «انطلقت الرحلة»، ولأولياء أمور الغائبين تنبيه بأن أبناءهم لم يحضروا. متابعة؟'));
