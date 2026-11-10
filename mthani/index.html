@@ -403,6 +403,12 @@
   .trcard{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer} .trcard b{display:block;font-size:17px;color:var(--navy3)} .trcard small{color:var(--muted)}
   .trr select{width:auto;min-width:140px;margin:0;flex:0 0 auto}
   .apcell{display:flex;flex-direction:column;gap:6px} .apcell .api{width:100%} .apfix{min-height:36px;border-radius:10px;border:1px dashed var(--navy);background:var(--card);color:var(--navy);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .ttcard{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-inline-start:4px solid var(--gold)} .ttcard>.btn{width:auto;flex:0 0 auto;padding-inline:22px} .ttcard>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .ttrow{padding:12px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px} .ttrow .nm{display:flex;flex-direction:column}
+  .tthl{background:#FDECEC;color:#9B1C1C;border-radius:10px;padding:6px 10px;font-weight:700;font-size:14px}
+  .ttct{display:flex;gap:8px;flex-wrap:wrap} .ttcall{padding:6px 12px;border-radius:999px;background:var(--light);color:var(--navy);text-decoration:none;font-weight:700;font-size:14px}
+  .ttbx{display:flex;align-items:center;gap:8px;flex-wrap:wrap} .ttbx small{color:var(--muted)}
+  .ttseg{display:flex;gap:6px} .ttseg button{min-height:40px;min-width:64px;border-radius:12px;border:1px solid var(--line);background:var(--card);font:inherit;font-weight:700;cursor:pointer;color:var(--ink,inherit)} .ttseg button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
   .trr .trvb{min-height:38px;padding:0 14px;border-radius:12px;border:1px solid var(--navy);background:var(--card);color:var(--navy);font:inherit;font-weight:700;cursor:pointer;flex:0 0 auto}
   .trr select.trop{min-width:120px}
   .trkv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 14px;margin:6px 0 4px} .trkv dt{color:var(--muted)} .trkv dd{margin:0;font-weight:700;overflow-wrap:anywhere} .trkv a{color:var(--navy)}
@@ -1276,6 +1282,7 @@
         <div class="tiles" id="attTiles"></div>
         <div class="bar"><span class="muted" id="saveState"></span><button class="mini" id="btnAllPresent">الكل حاضر</button></div>
       </div>
+      <div id="tripTeach"></div>
       <div class="zmstage hidden" id="zmStage"></div>
       <div class="stucards" id="stuList"></div>
       <div class="card evalstat" id="evalStat"></div>
@@ -2342,6 +2349,14 @@
   </div>
 </div>
 
+<div class="sheet hidden" id="ttSheet">
+  <div class="panel">
+    <div class="head"><h2 id="ttT">طلابي في الرحلة</h2><button class="iconbtn" id="ttClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
+    <div id="ttSub" class="muted" style="margin-bottom:8px"></div>
+    <div id="ttList"></div>
+  </div>
+</div>
+
 <div class="sheet hidden" id="trvSheet">
   <div class="panel">
     <div class="head"><h2 id="trvT">رد ولي الأمر</h2><button class="iconbtn" id="trvClose" aria-label="إغلاق" title="إغلاق">✕</button></div>
@@ -2366,6 +2381,8 @@
     <label for="trfMeet">نقطة التجمع</label><input id="trfMeet" maxlength="120" placeholder="مثال: ساحة الجامع">
     <label for="trfMeetLoc">موقع التجمع على الخرائط (اختياري)</label><input id="trfMeetLoc" maxlength="300" dir="ltr" style="text-align:right" inputmode="url" placeholder="https://maps.app.goo.gl/...">
     <small class="muted" style="display:block;margin-top:4px">انسخ رابط الموقع من خرائط Google أو Apple. يصل لولي الأمر في رسالة الدعوة ورسالة الوصول، ويظهر زراً في صفحة الموافقة.</small>
+    <label for="trfRemind">وقت تذكير يوم الرحلة</label><input id="trfRemind" type="time" value="13:00">
+    <small class="muted" style="display:block;margin-top:4px">يوم الرحلة في هذا الوقت يصل تلقائياً لأولياء أمور الموافَق عليهم تذكير بالرحلة، من بياناتها: وقت الانطلاق ومكان التجمع ورابطه وما يحضره الطالب وجوال المشرف. امسح الوقت لإيقاف التذكير.</small>
     <label for="trfBring">ما يحضره الطالب (اختياري)</label><input id="trfBring" maxlength="300">
     <label for="trfDl">آخر موعد للموافقة</label><input id="trfDl" type="datetime-local">
     <div class="edgrid"><div><label for="trfSups">المشرفون المرافقون</label><input id="trfSups" maxlength="200"></div><div><label for="trfSupP">جوال المشرف (يظهر لأولياء الأمور)</label><input id="trfSupP" type="tel" inputmode="tel" maxlength="10" dir="ltr" style="text-align:right" placeholder="05xxxxxxxx"></div>
@@ -3526,6 +3543,7 @@ async function loadAtt(){
   if (!r.ok) return msg('stuList', r.msg, 'err');
   dayCanFix = !!r.canFix; teachVO = !!r.ro; teachRO = !!r.ro || !!r.locked; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !r.ro); zmTeachBar();
   teachDiw = !!r.diw; $('pTeach').classList.toggle('diwd', teachDiw);
+  try { renderTripTeach(); } catch(e){}
   studs = r.students; exStuds = r.excluded || []; approval = r.approval; reeval = r.reeval || null; renderStuds(); renderAppr(); $('diwNote').classList.toggle('hidden', !r.diw); if (r.diw) $('diwNote').textContent = 'اليوم يوم ديوانية لهذه الحلقة: حضّر الطلاب (حضور فقط بلا تقييم) ثم اعتمد ليصل أولياء الأمور إشعار الحضور. غياب الديوانية لا يُحسب في غياب الطالب.';
   const sb = r.subBy && !(D && D.sub); $('subNote').classList.toggle('hidden', !sb && !(D && D.sub));
   if (sb) $('subNote').textContent = 'معلم بديل لهذا اليوم: ' + r.subBy.name + ' (جوال ' + r.subBy.phone + ')' + (r.subBy.done ? ' — اعتمد التقييم.' : ' — لم يعتمد بعد.');
@@ -4651,6 +4669,7 @@ function renderTrip(){ const t = TRV.trip, c = TRV.counts;
   $('tpTitle').textContent = t.title; $('trSt').textContent = t.status; $('trSt').className = 'pill ' + (t.status === 'مفتوحة' ? 'p-ok' : t.status === 'ملغاة' ? 'p-red' : 'p-none');
   $('trSub').textContent = [trDayTxt(t.date), t.place, t.go && 'الذهاب ' + t.go, t.back && 'العودة ' + t.back, t.meet && 'التجمع: ' + t.meet, t.deadline && 'آخر موعد للرد: ' + t.deadline.replace('T', ' ')].filter(Boolean).join(' • ');
   const ch = $('trChips'); ch.innerHTML = ''; [['وافق', c.yes, 'p-ok'], ['رفض', c.no, 'p-red'], ['لم يرد', c.none, 'p-none'], ['انتظار', c.wait, 'p-late']].forEach(x => ch.appendChild(el('span', 'pill ' + x[2], x[0] + ' ' + x[1])));
+  if (t.remindAt || t.remSent) ch.appendChild(el('span', 'pill ' + (t.remSent ? 'p-ok' : 'p-none'), t.remSent ? 'تذكير يوم الرحلة: أُرسل ' + t.remSent : 'تذكير يوم الرحلة الساعة ' + t.remindAt));
   if (t.seats) ch.appendChild(el('span', 'pill', 'المقاعد المتبقية ' + Math.max(0, t.seats - c.yes) + ' من ' + t.seats));
   const A = $('trActs'); A.innerHTML = ''; const live = ['ملغاة', 'منتهية'].indexOf(t.status) === -1, b = (txt, cls, fn) => { const x = el('button', cls || 'soft', txt); x.onclick = fn; A.appendChild(x); };
   const E = tCan('edit'), Y = tCan('day'); $('trNew').classList.toggle('hidden', !E);
@@ -4690,6 +4709,29 @@ function trRows(){ const box = $('trRows'); box.innerHTML = ''; const q = normAr
       r.appendChild(m); }
     box.appendChild(r); }); }
 $('tpQ').oninput = () => TRV && trRows();
+/* رحلة اليوم لمعلم الحلقة: يرافق طلابه الموافَق عليهم ويحضّرهم */
+let TT = null;
+function renderTripTeach(){ const box = $('tripTeach'); box.innerHTML = ''; const td = (D && D.today) || iso(new Date());
+  if (day !== td) return;
+  const L = ((D && D.ttrips) || []).filter(t => t.students.length);
+  L.forEach(t => { const c = el('div', 'card ttcard'), a = el('div'), n = t.students.length, b = t.students.filter(x => x.board === 'صعد').length, rt = t.students.filter(x => x.ret === 'عاد').length;
+    a.appendChild(el('b', '', '🚌 رحلة اليوم: ' + t.title)); a.appendChild(el('small', '', [t.go && 'الانطلاق ' + t.go, t.meet && 'من ' + t.meet, t.back && 'العودة ' + t.back].filter(Boolean).join(' • ')));
+    a.appendChild(el('small', '', 'طلابك الموافَق عليهم ' + n + ' • صعد ' + b + ' • عاد ' + rt)); c.appendChild(a);
+    const go = el('button', 'btn', 'كشف طلابي في الرحلة'); go.type = 'button'; go.onclick = () => openTT(t.id); c.appendChild(go); box.appendChild(c); }); }
+function openTT(id){ TT = ((D && D.ttrips) || []).find(t => t.id === id); if (!TT) return; $('ttT').textContent = TT.title;
+  $('ttSub').textContent = [TT.go && 'الانطلاق ' + TT.go, TT.meet && 'التجمع: ' + TT.meet, TT.back && 'العودة ' + TT.back, TT.sups && 'المشرف: ' + TT.sups + (TT.supPhone ? ' ' + TT.supPhone : '')].filter(Boolean).join(' • ');
+  renderTT(); $('ttSheet').classList.remove('hidden'); }
+function renderTT(){ const L = $('ttList'); L.innerHTML = ''; const tel = v => 'tel:' + String(v || '').replace(/\D/g, '');
+  TT.students.forEach(x => { const r = el('div', 'ttrow'), top = el('div', 'nm'); top.appendChild(el('b', '', x.sname)); top.appendChild(el('small', '', x.hname)); r.appendChild(top);
+    if (x.health && !/^(لا|لايوجد|لا يوجد)/.test(x.health.trim())) r.appendChild(el('div', 'tthl', '⚕ ' + x.health));
+    const ct = el('div', 'ttct'); [['ولي الأمر', x.pphone], ['الطوارئ', x.emerg]].forEach(p => { if (!p[1]) return; const a = el('a', 'ttcall', '📞 ' + p[0]); a.href = tel(p[1]); ct.appendChild(a); }); r.appendChild(ct);
+    const seg = (f, opts) => { const g = el('div', 'ttseg'); opts.forEach(v => { const b = el('button', x[f] === v ? 'on' : '', v); b.type = 'button';
+      b.onclick = async () => { const nv = x[f] === v ? '' : v, old = x[f]; x[f] = nv; renderTT(); renderTripTeach();
+        try { const res = await api({ action:'tripMark', id:TT.id, sid:x.sid, f:f, v:nv }); if (!res.ok){ x[f] = old; renderTT(); renderTripTeach(); toast(res.msg); } } catch(e){ x[f] = old; renderTT(); renderTripTeach(); toast('تعذّر الاتصال، حاول مجدداً.'); } };
+      g.appendChild(b); }); return g; };
+    const bx = el('div', 'ttbx'); bx.appendChild(el('small', '', 'الذهاب')); bx.appendChild(seg('board', ['صعد', 'غائب'])); bx.appendChild(el('small', '', 'العودة')); bx.appendChild(seg('ret', ['عاد'])); r.appendChild(bx);
+    L.appendChild(r); }); }
+$('ttClose').onclick = () => $('ttSheet').classList.add('hidden');
 /** استعراض رد ولي الأمر كاملاً */
 function trView(x){ $('trvT').textContent = 'رد ولي أمر: ' + x.sname; const b = $('trvBody'); b.innerHTML = '';
   const kv = el('dl', 'trkv'), add = (k, v, href) => { if (!v) return; kv.appendChild(el('dt', '', k)); const d = el('dd'); if (href){ const a = el('a', '', v); a.href = href; a.dir = 'ltr'; d.appendChild(a); } else d.textContent = v; kv.appendChild(d); };
@@ -4715,6 +4757,7 @@ function trForm(v){ const t = v ? v.trip : {}, H = (TRL && TRL.halaqat) || [];
   TRF = { id:t.id || null, hids:new Set(t.hids || []), stu:(v && v.students) || (TRL && TRL.students) || [], sel:{} };
   $('trFT').textContent = v ? 'تعديل الرحلة' : 'رحلة جديدة';
   [['trfTitle', 'title'], ['trfDate', 'date'], ['trfSeats', 'seats'], ['trfGo', 'go'], ['trfBack', 'back'], ['trfPlace', 'place'], ['trfMeet', 'meet'], ['trfMeetLoc', 'meetLoc'], ['trfBring', 'bring'], ['trfDl', 'deadline'], ['trfSups', 'sups'], ['trfSupP', 'supPhone'], ['trfTn', 'tname'], ['trfTp', 'tphone'], ['trfNotes', 'notes'], ['trfFee', 'fee']].forEach(x => $(x[0]).value = t[x[1]] || '');
+  $('trfRemind').value = v ? (t.remindAt || '') : '13:00';
   $('trfSeats').value = t.seats || ''; $('trfPledge').value = t.pledge || (TRL && TRL.pledge) || '';
   if (v) v.reqs.forEach(x => { if (x.status !== 'مستبعد') TRF.sel[x.sid] = true; });
   TRF.H = H.length ? H : (D.halaqat || []).map(h => ({ hid:String(h.hid), name:h.name })); trfHal();
@@ -4736,7 +4779,7 @@ function trfSetHal(h, on, quiet){ on ? TRF.hids.add(h.hid) : TRF.hids.delete(h.h
 const trfN = () => { $('trfN').textContent = '(' + Object.keys(TRF.sel).filter(k => TRF.sel[k]).length + ' طالب)'; };
 $('trfQ').oninput = () => TRF && trfStu();
 $('trFClose').onclick = () => { $('tpSheet').classList.add('hidden'); document.body.style.overflow = ''; };
-$('trfSave').onclick = async () => { const d = { title:$('trfTitle').value.trim(), date:$('trfDate').value, seats:$('trfSeats').value, go:$('trfGo').value, back:$('trfBack').value, place:$('trfPlace').value.trim(), meet:$('trfMeet').value.trim(), meetLoc:$('trfMeetLoc').value.trim(),
+$('trfSave').onclick = async () => { const d = { remindAt:$('trfRemind').value, title:$('trfTitle').value.trim(), date:$('trfDate').value, seats:$('trfSeats').value, go:$('trfGo').value, back:$('trfBack').value, place:$('trfPlace').value.trim(), meet:$('trfMeet').value.trim(), meetLoc:$('trfMeetLoc').value.trim(),
     bring:$('trfBring').value.trim(), deadline:$('trfDl').value, sups:$('trfSups').value.trim(), supPhone:$('trfSupP').value.trim(), tname:$('trfTn').value.trim(), tphone:$('trfTp').value.trim(), pledge:$('trfPledge').value.trim(), notes:$('trfNotes').value.trim(), fee:$('trfFee').value.trim(), hids:[...TRF.hids] };
   const inH = s => TRF.hids.has(s.hid); d.add = (TRF.stu || []).filter(s => TRF.sel[s.sid] && !inH(s)).map(s => s.sid); d.rem = (TRF.stu || []).filter(s => !TRF.sel[s.sid] && inH(s)).map(s => s.sid);
   if (!d.hids.length && !d.add.length) return msg('trfMsg', 'اختر حلقة أو طلاباً للرحلة.', 'err');
