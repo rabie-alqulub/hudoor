@@ -3982,7 +3982,7 @@ function renderAppr(){
     const d = el('div', 'appr', '✓ تم اعتماد تقييمات هذا اليوم' + (approval.at ? ' الساعة ' + approval.at : ''));
     st.appendChild(d);
     if (approval.starName) st.appendChild(el('div', '', 'فارس الحلقة: ' + approval.starName));
-    if ((dayCanFix || teachVO) && !teachDiw){ const fb = el('button', 'soft', 'إرسال التقرير المصحَّح لأولياء الأمور'); fb.type = 'button'; fb.style.marginTop = '8px';
+    if (dayCanFix || teachVO){ const fb = el('button', 'soft', 'إرسال التقرير المصحَّح لأولياء الأمور'); fb.type = 'button'; fb.style.marginTop = '8px';
       fb.title = 'بعد تصحيح الحضور أو التقييم: يصل التقرير الجديد فقط لمن تغيّر تقريره عمّا أُرسل له';
       fb.onclick = () => confirmOp('إرسال التقرير المصحَّح', 'تقارن المنصة تقرير كل طالب بما أُرسل لولي أمره اليوم، وترسل التقرير المصحَّح فقط لمن تغيّر تقريره، مع اعتذار عن الخطأ.', 'إرسال', async () => {
         fb.disabled = true; try { const r = await api({ action:'reportFix', hid:hal, date:day }); toast(r.msg); if (!r.ok) fb.disabled = false; } catch(e){ fb.disabled = false; toast('تعذّر الاتصال، حاول مجدداً.'); } });
