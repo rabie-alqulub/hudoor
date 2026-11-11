@@ -412,6 +412,8 @@
   .rmhd{display:flex;align-items:center;justify-content:space-between;gap:8px} .rmhd h2{margin:0} .rmsum{color:var(--muted);margin:4px 0 8px;font-weight:700}
   .rmrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)} .rmrow .grow{display:flex;flex-direction:column;gap:2px;min-width:0} .rmrow small{color:var(--muted)} .rmrow.off b{color:#9B1C1C}
   .rmside{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto} .rmcall{text-decoration:none} .rmcnt{font-size:12.5px}
+  .dqhd{display:flex;align-items:center;justify-content:space-between;gap:8px} .dqhd h2{margin:0}
+  .dqrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)} .dqrow .grow{display:flex;flex-direction:column;gap:2px;min-width:0} .dqrow small{color:var(--muted)} .dqwhy{color:#9B1C1C!important;font-weight:700}
   .trr .trvb{min-height:38px;padding:0 14px;border-radius:12px;border:1px solid var(--navy);background:var(--card);color:var(--navy);font:inherit;font-weight:700;cursor:pointer;flex:0 0 auto}
   .trr select.trop{min-width:120px}
   .trkv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 14px;margin:6px 0 4px} .trkv dt{color:var(--muted)} .trkv dd{margin:0;font-weight:700;overflow-wrap:anywhere} .trkv a{color:var(--navy)}
@@ -2195,6 +2197,12 @@
 
     <!-- ولي الأمر -->
     <div id="pParent" class="hidden"></div>
+    <div id="pDataQ" class="hidden">
+      <div class="card"><div class="dqhd"><h2>جودة بيانات الطلاب</h2><button class="mini" id="dqRef" type="button">تحديث</button></div>
+        <p class="muted" style="margin:4px 0 0">بيانات تمنع دخول الطالب أو ولي أمره، أو وصول الرسائل. اضغط «تعديل» لتصحيح بيانات الطالب.</p>
+        <div class="stchips" id="dqSum" style="margin-top:10px"></div><div id="dqMsg" class="msg hidden"></div></div>
+      <div id="dqBox"></div>
+    </div>
     <div id="pTrips" class="hidden">
       <div id="trHome">
         <div class="card"><h2>الرحلات</h2><small>أنشئ الرحلة واختر حلقاتها وطلابها، ثم أرسل طلب الموافقة لأولياء الأمور عبر برق، وتابع الردود ويوم الرحلة.</small>
@@ -3147,7 +3155,7 @@ const hasL = (k, lv) => { const P = (D && D.perms) || []; return P.indexOf('*') 
 // خانات تظهر فقط لمن عنده مستوى معيّن داخل البند (لا يكفيها «عرض»)
 const NAV_LV = { halaqaNew:['halaqat.manage:add'], halaqaEdit:['halaqat.manage:edit', 'halaqat.manage:del'] };
 const STAFF_EXTRA = [['repStu', 'تقارير شؤون الطلاب', 'reports.students'], ['repEdu', 'تقارير الشؤون التعليمية', 'reports.edu']];
-const NAV_PERM = { trips:'trips.manage', studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
+const NAV_PERM = { dataQ:'students.view_all', trips:'trips.manage', studentsList:'students.view_all', studentNew:'students.add', regLink:'students.add', apps:'students.apps', refsStu:'refs.students',
   nafStars:['competition.manage', 'competition.star'], nafPts:'competition.manage', nafStore:['competition.manage', 'competition.store'],
   moveMany:'students.move', absent:'students.absent', staff:'staff.view', staffNew:'staff.add', staffAtt:'reports.staffAtt', courses:'staff.courses',
   teach:'halaqat.evaluate_all', halaqaView:['halaqat.view', 'halaqat.manage'], halaqaNew:'halaqat.manage', halaqaEdit:'halaqat.manage', assign:'halaqat.assign', subst:'halaqat.substitute', diw:'diw.manage', remote:'halaqat.remote', reeval:'halaqat.reeval',
@@ -3159,7 +3167,7 @@ const ADMIN_NAV = [
   { t:'شؤون الموظفين', ic:'staff', items:[['staff', 'بيانات الموظفين'], ['staffNew', 'تسجيل موظف جديد'], ['staffAtt', 'تقرير بصمة الحضور'], ['courses', 'الدورات التدريبية']] },
   { t:'الشؤون التعليمية', ic:'book', items:[['plans', 'بناء الخطط التعليمية'], ['planDay', 'خطة اليوم للطلاب'], ['planF', 'متابعة سير الخطط'], ['refsEdu', 'الإحالات التعليمية']] },
   { t:'الاختبارات', ic:'exam', r:'exams' },
-  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين']] },
+  { t:'شؤون الطلاب', ic:'users', items:[['studentsList', 'بيانات الطلاب'], ['studentNew', 'تسجيل طالب جديد'], ['regLink', 'رابط التسجيل'], ['refsStu', 'إحالات شؤون الطلاب'], ['moveMany', 'نقل الطلاب بين الحلقات'], ['absent', 'الطلاب المنقطعون'], ['apps', 'طلبات المتقدمين'], ['dataQ', 'جودة البيانات']] },
   { t:'الحلقات', ic:'halaqa', items:[['teach', 'التقييم'], ['halaqaView', 'استعراض الحلقات'], ['halaqaNew', 'إضافة حلقة'], ['halaqaEdit', 'تعديل حلقة'], ['assign', 'إسناد حلقة لمعلم'], ['subst', 'تكليف معلم بديل (من خارج المجمع)'], ['remote', 'تفعيل حلقة عن بعد'], ['reeval', 'طلبات إعادة التقييم في حلقة']] },
   { t:'نافس', ic:'trophy', items:[['nafStars', 'فارس الحلقة'], ['nafPts', 'نقاطي'], ['nafStore', 'المتجر'], ['diw', 'الديوانية'], ['trips', 'الرحلات']] },
   { t:'المعاملات', ic:'exam', items:[['trxS', 'المعاملات الصادرة'], ['trxR', 'المعاملات الواردة']] },
@@ -3345,6 +3353,7 @@ function openRole(r, title, group){
   $('pPlans').classList.toggle('hidden', r !== 'plans');
   $('pParent').classList.toggle('hidden', r !== 'parent');
   $('pTrips').classList.toggle('hidden', r !== 'trips'); if (r === 'trips') openTrips();
+  $('pDataQ').classList.toggle('hidden', r !== 'dataQ'); if (r === 'dataQ') openDataQ();
   $('pMine').classList.toggle('hidden', r !== 'mine'); if (r === 'mine') renderMine();
   $('pShop').classList.toggle('hidden', r !== 'shop'); if (r === 'shop') renderShop();
   $('pReport').classList.toggle('hidden', r !== 'report');
@@ -3403,7 +3412,7 @@ function renderWelcome(){
     myStu:['طلاب الحلقة', 'إحالة الطلاب وترشيحهم للمرحلية ومتابعة الردود', 'gold'], refsStu:['إحالات شؤون الطلاب', 'استقبال إحالات المعلمين والرد عليها', ''],
     refsEdu:['الإحالات التعليمية', 'إحالات مستوى الحفظ والخطط', ''], refsExam:['ترشيحات المرحلية', 'مواعيد الاختبارات المرحلية ونتائجها', 'gold'],
     studentsList:['بيانات الطلاب', 'بيانات طلاب المجمع', ''], compete:['نافس', 'نقاط الطلاب ومتجر الجوائز', 'gold'], studentNew:['تسجيل طالب', 'تسجيل طالب جديد وتسكينه', ''],
-    regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''], trips:['الرحلات', 'موافقات أولياء الأمور ويوم الرحلة', ''],
+    regLink:['رابط التسجيل', 'رابط وباركود التسجيل العام', ''], dataQ:['جودة البيانات', 'هويات وجوالات تحتاج تصحيحاً', ''], apps:['طلبات المتقدمين', 'قبول طلبات التسجيل وتسكينهم', ''], trips:['الرحلات', 'موافقات أولياء الأمور ويوم الرحلة', ''],
     repStu:['تقارير شؤون الطلاب', 'الحضور والغياب والاستئذان لأي طالب أو حلقة', ''], repEdu:['التقارير التعليمية', 'الحفظ والدرجات والخطط لأي طالب أو حلقة', ''],
     preTest:['الاختبار قبل الترشيح', 'اختبار داخلي قبل ترشيح الجمعية', ''], assocNom:['ترشيحات الجمعية', 'ترشيح المجتازين ونتائج الجمعية', 'gold'],
     strug:['الطلاب المتعثرون', 'من يحتاج متابعة تعليمية', ''], planF:['متابعة سير الخطط', 'إنجاز الخطط مقارنة بالمتوقع', ''], planDay:['خطة اليوم للطلاب', 'الحفظ والمراجعة لكل طالب اليوم', ''], msgArc:['أرشيف الرسائل', 'سجل الرسائل وإحصائياتها', ''],
@@ -4737,6 +4746,28 @@ function renderTT(){ const L = $('ttList'); L.innerHTML = ''; const tel = v => '
     const bx = el('div', 'ttbx'); bx.appendChild(el('small', '', 'الذهاب')); bx.appendChild(seg('board', ['صعد', 'غائب'])); bx.appendChild(el('small', '', 'العودة')); bx.appendChild(seg('ret', ['عاد'])); r.appendChild(bx);
     L.appendChild(r); }); }
 $('ttClose').onclick = () => $('ttSheet').classList.add('hidden');
+/* جودة البيانات */
+let DQ = null;
+const DQ_SEC = [['badNid', 'هوية غير صحيحة', 'لا يستطيع الطالب الدخول لبوابة الطلاب، ولا تُقبل في تقارير الجمعية.'], ['dupNid', 'هوية مكررة', 'نفس الرقم مسجل لأكثر من طالب.'],
+  ['badPhone', 'جوال ولي الأمر ناقص أو غير صحيح', 'لا تصل رسائل التقرير اليومي، ولا يستطيع ولي الأمر الدخول.'], ['noHal', 'بلا حلقة', 'لا يظهر الطالب في التحضير.'],
+  ['inactive', 'غير نشطين (منقطع أو موقوف)', 'لا يظهرون في القوائم ولا يدخلون المنصة. أعدهم «نشط» من بيانات الطلاب إن عادوا.']];
+async function openDataQ(){ msg('dqMsg', 'جاري الفحص...', 'info'); $('dqBox').innerHTML = ''; $('dqSum').innerHTML = '';
+  let r; try { r = await api({ action:'dataQuality' }); } catch(e){ return msg('dqMsg', 'تعذّر الاتصال، حاول مجدداً.', 'err'); }
+  if (!r.ok) return msg('dqMsg', r.msg, 'err'); msg('dqMsg', '', ''); DQ = r; renderDataQ(); }
+function renderDataQ(){ const r = DQ, sum = $('dqSum'), box = $('dqBox'); sum.innerHTML = ''; box.innerHTML = '';
+  const issues = DQ_SEC.slice(0, 4).reduce((a, s) => a + r[s[0]].length, 0);
+  sum.appendChild(el('span', 'pill ' + (issues ? 'p-no' : 'p-ok'), issues ? issues + ' ملاحظة تحتاج تصحيحاً' : '✓ لا توجد ملاحظات'));
+  sum.appendChild(el('span', 'pill', 'الطلاب النشطون ' + r.total));
+  if (r.apps){ const a = el('button', 'pill', 'طلبات تسجيل بانتظار القبول ' + r.apps + ' ←'); a.type = 'button'; a.onclick = () => openRole('apps'); sum.appendChild(a); }
+  if (r.noPnid) sum.appendChild(el('span', 'pill', 'بلا هوية ولي أمر ' + r.noPnid));
+  DQ_SEC.forEach(s => { const L = r[s[0]]; if (!L.length) return; const c = el('div', 'card'); c.appendChild(el('h2', '', s[1] + ' (' + L.length + ')')); c.appendChild(el('p', 'muted', s[2]));
+    L.forEach(x => { const row = el('div', 'dqrow'), a = el('div', 'grow'); a.appendChild(el('b', '', x.name)); a.appendChild(el('small', '', x.hname + ' • رقم الطالب ' + x.sid));
+      const w = el('small', 'dqwhy', x.why + (x.v && s[0] !== 'inactive' ? ': ' : '')); if (x.v && s[0] !== 'inactive'){ const v = el('bdi', '', x.v); v.dir = 'ltr'; w.appendChild(v); } a.appendChild(w); row.appendChild(a);
+      const b = el('button', 'mini', 'تعديل'); b.type = 'button'; b.onclick = () => dqEdit(x.sid); row.appendChild(b); c.appendChild(row); });
+    box.appendChild(c); }); }
+async function dqEdit(sid){ openRole('studentsList'); for (let i = 0; i < 40 && !(SB && SB.students); i++) await new Promise(r => setTimeout(r, 150));
+  const x = SB && SB.students && SB.students.find(s => String(s.sid) === String(sid)); if (x) openStudentEdit(x); else toast('افتح الطالب من «بيانات الطلاب» (قد يكون غير نشط).'); }
+$('dqRef').onclick = openDataQ;
 /** استعراض رد ولي الأمر كاملاً */
 function trView(x){ $('trvT').textContent = 'رد ولي أمر: ' + x.sname; const b = $('trvBody'); b.innerHTML = '';
   const kv = el('dl', 'trkv'), add = (k, v, href) => { if (!v) return; kv.appendChild(el('dt', '', k)); const d = el('dd'); if (href){ const a = el('a', '', v); a.href = href; a.dir = 'ltr'; d.appendChild(a); } else d.textContent = v; kv.appendChild(d); };
