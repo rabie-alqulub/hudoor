@@ -3561,10 +3561,10 @@ async function loadAtt(){
   let r;
   try { r = await api({ action:'attendance', hid:hal, date:day }); } catch(e){ if (e.message !== 'expired') msg('stuList', 'تعذّر الاتصال بالخادم.', 'err'); return; }
   if (!r.ok) return msg('stuList', r.msg, 'err');
-  dayCanFix = !!r.canFix; teachVO = !!r.ro; teachRO = !!r.ro || !!r.locked; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !r.ro); zmTeachBar();
+  dayCanFix = !!r.canFix && !r.trip; teachVO = !!r.ro; teachRO = !!r.ro || !!r.locked || !!r.trip; $('pTeach').classList.toggle('ro', teachRO); $('roNote').classList.toggle('hidden', !r.ro); zmTeachBar();
   teachDiw = !!r.diw; $('pTeach').classList.toggle('diwd', teachDiw);
   try { renderTripTeach(); } catch(e){}
-  studs = r.students; exStuds = r.excluded || []; approval = r.approval; reeval = r.reeval || null; renderStuds(); renderAppr(); $('diwNote').classList.toggle('hidden', !r.diw); if (r.diw) $('diwNote').textContent = 'اليوم يوم ديوانية لهذه الحلقة: حضّر الطلاب (حضور فقط بلا تقييم) ثم اعتمد ليصل أولياء الأمور إشعار الحضور. غياب الديوانية لا يُحسب في غياب الطالب.';
+  studs = r.students; exStuds = r.excluded || []; approval = r.approval; reeval = r.reeval || null; renderStuds(); renderAppr(); $('diwNote').classList.toggle('hidden', !r.diw && !r.trip); if (r.trip) $('diwNote').textContent = 'اليوم يوم رحلة لهذه الحلقة («' + r.trip + '»): لا تحضير ولا تقييم ولا اعتماد. الحضور يسجّله المشرف في الرحلة، ولا يُحسب غياب على الطلاب، ولا تتأثر خططهم.'; else if (r.diw) $('diwNote').textContent = 'اليوم يوم ديوانية لهذه الحلقة: حضّر الطلاب (حضور فقط بلا تقييم) ثم اعتمد ليصل أولياء الأمور إشعار الحضور. غياب الديوانية لا يُحسب في غياب الطالب.';
   const sb = r.subBy && !(D && D.sub); $('subNote').classList.toggle('hidden', !sb && !(D && D.sub));
   if (sb) $('subNote').textContent = 'معلم بديل لهذا اليوم: ' + r.subBy.name + ' (جوال ' + r.subBy.phone + ')' + (r.subBy.done ? ' — اعتمد التقييم.' : ' — لم يعتمد بعد.');
   else if (D && D.sub) $('subNote').textContent = 'أهلاً ' + D.sub.name + '، أنت معلم بديل لـ«' + D.sub.hname + '» اليوم. سجّل الحضور وتقييم كل طالب حاضر، ثم اعتمد واختر فارس الحلقة. بعد الاعتماد يُقفل الرابط لهذا اليوم.';
@@ -6433,7 +6433,8 @@ async function loadLive(){
 function lvTile(v, l, sub, cls, go){ const d = el('button', 'lvk ' + (cls || '')); d.type = 'button'; d.appendChild(el('b', '', v == null ? '—' : v)); d.appendChild(el('span', '', nLbl(v, l))); if (sub) d.appendChild(el('small', '', sub)); if (go) d.onclick = go; else d.disabled = true; return d; }
 /* الاعتمادات أول الـ Dashboard: نسبة الحلقات المعتمدة اليوم، ثم غير المعتمدة أولاً؛ الضغط يفتح تقييم الحلقة */
 function renderLvAppr(H0, apN, R){
-  const H = H0, DWH = [];   // يوم الديوانية يُحضَّر ويُعتمد كغيره
+  const H = H0.filter(h => !h.trip), DWH = H0.filter(h => h.trip);   // يوم الديوانية يُحضَّر ويُعتمد كغيره؛ حلقات الرحلة لا تحتاج اعتماداً
+  apN = H.filter(h => h.approved).length;
   const b = $('lvAppr'); b.innerHTML = ''; if (lvGoAppr){ lvGoAppr = false; setTimeout(() => b.scrollIntoView({ behavior:'smooth', block:'start' }), 80); } const n = H.length, pct = n ? Math.round(apN * 100 / n) : 0;
   const hd = el('div', 'aph'); hd.appendChild(el('h2', '', 'اعتمادات اليوم')); hd.appendChild(el('span', 'grow'));
   const big = el('div', 'apn', apN + ' '); big.appendChild(el('small', '', 'من ' + n + ' • ' + pct + '%')); hd.appendChild(big); b.appendChild(hd);
@@ -6446,7 +6447,7 @@ function renderLvAppr(H0, apN, R){
       x.appendChild(t2); x.onclick = () => go(h); g.appendChild(x); }); b.appendChild(g); };
   if (!n) return b.appendChild(el('small', 'muted', 'لا توجد حلقات نشطة.'));
   sec('لم تُعتمد بعد', H.filter(h => !h.approved), false); sec('معتمدة', H.filter(h => h.approved), true);
-  if (DWH.length){ b.appendChild(el('div', 'apsec', 'في الديوانية اليوم (لا تحتاج اعتماداً)')); const g = el('div', 'apgrid'); DWH.forEach(h => { const x = el('div', 'api ok'); x.appendChild(el('i')); const t2 = el('div'); t2.appendChild(el('b', '', h.name)); t2.appendChild(el('small', '', 'يوم ديوانية')); x.appendChild(t2); g.appendChild(x); }); b.appendChild(g); }
+  if (DWH.length){ b.appendChild(el('div', 'apsec', 'في رحلة اليوم (لا تحتاج اعتماداً)')); const g = el('div', 'apgrid'); DWH.forEach(h => { const x = el('div', 'api ok'); x.appendChild(el('i')); const t2 = el('div'); t2.appendChild(el('b', '', h.name)); t2.appendChild(el('small', '', 'رحلة: ' + h.trip)); x.appendChild(t2); g.appendChild(x); }); b.appendChild(g); }
 }
 function renderLive(){
   const R = LV, K = R.kpi, at = K.present + K.late, mk = at + K.absent + K.excused;
@@ -6468,7 +6469,7 @@ function renderLive(){
   // الصف 1: الحلقات الآن + الحضور + الموظفون
   const r1 = $('lvRow1'); r1.innerHTML = '';
   const c1 = chCard('الحلقات الآن', 'اضغط الحلقة لتقييمها'); c1.appendChild(chStack(H.map(h => ({ label:h.name + (h.remote ? ' (عن بُعد)' : ''), sub:h.teacher + ' • تسميع ' + h.recs, parts:{ present:h.present, late:h.late, absent:h.absent, excused:h.excused, un:Math.max(0, h.students - h.present - h.late - h.absent - h.excused) }, onclick:() => { openRole('report'); } })),
-    ATT_SEGS.concat([['un', 'لم يُحضَّر', CHC.none]]), { rel:true, text:x => { const h = LV.halaqat.find(h => h.name === x.label.replace(' (عن بُعد)', '')) || {}; return h.approved ? '✓ معتمدة' : h.diw ? 'لم تُعتمد (ديوانية)' : 'لم تُعتمد'; }, empty:'لا توجد حلقات.' })); r1.appendChild(c1);
+    ATT_SEGS.concat([['un', 'لم يُحضَّر', CHC.none]]), { rel:true, text:x => { const h = LV.halaqat.find(h => h.name === x.label.replace(' (عن بُعد)', '')) || {}; return h.approved ? '✓ معتمدة' : h.trip ? '✓ في رحلة' : h.diw ? 'لم تُعتمد (ديوانية)' : 'لم تُعتمد'; }, empty:'لا توجد حلقات.' })); r1.appendChild(c1);
   const c2 = chCard('حضور الطلاب'); c2.appendChild(chDonut(ATT_SEGS.map(x => [x[1], K[x[0]], x[2]]).concat([['لم يُحضَّر', Math.max(0, K.students - mk), CHC.none]]), K.students ? Math.round(at * 100 / K.students) + '%' : '—', 'حضور')); r1.appendChild(c2);
   const c3 = chCard('حضور الموظفين (البصمة)'); c3.appendChild(S0 ? chDonut([['في الوقت', Math.max(0, S0.present - S0.late), CHC.ok], ['متأخر', S0.late, CHC.late], ['إجازة', S0.leave, CHC.exc], ['لم يبصم', S0.missing.length, CHC.abs]], S0.present + '/' + S0.due, 'موظف') : el('div', 'chempty', 'لم يُربط جدول البصمة.')); r1.appendChild(c3);
   // الصف 2: الاتجاه
@@ -6543,8 +6544,8 @@ function openApList(){
         w.appendChild(fb); g.appendChild(w); } else g.appendChild(x); });
     b.appendChild(g); };
   if (one){
-    sec('لم تُعتمد', H.filter(h => !h.apprToday), 'no', h => (h.diwToday ? 'في الديوانية • ' : '') + (h.teacher || 'بلا معلم'));
-    sec('معتمدة', H.filter(h => h.apprToday), 'ok', h => (h.diwToday ? 'ديوانية • ' : '') + (h.teacher || '') + (h.star ? ' • فارس: ' + h.star : ''));
+    sec('لم تُعتمد', H.filter(h => !h.apprToday && !h.tripToday), 'no', h => (h.diwToday ? 'في الديوانية • ' : '') + (h.teacher || 'بلا معلم'));
+    sec('معتمدة أو في رحلة', H.filter(h => h.apprToday || h.tripToday), 'ok', h => (h.tripToday ? 'في رحلة • ' : '') + (h.diwToday ? 'ديوانية • ' : '') + (h.teacher || '') + (h.star ? ' • فارس: ' + h.star : ''));
   } else {
     const L = H.slice().sort((a, b) => (a.approved / (a.studyDays || 1)) - (b.approved / (b.studyDays || 1)));
     sec('لم تكتمل اعتماداتها', L.filter(h => h.approved < h.studyDays), 'no', h => 'اعتمدت ' + h.approved + ' من ' + h.studyDays + ' يوماً' + (h.diwDays ? ' • ديوانية ' + h.diwDays : ''));
@@ -6579,7 +6580,7 @@ function renderDash(){
 }
 const DS_HCOLS = [['name', 'الحلقة'], ['teacher', 'المعلم'], ['students', 'الطلاب'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['recs', 'تسميع'], ['avg', 'متوسط الدرجة'], ['appr', 'الاعتماد']];
 const DS_SCOLS = [['name', 'الطالب'], ['hname', 'الحلقة'], ['att', 'الحضور %'], ['absent', 'غياب'], ['late', 'تأخر'], ['hifz', 'حفظ (آية)'], ['mur', 'مراجعة (آية)'], ['avg', 'متوسط الدرجة'], ['plan', 'إنجاز الخطة %'], ['stars', 'فارس الحلقة'], ['points', 'النقاط'], ['refs', 'إحالات']];
-const hAppr = h => DS.from === DS.to ? (h.diwToday && !h.apprToday ? '✗ لم تُعتمد (ديوانية)' : h.apprToday ? '✓ معتمدة' + (h.star ? ' • فارس: ' + h.star : '') : '✗ لم تُعتمد') : h.approved + '/' + h.studyDays;
+const hAppr = h => DS.from === DS.to ? (h.tripToday && !h.apprToday ? '✓ في رحلة' : h.diwToday && !h.apprToday ? '✗ لم تُعتمد (ديوانية)' : h.apprToday ? '✓ معتمدة' + (h.star ? ' • فارس: ' + h.star : '') : '✗ لم تُعتمد') : h.approved + '/' + h.studyDays;
 function sortBy(list, key, dir){ return list.slice().sort((a, b) => { const x = a[key], y = b[key]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return (typeof x === 'string' ? x.localeCompare(y, 'ar') : x - y) * dir; }); }
 function dsHead(t, cols, which, redraw){
   const tr = el('tr'); cols.forEach(c => { const th = el('th', dsSort[which][0] === c[0] ? 's' + (dsSort[which][1] > 0 ? ' up' : '') : '', c[1]); th.onclick = () => { dsSort[which] = [c[0], dsSort[which][0] === c[0] ? -dsSort[which][1] : (c[0] === 'name' || c[0] === 'hname' || c[0] === 'teacher' ? 1 : -1)]; redraw(); }; tr.appendChild(th); });
