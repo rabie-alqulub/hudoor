@@ -409,6 +409,9 @@
   .ttct{display:flex;gap:8px;flex-wrap:wrap} .ttcall{padding:6px 12px;border-radius:999px;background:var(--light);color:var(--navy);text-decoration:none;font-weight:700;font-size:14px}
   .ttbx{display:flex;align-items:center;gap:8px;flex-wrap:wrap} .ttbx small{color:var(--muted)}
   .ttseg{display:flex;gap:6px} .ttseg button{min-height:40px;min-width:64px;border-radius:12px;border:1px solid var(--line);background:var(--card);font:inherit;font-weight:700;cursor:pointer;color:var(--ink,inherit)} .ttseg button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .rmhd{display:flex;align-items:center;justify-content:space-between;gap:8px} .rmhd h2{margin:0} .rmsum{color:var(--muted);margin:4px 0 8px;font-weight:700}
+  .rmrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)} .rmrow .grow{display:flex;flex-direction:column;gap:2px;min-width:0} .rmrow small{color:var(--muted)} .rmrow.off b{color:#9B1C1C}
+  .rmcall{text-decoration:none} .rmcnt{font-size:12.5px}
   .trr .trvb{min-height:38px;padding:0 14px;border-radius:12px;border:1px solid var(--navy);background:var(--card);color:var(--navy);font:inherit;font-weight:700;cursor:pointer;flex:0 0 auto}
   .trr select.trop{min-width:120px}
   .trkv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 14px;margin:6px 0 4px} .trkv dt{color:var(--muted)} .trkv dd{margin:0;font-weight:700;overflow-wrap:anywhere} .trkv a{color:var(--navy)}
@@ -1259,6 +1262,7 @@
         <div class="hals" id="myHals"></div>
       </div>
       <div id="diwStrip" class="hidden"></div>
+      <div id="rmMon"></div>
       <div id="zmCards"></div>
       <div class="stats" id="stats"></div>
       <div class="card g2only hidden" id="weekCard"><div class="wkhead"><h2>الحضور والتسميع — آخر 7 أيام دراسية</h2><div class="wklg"><span><i style="background:#3B5F78"></i>الحاضرون</span><span><i style="background:#D08E2C"></i>مرات التسميع</span></div></div><div class="wksum" id="weekSum"></div><div id="weekChart"></div></div>
@@ -3372,7 +3376,7 @@ function roleText(){
   return '';
 }
 function renderWelcome(){
-  renderAnnFor('annWelcome'); zmCards();
+  renderAnnFor('annWelcome'); zmCards(); try { rmMon(); } catch(e){}
   const dw = D.diw || {}, ds = $('diwStrip'); ds.classList.toggle('hidden', !(dw.today || dw.next)); ds.innerHTML = '';
   if (dw.today || dw.next){ ds.className = 'diwstrip'; ds.appendChild(el('b', '', 'الديوانية')); if (dw.today){ const a = el('span'); a.appendChild(document.createTextNode('اليوم: ')); a.appendChild(el('i', '', dw.today)); ds.appendChild(a); }
     if (dw.next){ const a = el('span'); a.appendChild(document.createTextNode('القادمة: ')); a.appendChild(el('i', '', dw.next.hname + ' — ' + fmtD(dw.next.date, { weekday:'long', day:'numeric', month:'short' }))); ds.appendChild(a); }
@@ -5066,6 +5070,19 @@ $('zmGo').onclick = async () => {
   if (!r) document.body.classList.remove('zmon'); zmTeachBar();
 };
 $('zmCopy').onclick = () => zmCopyBtn(MTHANI_URL + '?p=student').onclick();   // الطلاب يدخلون الحلقة من صفحاتهم في مثاني
+/* متابعة الحلقات عن بعد اليوم (للمدير ومن يطّلع على التقييم) */
+let rmPoll = null;
+function rmMon(){ const box = $('rmMon'); if (!box) return; box.innerHTML = ''; const L = D && D.remoteToday; clearInterval(rmPoll); if (!L || !L.length) return;
+  const c = el('div', 'card rmcard'), hd = el('div', 'rmhd'), on = L.filter(x => x.live).length, P = L.reduce((a, x) => a + x.p, 0), N = L.reduce((a, x) => a + x.n, 0);
+  hd.appendChild(el('h2', '', 'الحلقات عن بعد اليوم')); const rf = el('button', 'mini', 'تحديث'); rf.type = 'button'; rf.onclick = rmRefresh; hd.appendChild(rf); c.appendChild(hd);
+  c.appendChild(el('div', 'rmsum', 'بدأت ' + on + ' من ' + L.length + ' حلقة • حضر ' + P + ' من ' + N + ' طالباً'));
+  L.forEach(x => { const r = el('div', 'rmrow' + (x.live ? '' : ' off')), a = el('div', 'grow');
+    a.appendChild(el('b', '', x.name)); const t = el('small', '', x.teacher || '—'); if (x.phone){ const k = el('a', 'rmcall', ' 📞'); k.href = 'tel:' + String(x.phone).replace(/\D/g, ''); k.title = 'اتصال بالمعلم'; t.appendChild(k); } a.appendChild(t);
+    const done = x.p + x.a + x.e; a.appendChild(el('small', 'rmcnt', done ? 'حاضر ' + x.p + (x.l ? ' (منهم متأخر ' + x.l + ')' : '') + ' • غائب ' + x.a + ' • مستأذن ' + x.e + ' — من ' + x.n + (x.appr ? ' • ✓ اعتُمد' : '') : 'لم يُسجَّل تحضير بعد (' + x.n + ' طالباً)'));
+    r.appendChild(a); r.appendChild(el('span', 'pill ' + (x.live ? 'p-ok' : 'p-no'), x.live ? 'بدأت ' + x.live : 'لم تبدأ')); c.appendChild(r); });
+  box.appendChild(c);
+  rmPoll = setInterval(() => { if (role === 'welcome' && !document.hidden) rmRefresh(); }, 60000); }
+async function rmRefresh(){ try { const r = await api({ action:'zmState' }); if (r.ok && r.remoteToday){ D.remoteToday = r.remoteToday; if (r.remote) D.remote = r.remote; rmMon(); } } catch(e){} }
 /* بطاقة الحلقة عن بعد للطالب وولي الأمر */
 function zmCards(){
   const box = $('zmCards'); if (!box) return; box.innerHTML = '';
