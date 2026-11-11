@@ -1168,6 +1168,8 @@
   .lvi.a-ref,.lvi.a-abs{background:var(--errbg)} .lvi.a-appr,.lvi.a-plan{background:var(--goldlight)}
   #pDash:fullscreen{background:var(--bg);overflow:auto;padding:20px} #pDash:fullscreen > .card:not(#lvWrap .card){display:none}
   body.g2 .lvk{background:var(--gl);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border-color:var(--glb)} body.g2 .lvk.hero{background:linear-gradient(140deg,#4A7591,#1F3546)} body.g2 .lvi{background:rgba(255,255,255,.45)}
+.zmwait{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(232,170,30,.16);border:1px solid rgba(232,170,30,.45);font-weight:700;font-size:14px;line-height:1.6}
+.zmwait.ok{background:rgba(40,160,80,.14);border-color:rgba(40,160,80,.45)}
 </style>
 </head>
 <body>
@@ -1520,7 +1522,7 @@
 
     <!-- دخول الحلقة عن بعد (للطالب وولي الأمر) -->
     <div id="pZoom" class="hidden">
-      <div class="card"><div class="zmbar"><b id="zmTitle"></b><span class="grow"></span><button class="mini" id="zmLeave">خروج من الحلقة</button></div><div id="zmMsg2"></div></div>
+      <div class="card"><div class="zmbar"><b id="zmTitle"></b><span class="grow"></span><button class="mini" id="zmLeave">خروج من الحلقة</button></div><div id="zmMsg2"></div><div id="zmWait" class="zmwait hidden"></div></div>
       <div class="zmstage" id="zmStage2"></div>
     </div>
 
@@ -5104,7 +5106,7 @@ function zmLost(){ const cur = zmCur; try { zmClient && zmClient.dispose(); } ca
 function zmLeaveOk(){ if (!confirm('أنت داخل الحلقة عن بعد. هل تريد الخروج منها؟')) return false; zmStop(false); return true; }
 window.addEventListener('beforeunload', e => { if (zmCur){ e.preventDefault(); e.returnValue = ''; } });
 async function zmStop(end){
-  const cur = zmCur; zmCur = null; document.body.classList.remove('zmon');
+  const cur = zmCur; zmCur = null; zmWaitOff(); document.body.classList.remove('zmon');
   try { if (zmClient){ zmClient.executeCommand && zmClient.executeCommand('hangup'); zmClient.dispose(); } } catch(e){}
   zmClient = null; ['zmStage', 'zmStage2'].forEach(id => { const x = $(id); if (x){ x.innerHTML = ''; } }); $('zmStage').classList.add('hidden');
   if (end && cur && cur.host) await cpCall({ action:'zmLive', hid:cur.hid, on:0 }, null);
@@ -5142,11 +5144,21 @@ async function rmRefresh(){ try { const r = await api({ action:'zmState' }); if 
 function zmCards(){
   const box = $('zmCards'); if (!box) return; box.innerHTML = '';
   (D.remote || []).filter(x => !x.host).forEach(x => { const c = el('div', 'zmcard'), g = el('div', 'grow'), b = el('b', '', 'حلقة ' + x.name.replace(/^حلقة\s+/, '') + ' عن بعد');
-    if (x.live){ const l = el('span', 'lv', 'مباشر الآن'); b.appendChild(l); } g.appendChild(b); g.appendChild(el('small', '', x.live ? 'بدأت الحلقة الساعة ' + x.live : 'لم تبدأ الحلقة بعد، وستظهر هنا عند بدئها')); c.appendChild(g);
-    const go = el('button', '', x.live ? 'ادخل الحلقة' : 'دخول'); go.onclick = () => zmEnter(x); c.appendChild(go); box.appendChild(c); });
+    if (x.live){ const l = el('span', 'lv', 'مباشر الآن'); b.appendChild(l); } g.appendChild(b); g.appendChild(el('small', '', x.live ? 'بدأت الحلقة الساعة ' + x.live : 'لم يدخل المعلم بعد، ويمكنك الدخول الآن وانتظاره داخل الغرفة')); c.appendChild(g);
+    const go = el('button', '', x.live ? 'ادخل الحلقة' : 'دخول وانتظار المعلم'); go.onclick = () => zmEnter(x); c.appendChild(go); box.appendChild(c); });
   clearInterval(zmPoll); if ((D.remote || []).some(x => !x.host)) zmPoll = setInterval(async () => { if (role !== 'welcome') return; try { const r = await api({ action:'zmState' }); if (r.ok){ D.remote = r.remote; zmCards(); } } catch(e){} }, 45000);
 }
-async function zmEnter(x){ openRole('zoom'); $('zmTitle').textContent = 'حلقة ' + x.name.replace(/^حلقة\s+/, '') + ' عن بعد'; await zmOpen(x.hid, 'zmStage2', 'zmMsg2'); }
+async function zmEnter(x){ openRole('zoom'); $('zmTitle').textContent = 'حلقة ' + x.name.replace(/^حلقة\s+/, '') + ' عن بعد'; const r = await zmOpen(x.hid, 'zmStage2', 'zmMsg2'); if (r && r.ok && !r.host) zmWaitFor(x.hid); }
+/* الطالب يدخل مبكراً: لافتة «المعلم لم ينضم» تتحدث وحدها حتى يبدأ المعلم الحلقة */
+let zmWaitT = null;
+function zmWaitOff(){ clearInterval(zmWaitT); zmWaitT = null; const w = $('zmWait'); if (w) w.classList.add('hidden'); }
+function zmWaitFor(hid){ zmWaitOff(); const w = $('zmWait');
+  const set = live => { w.classList.remove('hidden'); w.classList.toggle('ok', !!live);
+    w.textContent = live ? '✓ انضم المعلم، بدأت الحلقة' : '⏳ المعلم لم ينضم حتى الآن. ابقَ في الغرفة، وستبدأ الحلقة عند دخوله.';
+    if (live){ clearInterval(zmWaitT); zmWaitT = null; setTimeout(() => { if (!zmWaitT) w.classList.add('hidden'); }, 8000); } };
+  const chk = async () => { if (!zmCur || zmCur.hid !== hid) return zmWaitOff();
+    try { const r = await api({ action:'zmState' }); if (r.ok){ D.remote = r.remote; const x = (r.remote || []).find(y => y.hid === hid); if (x && x.live) set(true); else if (zmWaitT) set(false); } } catch(e){} };
+  zmWaitT = setInterval(chk, 20000); set(false); chk(); }
 $('zmLeave').onclick = async () => { if (zmCur && !confirm('هل تريد الخروج من الحلقة؟')) return; await zmStop(false); openRole('welcome'); };
 /* إعدادات ربط الحلقات عن بعد */
 let ZC = null;
