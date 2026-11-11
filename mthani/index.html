@@ -1170,6 +1170,7 @@
   body.g2 .lvk{background:var(--gl);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border-color:var(--glb)} body.g2 .lvk.hero{background:linear-gradient(140deg,#4A7591,#1F3546)} body.g2 .lvi{background:rgba(255,255,255,.45)}
 .zmwait{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(232,170,30,.16);border:1px solid rgba(232,170,30,.45);font-weight:700;font-size:14px;line-height:1.6}
 .zmwait.ok{background:rgba(40,160,80,.14);border-color:rgba(40,160,80,.45)}
+.pastcb{display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-size:13px;line-height:1.6;cursor:pointer}.pastcb input{margin-top:4px;width:18px;height:18px;flex:none}
 </style>
 </head>
 <body>
@@ -4586,6 +4587,9 @@ const ordAr = n => { const u = ['الأولى', 'الثانية', 'الثالث�
   t = ['', '', 'العشرون', 'الثلاثون', 'الأربعون', 'الخمسون', 'الستون', 'السبعون', 'الثمانون', 'التسعون']; n = +n || 0;
   if (n < 1 || n > 99) return 'رقم ' + n; if (n <= 10) return u[n - 1]; if (n < 20) return h[n - 11] + ' عشرة'; return n % 10 ? h[n % 10 - 1] + ' و' + t[Math.floor(n / 10)] : t[n / 10]; };
 const exbName = b => b && b.no ? 'المجموعة رقم ' + b.no : 'مجموعة (مسودة)';
+/* خيار «نتائج سابقة»: طلاب اختُبروا عند مشرف الجمعية قبل مثاني — يُدخل المشرف النتيجة والدرجة فقط، ولا رسائل لأولياء الأمور */
+function exbPastCb(d){ const l = el('label', 'pastcb'), c = el('input'); c.type = 'checkbox'; const t = new Date(Date.now() + 3 * 36e5).toISOString().slice(0, 10); c.checked = d < t;
+  l.appendChild(c); l.appendChild(el('span', '', 'نتائج سابقة (اختُبروا قبل مثاني): يُدخل المشرف «اجتاز/لم يجتز» والدرجة فقط، ولا تُرسل رسائل لأولياء الأمور')); return [l, c]; }
 const exbUrl = b => new URL('exam.html' + (b && b.no ? '?g=' + b.no : ''), location.href).href;
 const wDay = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('ar-SA', { weekday:'long' }); } catch(e){ return ''; } };
 function exbText(b, n){ return 'السلام عليكم ورحمة الله وبركاته\nفضيلة الشيخ ' + String(b.sup).replace(/^(فضيلة\s+)?(الشيخ|الأستاذ)\s+/, '') + ' حفظه الله\n\nنفيدكم باعتماد ' + exbName(b) + ' لاختبار المرحليات لطلاب ' + ((D && D.org) || BR.org || 'منصة مثاني') + ' يوم ' + wDay(b.date) + ' ' + b.date + '، وعددهم ' + n + ' طالب.\n\nرابط ' + exbName(b) + ':\n' + exbUrl(b) +
@@ -4611,7 +4615,7 @@ function renderBatches(){
   ds.forEach(d => { const L = AX.list.filter(x => exbIn(x) && x.examDate === d).sort((a, b) => AX.levels.indexOf(a.level) - AX.levels.indexOf(b.level) || a.sname.localeCompare(b.sname, 'ar'));
     const bt = (AX.batches || []).find(b => b.date === d), stt = bt ? bt.status : AX.exSt.draft, rec = L.filter(x => x.status !== AX.st.nom).length, okN = L.filter(x => x.status === AX.st.ok).length, mid = 'exbM' + d;
     const w = el('div', 'strow'), tp = el('div', 'top'); w.id = 'exb-' + d; tp.appendChild(el('b', '', exbName(stt === AX.exSt.draft ? null : bt) + ' — ' + wDay(d) + ' ' + d)); w.appendChild(tp);
-    const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (stt === AX.exSt.done ? 'p-ok' : stt === AX.exSt.ok ? 'p-late' : 'p-none'), stt)); pl.appendChild(el('span', 'pill p-none', L.length + ' طالب'));
+    const pl = el('div', 'rfpills'); pl.appendChild(el('span', 'pill ' + (stt === AX.exSt.done ? 'p-ok' : stt === AX.exSt.ok ? 'p-late' : 'p-none'), stt)); pl.appendChild(el('span', 'pill p-none', L.length + ' طالب')); if (bt && bt.past) pl.appendChild(el('span', 'pill p-late', 'نتائج سابقة'));
     if (rec) pl.appendChild(el('span', 'pill p-ok', 'النتائج: ' + rec + ' من ' + L.length + ' • اجتاز ' + okN)); w.appendChild(pl);
     const lv = {}; L.forEach(x => lv[x.level] = (lv[x.level] || 0) + 1); w.appendChild(el('div', 'meta', Object.keys(lv).map(k => k.replace('المرحلية ', '') + ' × ' + lv[k]).join(' • ')));
     const tw = el('div'); tw.style.overflowX = 'auto'; const t = el('table', 'pttbl'); t.innerHTML = '<thead><tr><th>م</th><th>الطالب</th><th>الهوية</th><th>المرحلية</th><th>الحلقة</th><th>النتيجة</th></tr></thead>'; const tb = el('tbody');
@@ -4619,7 +4623,8 @@ function renderBatches(){
     t.appendChild(tb); tw.appendChild(t); w.appendChild(tw);
     const ac = el('div', 'stact'), b = (tx, cls, fn) => { const y = el('button', cls, tx); y.onclick = fn; ac.appendChild(y); return y; };
     const ed = el('div'); ed.style.marginTop = '10px'; ed.appendChild(lab('مشرف الجمعية المختبِر', true)); const sp = el('select'); fillSel2(sp, AX.sups.map(s => [s.id, s.name + (s.org ? ' — ' + s.org : '')]), AX.sups.length ? '— اختر المشرف —' : '— أضف مشرفاً أولاً —'); if (bt) sp.value = bt.supId || ''; ed.appendChild(sp);
-    const approve = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر' + (AX.sups.length ? '.' : ' (أضفه من «مشرفو الجمعية» أعلى الصفحة).'), 'err'); exbDo('exbApprove', { base:exbUrl(null), date:d, supId:sp.value }, mid); };
+    const pcb = exbPastCb(d); ed.appendChild(pcb[0]);
+    const approve = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر' + (AX.sups.length ? '.' : ' (أضفه من «مشرفو الجمعية» أعلى الصفحة).'), 'err'); exbDo('exbApprove', { base:exbUrl(null), date:d, supId:sp.value, past:pcb[1].checked ? 1 : 0 }, mid); };
     if (AX.canNom && stt === AX.exSt.draft){ w.appendChild(ed); b('اعتماد المجموعة وإرسالها للمشرف', 'good', approve); }
     if (stt === AX.exSt.done) w.appendChild(el('div', 'msg ok', '✓ اعتمد المشرف نتائج هذه المجموعة، وهي مغلقة للاطلاع فقط.'));
     if (bt && bt.back && stt === AX.exSt.ok) w.appendChild(el('div', 'msg err', 'أُعيدت النتائج للمشرف ليراجعها (' + bt.back.by + ' • ' + String(bt.back.at).slice(0, 16) + '): ' + bt.back.reason));
@@ -5234,15 +5239,15 @@ function renderExam(){
     ds.forEach(d => { const Ld = L.filter(x => x.examDate === d), g = el('div', 'exgrp'), h = el('div', 'exgh'), mid = 'exM' + d; g.id = 'exb-' + d;
       h.appendChild(el('b', '', 'مجموعة ' + wDay(d) + ' ' + d + ' — ' + Ld.length + ' طالب')); g.appendChild(h);
       if (can){ const row = el('div', 'exsend'), sp = el('select'); fillSel2(sp, AX.sups.map(s => [s.id, s.name + (s.org ? ' — ' + s.org : '')]), AX.sups.length ? '— اختر مشرف الجمعية المختبِر —' : '— أضف مشرفاً من «مشرفو الجمعية» —');
-        const go = el('button', 'btn gold', 'اعتماد المجموعة وإرسالها للمشرف'); go.onclick = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر.', 'err'); exbDo('exbApprove', { base:exbUrl(null), date:d, supId:sp.value }, mid).then(r => { if (r && r.ok){ exS = 4; renderExam(); } }); };
-        row.appendChild(sp); row.appendChild(go); g.appendChild(row); const m = el('div'); m.id = mid; g.appendChild(m); }
+        const go = el('button', 'btn gold', 'اعتماد المجموعة وإرسالها للمشرف'); go.onclick = () => { if (!sp.value) return msg(mid, 'اختر المشرف المختبِر.', 'err'); exbDo('exbApprove', { base:exbUrl(null), date:d, supId:sp.value, past:pcb[1].checked ? 1 : 0 }, mid).then(r => { if (r && r.ok){ exS = 4; renderExam(); } }); };
+        const pcb = exbPastCb(d); row.appendChild(sp); row.appendChild(go); g.appendChild(pcb[0]); g.appendChild(row); const m = el('div'); m.id = mid; g.appendChild(m); }
       Ld.forEach(x => stu(x, g)); wrap.appendChild(g); });
     return;
   }
   if (exS === 4){
     if (!X.s4.length) return empty('لا توجد مجموعات عند المشرفين الآن.');
     X.s4.forEach(bt => { const L = AX.list.filter(x => exbIn(x) && x.examDate === bt.date), rec = L.filter(x => x.status !== AX.st.nom).length, g = el('div', 'exgrp'), h = el('div', 'exgh'), mid = 'exM' + bt.date;
-      h.appendChild(el('b', '', exbName(bt) + ' — ' + wDay(bt.date) + ' ' + bt.date)); h.appendChild(el('span', 'pill p-late', 'سُجّلت ' + rec + ' من ' + L.length)); g.appendChild(h);
+      h.appendChild(el('b', '', exbName(bt) + ' — ' + wDay(bt.date) + ' ' + bt.date)); h.appendChild(el('span', 'pill p-late', 'سُجّلت ' + rec + ' من ' + L.length)); if (bt.past) h.appendChild(el('span', 'pill p-none', 'نتائج سابقة')); g.appendChild(h);
       g.appendChild(el('div', 'meta', 'المختبِر: ' + bt.sup + (bt.phone ? ' • ' + bt.phone : '')));
       if (bt.back) g.appendChild(el('div', 'msg err', 'أُعيدت النتائج للمشرف ليراجعها: ' + bt.back.reason));
       const nl = el('div', 'numlist'); L.forEach((x, i) => { const r = el('div', 'numrow'); r.appendChild(el('span', 'no', i + 1)); const nm = el('div', 'nm'); nm.appendChild(el('b', '', x.sname)); nm.appendChild(el('small', '', x.level + ' • ' + x.hname)); r.appendChild(nm);
