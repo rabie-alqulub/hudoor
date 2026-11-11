@@ -2955,6 +2955,7 @@ $('btnCheck').onclick = async () => {
     const r = await api({ action:'check', nid, portal });
     if (!r.ok) return msg('loginMsg', r.msg, 'err');
     store.set('hq_nid', nid); store.set('hq_nid_' + portal, nid);
+    if (r.direct && r.token){ store.set('hq_token', r.token); store.set('hq_must', ''); msg('loginMsg', '', ''); await loadHome(); return; }   // الطلاب برقم الهوية فقط
     $('stepNid').classList.add('hidden');
     if (r.hasPin){ $('hiName').textContent = 'أهلاً ' + r.name; $('stepPin').classList.remove('hidden'); const sp = store.get('hq_nid_' + portal) === nid ? savedPin(portal) : '';
       $('pin').value = sp; $('remember').checked = !!sp || store.get('hq_rem') === '1'; if (sp) $('btnLogin').click(); else $('pin').focus(); }
