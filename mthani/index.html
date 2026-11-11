@@ -1525,7 +1525,7 @@
     <!-- الطلاب المرشحون: ترشيحات المعلمين + الاختبار قبل الترشيح + الموافقة -->
     <div id="pExam" class="hidden">
       <div class="card">
-        <div class="exhead"><h2>المرشحون لاختبار المرحليات</h2><span class="grow"></span><button class="mini" id="exSupBtn" type="button">مشرف الجمعية</button><button class="mini good" id="exAdd" type="button">+ إضافة طالب للاختبار القبلي</button></div>
+        <div class="exhead"><h2>المرشحون لاختبار المرحليات</h2><span class="grow"></span><button class="mini" id="exSupBtn" type="button">مشرف الجمعية</button><button class="mini good" id="exAdd" type="button">+ ترشيح طالب لاختبار الجمعية</button></div>
         <div class="exsteps" id="exSteps"></div>
         <div class="stchips" id="exSub"></div>
         <input id="exQ" placeholder="ابحث باسم الطالب أو الحلقة" style="margin-top:8px">
@@ -4414,7 +4414,7 @@ async function openAssoc(mode){
 function renderAssoc(){
   if (role === 'exams') return renderExam();
   $('asAdd').textContent = asMode === 'preTest' ? '+ إضافة طلاب للاختبار القبلي' : '+ ترشيح طلاب';
-  $('asAdd').classList.toggle('hidden', asMode === 'assocNom');
+  $('asAdd').classList.toggle('hidden', asMode === 'assocNom' || asMode === 'preTest');   // الإضافة للاختبار القبلي أُلغيت؛ القبلي لترشيحات المعلمين
   const isB = asT === 'batch'; $('asXls').classList.toggle('hidden', isB); $('asQ').classList.toggle('hidden', isB);
   const isNom = asMode === 'assocNom' && asT === 'nom', dts = [...new Set(AX.list.filter(x => x.status === AX.st.nom).map(x => x.examDate || ''))].sort();
   if (asDate && dts.indexOf(asDate) === -1) asDate = ''; const dc = $('asDates'); dc.innerHTML = ''; dc.classList.toggle('hidden', !isNom || dts.length < 1); $('asPdf').classList.toggle('hidden', !isNom); $('asSetDate').classList.toggle('hidden', !isNom || !AX.canNom);
@@ -4547,7 +4547,7 @@ $('asShSave').onclick = async () => {
   if (asAct.op === 'exbBack'){ if (!d.reason) return msg('asShMsg', 'اكتب سبب الإرجاع.', 'err'); $('asShSave').disabled = true; await exbDo('exbReturn', d, 'asShMsg'); $('asShSave').disabled = false; return; }
   if (asAct.op === 'sup'){ $('asShSave').disabled = true; await exbDo('supSave', d, 'asShMsg'); $('asShSave').disabled = false; return; }
   $('asShSave').disabled = true; const r = await asDo(asAct.op, asAct.x ? asAct.x.id : '', d, 'asShMsg'); $('asShSave').disabled = false;
-  if (r && r.ok && asAct.op === 'nomMany'){ asT = 'nom'; asDate = r.examDate || ''; renderAssoc(); }
+  if (r && r.ok && asAct.op === 'nomMany'){ asT = 'nom'; asDate = r.examDate || ''; if (role === 'exams') exS = 3; renderAssoc(); }
 };
 $('asXls').onclick = () => {
   if (!AX) return; const list = asList();
@@ -5138,7 +5138,7 @@ function renderExam(){
   EX_STEPS.forEach(t => { const b = el('button', 'exstep' + (exS === t[0] ? ' on' : '') + (cnt[t[0]] ? ' has' : '')); b.type = 'button';
     const tx = el('span'); tx.appendChild(el('b', '', t[1])); tx.appendChild(el('small', '', cnt[t[0]] + (t[0] === 4 ? ' مجموعة' : ' طالب'))); b.appendChild(tx);
     b.onclick = () => { exS = t[0]; exSub = ''; renderExam(); }; sb.appendChild(b); });
-  $('exAdd').classList.toggle('hidden', !can || exS !== 1 || AX.canPre === false); $('exSupBtn').classList.toggle('hidden', !can || !AX.supEdit);
+  $('exAdd').classList.toggle('hidden', !can); $('exSupBtn').classList.toggle('hidden', !can || !AX.supEdit);
   const sup = $('exSupBox'); sup.classList.toggle('hidden', !exSupOpen || !AX.supEdit); if (exSupOpen && AX.supEdit){ sup.innerHTML = ''; const c = el('div', 'card'); supCard(c); sup.appendChild(c); }
   const sub = $('exSub'); sub.innerHTML = ''; const chips = list => { list.forEach(x => { const b = el('button', exSub === x[0] ? 'on' : '', x[1]); b.onclick = () => { exSub = x[0]; renderExam(); }; sub.appendChild(b); }); };
   const box = $('exBox'); box.innerHTML = ''; const wrap = el('div', 'card'); box.appendChild(wrap);
@@ -5202,7 +5202,7 @@ function renderExam(){
     x.cert && /^https?:/.test(x.cert) ? ['الشهادة', () => window.open(x.cert, '_blank')] : null, [['ملف الطالب', () => goFile(x.sid)]])));
 }
 $('exQ').oninput = () => AX && renderExam();
-$('exAdd').onclick = () => asSheet('addMany', null);
+$('exAdd').onclick = () => asSheet('nomMany', null);   // ترشيح الإدارة مباشرة للجمعية (الاختبار القبلي لترشيحات المعلمين فقط)
 $('exSupBtn').onclick = () => { exSupOpen = !exSupOpen; $('exSupBtn').classList.toggle('on', exSupOpen); renderExam(); };
 async function openCands(){ $('cdBox').innerHTML = '<div class="msg info">جاري التحميل...</div>'; const r = await cpCall({ action:'assoc' }, 'cdBox'); if (r && r.ok){ AX = r; renderCands(); } }
 function cdItems(){
@@ -5218,7 +5218,7 @@ function renderCands(){
   if (role === 'exams') return renderExam();
   CD_F = CD_F_ALL.filter(f => f[0] === 'new' || f[0] === 'fail' || (f[0] === 'pass' && cdItems().some(x => x.k === 'pass'))); if (!CD_F.some(f => f[0] === cdF)) cdF = 'new';
   $('cdTitle').textContent = 'الطلاب المرشحون للاختبار القبلي';
-  const all = cdItems(), sum = $('cdSum'); sum.innerHTML = ''; $('cdAdd').classList.toggle('hidden', !AX.canNom || AX.canPre === false);
+  const all = cdItems(), sum = $('cdSum'); sum.innerHTML = ''; $('cdAdd').classList.add('hidden');   // أُلغي: الإدارة ترشّح مباشرة من «المرشحون لاختبار المرحليات»
   CD_F.forEach(f => { const n = all.filter(x => f[0] === 'all' || x.k === f[0]).length; const b = el('button', cdF === f[0] ? 'on' : '', f[1] + ' (' + n + ')'); b.onclick = () => { cdF = f[0]; renderCands(); }; sum.appendChild(b); });
   const q = normAr($('cdQ').value), box = $('cdBox'); box.innerHTML = '';
   const list = all.filter(x => (cdF === 'all' || x.k === cdF) && (!q || normAr(x.name + ' ' + x.hname + ' ' + x.teacher).indexOf(q) !== -1));
