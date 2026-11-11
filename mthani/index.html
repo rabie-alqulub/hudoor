@@ -2999,6 +2999,8 @@ $('btnSetPin').onclick = () => {
   doAuth({ action:'setpin', nid:store.get('hq_nid'), phone4:p4, pin:a }, $('btnSetPin'));
 };
 $('btnLogout').onclick = async () => {
+  if (!confirm(zmCur ? 'أنت داخل الحلقة عن بعد. تسجيل الخروج سيُخرجك من الحلقة ومن مثاني. هل تريد الخروج؟' : 'هل تريد تسجيل الخروج من مثاني؟')) return;
+  if (zmCur) await zmStop(false);
   try { await api({ action:'logout' }); } catch(e){}
   ss.del('hq_route'); store.del('hq_token'); D = null; document.body.classList.remove('ro'); $('peekBar').classList.add('hidden'); portal = ''; store.del('hq_portal'); showLogin('تم تسجيل الخروج.');
 };
@@ -3247,6 +3249,7 @@ window.addEventListener('pagehide', () => { try { const sr = JSON.parse(ss.get('
 let navHist = [], navBacking = false, roleTitle = '', refNav = '';
 const roleName = (r, t) => t || (r === 'welcome' ? 'الرئيسية' : ((document.querySelector('#nav [data-r="' + r + '"]') || {}).dataset || {}).t || ((TABS || []).find(x => x[0] === r) || [])[1] || '');
 function goBack(fromPop){
+  if (zmCur && !zmLeaveOk()){ if (fromPop) try { history.pushState({ m:1 }, ''); } catch(e){} return; }
   const p = navHist.pop(); if (!p){ if (role !== 'welcome'){ navBacking = true; show('vHome'); openRole('welcome'); navBacking = false; window.scrollTo(0, 0); } return; }
   navBacking = true; show('vHome'); openRole(p.r, p.t); navBacking = false; setTimeout(() => window.scrollTo(0, p.y || 0), 350);
 }
@@ -3256,6 +3259,7 @@ $('btnPgBack').onclick = () => goBack(false);
 window.addEventListener('popstate', () => { if (D) goBack(true); });
 function openRole(r, title, group){
   if (r === 'mePin'){ setTimeout(openPin, 50); r = 'me'; }
+  if (!navBacking && zmCur && r !== (zmCur.stage === 'zmStage' ? 'teach' : 'zoom') && !zmLeaveOk()) return;
   if (r === 'refS' || r === 'refE'){ msSec = r === 'refS' ? 'stu' : 'edu'; refNav = r; r = 'myStu'; } else if (r !== 'myStu') refNav = '';
   if (!navBacking && role && role !== r && routeRestored){ if (r === 'welcome') navHist = []; else { navHist.push({ r:role, t:roleTitle, y:window.scrollY }); if (navHist.length > 30) navHist.shift(); try { history.pushState({ m:1 }, ''); } catch(e){} } }
   role = r; roleTitle = title || ''; saveRoute(r, title); setTimeout(backBar, 0);
@@ -5064,23 +5068,32 @@ function zmCopyBtn(url){ const b = el('button', 'link', 'نسخ الرابط'); 
 function zmScript(src){ return new Promise((ok, no) => { const x = document.createElement('script'); x.src = src; x.onload = ok; x.onerror = no; document.head.appendChild(x); }); }
 function zmSdk(app){ if (window.JitsiMeetExternalAPI) return Promise.resolve(); if (!zmLoad) zmLoad = zmScript('https://8x8.vc/' + app + '/external_api.js').catch(e => { zmLoad = null; throw e; }); return zmLoad; }
 /* يفتح الحلقة داخل الصفحة: المعلم مشرف الغرفة، والطالب وولي الأمر مشاركان */
-async function zmOpen(hid, stage, msgBox){
+async function zmOpen(hid, stage, msgBox, again){
   const S0 = $(stage); S0.classList.remove('hidden'); S0.innerHTML = '<div class="zmph">جاري فتح الحلقة...</div>';
   const r = await cpCall({ action:'zmJoin', hid:hid }, msgBox); if (!r || !r.ok){ S0.classList.add('hidden'); return null; }
-  zmCur = { hid:hid, stage:stage, host:r.host };
+  zmCur = { hid:hid, stage:stage, host:r.host, msg:msgBox };
   try {
     await zmSdk(r.app); S0.innerHTML = '';
     const h = Math.max(320, Math.min(innerHeight - 160, Math.round(S0.clientWidth * (innerWidth < 700 ? 1.25 : 0.68))));
     zmClient = new JitsiMeetExternalAPI('8x8.vc', { roomName:r.app + '/' + r.room, parentNode:S0, jwt:r.jwt, width:'100%', height:h, lang:'ar',
       userInfo:{ displayName:r.userName },
       configOverwrite:{ disableDeepLinking:true, prejoinConfig:{ enabled:false }, startWithAudioMuted:!r.host, startWithVideoMuted:!r.host, subject:'حلقة ' + r.name.replace(/^حلقة\s+/, ''),
-        disableInviteFunctions:true, enableWelcomePage:false, enableClosePage:false, hideConferenceSubject:false, toolbarButtons:['microphone', 'camera', 'raisehand', 'tileview', 'fullscreen', 'chat', 'participants-pane', 'settings', 'hangup'].concat(r.host ? ['mute-everyone', 'security'] : []) },
+        disableInviteFunctions:true, enableWelcomePage:false, enableClosePage:false, hideConferenceSubject:false, toolbarButtons:['microphone', 'camera', 'raisehand', 'tileview', 'fullscreen', 'chat', 'participants-pane', 'settings'].concat(r.host ? ['mute-everyone', 'security'] : []) },
       interfaceConfigOverwrite:{ MOBILE_APP_PROMO:false, SHOW_JITSI_WATERMARK:false } });
-    zmClient.addListener('readyToClose', () => zmStop(r.host));
-    if (r.host) await cpCall({ action:'zmLive', hid:hid, on:1 }, null);
+    const me = zmClient; zmClient.addListener('readyToClose', () => { if (zmCur && zmClient === me) zmLost(); });
+    if (r.host && !again) await cpCall({ action:'zmLive', hid:hid, on:1 }, null);
   } catch(e){ S0.innerHTML = '<div class="zmph">تعذّر فتح الحلقة. تحقق من الاتصال بالإنترنت ثم أعد المحاولة.</div>'; }
   return r;
 }
+/* خروج غير مقصود من الغرفة: لا تُنهى الحلقة، ويظهر زر العودة */
+function zmLost(){ const cur = zmCur; try { zmClient && zmClient.dispose(); } catch(e){} zmClient = null;
+  const S0 = $(cur.stage); S0.innerHTML = ''; const w = el('div', 'zmph'); w.appendChild(el('div', '', 'خرجت من الحلقة، والحلقة ما زالت قائمة.'));
+  const b = el('button', 'zmgo', 'العودة للحلقة'); b.type = 'button'; b.style.marginTop = '10px';
+  b.onclick = async () => { b.disabled = true; zmCur = null; const r = await zmOpen(cur.hid, cur.stage, cur.msg, true); if (!r){ zmCur = cur; b.disabled = false; } if (cur.stage === 'zmStage') zmTeachBar(); };
+  w.appendChild(b); S0.appendChild(w); }
+/* قبل مغادرة صفحة الحلقة: تأكيد، ثم خروج من الغرفة دون إنهاء الحلقة للطلاب */
+function zmLeaveOk(){ if (!confirm('أنت داخل الحلقة عن بعد. هل تريد الخروج منها؟')) return false; zmStop(false); return true; }
+window.addEventListener('beforeunload', e => { if (zmCur){ e.preventDefault(); e.returnValue = ''; } });
 async function zmStop(end){
   const cur = zmCur; zmCur = null; document.body.classList.remove('zmon');
   try { if (zmClient){ zmClient.executeCommand && zmClient.executeCommand('hangup'); zmClient.dispose(); } } catch(e){}
@@ -5125,7 +5138,7 @@ function zmCards(){
   clearInterval(zmPoll); if ((D.remote || []).some(x => !x.host)) zmPoll = setInterval(async () => { if (role !== 'welcome') return; try { const r = await api({ action:'zmState' }); if (r.ok){ D.remote = r.remote; zmCards(); } } catch(e){} }, 45000);
 }
 async function zmEnter(x){ openRole('zoom'); $('zmTitle').textContent = 'حلقة ' + x.name.replace(/^حلقة\s+/, '') + ' عن بعد'; await zmOpen(x.hid, 'zmStage2', 'zmMsg2'); }
-$('zmLeave').onclick = async () => { await zmStop(false); openRole('welcome'); };
+$('zmLeave').onclick = async () => { if (zmCur && !confirm('هل تريد الخروج من الحلقة؟')) return; await zmStop(false); openRole('welcome'); };
 /* إعدادات ربط الحلقات عن بعد */
 let ZC = null;
 async function openZoomCfg(){ const r = await cpCall({ action:'zmCfg' }, 'zcMsg'); if (r && r.ok){ ZC = r; fillZc(); } }
