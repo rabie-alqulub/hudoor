@@ -2047,8 +2047,10 @@
       <div id="cpAdd" class="cpsec hidden">
         <div class="card">
           <h3 class="cph">إضافة نقاط</h3>
-          <small>اختر الحلقة، ثم اضغط «إضافة نقاط» بجانب الطالب واكتب عدد النقاط.</small>
+          <small>اختر الحلقة وتاريخ الإضافة، ثم اضغط «إضافة نقاط» بجانب الطالب واكتب عدد النقاط.</small>
           <label for="adHal">الحلقة</label><select id="adHal"></select>
+          <label for="adDate">تاريخ الإضافة</label><input type="date" id="adDate">
+          <small class="muted">اليوم افتراضياً، ويمكن اختيار تاريخ سابق لإضافة نقاط بأثر رجعي.</small>
         </div>
         <div class="card" id="adList"></div>
       </div>
@@ -7736,6 +7738,7 @@ $('byGo').onclick = async () => {
 /* إضافة نقاط */
 let AD = null;
 async function openAdd(){
+  const td = new Date(Date.now() + 3 * 36e5).toISOString().slice(0, 10); $('adDate').max = td; if (!$('adDate').value) $('adDate').value = td;
   if (!$('adHal').options.length || !CP){ const r = await cpCall({ action:'compete' }, 'adList'); if (!r || !r.ok) return; CP = r; }
   const cur = $('adHal').value; fillSel('adHal', CP.halaqat.map(h => [h.hid, h.name]), '— اختر الحلقة —'); $('adHal').value = cur;
   if (!cur) { $('adList').innerHTML = ''; $('adList').appendChild(el('small', '', 'اختر الحلقة لتظهر أسماء طلابها.')); } else loadAdd();
@@ -7754,7 +7757,8 @@ async function loadAdd(){
     open.onclick = () => { if (f.classList.contains('hidden')) w.parentNode.querySelectorAll('.addrow .frm:not(.hidden)').forEach(x => x.classList.add('hidden')); f.classList.toggle('hidden'); if (!f.classList.contains('hidden')) n.focus(); };
     sv.onclick = async () => {
       const v = Number(n.value); if (!(v >= 1)) return toast('اكتب عدد النقاط');
-      sv.disabled = true; const x = await cpCall({ action:'pointsAdd', sid:s.sid, points:v, note:note.value.trim() }); sv.disabled = false;
+      const dt = $('adDate').value; if (!dt || dt > $('adDate').max) return toast('اختر تاريخ الإضافة (اليوم أو تاريخاً سابقاً)');
+      sv.disabled = true; const x = await cpCall({ action:'pointsAdd', sid:s.sid, points:v, note:note.value.trim(), date:dt }); sv.disabled = false;
       if (!x) return; toast(needSrv(x) || x.msg);
       if (x.ok){ bl.textContent = 'الرصيد: ' + x.balance + ' نقطة'; n.value = ''; note.value = ''; f.classList.add('hidden'); }
     };
